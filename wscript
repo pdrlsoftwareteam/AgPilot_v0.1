@@ -480,18 +480,6 @@ def configure(cfg):
     else:
         cfg.load('uavcangen')
 
-    cfg.env.SUBMODULE_UPDATE = cfg.options.submodule_update
-
-    cfg.start_msg('Source is git repository')
-    if cfg.srcnode.find_node('.git'):
-        cfg.end_msg('yes')
-    else:
-        cfg.end_msg('no')
-        cfg.env.SUBMODULE_UPDATE = False
-
-    cfg.msg('Update submodules', 'yes' if cfg.env.SUBMODULE_UPDATE else 'no')
-    cfg.load('git_submodule')
-
     if cfg.options.enable_benchmarks:
         cfg.load('gbenchmark')
     cfg.load('gtest')
@@ -542,8 +530,6 @@ def configure(cfg):
         cfg.end_msg('enabled')
     else:
         cfg.end_msg('disabled', color='YELLOW')
-
-    cfg.env.append_value('GIT_SUBMODULES', 'mavlink')
 
     cfg.env.prepend_value('INCLUDES', [
         cfg.srcnode.abspath() + '/libraries/',
@@ -815,11 +801,6 @@ def build(bld):
         bld.env.AP_LIBRARIES_OBJECTS_KW['use'] += ['dronecan']
 
     _build_cmd_tweaks(bld)
-
-    if bld.env.SUBMODULE_UPDATE:
-        bld.add_group('git_submodules')
-        for name in bld.env.GIT_SUBMODULES:
-            bld.git_submodule(name)
 
     bld.add_group('dynamic_sources')
     _build_dynamic_sources(bld)
