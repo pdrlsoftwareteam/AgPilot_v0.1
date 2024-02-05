@@ -165,11 +165,6 @@ bool AP_RangeFinder_PulsedLightLRF::init(void)
     // LidarLite needs split transfers
     _dev->set_split_transfers(true);
 
-    if (rftype == RangeFinder::Type::PLI2CV3) {
-        v2_hardware = true;
-    } else if (rftype == RangeFinder::Type::PLI2CV3HP) {
-        v3hp_hardware = true;
-    } else {
         // auto-detect v1 vs v2
         if (!(_dev->read_registers(LL40LS_HW_VERSION, &hw_version, 1) &&
               hw_version > 0 &&
@@ -180,7 +175,6 @@ bool AP_RangeFinder_PulsedLightLRF::init(void)
             goto failed;
         }
         v2_hardware = (hw_version >= 0x15);
-    }
     
     const struct settings_table *table;
     uint8_t num_settings;
