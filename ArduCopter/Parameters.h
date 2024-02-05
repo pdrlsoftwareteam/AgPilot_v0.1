@@ -461,9 +461,6 @@ public:
     AP_Float        fs_ekf_thresh;
     AP_Int16        gcs_pid_mask;
 
-#if MODE_THROW_ENABLED == ENABLED
-    AP_Enum<ModeThrow::PreThrowMotorState>         throw_motor_start;
-#endif
 
     AP_Int16                rc_speed; // speed of fast RC Channels in Hz
 
@@ -502,11 +499,6 @@ public:
     AP_Gripper gripper;
 #endif
 
-#if MODE_THROW_ENABLED == ENABLED
-    // Throw mode parameters
-    AP_Int8 throw_nextmode;
-    AP_Enum<ModeThrow::ThrowType> throw_type;
-#endif
 
     // ground effect compensation enable/disable
     AP_Int8 gndeffect_comp_enabled;
@@ -562,16 +554,6 @@ public:
 
 #if TOY_MODE_ENABLED == ENABLED
     ToyMode toy_mode;
-#endif
-
-#if MODE_FLOWHOLD_ENABLED
-    // we need a pointer to the mode for the G2 table
-    void *mode_flowhold_ptr;
-#endif
-
-#if MODE_FOLLOW_ENABLED == ENABLED
-    // follow
-    AP_Follow follow;
 #endif
 
 #ifdef USER_PARAMS_ENABLED
