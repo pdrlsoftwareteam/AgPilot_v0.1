@@ -627,18 +627,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         do_loiter_unlimited(cmd);
         break;
 
-    case MAV_CMD_NAV_LOITER_TURNS:              //18 Loiter N Times
-        do_circle(cmd);
-        break;
-
-    case MAV_CMD_NAV_LOITER_TIME:              // 19
-        do_loiter_time(cmd);
-        break;
-
-    case MAV_CMD_NAV_LOITER_TO_ALT:
-        do_loiter_to_alt(cmd);
-        break;
-
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:             //20
         do_RTL();
         break;
@@ -660,12 +648,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
     case MAV_CMD_NAV_PAYLOAD_PLACE:              // 94 place at Waypoint
         do_payload_place(cmd);
         break;
-
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        do_nav_script_time(cmd);
-        break;
-#endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
         do_nav_attitude_time(cmd);
@@ -718,12 +700,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         }
 #endif //AP_FENCE_ENABLED
         break;
-
-#if NAV_GUIDED == ENABLED
-    case MAV_CMD_DO_GUIDED_LIMITS:                      // 220  accept guided mode limits
-        do_guided_limits(cmd);
-        break;
-#endif
 
 #if AP_WINCH_ENABLED
     case MAV_CMD_DO_WINCH:                             // Mission command to control winch
@@ -873,17 +849,6 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
         cmd_complete = verify_loiter_unlimited();
         break;
 
-    case MAV_CMD_NAV_LOITER_TURNS:
-        cmd_complete = verify_circle(cmd);
-        break;
-
-    case MAV_CMD_NAV_LOITER_TIME:
-        cmd_complete = verify_loiter_time(cmd);
-        break;
-
-    case MAV_CMD_NAV_LOITER_TO_ALT:
-        return verify_loiter_to_alt();
-
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:
         cmd_complete = verify_RTL();
         break;
@@ -901,12 +866,6 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
      case MAV_CMD_NAV_DELAY:
         cmd_complete = verify_nav_delay(cmd);
         break;
-
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        cmd_complete = verify_nav_script_time();
-        break;
-#endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
         cmd_complete = verify_nav_attitude_time(cmd);
@@ -932,7 +891,6 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
     case MAV_CMD_DO_SET_HOME:
     case MAV_CMD_DO_SET_ROI:
     case MAV_CMD_DO_MOUNT_CONTROL:
-    case MAV_CMD_DO_GUIDED_LIMITS:
     case MAV_CMD_DO_FENCE_ENABLE:
     case MAV_CMD_DO_WINCH:
     case MAV_CMD_DO_LAND_START:
@@ -1521,7 +1479,6 @@ bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const
     switch (next_cmd.id) {
     case MAV_CMD_NAV_WAYPOINT:
     case MAV_CMD_NAV_LOITER_UNLIM:
-    case MAV_CMD_NAV_LOITER_TIME:
     case MAV_CMD_NAV_PAYLOAD_PLACE: {
         const Location dest_loc = loc_from_cmd(current_cmd, default_loc);
         const Location next_dest_loc = loc_from_cmd(next_cmd, dest_loc);
@@ -1537,7 +1494,6 @@ bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const
     case MAV_CMD_NAV_VTOL_LAND:
     case MAV_CMD_NAV_LAND:
         // stop because we may change between rel,abs and terrain alt types
-    case MAV_CMD_NAV_LOITER_TURNS:
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:
     case MAV_CMD_NAV_VTOL_TAKEOFF:
     case MAV_CMD_NAV_TAKEOFF:
@@ -1630,11 +1586,6 @@ void ModeAuto::do_circle(const AP_Mission::Mission_Command& cmd)
 
     // calculate radius
     uint16_t circle_radius_m = HIGHBYTE(cmd.p1); // circle radius held in high byte of p1
-    if (cmd.id == MAV_CMD_NAV_LOITER_TURNS &&
-        cmd.type_specific_bits & (1U << 0)) {
-        // special storage handling allows for larger radii
-        circle_radius_m *= 10;
-    }
 
     // true if circle should be ccw
     const bool circle_direction_ccw = cmd.content.location.loiter_ccw;
