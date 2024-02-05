@@ -467,17 +467,6 @@ public:
 
     AP_Int16                rc_speed; // speed of fast RC Channels in Hz
 
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    // Acro parameters
-    AP_Float                acro_balance_roll;
-    AP_Float                acro_balance_pitch;
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED
-    // Acro parameters
-    AP_Int8                 acro_trainer;
-#endif
-
     // Note: keep initializers here in the same order as they are declared
     // above.
     Parameters()
@@ -545,10 +534,6 @@ public:
 
     // developer options
     AP_Int32 dev_options;
-
-#if MODE_ACRO_ENABLED == ENABLED
-    AP_Float acro_thr_mid;
-#endif
 
     // frame class
     AP_Int8 frame_class;
@@ -632,20 +617,7 @@ public:
     void *mode_zigzag_ptr;
 #endif
 
-    // command model parameters
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    AC_CommandModel command_model_acro_rp;
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_DRIFT_ENABLED == ENABLED
-    AC_CommandModel command_model_acro_y;
-#endif
-
     AC_CommandModel command_model_pilot;
-
-#if MODE_ACRO_ENABLED == ENABLED
-    AP_Int8 acro_options;
-#endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     AP_Int32 auto_options;
@@ -680,10 +652,6 @@ public:
     AP_Float takeoff_throttle_slew_time;
 #if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
     AP_Int16 takeoff_rpm_min;
-#endif
-
-#if WEATHERVANE_ENABLED == ENABLED
-    AC_WeatherVane weathervane;
 #endif
 
     // payload place parameters

@@ -157,12 +157,6 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Acro - fly vehicle in acrobatic mode
-#ifndef MODE_ACRO_ENABLED
-# define MODE_ACRO_ENABLED ENABLED
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Auto mode - allows vehicle to trace waypoints and perform automated actions
 #ifndef MODE_AUTO_ENABLED
 # define MODE_AUTO_ENABLED ENABLED
@@ -591,10 +585,6 @@
 
 #if MODE_AUTO_ENABLED && !MODE_RTL_ENABLED
   #error ModeAuto requires ModeRTL which is disabled
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME && !MODE_ACRO_ENABLED
-  #error Helicopter frame requires acro mode support which is disabled
 #endif
 
 #if MODE_SMARTRTL_ENABLED && !MODE_RTL_ENABLED

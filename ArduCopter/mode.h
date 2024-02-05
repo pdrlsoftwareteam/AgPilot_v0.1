@@ -122,10 +122,6 @@ public:
     virtual bool pause() { return false; };
     virtual bool resume() { return false; };
 
-    // true if weathervaning is allowed in the current mode
-#if WEATHERVANE_ENABLED == ENABLED
-    virtual bool allows_weathervaning() const { return false; }
-#endif
 
 protected:
 
@@ -272,10 +268,6 @@ public:
 
         bool reached_fixed_yaw_target();
 
-#if WEATHERVANE_ENABLED == ENABLED
-        void update_weathervane(const int16_t pilot_yaw_cds);
-#endif
-
         AC_AttitudeControl::HeadingCommand get_heading();
 
     private:
@@ -327,71 +319,6 @@ public:
     uint16_t get_pilot_speed_dn(void);
     // end pass-through functions
 };
-
-
-#if MODE_ACRO_ENABLED == ENABLED
-class ModeAcro : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::ACRO; }
-
-    enum class Trainer {
-        OFF = 0,
-        LEVELING = 1,
-        LIMITED = 2,
-    };
-
-    enum class AcroOptions {
-        AIR_MODE = 1 << 0,
-        RATE_LOOP_ONLY = 1 << 1,
-    };
-
-    virtual void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    // whether an air-mode aux switch has been toggled
-    void air_mode_aux_changed();
-    bool allows_save_trim() const override { return true; }
-    bool allows_flip() const override { return true; }
-
-protected:
-
-    const char *name() const override { return "ACRO"; }
-    const char *name4() const override { return "ACRO"; }
-
-    // get_pilot_desired_angle_rates - transform pilot's normalised roll pitch and yaw input into a desired lean angle rates
-    // inputs are -1 to 1 and the function returns desired angle rates in centi-degrees-per-second
-    void get_pilot_desired_angle_rates(float roll_in, float pitch_in, float yaw_in, float &roll_out, float &pitch_out, float &yaw_out);
-
-    float throttle_hover() const override;
-
-private:
-    bool disable_air_mode_reset;
-};
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-class ModeAcro_Heli : public ModeAcro {
-
-public:
-    // inherit constructor
-    using ModeAcro::Mode;
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-    void virtual_flybar( float &roll_out, float &pitch_out, float &yaw_out, float pitch_leak, float roll_leak);
-
-protected:
-private:
-};
-#endif
 
 
 class ModeAltHold : public Mode {
@@ -508,10 +435,6 @@ public:
     // Mission change detector
     AP_Mission_ChangeDetector mis_change_detector;
 
-    // true if weathervaning is allowed in auto
-#if WEATHERVANE_ENABLED == ENABLED
-    bool allows_weathervaning(void) const override;
-#endif
 
 protected:
 
@@ -801,163 +724,6 @@ private:
 };
 
 
-class ModeDrift : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::DRIFT; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-
-protected:
-
-    const char *name() const override { return "DRIFT"; }
-    const char *name4() const override { return "DRIF"; }
-
-private:
-
-    float get_throttle_assist(float velz, float pilot_throttle_scaled);
-
-};
-
-
-class ModeFlip : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::FLIP; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
-    bool is_autopilot() const override { return false; }
-
-protected:
-
-    const char *name() const override { return "FLIP"; }
-    const char *name4() const override { return "FLIP"; }
-
-private:
-
-    // Flip
-    Vector3f orig_attitude;         // original vehicle attitude before flip
-
-    enum class FlipState : uint8_t {
-        Start,
-        Roll,
-        Pitch_A,
-        Pitch_B,
-        Recover,
-        Abandon
-    };
-    FlipState _state;               // current state of flip
-    Mode::Number   orig_control_mode;   // flight mode when flip was initated
-    uint32_t  start_time_ms;          // time since flip began
-    int8_t    roll_dir;            // roll direction (-1 = roll left, 1 = roll right)
-    int8_t    pitch_dir;           // pitch direction (-1 = pitch forward, 1 = pitch back)
-};
-
-
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-/*
-  class to support FLOWHOLD mode, which is a position hold mode using
-  optical flow directly, avoiding the need for a rangefinder
- */
-
-class ModeFlowHold : public Mode {
-public:
-    // need a constructor for parameters
-    ModeFlowHold(void);
-    Number mode_number() const override { return Number::FLOWHOLD; }
-
-    bool init(bool ignore_checks) override;
-    void run(void) override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool has_user_takeoff(bool must_navigate) const override {
-        return !must_navigate;
-    }
-    bool allows_flip() const override { return true; }
-
-    static const struct AP_Param::GroupInfo var_info[];
-
-protected:
-    const char *name() const override { return "FLOWHOLD"; }
-    const char *name4() const override { return "FHLD"; }
-
-private:
-
-    // FlowHold states
-    enum FlowHoldModeState {
-        FlowHold_MotorStopped,
-        FlowHold_Takeoff,
-        FlowHold_Flying,
-        FlowHold_Landed
-    };
-
-    // calculate attitude from flow data
-    void flow_to_angle(Vector2f &bf_angle);
-
-    LowPassFilterVector2f flow_filter;
-
-    bool flowhold_init(bool ignore_checks);
-    void flowhold_run();
-    void flowhold_flow_to_angle(Vector2f &angle, bool stick_input);
-    void update_height_estimate(void);
-
-    // minimum assumed height
-    const float height_min = 0.1f;
-
-    // maximum scaling height
-    const float height_max = 3.0f;
-
-    AP_Float flow_max;
-    AC_PI_2D flow_pi_xy{0.2f, 0.3f, 3000, 5, 0.0025f};
-    AP_Float flow_filter_hz;
-    AP_Int8  flow_min_quality;
-    AP_Int8  brake_rate_dps;
-
-    float quality_filtered;
-
-    uint8_t log_counter;
-    bool limited;
-    Vector2f xy_I;
-
-    // accumulated INS delta velocity in north-east form since last flow update
-    Vector2f delta_velocity_ne;
-
-    // last flow rate in radians/sec in north-east axis
-    Vector2f last_flow_rate_rps;
-
-    // timestamp of last flow data
-    uint32_t last_flow_ms;
-
-    float last_ins_height;
-    float height_offset;
-
-    // are we braking after pilot input?
-    bool braking;
-
-    // last time there was significant stick input
-    uint32_t last_stick_input_ms;
-};
-#endif // MODE_FLOWHOLD_ENABLED
-
-
 class ModeGuided : public Mode {
 
 public:
@@ -1045,10 +811,6 @@ public:
     bool pause() override;
     bool resume() override;
 
-    // true if weathervaning is allowed in guided
-#if WEATHERVANE_ENABLED == ENABLED
-    bool allows_weathervaning(void) const override;
-#endif
 
 protected:
 

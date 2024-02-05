@@ -97,14 +97,12 @@ void RC_Channel_Copter::init_aux_function(const aux_func_t ch_option, const AuxS
     case AUX_FUNC::ZIGZAG:
     case AUX_FUNC::ZIGZAG_Auto:
     case AUX_FUNC::ZIGZAG_SaveWP:
-    case AUX_FUNC::ACRO:
     case AUX_FUNC::AUTO_RTL:
     case AUX_FUNC::TURTLE:
     case AUX_FUNC::SIMPLE_HEADING_RESET:
     case AUX_FUNC::ARMDISARM_AIRMODE:
     case AUX_FUNC::TURBINE_START:
         break;
-    case AUX_FUNC::ACRO_TRAINER:
     case AUX_FUNC::ATTCON_ACCEL_LIM:
     case AUX_FUNC::ATTCON_FEEDFWD:
     case AUX_FUNC::INVERTED:
@@ -266,25 +264,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 #endif
             break;
 
-        case AUX_FUNC::ACRO_TRAINER:
-#if MODE_ACRO_ENABLED == ENABLED
-            switch(ch_flag) {
-                case AuxSwitchPos::LOW:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::OFF);
-                    AP::logger().Write_Event(LogEvent::ACRO_TRAINER_OFF);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::LEVELING);
-                    AP::logger().Write_Event(LogEvent::ACRO_TRAINER_LEVELING);
-                    break;
-                case AuxSwitchPos::HIGH:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::LIMITED);
-                    AP::logger().Write_Event(LogEvent::ACRO_TRAINER_LIMITED);
-                    break;
-            }
-#endif
-            break;
-
         case AUX_FUNC::AUTOTUNE:
 #if AUTOTUNE_ENABLED == ENABLED
             do_aux_function_change_mode(Mode::Number::AUTOTUNE, ch_flag);
@@ -381,12 +360,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
         case AUX_FUNC::BRAKE:
 #if MODE_BRAKE_ENABLED == ENABLED
             do_aux_function_change_mode(Mode::Number::BRAKE, ch_flag);
-#endif
-            break;
-
-        case AUX_FUNC::THROW:
-#if MODE_THROW_ENABLED == ENABLED
-            do_aux_function_change_mode(Mode::Number::THROW, ch_flag);
 #endif
             break;
 
@@ -506,28 +479,9 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             do_aux_function_change_mode(Mode::Number::ALT_HOLD, ch_flag);
             break;
 
-
-        case AUX_FUNC::ACRO:
-#if MODE_ACRO_ENABLED == ENABLED
-            do_aux_function_change_mode(Mode::Number::ACRO, ch_flag);
-#endif
-            break;
-
-        case AUX_FUNC::FLOWHOLD:
-#if MODE_FLOWHOLD_ENABLED
-            do_aux_function_change_mode(Mode::Number::FLOWHOLD, ch_flag);
-#endif
-            break;
-
         case AUX_FUNC::CIRCLE:
 #if MODE_CIRCLE_ENABLED == ENABLED
             do_aux_function_change_mode(Mode::Number::CIRCLE, ch_flag);
-#endif
-            break;
-
-        case AUX_FUNC::DRIFT:
-#if MODE_DRIFT_ENABLED == ENABLED
-            do_aux_function_change_mode(Mode::Number::DRIFT, ch_flag);
 #endif
             break;
 
@@ -578,9 +532,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 
         case AUX_FUNC::AIRMODE:
             do_aux_function_change_air_mode(ch_flag);
-#if MODE_ACRO_ENABLED == ENABLED && FRAME_CONFIG != HELI_FRAME
-            copter.mode_acro.air_mode_aux_changed();
-#endif
             break;
 
         case AUX_FUNC::FORCEFLYING:
@@ -590,12 +541,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
         case AUX_FUNC::AUTO_RTL:
 #if MODE_AUTO_ENABLED == ENABLED
             do_aux_function_change_mode(Mode::Number::AUTO_RTL, ch_flag);
-#endif
-            break;
-
-        case AUX_FUNC::TURTLE:
-#if MODE_TURTLE_ENABLED == ENABLED
-            do_aux_function_change_mode(Mode::Number::TURTLE, ch_flag);
 #endif
             break;
 
@@ -617,22 +562,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
         case AUX_FUNC::CUSTOM_CONTROLLER:
             copter.custom_control.set_custom_controller(ch_flag == AuxSwitchPos::HIGH);
             break;
-#endif
-
-#if WEATHERVANE_ENABLED == ENABLED
-    case AUX_FUNC::WEATHER_VANE_ENABLE: {
-        switch (ch_flag) {
-            case AuxSwitchPos::HIGH:
-                copter.g2.weathervane.allow_weathervaning(true);
-                break;
-            case AuxSwitchPos::MIDDLE:
-                break;
-            case AuxSwitchPos::LOW:
-                copter.g2.weathervane.allow_weathervaning(false);
-                break;
-        }
-        break;
-    }
 #endif
 
     default:

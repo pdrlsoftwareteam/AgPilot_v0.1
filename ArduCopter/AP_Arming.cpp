@@ -203,14 +203,6 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
             return false;
         }
 
-        // acro balance parameter check
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-        if ((copter.g.acro_balance_roll > copter.attitude_control->get_angle_roll_p().kP()) || (copter.g.acro_balance_pitch > copter.attitude_control->get_angle_pitch_p().kP())) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Check ACRO_BAL_ROLL/PITCH");
-            return false;
-        }
-#endif
-
         // pilot-speed-up parameter check
         if (copter.g.pilot_speed_up <= 0) {
             check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Check PILOT_SPEED_UP");
@@ -637,7 +629,7 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
             }
             // in manual modes throttle must be at zero
             #if FRAME_CONFIG != HELI_FRAME
-            if ((copter.flightmode->has_manual_throttle() || copter.flightmode->mode_number() == Mode::Number::DRIFT) && copter.channel_throttle->get_control_in() > 0) {
+            if (copter.flightmode->has_manual_throttle() && copter.channel_throttle->get_control_in() > 0) {
                 check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
                 return false;
             }
