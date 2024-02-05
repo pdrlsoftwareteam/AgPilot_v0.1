@@ -96,23 +96,10 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::AVOID_ADSB:
             ret = &mode_avoid_adsb;
             break;
-#endif
-
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-        case Mode::Number::GUIDED_NOGPS:
-            ret = &mode_guided_nogps;
-            break;
-#endif
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
         case Mode::Number::SMART_RTL:
             ret = &mode_smartrtl;
-            break;
-#endif
-
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-        case Mode::Number::FLOWHOLD:
-            ret = (Mode *)g2.mode_flowhold_ptr;
             break;
 #endif
 

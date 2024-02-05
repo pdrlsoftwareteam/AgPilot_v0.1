@@ -1091,12 +1091,6 @@ ParametersG2::ParametersG2(void)
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ,smart_rtl()
 #endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ,mode_flowhold_ptr(&copter.mode_flowhold)
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ,follow()
-#endif
 #ifdef USER_PARAMS_ENABLED
     ,user_parameters()
 #endif
@@ -1224,24 +1218,12 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_pid_rate_yaw, 0, AP_PARAM_FLOAT, "ATC_RAT_YAW_P" },
         { Parameters::k_param_pid_rate_yaw, 1, AP_PARAM_FLOAT, "ATC_RAT_YAW_I" },
         { Parameters::k_param_pid_rate_yaw, 2, AP_PARAM_FLOAT, "ATC_RAT_YAW_D" },
-#if FRAME_CONFIG == HELI_FRAME
-        // PARAMETER_CONVERSION - Added: May-2016
-        { Parameters::k_param_pid_rate_roll,  4, AP_PARAM_FLOAT, "ATC_RAT_RLL_VFF" },
-        { Parameters::k_param_pid_rate_pitch, 4, AP_PARAM_FLOAT, "ATC_RAT_PIT_VFF" },
-        { Parameters::k_param_pid_rate_yaw  , 4, AP_PARAM_FLOAT, "ATC_RAT_YAW_VFF" },
-#endif
     };
     const AP_Param::ConversionInfo imax_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Apr-2016
         { Parameters::k_param_pid_rate_roll,  5, AP_PARAM_FLOAT, "ATC_RAT_RLL_IMAX" },
         { Parameters::k_param_pid_rate_pitch, 5, AP_PARAM_FLOAT, "ATC_RAT_PIT_IMAX" },
         { Parameters::k_param_pid_rate_yaw,   5, AP_PARAM_FLOAT, "ATC_RAT_YAW_IMAX" },
-#if FRAME_CONFIG == HELI_FRAME
-        // PARAMETER_CONVERSION - Added: May-2016
-        { Parameters::k_param_pid_rate_roll,  7, AP_PARAM_FLOAT, "ATC_RAT_RLL_ILMI" },
-        { Parameters::k_param_pid_rate_pitch, 7, AP_PARAM_FLOAT, "ATC_RAT_PIT_ILMI" },
-        { Parameters::k_param_pid_rate_yaw,   7, AP_PARAM_FLOAT, "ATC_RAT_YAW_ILMI" },
-#endif
     };
     // conversion from Copter-3.3 to Copter-3.4
     const AP_Param::ConversionInfo angle_and_filt_conversion_info[] = {
@@ -1324,42 +1306,10 @@ void Copter::convert_pid_parameters(void)
         AP_Param::convert_old_parameter(&info, 1.0f);
     }
 
-    // TradHeli default parameters
-#if FRAME_CONFIG == HELI_FRAME
-    static const struct AP_Param::defaults_table_struct heli_defaults_table[] = {
-        // PARAMETER_CONVERSION - Added: Nov-2018
-        { "LOIT_ACC_MAX", 500.0f },
-        { "LOIT_BRK_ACCEL", 125.0f },
-        { "LOIT_BRK_DELAY", 1.0f },
-        { "LOIT_BRK_JERK", 250.0f },
-        { "LOIT_SPEED", 3000.0f },
-        { "PHLD_BRAKE_ANGLE", 800.0f },
-        { "PHLD_BRAKE_RATE", 4.0f },
-        { "PSC_ACCZ_P", 0.28f },
-        { "PSC_VELXY_D", 0.0f },
-        { "PSC_VELXY_I", 0.5f },
-        { "PSC_VELXY_P", 1.0f },
-        // PARAMETER_CONVERSION - Added: Jan-2019
-        { "RC8_OPTION", 32 },
-        // PARAMETER_CONVERSION - Added: Aug-2018
-        { "RC_OPTIONS", 0 },
-        // PARAMETER_CONVERSION - Added: Feb-2022
-        { "ATC_RAT_RLL_ILMI", 0.05},
-        { "ATC_RAT_PIT_ILMI", 0.05},
-    };
-    AP_Param::set_defaults_from_table(heli_defaults_table, ARRAY_SIZE(heli_defaults_table));
-#endif
 
     // attitude and position control filter parameter changes (from _FILT to FLTD, FLTE, FLTT) for Copter-4.0
     // magic numbers shown below are discovered by setting AP_PARAM_KEY_DUMP = 1
     const AP_Param::ConversionInfo ff_and_filt_conversion_info[] = {
-#if FRAME_CONFIG == HELI_FRAME
-        // tradheli moves ATC_RAT_RLL/PIT_FILT to FLTE, ATC_RAT_YAW_FILT to FLTE
-        // PARAMETER_CONVERSION - Added: Jul-2019
-        { Parameters::k_param_attitude_control, 386, AP_PARAM_FLOAT, "ATC_RAT_RLL_FLTE" },
-        { Parameters::k_param_attitude_control, 387, AP_PARAM_FLOAT, "ATC_RAT_PIT_FLTE" },
-        { Parameters::k_param_attitude_control, 388, AP_PARAM_FLOAT, "ATC_RAT_YAW_FLTE" },
-#else
         // multicopters move ATC_RAT_RLL/PIT_FILT to FLTD & FLTT, ATC_RAT_YAW_FILT to FLTE
         { Parameters::k_param_attitude_control, 385, AP_PARAM_FLOAT, "ATC_RAT_RLL_FLTD" },
         // PARAMETER_CONVERSION - Added: Oct-2019
@@ -1373,7 +1323,6 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_attitude_control, 449, AP_PARAM_FLOAT, "ATC_RAT_RLL_FF" },
         { Parameters::k_param_attitude_control, 450, AP_PARAM_FLOAT, "ATC_RAT_PIT_FF" },
         { Parameters::k_param_attitude_control, 451, AP_PARAM_FLOAT, "ATC_RAT_YAW_FF" },
-#endif
         // PARAMETER_CONVERSION - Added: Oct-2019
         { Parameters::k_param_pos_control, 388, AP_PARAM_FLOAT, "PSC_ACCZ_FLTE" },
     };
@@ -1509,191 +1458,5 @@ void Copter::convert_lgr_parameters(void)
         servo_trim->set_and_save(old_deploy);
         servo_reversed->set_and_save_ifchanged(1);
     }
-}
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-// handle conversion of tradheli parameters from Copter-3.6 to Copter-3.7
-void Copter::convert_tradheli_parameters(void) const
-{
-        // PARAMETER_CONVERSION - Added: Mar-2019
-    if (g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI) {
-        // single heli conversion info
-        const AP_Param::ConversionInfo singleheli_conversion_info[] = {
-            { Parameters::k_param_motors, 1, AP_PARAM_INT16, "H_SW_H3_SV1_POS" },
-            { Parameters::k_param_motors, 2, AP_PARAM_INT16, "H_SW_H3_SV2_POS" },
-            { Parameters::k_param_motors, 3, AP_PARAM_INT16, "H_SW_H3_SV3_POS" },
-            { Parameters::k_param_motors, 7, AP_PARAM_INT16, "H_SW_H3_PHANG" },
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW_COL_DIR" },
-        };
-
-        // convert single heli parameters without scaling
-        uint8_t table_size = ARRAY_SIZE(singleheli_conversion_info);
-        for (uint8_t i=0; i<table_size; i++) {
-            AP_Param::convert_old_parameter(&singleheli_conversion_info[i], 1.0f);
-        }
-
-        // convert to known swash type for setups that match
-        // PARAMETER_CONVERSION - Added: Sep-2019
-        AP_Int16 swash_pos_1, swash_pos_2, swash_pos_3, swash_phang; 
-        AP_Int8  swash_type;
-        bool swash_pos1_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[0], &swash_pos_1);
-        bool swash_pos2_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[1], &swash_pos_2);
-        bool swash_pos3_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[2], &swash_pos_3);
-        bool swash_phang_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[3], &swash_phang);
-        const AP_Param::ConversionInfo swash_type_info { Parameters::k_param_motors, 5, AP_PARAM_INT8, "H_SW_TYPE" };
-        bool swash_type_exists = AP_Param::find_old_parameter(&swash_type_info, &swash_type);
-
-        if (swash_type_exists) {
-            // convert swash type to new parameter
-            AP_Param::convert_old_parameter(&swash_type_info, 1.0f);
-        } else {
-        // old swash type is not in eeprom and thus type is default value of generic swash
-            if (swash_pos1_exist || swash_pos2_exist || swash_pos3_exist || swash_phang_exist) {
-                // if any params exist with the generic swash then the upgraded swash type must be generic
-                // find the new variable in the variable structures
-                enum ap_var_type ptype;
-                AP_Param *ap2;
-                ap2 = AP_Param::find("H_SW_TYPE", &ptype);
-                // make sure the pointer is valid
-                if (ap2 != nullptr) {
-                    // see if we can load it from EEPROM
-                    if (!ap2->configured()) {
-                        // the new parameter is not in storage so set generic swash
-                        AP_Param::set_and_save_by_name("H_SW_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                    }
-                }
-            }
-        }
-    } else if (g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI_DUAL) {
-        // dual heli conversion info
-        const AP_Param::ConversionInfo dualheli_conversion_info[] = {
-            { Parameters::k_param_motors, 1, AP_PARAM_INT16, "H_SW_H3_SV1_POS" },
-            { Parameters::k_param_motors, 2, AP_PARAM_INT16, "H_SW_H3_SV2_POS" },
-            { Parameters::k_param_motors, 3, AP_PARAM_INT16, "H_SW_H3_SV3_POS" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 4, AP_PARAM_INT16, "H_SW2_H3_SV1_POS" },
-            { Parameters::k_param_motors, 5, AP_PARAM_INT16, "H_SW2_H3_SV2_POS" },
-            { Parameters::k_param_motors, 6, AP_PARAM_INT16, "H_SW2_H3_SV3_POS" },
-        // PARAMETER_CONVERSION - Added: Sep-2019
-            { Parameters::k_param_motors, 7, AP_PARAM_INT16, "H_SW_H3_PHANG" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 8, AP_PARAM_INT16, "H_SW2_H3_PHANG" },
-        // PARAMETER_CONVERSION - Added: Sep-2019
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW_COL_DIR" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW2_COL_DIR" },
-        };
-
-        // convert dual heli parameters without scaling
-        uint8_t table_size = ARRAY_SIZE(dualheli_conversion_info);
-        for (uint8_t i=0; i<table_size; i++) {
-            AP_Param::convert_old_parameter(&dualheli_conversion_info[i], 1.0f);
-        }
-
-
-        // PARAMETER_CONVERSION - Added: Sep-2019
-
-        // convert to known swash type for setups that match
-        AP_Int16 swash1_pos_1, swash1_pos_2, swash1_pos_3, swash1_phang, swash2_pos_1, swash2_pos_2, swash2_pos_3, swash2_phang; 
-        bool swash1_pos1_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[0], &swash1_pos_1);
-        bool swash1_pos2_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[1], &swash1_pos_2);
-        bool swash1_pos3_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[2], &swash1_pos_3);
-        bool swash1_phang_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[6], &swash1_phang);
-        bool swash2_pos1_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[3], &swash2_pos_1);
-        bool swash2_pos2_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[4], &swash2_pos_2);
-        bool swash2_pos3_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[5], &swash2_pos_3);
-        bool swash2_phang_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[7], &swash2_phang);
-
-        // SWASH 1
-        // old swash type is not in eeprom and thus type is default value of generic swash
-        if (swash1_pos1_exist || swash1_pos2_exist || swash1_pos3_exist || swash1_phang_exist) {
-            // if any params exist with the generic swash then the upgraded swash type must be generic
-            // find the new variable in the variable structures
-            enum ap_var_type ptype;
-            AP_Param *ap2;
-            ap2 = AP_Param::find("H_SW_TYPE", &ptype);
-            // make sure the pointer is valid
-            if (ap2 != nullptr) {
-                // see if we can load it from EEPROM
-                if (!ap2->configured()) {
-                    // the new parameter is not in storage so set generic swash
-                    AP_Param::set_and_save_by_name("H_SW_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                }
-            }
-        }
-        //SWASH 2
-        // old swash type is not in eeprom and thus type is default value of generic swash
-        if (swash2_pos1_exist || swash2_pos2_exist || swash2_pos3_exist || swash2_phang_exist) {
-            // if any params exist with the generic swash then the upgraded swash type must be generic
-            // find the new variable in the variable structures
-            enum ap_var_type ptype;
-            AP_Param *ap2;
-            ap2 = AP_Param::find("H_SW2_TYPE", &ptype);
-            // make sure the pointer is valid
-            if (ap2 != nullptr) {
-                // see if we can load it from EEPROM
-                if (!ap2->configured()) {
-                    // the new parameter is not in storage so set generic swash
-                    AP_Param::set_and_save_by_name("H_SW2_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                }
-            }
-        }
-    }
-
-    // table of rsc parameters to be converted with scaling
-    const AP_Param::ConversionInfo rschelipct_conversion_info[] = {
-        { Parameters::k_param_motors, 1280, AP_PARAM_INT16, "H_RSC_THRCRV_0" },
-        { Parameters::k_param_motors, 1344, AP_PARAM_INT16, "H_RSC_THRCRV_25" },
-        { Parameters::k_param_motors, 1408, AP_PARAM_INT16, "H_RSC_THRCRV_50" },
-        { Parameters::k_param_motors, 1472, AP_PARAM_INT16, "H_RSC_THRCRV_75" },
-        { Parameters::k_param_motors, 1536, AP_PARAM_INT16, "H_RSC_THRCRV_100" },
-        { Parameters::k_param_motors, 448, AP_PARAM_INT16, "H_RSC_SETPOINT" },
-        { Parameters::k_param_motors, 768, AP_PARAM_INT16, "H_RSC_CRITICAL" },
-        { Parameters::k_param_motors, 832, AP_PARAM_INT16, "H_RSC_IDLE" },
-    };
-    // convert heli rsc parameters with scaling
-    uint8_t table_size = ARRAY_SIZE(rschelipct_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&rschelipct_conversion_info[i], 0.1f);
-    }
-
-    // table of rsc parameters to be converted without scaling
-    const AP_Param::ConversionInfo rscheli_conversion_info[] = {
-        { Parameters::k_param_motors, 512, AP_PARAM_INT8,  "H_RSC_MODE" },
-        { Parameters::k_param_motors, 640, AP_PARAM_INT8,  "H_RSC_RAMP_TIME" },
-        { Parameters::k_param_motors, 704, AP_PARAM_INT8,  "H_RSC_RUNUP_TIME" },
-        { Parameters::k_param_motors, 1216, AP_PARAM_INT16,"H_RSC_SLEWRATE" },
-    };
-    // convert heli rsc parameters without scaling
-    table_size = ARRAY_SIZE(rscheli_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&rscheli_conversion_info[i], 1.0f);
-    }
-
-    // update tail speed parameter with scaling
-    AP_Int16 *tailspeed;
-    enum ap_var_type ptype;
-    tailspeed = (AP_Int16 *)AP_Param::find("H_TAIL_SPEED", &ptype);
-    if (tailspeed != nullptr && tailspeed->get() > 100 ) {
-        uint16_t tailspeed_pct = (uint16_t)(0.1f * tailspeed->get());
-        AP_Param::set_and_save_by_name("H_TAIL_SPEED", tailspeed_pct );
-    }
-
-    // PARAMETER_CONVERSION - Added: Dec-2019
-    // table of stabilize collective parameters to be converted with scaling
-    const AP_Param::ConversionInfo collhelipct_conversion_info[] = {
-        { Parameters::k_param_input_manager, 1, AP_PARAM_INT16,  "IM_STB_COL_1" },
-        { Parameters::k_param_input_manager, 2, AP_PARAM_INT16,  "IM_STB_COL_2" },
-        { Parameters::k_param_input_manager, 3, AP_PARAM_INT16,  "IM_STB_COL_3" },
-        { Parameters::k_param_input_manager, 4, AP_PARAM_INT16,  "IM_STB_COL_4" },
-    };
-
-    // convert stabilize collective parameters with scaling
-    table_size = ARRAY_SIZE(collhelipct_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&collhelipct_conversion_info[i], 0.1f);
-    }
-
 }
 #endif
