@@ -160,9 +160,6 @@ void SIMState::fdm_input_local(void)
     if (blping != nullptr) {
         blping->update(sitl_model->rangefinder_range());
     }
-    if (leddarone != nullptr) {
-        leddarone->update(sitl_model->rangefinder_range());
-    }
     if (USD1_v0 != nullptr) {
         USD1_v0->update(sitl_model->rangefinder_range());
     }
