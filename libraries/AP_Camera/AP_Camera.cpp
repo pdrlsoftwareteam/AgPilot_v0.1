@@ -205,9 +205,6 @@ void AP_Camera::handle_message(mavlink_channel_t chan, const mavlink_message_t &
 MAV_RESULT AP_Camera::handle_command_long(const mavlink_command_long_t &packet)
 {
     switch (packet.command) {
-    case MAV_CMD_DO_DIGICAM_CONFIGURE:
-        configure(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6, packet.param7);
-        return MAV_RESULT_ACCEPTED;
     case MAV_CMD_DO_DIGICAM_CONTROL:
         control(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6);
         return MAV_RESULT_ACCEPTED;
@@ -246,25 +243,7 @@ MAV_RESULT AP_Camera::handle_command_long(const mavlink_command_long_t &packet)
         }
         take_picture();
         return MAV_RESULT_ACCEPTED;
-    case MAV_CMD_VIDEO_START_CAPTURE:
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
-    {
-        bool success = false;
-        const bool start_recording = (packet.command == MAV_CMD_VIDEO_START_CAPTURE);
-        const uint8_t stream_id = packet.param1;  // Stream ID
-        if (stream_id == 0) {
-            // stream id of 0 interpreted as primary camera
-            success = record_video(start_recording);
-        } else {
-            // convert stream id to instance id
-            success = record_video(stream_id - 1, start_recording);
-        }
-        if (success) {
-            return MAV_RESULT_ACCEPTED;
-        } else {
-            return MAV_RESULT_FAILED;
-        }
-    }
+
     default:
         return MAV_RESULT_UNSUPPORTED;
     }

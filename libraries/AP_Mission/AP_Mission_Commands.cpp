@@ -70,19 +70,6 @@ bool AP_Mission::start_command_do_servorelayevents(const AP_Mission::Mission_Com
     case MAV_CMD_DO_SET_SERVO:
         return sre->do_set_servo(cmd.content.servo.channel, cmd.content.servo.pwm);
 
-    case MAV_CMD_DO_SET_RELAY:
-        return sre->do_set_relay(cmd.content.relay.num, cmd.content.relay.state);
-
-    case MAV_CMD_DO_REPEAT_SERVO:
-        return sre->do_repeat_servo(cmd.content.repeat_servo.channel,
-                                    cmd.content.repeat_servo.pwm,
-                                    cmd.content.repeat_servo.repeat_count,
-                                    cmd.content.repeat_servo.cycle_time * 1000.0f);
-
-    case MAV_CMD_DO_REPEAT_RELAY:
-        return sre->do_repeat_relay(cmd.content.repeat_relay.num,
-                                    cmd.content.repeat_relay.repeat_count,
-                                    cmd.content.repeat_relay.cycle_time * 1000.0f);
     default:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
         AP_HAL::panic("Unhandled servo/relay case");
@@ -100,17 +87,6 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
     }
 
     switch (cmd.id) {
-
-    case MAV_CMD_DO_DIGICAM_CONFIGURE:                  // Mission command to configure an on-board camera controller system. |Modes: P, TV, AV, M, Etc| Shutter speed: Divisor number for one second| Aperture: F stop number| ISO number e.g. 80, 100, 200, Etc| Exposure type enumerator| Command Identity| Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)|
-        camera->configure(
-            cmd.content.digicam_configure.shooting_mode,
-            cmd.content.digicam_configure.shutter_speed,
-            cmd.content.digicam_configure.aperture,
-            cmd.content.digicam_configure.ISO,
-            cmd.content.digicam_configure.exposure_type,
-            cmd.content.digicam_configure.cmd_id,
-            cmd.content.digicam_configure.engine_cutoff_time);
-        return true;
 
     case MAV_CMD_DO_DIGICAM_CONTROL:                    // Mission command to control an on-board camera controller system. |Session control e.g. show/hide lens| Zoom's absolute position| Zooming step value to offset zoom from the current position| Focus Locking, Unlocking or Re-locking| Shooting Command| Command Identity| Empty|
         camera->control(
@@ -154,19 +130,6 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
     case MAV_CMD_IMAGE_START_CAPTURE:
         camera->take_picture();
         return true;
-
-    case MAV_CMD_VIDEO_START_CAPTURE:
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
-    {
-        const bool start_recording = (cmd.id == MAV_CMD_VIDEO_START_CAPTURE);
-        if (cmd.content.video_start_capture.video_stream_id == 0) {
-            // stream id of zero interpreted as primary camera
-            return camera->record_video(start_recording);
-        } else {
-            // non-zero stream id is converted to camera instance
-            return camera->record_video(cmd.content.video_start_capture.video_stream_id - 1, start_recording);
-        }
-    }
 
     default:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
