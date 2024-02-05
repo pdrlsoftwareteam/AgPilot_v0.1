@@ -6,6 +6,7 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/Bitmask.h>
+#include <SRV_Channel/SRV_Channel.h>
 
 #ifndef AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
 #define AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED 1
