@@ -22,7 +22,6 @@
 #if (CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_BEBOP || \
      CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_DISCO) &&      \
     defined(HAVE_LIBIIO)
-#include "AP_RangeFinder_Bebop.h"
 #endif
 #include "AP_RangeFinder_MAVLink.h"
 #include "AP_RangeFinder_USD1_Serial.h"
@@ -34,7 +33,6 @@
 #include "AP_RangeFinder_Benewake_TFMiniPlus.h"
 #include "AP_RangeFinder_PWM.h"
 #include "AP_RangeFinder_HC_SR04.h"
-#include "AP_RangeFinder_Bebop.h"
 #include "AP_RangeFinder_UAVCAN.h"
 #include "AP_RangeFinder_LeddarVu8.h"
 #include "AP_RangeFinder_SITL.h"
@@ -292,13 +290,6 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
     case Type::USD1_Serial:
 #if AP_RANGEFINDER_USD1_SERIAL_ENABLED
         serial_create_fn = AP_RangeFinder_USD1_Serial::create;
-#endif
-        break;
-    case Type::BEBOP:
-#if AP_RANGEFINDER_BEBOP_ENABLED
-        if (AP_RangeFinder_Bebop::detect()) {
-            _add_backend(new AP_RangeFinder_Bebop(state[instance], params[instance]), instance);
-        }
 #endif
         break;
     case Type::MAVLink:
