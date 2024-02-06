@@ -15,7 +15,6 @@
 
 #include "AP_RangeFinder.h"
 #include "AP_RangeFinder_analog.h"
-#include "AP_RangeFinder_PulsedLightLRF.h"
 #include "AP_RangeFinder_MaxsonarI2CXL.h"
 #include "AP_RangeFinder_MaxsonarSerialLV.h"
 #include "AP_RangeFinder_LightWareSerial.h"
@@ -253,15 +252,6 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
 
     const Type _type = (Type)params[instance].type.get();
     switch (_type) {
-#if AP_RANGEFINDER_PULSEDLIGHTLRF_ENABLED
-        FOREACH_I2C(i) {
-            if (_add_backend(AP_RangeFinder_PulsedLightLRF::detect(i, state[instance], params[instance], _type),
-                             instance)) {
-                break;
-            }
-        }
-#endif
-        break;
     case Type::BenewakeTFminiPlus: {
 #if AP_RANGEFINDER_BENEWAKE_TFMINIPLUS_ENABLED
         uint8_t addr = TFMINIPLUS_ADDR_DEFAULT;
