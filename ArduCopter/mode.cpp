@@ -74,12 +74,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
-#if AUTOTUNE_ENABLED == ENABLED
-        case Mode::Number::AUTOTUNE:
-            ret = &mode_autotune;
-            break;
-#endif
-
 #if MODE_POSHOLD_ENABLED == ENABLED
         case Mode::Number::POSHOLD:
             ret = &mode_poshold;
@@ -96,16 +90,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::AVOID_ADSB:
             ret = &mode_avoid_adsb;
             break;
+#endif
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
         case Mode::Number::SMART_RTL:
             ret = &mode_smartrtl;
-            break;
-#endif
-
-#if MODE_ZIGZAG_ENABLED == ENABLED
-        case Mode::Number::ZIGZAG:
-            ret = &mode_zigzag;
             break;
 #endif
 
