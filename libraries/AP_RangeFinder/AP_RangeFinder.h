@@ -70,7 +70,6 @@ public:
         ANALOG = 1,
 //        PX4    = 4, // no longer used, but may be in some user's parameters
         PX4_PWM= 5,
-        BEBOP  = 9,
         MAVLink = 10,
         USD1_Serial = 11,
         BenewakeTF02 = 19,
