@@ -621,7 +621,7 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
         const char *rc_item = "Throttle";
         #endif
         // check throttle is not too high - skips checks if arming from GCS/scripting in Guided,Guided_NoGPS or Auto 
-        if (!((method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::GUIDED_NOGPS || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
+        if (!((method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
             // above top of deadband is too always high
             if (copter.get_pilot_desired_climb_rate(copter.channel_throttle->get_control_in()) > 0.0f) {
                 check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
@@ -814,14 +814,6 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
         }
     }
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // save auto tuned parameters
-    if (copter.flightmode == &copter.mode_autotune) {
-        copter.mode_autotune.save_tuning_gains();
-    } else {
-        copter.mode_autotune.reset();
-    }
-#endif
 
     // we are not in the air
     copter.set_land_complete(true);

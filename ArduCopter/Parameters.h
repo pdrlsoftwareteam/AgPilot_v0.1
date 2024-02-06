@@ -10,9 +10,7 @@
 #if AP_GRIPPER_ENABLED
  # include <AP_Gripper/AP_Gripper.h>
 #endif
-#if MODE_FOLLOW_ENABLED == ENABLED
- # include <AP_Follow/AP_Follow.h>
-#endif
+
 #if WEATHERVANE_ENABLED == ENABLED
  #include <AC_AttitudeControl/AC_WeatherVane.h>
 #endif
@@ -559,11 +557,6 @@ public:
 #ifdef USER_PARAMS_ENABLED
     // User custom parameters
     UserParameters user_parameters;
-#endif
-
-#if AUTOTUNE_ENABLED == ENABLED
-    // we need a pointer to autotune for the G2 table
-    void *autotune_ptr;
 #endif
 
 #if AP_SCRIPTING_ENABLED

@@ -117,9 +117,6 @@
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
 #endif
-#if MODE_FOLLOW_ENABLED == ENABLED
- # include <AP_Follow/AP_Follow.h>
-#endif
 #if AP_TERRAIN_AVAILABLE
  # include <AP_Terrain/AP_Terrain.h>
 #endif
@@ -190,39 +187,29 @@ public:
     friend class AP_AdvancedFailsafe_Copter;
 #endif
     friend class AP_Arming_Copter;
-    friend class ToyMode;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
     friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAcro;
     friend class ModeAcro_Heli;
     friend class ModeAltHold;
     friend class ModeAuto;
-    friend class ModeAutoTune;
     friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
-    friend class ModeDrift;
-    friend class ModeFlip;
     friend class ModeFlowHold;
-    friend class ModeFollow;
     friend class ModeGuided;
     friend class ModeLand;
     friend class ModeLoiter;
     friend class ModePosHold;
     friend class ModeRTL;
     friend class ModeSmartRTL;
-    friend class ModeSport;
     friend class ModeStabilize;
     friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    friend class ModeThrow;
-    friend class ModeZigZag;
     friend class ModeAutorotate;
-    friend class ModeTurtle;
 
     Copter(void);
 
@@ -948,9 +935,6 @@ private:
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
 #endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ModeAutoTune mode_autotune;
-#endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;
 #endif
@@ -983,15 +967,8 @@ private:
     ModeAvoidADSB mode_avoid_adsb;
 #endif
 
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-    ModeGuidedNoGPS mode_guided_nogps;
-#endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
-#endif
-
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ModeZigZag mode_zigzag;
 #endif
 
     // mode.cpp

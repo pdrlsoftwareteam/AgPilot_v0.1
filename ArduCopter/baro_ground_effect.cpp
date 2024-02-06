@@ -31,10 +31,7 @@ void Copter::update_ground_effect_detector(void)
 
     // takeoff logic
 
-    if (flightmode->mode_number() == Mode::Number::THROW) {
-        // throw mode never wants the takeoff expected EKF code
-        gndeffect_state.takeoff_expected = false;
-    } else if (motors->armed() && ap.land_complete) {
+    if (motors->armed() && ap.land_complete) {
         // if we are armed and haven't yet taken off then we expect an imminent takeoff
         gndeffect_state.takeoff_expected = true;
     }
