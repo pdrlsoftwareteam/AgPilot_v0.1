@@ -63,10 +63,6 @@ AP_FETtecOneWire *SRV_Channels::fetteconwire_ptr;
 
 uint16_t SRV_Channels::override_counter[NUM_SERVO_CHANNELS];
 
-#if HAL_SUPPORT_RCOUT_SERIAL
-AP_BLHeli *SRV_Channels::blheli_ptr;
-#endif
-
 uint32_t SRV_Channels::disabled_mask;
 uint32_t SRV_Channels::digital_mask;
 uint32_t SRV_Channels::reversible_mask;
@@ -204,12 +200,6 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @Path: ../AP_SBusOut/AP_SBusOut.cpp
     AP_SUBGROUPINFO(sbus, "_SBUS_",  20, SRV_Channels, AP_SBusOut),
 #endif // HAL_BUILD_AP_PERIPH
-
-#if HAL_SUPPORT_RCOUT_SERIAL
-    // @Group: _BLH_
-    // @Path: ../AP_BLHeli/AP_BLHeli.cpp
-    AP_SUBGROUPINFO(blheli, "_BLH_",  21, SRV_Channels, AP_BLHeli),
-#endif
 
 #if AP_ROBOTISSERVO_ENABLED
     // @Group: _ROB_

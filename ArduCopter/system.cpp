@@ -62,14 +62,6 @@ void Copter::init_ardupilot()
     // update motor interlock state
     update_using_interlock();
 
-#if FRAME_CONFIG == HELI_FRAME
-    // trad heli specific initialisation
-    heli_init();
-#endif
-#if FRAME_CONFIG == HELI_FRAME
-    input_manager.set_loop_rate(scheduler.get_loop_rate_hz());
-#endif
-
     init_rc_in();               // sets up rc channels from radio
 
     // initialise surface to be tracked in SurfaceTracking
@@ -375,7 +367,6 @@ bool Copter::should_log(uint32_t mask)
 void Copter::allocate_motors(void)
 {
     switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
-#if FRAME_CONFIG != HELI_FRAME
         case AP_Motors::MOTOR_FRAME_QUAD:
         case AP_Motors::MOTOR_FRAME_HEXA:
         case AP_Motors::MOTOR_FRAME_Y6:
@@ -417,26 +408,6 @@ void Copter::allocate_motors(void)
             motors_var_info = AP_MotorsMatrix_Scripting_Dynamic::var_info;
 #endif // AP_SCRIPTING_ENABLED
             break;
-#else // FRAME_CONFIG == HELI_FRAME
-        case AP_Motors::MOTOR_FRAME_HELI_DUAL:
-            motors = new AP_MotorsHeli_Dual(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Dual::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-
-        case AP_Motors::MOTOR_FRAME_HELI_QUAD:
-            motors = new AP_MotorsHeli_Quad(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Quad::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-            
-        case AP_Motors::MOTOR_FRAME_HELI:
-        default:
-            motors = new AP_MotorsHeli_Single(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Single::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-#endif
     }
     if (motors == nullptr) {
         AP_BoardConfig::allocation_error("FRAME_CLASS=%u", (unsigned)g2.frame_class.get());
@@ -450,7 +421,6 @@ void Copter::allocate_motors(void)
 
     const struct AP_Param::GroupInfo *ac_var_info;
 
-#if FRAME_CONFIG != HELI_FRAME
     if ((AP_Motors::motor_frame_class)g2.frame_class.get() == AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING) {
 #if AP_SCRIPTING_ENABLED
         attitude_control = new AC_AttitudeControl_Multi_6DoF(*ahrs_view, aparm, *motors);
@@ -460,10 +430,6 @@ void Copter::allocate_motors(void)
         attitude_control = new AC_AttitudeControl_Multi(*ahrs_view, aparm, *motors);
         ac_var_info = AC_AttitudeControl_Multi::var_info;
     }
-#else
-    attitude_control = new AC_AttitudeControl_Heli(*ahrs_view, aparm, *motors);
-    ac_var_info = AC_AttitudeControl_Heli::var_info;
-#endif
     if (attitude_control == nullptr) {
         AP_BoardConfig::allocation_error("AttitudeControl");
     }
@@ -526,9 +492,6 @@ void Copter::allocate_motors(void)
     
     // upgrade parameters. This must be done after allocating the objects
     convert_pid_parameters();
-#if FRAME_CONFIG == HELI_FRAME
-    convert_tradheli_parameters();
-#endif
 
 #if HAL_PROXIMITY_ENABLED
     // convert PRX to PRX1_ parameters
@@ -537,13 +500,4 @@ void Copter::allocate_motors(void)
 
     // param count could have changed
     AP_Param::invalidate_count();
-}
-
-bool Copter::is_tradheli() const
-{
-#if FRAME_CONFIG == HELI_FRAME
-    return true;
-#else
-    return false;
-#endif
 }
