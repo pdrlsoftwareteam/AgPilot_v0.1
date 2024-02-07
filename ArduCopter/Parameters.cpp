@@ -412,34 +412,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(rc_speed, "RC_SPEED",              RC_FAST_SPEED),
 
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    // @Param: ACRO_BAL_ROLL
-    // @DisplayName: Acro Balance Roll
-    // @Description: rate at which roll angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the roll axis. A higher value causes faster decay of desired to actual attitude.
-    // @Range: 0 3
-    // @Increment: 0.1
-    // @User: Advanced
-    GSCALAR(acro_balance_roll,      "ACRO_BAL_ROLL",    ACRO_BALANCE_ROLL),
-
-    // @Param: ACRO_BAL_PITCH
-    // @DisplayName: Acro Balance Pitch
-    // @Description: rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.
-    // @Range: 0 3
-    // @Increment: 0.1
-    // @User: Advanced
-    GSCALAR(acro_balance_pitch,     "ACRO_BAL_PITCH",   ACRO_BALANCE_PITCH),
-#endif
-
-    // ACRO_RP_EXPO moved to Command Model class
-
-#if MODE_ACRO_ENABLED == ENABLED
-    // @Param: ACRO_TRAINER
-    // @DisplayName: Acro Trainer
-    // @Description: Type of trainer used in acro mode
-    // @Values: 0:Disabled,1:Leveling,2:Leveling and Limited
-    // @User: Advanced
-    GSCALAR(acro_trainer,   "ACRO_TRAINER",     (uint8_t)ModeAcro::Trainer::LIMITED),
-#endif
 
     // variables not in the g class which contain EEPROM saved variables
 
@@ -690,15 +662,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_Notify/AP_Notify.cpp
     GOBJECT(notify, "NTF_",  AP_Notify),
 
-#if MODE_THROW_ENABLED == ENABLED
-    // @Param: THROW_MOT_START
-    // @DisplayName: Start motors before throwing is detected
-    // @Description: Used by Throw mode. Controls whether motors will run at the speed set by MOT_SPIN_MIN or will be stopped when armed and waiting for the throw.
-    // @Values: 0:Stopped,1:Running
-    // @User: Standard
-    GSCALAR(throw_motor_start, "THROW_MOT_START", (float)ModeThrow::PreThrowMotorState::STOPPED),
-#endif
-
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     // @Group: OSD
     // @Path: ../libraries/AP_OSD/AP_OSD.cpp
@@ -740,22 +703,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPPTR(button_ptr, "BTN_", 2, ParametersG2, AP_Button),
 #endif
 
-#if MODE_THROW_ENABLED == ENABLED
-    // @Param: THROW_NEXTMODE
-    // @DisplayName: Throw mode's follow up mode
-    // @Description: Vehicle will switch to this mode after the throw is successfully completed.  Default is to stay in throw mode (18)
-    // @Values: 3:Auto,4:Guided,5:LOITER,6:RTL,9:Land,17:Brake,18:Throw
-    // @User: Standard
-    AP_GROUPINFO("THROW_NEXTMODE", 3, ParametersG2, throw_nextmode, 18),
-
-    // @Param: THROW_TYPE
-    // @DisplayName: Type of Type
-    // @Description: Used by Throw mode. Specifies whether Copter is thrown upward or dropped.
-    // @Values: 0:Upward Throw,1:Drop
-    // @User: Standard
-    AP_GROUPINFO("THROW_TYPE", 4, ParametersG2, throw_type, (float)ModeThrow::ThrowType::Upward),
-#endif
-
     // @Param: GND_EFFECT_COMP
     // @DisplayName: Ground Effect Compensation Enable/Disable
     // @Description: Ground Effect Compensation Enable/Disable
@@ -789,15 +736,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 #endif
 
     // ACRO_Y_EXPO (9) moved to Command Model Class
-
-#if MODE_ACRO_ENABLED == ENABLED
-    // @Param: ACRO_THR_MID
-    // @DisplayName: Acro Thr Mid
-    // @Description: Acro Throttle Mid
-    // @Range: 0 1
-    // @User: Advanced
-    AP_GROUPINFO("ACRO_THR_MID", 10, ParametersG2, acro_thr_mid, ACRO_THR_MID_DEFAULT),
-#endif
 
     // @Param: SYSID_ENFORCE
     // @DisplayName: GCS sysid enforcement
@@ -878,27 +816,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("LAND_ALT_LOW", 25, ParametersG2, land_alt_low, 1000),
 
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    // @Group: FHLD
-    // @Path: mode_flowhold.cpp
-    AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
-#endif
-
-#if MODE_FOLLOW_ENABLED == ENABLED
-    // @Group: FOLL
-    // @Path: ../libraries/AP_Follow/AP_Follow.cpp
-    AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
-#endif
 
 #ifdef USER_PARAMS_ENABLED
     AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
 #endif
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // @Group: AUTOTUNE_
-    // @Path: ../libraries/AC_AutoTune/AC_AutoTune_Multi.cpp,../libraries/AC_AutoTune/AC_AutoTune_Heli.cpp
-    AP_SUBGROUPPTR(autotune_ptr, "AUTOTUNE_",  29, ParametersG2, AutoTune),
-#endif
 
 #if AP_SCRIPTING_ENABLED
     // @Group: SCR_
@@ -951,20 +873,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    // @Group: ZIGZ_
-    // @Path: mode_zigzag.cpp
-    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED
-    // @Param: ACRO_OPTIONS
-    // @DisplayName: Acro mode options
-    // @Description: A range of options that can be applied to change acro mode behaviour. Air-mode enables ATC_THR_MIX_MAN at all times (air-mode has no effect on helicopters). Rate Loop Only disables the use of angle stabilization and uses angular rate stabilization only.
-    // @Bitmask: 0:Air-mode,1:Rate Loop Only
-    // @User: Advanced
-    AP_GROUPINFO("ACRO_OPTIONS", 39, ParametersG2, acro_options, 0),
-#endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     // @Param: AUTO_OPTIONS
@@ -1054,57 +962,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("FS_DR_TIMEOUT", 53, ParametersG2, failsafe_dr_timeout, 30),
 
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    // @Param: ACRO_RP_RATE
-    // @DisplayName: Acro Roll and Pitch Rate
-    // @Description: Acro mode maximum roll and pitch rate.  Higher values mean faster rate of rotation
-    // @Units: deg/s
-    // @Range: 1 1080
-    // @User: Standard
-
-    // @Param: ACRO_RP_EXPO
-    // @DisplayName: Acro Roll/Pitch Expo
-    // @Description: Acro roll/pitch Expo to allow faster rotation when stick at edges
-    // @Values: 0:Disabled,0.1:Very Low,0.2:Low,0.3:Medium,0.4:High,0.5:Very High
-    // @Range: -0.5 0.95
-    // @User: Advanced
-
-    // @Param: ACRO_RP_RATE_TC
-    // @DisplayName: Acro roll/pitch rate control input time constant
-    // @Description: Acro roll and pitch rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response
-    // @Units: s
-    // @Range: 0 1
-    // @Increment: 0.01
-    // @Values: 0.5:Very Soft, 0.2:Soft, 0.15:Medium, 0.1:Crisp, 0.05:Very Crisp
-    // @User: Standard
-    AP_SUBGROUPINFO(command_model_acro_rp, "ACRO_RP_", 54, ParametersG2, AC_CommandModel),
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_DRIFT_ENABLED == ENABLED
-    // @Param: ACRO_Y_RATE
-    // @DisplayName: Acro Yaw Rate
-    // @Description: Acro mode maximum yaw rate.  Higher value means faster rate of rotation
-    // @Units: deg/s
-    // @Range: 1 360
-    // @User: Standard
-
-    // @Param: ACRO_Y_EXPO
-    // @DisplayName: Acro Yaw Expo
-    // @Description: Acro yaw expo to allow faster rotation when stick at edges
-    // @Values: 0:Disabled,0.1:Very Low,0.2:Low,0.3:Medium,0.4:High,0.5:Very High
-    // @Range: -1.0 0.95
-    // @User: Advanced
-
-    // @Param: ACRO_Y_RATE_TC
-    // @DisplayName: Acro yaw rate control input time constant
-    // @Description: Acro yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response
-    // @Units: s
-    // @Range: 0 1
-    // @Increment: 0.01
-    // @Values: 0.5:Very Soft, 0.2:Soft, 0.15:Medium, 0.1:Crisp, 0.05:Very Crisp
-    // @User: Standard
-    AP_SUBGROUPINFO(command_model_acro_y, "ACRO_Y_", 55, ParametersG2, AC_CommandModel),
-#endif
 
     // @Param: PILOT_Y_RATE
     // @DisplayName: Pilot controlled yaw rate
@@ -1145,12 +1002,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Range: 0 10000
     // @User: Standard
     AP_GROUPINFO("TKOFF_RPM_MIN", 58, ParametersG2, takeoff_rpm_min, 0),
-#endif
-
-#if WEATHERVANE_ENABLED == ENABLED
-    // @Group: WVANE_
-    // @Path: ../libraries/AC_AttitudeControl/AC_WeatherVane.cpp
-    AP_SUBGROUPINFO(weathervane, "WVANE_", 59, ParametersG2, AC_WeatherVane),
 #endif
 
     // ID 60 is reserved for the SHIP_OPS
@@ -1230,17 +1081,8 @@ ParametersG2::ParametersG2(void)
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ,smart_rtl()
 #endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ,mode_flowhold_ptr(&copter.mode_flowhold)
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ,follow()
-#endif
 #ifdef USER_PARAMS_ENABLED
     ,user_parameters()
-#endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ,autotune_ptr(&copter.mode_autotune.autotune)
 #endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ,mode_systemid_ptr(&copter.mode_systemid)
@@ -1251,23 +1093,8 @@ ParametersG2::ParametersG2(void)
 #if HAL_BUTTON_ENABLED
     ,button_ptr(&copter.button)
 #endif
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ,mode_zigzag_ptr(&copter.mode_zigzag)
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    ,command_model_acro_rp(ACRO_RP_RATE_DEFAULT, ACRO_RP_EXPO_DEFAULT, 0.0f)
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_DRIFT_ENABLED == ENABLED
-    ,command_model_acro_y(ACRO_Y_RATE_DEFAULT, ACRO_Y_EXPO_DEFAULT, 0.0f)
-#endif
 
     ,command_model_pilot(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
-
-#if WEATHERVANE_ENABLED == ENABLED
-    ,weathervane()
-#endif
 {
     AP_Param::setup_object_defaults(this, var_info);
     AP_Param::setup_object_defaults(this, var_info2);
@@ -1375,24 +1202,12 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_pid_rate_yaw, 0, AP_PARAM_FLOAT, "ATC_RAT_YAW_P" },
         { Parameters::k_param_pid_rate_yaw, 1, AP_PARAM_FLOAT, "ATC_RAT_YAW_I" },
         { Parameters::k_param_pid_rate_yaw, 2, AP_PARAM_FLOAT, "ATC_RAT_YAW_D" },
-#if FRAME_CONFIG == HELI_FRAME
-        // PARAMETER_CONVERSION - Added: May-2016
-        { Parameters::k_param_pid_rate_roll,  4, AP_PARAM_FLOAT, "ATC_RAT_RLL_VFF" },
-        { Parameters::k_param_pid_rate_pitch, 4, AP_PARAM_FLOAT, "ATC_RAT_PIT_VFF" },
-        { Parameters::k_param_pid_rate_yaw  , 4, AP_PARAM_FLOAT, "ATC_RAT_YAW_VFF" },
-#endif
     };
     const AP_Param::ConversionInfo imax_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Apr-2016
         { Parameters::k_param_pid_rate_roll,  5, AP_PARAM_FLOAT, "ATC_RAT_RLL_IMAX" },
         { Parameters::k_param_pid_rate_pitch, 5, AP_PARAM_FLOAT, "ATC_RAT_PIT_IMAX" },
         { Parameters::k_param_pid_rate_yaw,   5, AP_PARAM_FLOAT, "ATC_RAT_YAW_IMAX" },
-#if FRAME_CONFIG == HELI_FRAME
-        // PARAMETER_CONVERSION - Added: May-2016
-        { Parameters::k_param_pid_rate_roll,  7, AP_PARAM_FLOAT, "ATC_RAT_RLL_ILMI" },
-        { Parameters::k_param_pid_rate_pitch, 7, AP_PARAM_FLOAT, "ATC_RAT_PIT_ILMI" },
-        { Parameters::k_param_pid_rate_yaw,   7, AP_PARAM_FLOAT, "ATC_RAT_YAW_ILMI" },
-#endif
     };
     // conversion from Copter-3.3 to Copter-3.4
     const AP_Param::ConversionInfo angle_and_filt_conversion_info[] = {
@@ -1475,42 +1290,10 @@ void Copter::convert_pid_parameters(void)
         AP_Param::convert_old_parameter(&info, 1.0f);
     }
 
-    // TradHeli default parameters
-#if FRAME_CONFIG == HELI_FRAME
-    static const struct AP_Param::defaults_table_struct heli_defaults_table[] = {
-        // PARAMETER_CONVERSION - Added: Nov-2018
-        { "LOIT_ACC_MAX", 500.0f },
-        { "LOIT_BRK_ACCEL", 125.0f },
-        { "LOIT_BRK_DELAY", 1.0f },
-        { "LOIT_BRK_JERK", 250.0f },
-        { "LOIT_SPEED", 3000.0f },
-        { "PHLD_BRAKE_ANGLE", 800.0f },
-        { "PHLD_BRAKE_RATE", 4.0f },
-        { "PSC_ACCZ_P", 0.28f },
-        { "PSC_VELXY_D", 0.0f },
-        { "PSC_VELXY_I", 0.5f },
-        { "PSC_VELXY_P", 1.0f },
-        // PARAMETER_CONVERSION - Added: Jan-2019
-        { "RC8_OPTION", 32 },
-        // PARAMETER_CONVERSION - Added: Aug-2018
-        { "RC_OPTIONS", 0 },
-        // PARAMETER_CONVERSION - Added: Feb-2022
-        { "ATC_RAT_RLL_ILMI", 0.05},
-        { "ATC_RAT_PIT_ILMI", 0.05},
-    };
-    AP_Param::set_defaults_from_table(heli_defaults_table, ARRAY_SIZE(heli_defaults_table));
-#endif
 
     // attitude and position control filter parameter changes (from _FILT to FLTD, FLTE, FLTT) for Copter-4.0
     // magic numbers shown below are discovered by setting AP_PARAM_KEY_DUMP = 1
     const AP_Param::ConversionInfo ff_and_filt_conversion_info[] = {
-#if FRAME_CONFIG == HELI_FRAME
-        // tradheli moves ATC_RAT_RLL/PIT_FILT to FLTE, ATC_RAT_YAW_FILT to FLTE
-        // PARAMETER_CONVERSION - Added: Jul-2019
-        { Parameters::k_param_attitude_control, 386, AP_PARAM_FLOAT, "ATC_RAT_RLL_FLTE" },
-        { Parameters::k_param_attitude_control, 387, AP_PARAM_FLOAT, "ATC_RAT_PIT_FLTE" },
-        { Parameters::k_param_attitude_control, 388, AP_PARAM_FLOAT, "ATC_RAT_YAW_FLTE" },
-#else
         // multicopters move ATC_RAT_RLL/PIT_FILT to FLTD & FLTT, ATC_RAT_YAW_FILT to FLTE
         { Parameters::k_param_attitude_control, 385, AP_PARAM_FLOAT, "ATC_RAT_RLL_FLTD" },
         // PARAMETER_CONVERSION - Added: Oct-2019
@@ -1524,7 +1307,6 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_attitude_control, 449, AP_PARAM_FLOAT, "ATC_RAT_RLL_FF" },
         { Parameters::k_param_attitude_control, 450, AP_PARAM_FLOAT, "ATC_RAT_PIT_FF" },
         { Parameters::k_param_attitude_control, 451, AP_PARAM_FLOAT, "ATC_RAT_YAW_FF" },
-#endif
         // PARAMETER_CONVERSION - Added: Oct-2019
         { Parameters::k_param_pos_control, 388, AP_PARAM_FLOAT, "PSC_ACCZ_FLTE" },
     };
@@ -1546,29 +1328,6 @@ void Copter::convert_pid_parameters(void)
     }
 #endif
 
-    // ACRO_RP_P and ACRO_Y_P replaced with ACRO_RP_RATE and ACRO_Y_RATE for Copter-4.2
-    // PARAMETER_CONVERSION - Added: Sep-2021
-    const AP_Param::ConversionInfo acro_rpy_conversion_info[] = {
-        { Parameters::k_param_acro_rp_p, 0, AP_PARAM_FLOAT, "ACRO_RP_RATE" },
-        { Parameters::k_param_acro_yaw_p,  0, AP_PARAM_FLOAT, "ACRO_Y_RATE" }
-    };
-    for (const auto &info : acro_rpy_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 45.0);
-    }
-
-    // convert rate and expo command model parameters for Copter-4.3
-    // PARAMETER_CONVERSION - Added: June-2022
-    const AP_Param::ConversionInfo cmd_mdl_conversion_info[] = {
-        { Parameters::k_param_g2, 47, AP_PARAM_FLOAT, "ACRO_RP_RATE" },
-        { Parameters::k_param_acro_rp_expo,  0, AP_PARAM_FLOAT, "ACRO_RP_EXPO" },
-        { Parameters::k_param_g2,  48, AP_PARAM_FLOAT, "ACRO_Y_RATE" },
-        { Parameters::k_param_g2,  9, AP_PARAM_FLOAT, "ACRO_Y_EXPO" },
-        { Parameters::k_param_g2,  49, AP_PARAM_FLOAT, "PILOT_Y_RATE" },
-        { Parameters::k_param_g2,  50, AP_PARAM_FLOAT, "PILOT_Y_EXPO" },
-    };
-    for (const auto &info : cmd_mdl_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0);
-    }
 
     // make any SRV_Channel upgrades needed
     SRV_Channels::upgrade_parameters();
@@ -1683,191 +1442,5 @@ void Copter::convert_lgr_parameters(void)
         servo_trim->set_and_save(old_deploy);
         servo_reversed->set_and_save_ifchanged(1);
     }
-}
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-// handle conversion of tradheli parameters from Copter-3.6 to Copter-3.7
-void Copter::convert_tradheli_parameters(void) const
-{
-        // PARAMETER_CONVERSION - Added: Mar-2019
-    if (g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI) {
-        // single heli conversion info
-        const AP_Param::ConversionInfo singleheli_conversion_info[] = {
-            { Parameters::k_param_motors, 1, AP_PARAM_INT16, "H_SW_H3_SV1_POS" },
-            { Parameters::k_param_motors, 2, AP_PARAM_INT16, "H_SW_H3_SV2_POS" },
-            { Parameters::k_param_motors, 3, AP_PARAM_INT16, "H_SW_H3_SV3_POS" },
-            { Parameters::k_param_motors, 7, AP_PARAM_INT16, "H_SW_H3_PHANG" },
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW_COL_DIR" },
-        };
-
-        // convert single heli parameters without scaling
-        uint8_t table_size = ARRAY_SIZE(singleheli_conversion_info);
-        for (uint8_t i=0; i<table_size; i++) {
-            AP_Param::convert_old_parameter(&singleheli_conversion_info[i], 1.0f);
-        }
-
-        // convert to known swash type for setups that match
-        // PARAMETER_CONVERSION - Added: Sep-2019
-        AP_Int16 swash_pos_1, swash_pos_2, swash_pos_3, swash_phang; 
-        AP_Int8  swash_type;
-        bool swash_pos1_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[0], &swash_pos_1);
-        bool swash_pos2_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[1], &swash_pos_2);
-        bool swash_pos3_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[2], &swash_pos_3);
-        bool swash_phang_exist = AP_Param::find_old_parameter(&singleheli_conversion_info[3], &swash_phang);
-        const AP_Param::ConversionInfo swash_type_info { Parameters::k_param_motors, 5, AP_PARAM_INT8, "H_SW_TYPE" };
-        bool swash_type_exists = AP_Param::find_old_parameter(&swash_type_info, &swash_type);
-
-        if (swash_type_exists) {
-            // convert swash type to new parameter
-            AP_Param::convert_old_parameter(&swash_type_info, 1.0f);
-        } else {
-        // old swash type is not in eeprom and thus type is default value of generic swash
-            if (swash_pos1_exist || swash_pos2_exist || swash_pos3_exist || swash_phang_exist) {
-                // if any params exist with the generic swash then the upgraded swash type must be generic
-                // find the new variable in the variable structures
-                enum ap_var_type ptype;
-                AP_Param *ap2;
-                ap2 = AP_Param::find("H_SW_TYPE", &ptype);
-                // make sure the pointer is valid
-                if (ap2 != nullptr) {
-                    // see if we can load it from EEPROM
-                    if (!ap2->configured()) {
-                        // the new parameter is not in storage so set generic swash
-                        AP_Param::set_and_save_by_name("H_SW_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                    }
-                }
-            }
-        }
-    } else if (g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI_DUAL) {
-        // dual heli conversion info
-        const AP_Param::ConversionInfo dualheli_conversion_info[] = {
-            { Parameters::k_param_motors, 1, AP_PARAM_INT16, "H_SW_H3_SV1_POS" },
-            { Parameters::k_param_motors, 2, AP_PARAM_INT16, "H_SW_H3_SV2_POS" },
-            { Parameters::k_param_motors, 3, AP_PARAM_INT16, "H_SW_H3_SV3_POS" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 4, AP_PARAM_INT16, "H_SW2_H3_SV1_POS" },
-            { Parameters::k_param_motors, 5, AP_PARAM_INT16, "H_SW2_H3_SV2_POS" },
-            { Parameters::k_param_motors, 6, AP_PARAM_INT16, "H_SW2_H3_SV3_POS" },
-        // PARAMETER_CONVERSION - Added: Sep-2019
-            { Parameters::k_param_motors, 7, AP_PARAM_INT16, "H_SW_H3_PHANG" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 8, AP_PARAM_INT16, "H_SW2_H3_PHANG" },
-        // PARAMETER_CONVERSION - Added: Sep-2019
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW_COL_DIR" },
-        // PARAMETER_CONVERSION - Added: Mar-2019
-            { Parameters::k_param_motors, 19, AP_PARAM_INT8, "H_SW2_COL_DIR" },
-        };
-
-        // convert dual heli parameters without scaling
-        uint8_t table_size = ARRAY_SIZE(dualheli_conversion_info);
-        for (uint8_t i=0; i<table_size; i++) {
-            AP_Param::convert_old_parameter(&dualheli_conversion_info[i], 1.0f);
-        }
-
-
-        // PARAMETER_CONVERSION - Added: Sep-2019
-
-        // convert to known swash type for setups that match
-        AP_Int16 swash1_pos_1, swash1_pos_2, swash1_pos_3, swash1_phang, swash2_pos_1, swash2_pos_2, swash2_pos_3, swash2_phang; 
-        bool swash1_pos1_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[0], &swash1_pos_1);
-        bool swash1_pos2_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[1], &swash1_pos_2);
-        bool swash1_pos3_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[2], &swash1_pos_3);
-        bool swash1_phang_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[6], &swash1_phang);
-        bool swash2_pos1_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[3], &swash2_pos_1);
-        bool swash2_pos2_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[4], &swash2_pos_2);
-        bool swash2_pos3_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[5], &swash2_pos_3);
-        bool swash2_phang_exist = AP_Param::find_old_parameter(&dualheli_conversion_info[7], &swash2_phang);
-
-        // SWASH 1
-        // old swash type is not in eeprom and thus type is default value of generic swash
-        if (swash1_pos1_exist || swash1_pos2_exist || swash1_pos3_exist || swash1_phang_exist) {
-            // if any params exist with the generic swash then the upgraded swash type must be generic
-            // find the new variable in the variable structures
-            enum ap_var_type ptype;
-            AP_Param *ap2;
-            ap2 = AP_Param::find("H_SW_TYPE", &ptype);
-            // make sure the pointer is valid
-            if (ap2 != nullptr) {
-                // see if we can load it from EEPROM
-                if (!ap2->configured()) {
-                    // the new parameter is not in storage so set generic swash
-                    AP_Param::set_and_save_by_name("H_SW_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                }
-            }
-        }
-        //SWASH 2
-        // old swash type is not in eeprom and thus type is default value of generic swash
-        if (swash2_pos1_exist || swash2_pos2_exist || swash2_pos3_exist || swash2_phang_exist) {
-            // if any params exist with the generic swash then the upgraded swash type must be generic
-            // find the new variable in the variable structures
-            enum ap_var_type ptype;
-            AP_Param *ap2;
-            ap2 = AP_Param::find("H_SW2_TYPE", &ptype);
-            // make sure the pointer is valid
-            if (ap2 != nullptr) {
-                // see if we can load it from EEPROM
-                if (!ap2->configured()) {
-                    // the new parameter is not in storage so set generic swash
-                    AP_Param::set_and_save_by_name("H_SW2_TYPE", SwashPlateType::SWASHPLATE_TYPE_H3);            
-                }
-            }
-        }
-    }
-
-    // table of rsc parameters to be converted with scaling
-    const AP_Param::ConversionInfo rschelipct_conversion_info[] = {
-        { Parameters::k_param_motors, 1280, AP_PARAM_INT16, "H_RSC_THRCRV_0" },
-        { Parameters::k_param_motors, 1344, AP_PARAM_INT16, "H_RSC_THRCRV_25" },
-        { Parameters::k_param_motors, 1408, AP_PARAM_INT16, "H_RSC_THRCRV_50" },
-        { Parameters::k_param_motors, 1472, AP_PARAM_INT16, "H_RSC_THRCRV_75" },
-        { Parameters::k_param_motors, 1536, AP_PARAM_INT16, "H_RSC_THRCRV_100" },
-        { Parameters::k_param_motors, 448, AP_PARAM_INT16, "H_RSC_SETPOINT" },
-        { Parameters::k_param_motors, 768, AP_PARAM_INT16, "H_RSC_CRITICAL" },
-        { Parameters::k_param_motors, 832, AP_PARAM_INT16, "H_RSC_IDLE" },
-    };
-    // convert heli rsc parameters with scaling
-    uint8_t table_size = ARRAY_SIZE(rschelipct_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&rschelipct_conversion_info[i], 0.1f);
-    }
-
-    // table of rsc parameters to be converted without scaling
-    const AP_Param::ConversionInfo rscheli_conversion_info[] = {
-        { Parameters::k_param_motors, 512, AP_PARAM_INT8,  "H_RSC_MODE" },
-        { Parameters::k_param_motors, 640, AP_PARAM_INT8,  "H_RSC_RAMP_TIME" },
-        { Parameters::k_param_motors, 704, AP_PARAM_INT8,  "H_RSC_RUNUP_TIME" },
-        { Parameters::k_param_motors, 1216, AP_PARAM_INT16,"H_RSC_SLEWRATE" },
-    };
-    // convert heli rsc parameters without scaling
-    table_size = ARRAY_SIZE(rscheli_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&rscheli_conversion_info[i], 1.0f);
-    }
-
-    // update tail speed parameter with scaling
-    AP_Int16 *tailspeed;
-    enum ap_var_type ptype;
-    tailspeed = (AP_Int16 *)AP_Param::find("H_TAIL_SPEED", &ptype);
-    if (tailspeed != nullptr && tailspeed->get() > 100 ) {
-        uint16_t tailspeed_pct = (uint16_t)(0.1f * tailspeed->get());
-        AP_Param::set_and_save_by_name("H_TAIL_SPEED", tailspeed_pct );
-    }
-
-    // PARAMETER_CONVERSION - Added: Dec-2019
-    // table of stabilize collective parameters to be converted with scaling
-    const AP_Param::ConversionInfo collhelipct_conversion_info[] = {
-        { Parameters::k_param_input_manager, 1, AP_PARAM_INT16,  "IM_STB_COL_1" },
-        { Parameters::k_param_input_manager, 2, AP_PARAM_INT16,  "IM_STB_COL_2" },
-        { Parameters::k_param_input_manager, 3, AP_PARAM_INT16,  "IM_STB_COL_3" },
-        { Parameters::k_param_input_manager, 4, AP_PARAM_INT16,  "IM_STB_COL_4" },
-    };
-
-    // convert stabilize collective parameters with scaling
-    table_size = ARRAY_SIZE(collhelipct_conversion_info);
-    for (uint8_t i=0; i<table_size; i++) {
-        AP_Param::convert_old_parameter(&collhelipct_conversion_info[i], 0.1f);
-    }
-
 }
 #endif

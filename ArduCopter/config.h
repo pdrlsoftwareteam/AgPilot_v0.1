@@ -133,12 +133,6 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-//  Auto Tuning
-#ifndef AUTOTUNE_ENABLED
- # define AUTOTUNE_ENABLED  ENABLED
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Precision Landing with companion computer or IRLock sensor
 #ifndef PRECISION_LANDING
  # define PRECISION_LANDING ENABLED
@@ -154,12 +148,6 @@
 // Nav-Guided - allows external nav computer to control vehicle
 #ifndef NAV_GUIDED
  # define NAV_GUIDED    !HAL_MINIMIZE_FEATURES
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-// Acro - fly vehicle in acrobatic mode
-#ifndef MODE_ACRO_ENABLED
-# define MODE_ACRO_ENABLED ENABLED
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -193,21 +181,9 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Follow - follow another vehicle or GCS
-#ifndef MODE_FOLLOW_ENABLED
-# define MODE_FOLLOW_ENABLED !HAL_MINIMIZE_FEATURES
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Guided mode - control vehicle's position or angles from GCS
 #ifndef MODE_GUIDED_ENABLED
 # define MODE_GUIDED_ENABLED ENABLED
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-// GuidedNoGPS mode - control vehicle's angles from GCS
-#ifndef MODE_GUIDED_NOGPS_ENABLED
-# define MODE_GUIDED_NOGPS_ENABLED !HAL_MINIMIZE_FEATURES
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -244,12 +220,6 @@
 // System ID - conduct system identification tests on vehicle
 #ifndef MODE_SYSTEMID_ENABLED
 # define MODE_SYSTEMID_ENABLED !HAL_MINIMIZE_FEATURES
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-// Throw - fly vehicle after throwing it in the air
-#ifndef MODE_THROW_ENABLED
-# define MODE_THROW_ENABLED ENABLED
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -530,16 +500,6 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Throw mode configuration
-//
-#ifndef THROW_HIGH_SPEED
-# define THROW_HIGH_SPEED       500.0f  // vehicle much reach this total 3D speed in cm/s (or be free falling)
-#endif
-#ifndef THROW_VERTICAL_SPEED
-# define THROW_VERTICAL_SPEED   50.0f   // motors start when vehicle reaches this total 3D speed in cm/s
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Logging control
 //
 #ifndef LOGGING_ENABLED
@@ -577,10 +537,6 @@
  #define AC_OAPATHPLANNER_ENABLED   !HAL_MINIMIZE_FEATURES
 #endif
 
-#if MODE_FOLLOW_ENABLED && !AC_AVOID_ENABLED
-  #error Follow Mode relies on AC_AVOID which is disabled
-#endif
-
 #if MODE_AUTO_ENABLED && !MODE_GUIDED_ENABLED
   #error ModeAuto requires ModeGuided which is disabled
 #endif
@@ -593,10 +549,6 @@
   #error ModeAuto requires ModeRTL which is disabled
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME && !MODE_ACRO_ENABLED
-  #error Helicopter frame requires acro mode support which is disabled
-#endif
-
 #if MODE_SMARTRTL_ENABLED && !MODE_RTL_ENABLED
   #error SmartRTL requires ModeRTL which is disabled
 #endif
@@ -605,13 +557,6 @@
   #error ADSB requires ModeGuided which is disabled
 #endif
 
-#if MODE_FOLLOW_ENABLED && !MODE_GUIDED_ENABLED
-  #error Follow requires ModeGuided which is disabled
-#endif
-
-#if MODE_GUIDED_NOGPS_ENABLED && !MODE_GUIDED_ENABLED
-  #error ModeGuided-NoGPS requires ModeGuided which is disabled
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Developer Items
