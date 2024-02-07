@@ -22,23 +22,14 @@ public:
         RTL =           6,  // automatic return to launching point
         CIRCLE =        7,  // automatic circular flight with automatic throttle
         LAND =          9,  // automatic landing with horizontal position control
-        DRIFT =        11,  // semi-autonomous position, yaw and throttle control
-        SPORT =        13,  // manual earth-frame angular rate control with manual throttle
-        FLIP =         14,  // automatically flip the vehicle on the roll axis
         AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
         POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
         BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
-        THROW =        18,  // throw to launch mode using inertial/GPS system, no pilot input
         AVOID_ADSB =   19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
-        GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
         SMART_RTL =    21,  // SMART_RTL returns to home by retracing its steps
-        FLOWHOLD  =    22,  // FLOWHOLD holds position with optical flow without rangefinder
-        FOLLOW    =    23,  // follow attempts to follow another vehicle or ground station
         ZIGZAG    =    24,  // ZIGZAG mode is able to fly in a zigzag manner with predefined point A and point B
         SYSTEMID  =    25,  // System ID mode produces automated system identification signals in the controllers
-        AUTOROTATE =   26,  // Autonomous autorotation
         AUTO_RTL =     27,  // Auto RTL, this is not a true mode, AUTO will report as this mode if entered to perform a DO_LAND_START Landing sequence
-        TURTLE =       28,  // Flip over after crash
 
         // Mode number 127 reserved for the "drone show mode" in the Skybrush
         // fork at https://github.com/skybrush-io/ardupilot
@@ -122,10 +113,6 @@ public:
     virtual bool pause() { return false; };
     virtual bool resume() { return false; };
 
-    // true if weathervaning is allowed in the current mode
-#if WEATHERVANE_ENABLED == ENABLED
-    virtual bool allows_weathervaning() const { return false; }
-#endif
 
 protected:
 
@@ -272,10 +259,6 @@ public:
 
         bool reached_fixed_yaw_target();
 
-#if WEATHERVANE_ENABLED == ENABLED
-        void update_weathervane(const int16_t pilot_yaw_cds);
-#endif
-
         AC_AttitudeControl::HeadingCommand get_heading();
 
     private:
@@ -327,71 +310,6 @@ public:
     uint16_t get_pilot_speed_dn(void);
     // end pass-through functions
 };
-
-
-#if MODE_ACRO_ENABLED == ENABLED
-class ModeAcro : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::ACRO; }
-
-    enum class Trainer {
-        OFF = 0,
-        LEVELING = 1,
-        LIMITED = 2,
-    };
-
-    enum class AcroOptions {
-        AIR_MODE = 1 << 0,
-        RATE_LOOP_ONLY = 1 << 1,
-    };
-
-    virtual void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    // whether an air-mode aux switch has been toggled
-    void air_mode_aux_changed();
-    bool allows_save_trim() const override { return true; }
-    bool allows_flip() const override { return true; }
-
-protected:
-
-    const char *name() const override { return "ACRO"; }
-    const char *name4() const override { return "ACRO"; }
-
-    // get_pilot_desired_angle_rates - transform pilot's normalised roll pitch and yaw input into a desired lean angle rates
-    // inputs are -1 to 1 and the function returns desired angle rates in centi-degrees-per-second
-    void get_pilot_desired_angle_rates(float roll_in, float pitch_in, float yaw_in, float &roll_out, float &pitch_out, float &yaw_out);
-
-    float throttle_hover() const override;
-
-private:
-    bool disable_air_mode_reset;
-};
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-class ModeAcro_Heli : public ModeAcro {
-
-public:
-    // inherit constructor
-    using ModeAcro::Mode;
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-    void virtual_flybar( float &roll_out, float &pitch_out, float &yaw_out, float pitch_leak, float roll_leak);
-
-protected:
-private:
-};
-#endif
 
 
 class ModeAltHold : public Mode {
@@ -508,10 +426,6 @@ public:
     // Mission change detector
     AP_Mission_ChangeDetector mis_change_detector;
 
-    // true if weathervaning is allowed in auto
-#if WEATHERVANE_ENABLED == ENABLED
-    bool allows_weathervaning(void) const override;
-#endif
 
 protected:
 
@@ -683,64 +597,6 @@ private:
     } nav_attitude_time;
 };
 
-#if AUTOTUNE_ENABLED == ENABLED
-/*
-  wrapper class for AC_AutoTune
- */
-
-#if FRAME_CONFIG == HELI_FRAME
-class AutoTune : public AC_AutoTune_Heli
-#else
-class AutoTune : public AC_AutoTune_Multi
-#endif
-{
-public:
-    bool init() override;
-    void run() override;
-
-protected:
-    bool position_ok() override;
-    float get_pilot_desired_climb_rate_cms(void) const override;
-    void get_pilot_desired_rp_yrate_cd(float &roll_cd, float &pitch_cd, float &yaw_rate_cds) override;
-    void init_z_limits() override;
-    void log_pids() override;
-};
-
-class ModeAutoTune : public Mode {
-
-    // ParametersG2 sets a pointer within our autotune object:
-    friend class ParametersG2;
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::AUTOTUNE; }
-
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
-    bool is_autopilot() const override { return false; }
-
-    void save_tuning_gains();
-    void reset();
-
-protected:
-
-    const char *name() const override { return "AUTOTUNE"; }
-    const char *name4() const override { return "ATUN"; }
-
-private:
-
-    AutoTune autotune;
-
-};
-#endif
-
-
 class ModeBrake : public Mode {
 
 public:
@@ -799,163 +655,6 @@ private:
     // Circle
     bool speed_changing = false;     // true when the roll stick is being held to facilitate stopping at 0 rate
 };
-
-
-class ModeDrift : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::DRIFT; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-
-protected:
-
-    const char *name() const override { return "DRIFT"; }
-    const char *name4() const override { return "DRIF"; }
-
-private:
-
-    float get_throttle_assist(float velz, float pilot_throttle_scaled);
-
-};
-
-
-class ModeFlip : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::FLIP; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
-    bool is_autopilot() const override { return false; }
-
-protected:
-
-    const char *name() const override { return "FLIP"; }
-    const char *name4() const override { return "FLIP"; }
-
-private:
-
-    // Flip
-    Vector3f orig_attitude;         // original vehicle attitude before flip
-
-    enum class FlipState : uint8_t {
-        Start,
-        Roll,
-        Pitch_A,
-        Pitch_B,
-        Recover,
-        Abandon
-    };
-    FlipState _state;               // current state of flip
-    Mode::Number   orig_control_mode;   // flight mode when flip was initated
-    uint32_t  start_time_ms;          // time since flip began
-    int8_t    roll_dir;            // roll direction (-1 = roll left, 1 = roll right)
-    int8_t    pitch_dir;           // pitch direction (-1 = pitch forward, 1 = pitch back)
-};
-
-
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-/*
-  class to support FLOWHOLD mode, which is a position hold mode using
-  optical flow directly, avoiding the need for a rangefinder
- */
-
-class ModeFlowHold : public Mode {
-public:
-    // need a constructor for parameters
-    ModeFlowHold(void);
-    Number mode_number() const override { return Number::FLOWHOLD; }
-
-    bool init(bool ignore_checks) override;
-    void run(void) override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool has_user_takeoff(bool must_navigate) const override {
-        return !must_navigate;
-    }
-    bool allows_flip() const override { return true; }
-
-    static const struct AP_Param::GroupInfo var_info[];
-
-protected:
-    const char *name() const override { return "FLOWHOLD"; }
-    const char *name4() const override { return "FHLD"; }
-
-private:
-
-    // FlowHold states
-    enum FlowHoldModeState {
-        FlowHold_MotorStopped,
-        FlowHold_Takeoff,
-        FlowHold_Flying,
-        FlowHold_Landed
-    };
-
-    // calculate attitude from flow data
-    void flow_to_angle(Vector2f &bf_angle);
-
-    LowPassFilterVector2f flow_filter;
-
-    bool flowhold_init(bool ignore_checks);
-    void flowhold_run();
-    void flowhold_flow_to_angle(Vector2f &angle, bool stick_input);
-    void update_height_estimate(void);
-
-    // minimum assumed height
-    const float height_min = 0.1f;
-
-    // maximum scaling height
-    const float height_max = 3.0f;
-
-    AP_Float flow_max;
-    AC_PI_2D flow_pi_xy{0.2f, 0.3f, 3000, 5, 0.0025f};
-    AP_Float flow_filter_hz;
-    AP_Int8  flow_min_quality;
-    AP_Int8  brake_rate_dps;
-
-    float quality_filtered;
-
-    uint8_t log_counter;
-    bool limited;
-    Vector2f xy_I;
-
-    // accumulated INS delta velocity in north-east form since last flow update
-    Vector2f delta_velocity_ne;
-
-    // last flow rate in radians/sec in north-east axis
-    Vector2f last_flow_rate_rps;
-
-    // timestamp of last flow data
-    uint32_t last_flow_ms;
-
-    float last_ins_height;
-    float height_offset;
-
-    // are we braking after pilot input?
-    bool braking;
-
-    // last time there was significant stick input
-    uint32_t last_stick_input_ms;
-};
-#endif // MODE_FLOWHOLD_ENABLED
 
 
 class ModeGuided : public Mode {
@@ -1045,10 +744,6 @@ public:
     bool pause() override;
     bool resume() override;
 
-    // true if weathervaning is allowed in guided
-#if WEATHERVANE_ENABLED == ENABLED
-    bool allows_weathervaning(void) const override;
-#endif
 
 protected:
 
@@ -1099,29 +794,6 @@ private:
     bool _paused;
 };
 
-
-class ModeGuidedNoGPS : public ModeGuided {
-
-public:
-    // inherit constructor
-    using ModeGuided::Mode;
-    Number mode_number() const override { return Number::GUIDED_NOGPS; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool is_autopilot() const override { return true; }
-
-protected:
-
-    const char *name() const override { return "GUIDED_NOGPS"; }
-    const char *name4() const override { return "GNGP"; }
-
-private:
-
-};
 
 
 class ModeLand : public Mode {
@@ -1464,34 +1136,6 @@ private:
 };
 
 
-class ModeSport : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::SPORT; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool has_user_takeoff(bool must_navigate) const override {
-        return !must_navigate;
-    }
-
-protected:
-
-    const char *name() const override { return "SPORT"; }
-    const char *name4() const override { return "SPRT"; }
-
-private:
-
-};
-
-
 class ModeStabilize : public Mode {
 
 public:
@@ -1605,95 +1249,6 @@ private:
     } systemid_state;
 };
 
-class ModeThrow : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::THROW; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-
-    // Throw types
-    enum class ThrowType {
-        Upward = 0,
-        Drop = 1
-    };
-
-    enum class PreThrowMotorState {
-        STOPPED = 0,
-        RUNNING = 1,
-    };
-
-protected:
-
-    const char *name() const override { return "THROW"; }
-    const char *name4() const override { return "THRW"; }
-
-private:
-
-    bool throw_detected();
-    bool throw_position_good() const;
-    bool throw_height_good() const;
-    bool throw_attitude_good() const;
-
-    // Throw stages
-    enum ThrowModeStage {
-        Throw_Disarmed,
-        Throw_Detecting,
-        Throw_Wait_Throttle_Unlimited,
-        Throw_Uprighting,
-        Throw_HgtStabilise,
-        Throw_PosHold
-    };
-
-    ThrowModeStage stage = Throw_Disarmed;
-    ThrowModeStage prev_stage = Throw_Disarmed;
-    uint32_t last_log_ms;
-    bool nextmode_attempted;
-    uint32_t free_fall_start_ms;    // system time free fall was detected
-    float free_fall_start_velz;     // vertical velocity when free fall was detected
-};
-
-#if MODE_TURTLE_ENABLED == ENABLED
-class ModeTurtle : public Mode {
-
-public:
-    // inherit constructors
-    using Mode::Mode;
-    Number mode_number() const override { return Number::TURTLE; }
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-    void exit() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override;
-    bool is_autopilot() const override { return false; }
-    void change_motor_direction(bool reverse);
-    void output_to_motors() override;
-
-protected:
-    const char *name() const override { return "TURTLE"; }
-    const char *name4() const override { return "TRTL"; }
-
-private:
-    void arm_motors();
-    void disarm_motors();
-
-    float motors_output;
-    Vector2f motors_input;
-    uint32_t last_throttle_warning_output_ms;
-};
-#endif
-
 // modes below rely on Guided mode so must be declared at the end (instead of in alphabetical order)
 
 class ModeAvoidADSB : public ModeGuided {
@@ -1720,130 +1275,6 @@ protected:
 
 private:
 
-};
-
-class ModeFollow : public ModeGuided {
-
-public:
-
-    // inherit constructor
-    using ModeGuided::Mode;
-    Number mode_number() const override { return Number::FOLLOW; }
-
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    void run() override;
-
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
-    bool is_autopilot() const override { return true; }
-
-protected:
-
-    const char *name() const override { return "FOLLOW"; }
-    const char *name4() const override { return "FOLL"; }
-
-    // for reporting to GCS
-    bool get_wp(Location &loc) const override;
-    uint32_t wp_distance() const override;
-    int32_t wp_bearing() const override;
-
-    uint32_t last_log_ms;   // system time of last time desired velocity was logging
-};
-
-class ModeZigZag : public Mode {        
-
-public:
-    ModeZigZag(void);
-
-    // Inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::ZIGZAG; }
-
-    enum class Destination : uint8_t {
-        A,  // Destination A
-        B,  // Destination B
-    };
-
-    enum class Direction : uint8_t {
-        FORWARD,        // moving forward from the yaw direction
-        RIGHT,          // moving right from the yaw direction
-        BACKWARD,       // moving backward from the yaw direction
-        LEFT,           // moving left from the yaw direction
-    } zigzag_direction;
-
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    void run() override;
-
-    // auto control methods.  copter flies grid pattern
-    void run_auto();
-    void suspend_auto();
-    void init_auto();
-
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; }
-    bool is_autopilot() const override { return true; }
-    bool has_user_takeoff(bool must_navigate) const override { return true; }
-
-    // save current position as A or B.  If both A and B have been saved move to the one specified
-    void save_or_move_to_destination(Destination ab_dest);
-
-    // return manual control to the pilot
-    void return_to_manual_control(bool maintain_target);
-
-    static const struct AP_Param::GroupInfo var_info[];
-
-protected:
-
-    const char *name() const override { return "ZIGZAG"; }
-    const char *name4() const override { return "ZIGZ"; }
-
-private:
-
-    void auto_control();
-    void manual_control();
-    bool reached_destination();
-    bool calculate_next_dest(Destination ab_dest, bool use_wpnav_alt, Vector3f& next_dest, bool& terrain_alt) const;
-    void spray(bool b);
-    bool calculate_side_dest(Vector3f& next_dest, bool& terrain_alt) const;
-    void move_to_side();
-
-    Vector2f dest_A;    // in NEU frame in cm relative to ekf origin
-    Vector2f dest_B;    // in NEU frame in cm relative to ekf origin
-    Vector3f current_dest; // current target destination (use for resume after suspending)
-    bool current_terr_alt;
-
-    // parameters
-    AP_Int8  _auto_enabled;    // top level enable/disable control
-#if HAL_SPRAYER_ENABLED
-    AP_Int8  _spray_enabled;   // auto spray enable/disable
-#endif
-    AP_Int8  _wp_delay;        // delay for zigzag waypoint
-    AP_Float _side_dist;       // sideways distance
-    AP_Int8  _direction;       // sideways direction
-    AP_Int16 _line_num;        // total number of lines
-
-    enum ZigZagState {
-        STORING_POINTS, // storing points A and B, pilot has manual control
-        AUTO,           // after A and B defined, pilot toggle the switch from one side to the other, vehicle flies autonomously
-        MANUAL_REGAIN   // pilot toggle the switch to middle position, has manual control
-    } stage;
-
-    enum AutoState {
-        MANUAL,         // not in ZigZag Auto
-        AB_MOVING,      // moving from A to B or from B to A
-        SIDEWAYS,       // moving to sideways
-    } auto_stage;
-
-    uint32_t reach_wp_time_ms = 0;  // time since vehicle reached destination (or zero if not yet reached)
-    Destination ab_dest_stored;     // store the current destination
-    bool is_auto;                   // enable zigzag auto feature which is automate both AB and sideways
-    uint16_t line_count = 0;        // current line number
-    int16_t line_num = 0;           // target line number
-    bool is_suspended;              // true if zigzag auto is suspended
 };
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED

@@ -43,7 +43,6 @@
 #include <AP_Mission/AP_Mission_ChangeDetector.h>               // Mission command change detection library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>        // Attitude control library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Heli.h>         // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>                   // Position control library
 #include <AC_AttitudeControl/AC_CommandModel.h>                 // Command model library
 #include <AP_Motors/AP_Motors.h>            // AP Motors library
@@ -59,7 +58,6 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
 #include <AP_LandingGear/AP_LandingGear.h>  // Landing Gear library
 #include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-#include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
 #include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
 #include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
@@ -118,9 +116,6 @@
 #if PRECISION_LANDING == ENABLED
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
- # include <AP_Follow/AP_Follow.h>
 #endif
 #if AP_TERRAIN_AVAILABLE
  # include <AP_Terrain/AP_Terrain.h>
@@ -192,39 +187,29 @@ public:
     friend class AP_AdvancedFailsafe_Copter;
 #endif
     friend class AP_Arming_Copter;
-    friend class ToyMode;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
     friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAcro;
     friend class ModeAcro_Heli;
     friend class ModeAltHold;
     friend class ModeAuto;
-    friend class ModeAutoTune;
     friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
-    friend class ModeDrift;
-    friend class ModeFlip;
     friend class ModeFlowHold;
-    friend class ModeFollow;
     friend class ModeGuided;
     friend class ModeLand;
     friend class ModeLoiter;
     friend class ModePosHold;
     friend class ModeRTL;
     friend class ModeSmartRTL;
-    friend class ModeSport;
     friend class ModeStabilize;
     friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    friend class ModeThrow;
-    friend class ModeZigZag;
     friend class ModeAutorotate;
-    friend class ModeTurtle;
 
     Copter(void);
 
@@ -946,34 +931,15 @@ private:
     void userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag);
 
-#if MODE_ACRO_ENABLED == ENABLED
-#if FRAME_CONFIG == HELI_FRAME
-    ModeAcro_Heli mode_acro;
-#else
-    ModeAcro mode_acro;
-#endif
-#endif
     ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
-#endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ModeAutoTune mode_autotune;
 #endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;
 #endif
 #if MODE_CIRCLE_ENABLED == ENABLED
     ModeCircle mode_circle;
-#endif
-#if MODE_DRIFT_ENABLED == ENABLED
-    ModeDrift mode_drift;
-#endif
-#if MODE_FLIP_ENABLED == ENABLED
-    ModeFlip mode_flip;
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ModeFollow mode_follow;
 #endif
 #if MODE_GUIDED_ENABLED == ENABLED
     ModeGuided mode_guided;
@@ -993,35 +959,16 @@ private:
 #else
     ModeStabilize mode_stabilize;
 #endif
-#if MODE_SPORT_ENABLED == ENABLED
-    ModeSport mode_sport;
-#endif
+
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ModeSystemId mode_systemid;
 #endif
 #if HAL_ADSB_ENABLED
     ModeAvoidADSB mode_avoid_adsb;
 #endif
-#if MODE_THROW_ENABLED == ENABLED
-    ModeThrow mode_throw;
-#endif
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-    ModeGuidedNoGPS mode_guided_nogps;
-#endif
+
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
-#endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ModeFlowHold mode_flowhold;
-#endif
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ModeZigZag mode_zigzag;
-#endif
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-    ModeAutorotate mode_autorotate;
-#endif
-#if MODE_TURTLE_ENABLED == ENABLED
-    ModeTurtle mode_turtle;
 #endif
 
     // mode.cpp

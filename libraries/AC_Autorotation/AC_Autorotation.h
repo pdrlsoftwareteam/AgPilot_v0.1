@@ -4,7 +4,6 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Motors/AP_Motors.h>
-#include <AP_Motors/AP_MotorsHeli_RSC.h>
 #include <Filter/Filter.h>
 #include <Filter/LowPassFilter.h>
 #include <AC_PID/AC_P.h>
