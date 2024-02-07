@@ -821,11 +821,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
 #endif
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // @Group: AUTOTUNE_
-    // @Path: ../libraries/AC_AutoTune/AC_AutoTune_Multi.cpp,../libraries/AC_AutoTune/AC_AutoTune_Heli.cpp
-    AP_SUBGROUPPTR(autotune_ptr, "AUTOTUNE_",  29, ParametersG2, AutoTune),
-#endif
 
 #if AP_SCRIPTING_ENABLED
     // @Group: SCR_
@@ -878,11 +873,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    // @Group: ZIGZ_
-    // @Path: mode_zigzag.cpp
-    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
-#endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     // @Param: AUTO_OPTIONS
@@ -1094,9 +1084,6 @@ ParametersG2::ParametersG2(void)
 #ifdef USER_PARAMS_ENABLED
     ,user_parameters()
 #endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ,autotune_ptr(&copter.mode_autotune.autotune)
-#endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ,mode_systemid_ptr(&copter.mode_systemid)
 #endif
@@ -1105,9 +1092,6 @@ ParametersG2::ParametersG2(void)
 #endif
 #if HAL_BUTTON_ENABLED
     ,button_ptr(&copter.button)
-#endif
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ,mode_zigzag_ptr(&copter.mode_zigzag)
 #endif
 
     ,command_model_pilot(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
