@@ -50,13 +50,6 @@
  # define FRAME_CONFIG   MULTICOPTER_FRAME
 #endif
 
-/////////////////////////////////////////////////////////////////////////////////
-// TradHeli defaults
-#if FRAME_CONFIG == HELI_FRAME
-  # define RC_FAST_SPEED                        125
-  # define WP_YAW_BEHAVIOR_DEFAULT              WP_YAW_BEHAVIOR_LOOK_AHEAD
-#endif
-
 //////////////////////////////////////////////////////////////////////////////
 // PWM control
 // default RC speed in Hz
@@ -253,13 +246,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Autorotate - autonomous auto-rotation - helicopters only
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-    #if FRAME_CONFIG == HELI_FRAME
-        #ifndef MODE_AUTOROTATE_ENABLED
-        # define MODE_AUTOROTATE_ENABLED !HAL_MINIMIZE_FEATURES
-        #endif
-    #else
         # define MODE_AUTOROTATE_ENABLED DISABLED
-    #endif
 #else
     # define MODE_AUTOROTATE_ENABLED DISABLED
 #endif
@@ -572,10 +559,6 @@
 
 #ifndef TOY_MODE_ENABLED
 #define TOY_MODE_ENABLED DISABLED
-#endif
-
-#if TOY_MODE_ENABLED && FRAME_CONFIG == HELI_FRAME
-  #error Toy mode is not available on Helicopters
 #endif
 
 #ifndef STATS_ENABLED
