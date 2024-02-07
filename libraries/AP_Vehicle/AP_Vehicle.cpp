@@ -1,6 +1,5 @@
 #include "AP_Vehicle.h"
 
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_Arming/AP_Arming.h>
 #include <AP_Frsky_Telem/AP_Frsky_Parameters.h>

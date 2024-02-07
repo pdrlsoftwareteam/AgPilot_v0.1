@@ -107,7 +107,6 @@
 #define AP_PARAM_FRAME_PLANE        (1<<2)
 #define AP_PARAM_FRAME_SUB          (1<<3)
 #define AP_PARAM_FRAME_TRICOPTER    (1<<4)
-#define AP_PARAM_FRAME_HELI         (1<<5)
 #define AP_PARAM_FRAME_BLIMP        (1<<6)
 
 // a variant of offsetof() to work around C++ restrictions.
