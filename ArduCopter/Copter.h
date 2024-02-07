@@ -209,6 +209,7 @@ public:
     friend class ModeStabilize;
     friend class ModeStabilize_Heli;
     friend class ModeSystemId;
+    friend class ModeZigZag;
     friend class ModeAutorotate;
 
     Copter(void);
@@ -970,7 +971,9 @@ private:
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif
-
+#if MODE_ZIGZAG_ENABLED == ENABLED
+    ModeZigZag mode_zigzag;
+#endif
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);
