@@ -597,64 +597,6 @@ private:
     } nav_attitude_time;
 };
 
-#if AUTOTUNE_ENABLED == ENABLED
-/*
-  wrapper class for AC_AutoTune
- */
-
-#if FRAME_CONFIG == HELI_FRAME
-class AutoTune : public AC_AutoTune_Heli
-#else
-class AutoTune : public AC_AutoTune_Multi
-#endif
-{
-public:
-    bool init() override;
-    void run() override;
-
-protected:
-    bool position_ok() override;
-    float get_pilot_desired_climb_rate_cms(void) const override;
-    void get_pilot_desired_rp_yrate_cd(float &roll_cd, float &pitch_cd, float &yaw_rate_cds) override;
-    void init_z_limits() override;
-    void log_pids() override;
-};
-
-class ModeAutoTune : public Mode {
-
-    // ParametersG2 sets a pointer within our autotune object:
-    friend class ParametersG2;
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::AUTOTUNE; }
-
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
-    bool is_autopilot() const override { return false; }
-
-    void save_tuning_gains();
-    void reset();
-
-protected:
-
-    const char *name() const override { return "AUTOTUNE"; }
-    const char *name4() const override { return "ATUN"; }
-
-private:
-
-    AutoTune autotune;
-
-};
-#endif
-
-
 class ModeBrake : public Mode {
 
 public:

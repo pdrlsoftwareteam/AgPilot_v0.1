@@ -43,7 +43,6 @@ MAV_MODE GCS_MAVLINK_Copter::base_mode() const
     case Mode::Number::RTL:
     case Mode::Number::LOITER:
     case Mode::Number::AVOID_ADSB:
-    case Mode::Number::FOLLOW:
     case Mode::Number::GUIDED:
     case Mode::Number::CIRCLE:
     case Mode::Number::POSHOLD:
@@ -598,10 +597,7 @@ void GCS_MAVLINK_Copter::packetReceived(const mavlink_status_t &status,
         copter.avoidance_adsb.handle_msg(msg);
     }
 #endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    // pass message to follow library
-    copter.g2.follow.handle_msg(msg);
-#endif
+
     GCS_MAVLINK::packetReceived(status, msg);
 }
 
@@ -731,15 +727,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_do_reposition(const mavlink_co
 MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_int_t &packet)
 {
     switch(packet.command) {
-    case MAV_CMD_DO_FOLLOW:
-#if MODE_FOLLOW_ENABLED == ENABLED
-        // param1: sysid of target to follow
-        if ((packet.param1 > 0) && (packet.param1 <= 255)) {
-            copter.g2.follow.set_target_sysid((uint8_t)packet.param1);
-            return MAV_RESULT_ACCEPTED;
-        }
-#endif
-        return MAV_RESULT_UNSUPPORTED;
 
     case MAV_CMD_DO_REPOSITION:
         return handle_command_int_do_reposition(packet);
@@ -817,16 +804,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
             return MAV_RESULT_FAILED;
         }
         return MAV_RESULT_ACCEPTED;
-
-#if MODE_FOLLOW_ENABLED == ENABLED
-    case MAV_CMD_DO_FOLLOW:
-        // param1: sysid of target to follow
-        if ((packet.param1 > 0) && (packet.param1 <= 255)) {
-            copter.g2.follow.set_target_sysid((uint8_t)packet.param1);
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-#endif
 
     case MAV_CMD_CONDITION_YAW:
         // param1 : target angle [0-360]
@@ -1002,7 +979,7 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
             } else {
                 // assume that shots modes are all done in guided.
                 // NOTE: this may need to change if we add a non-guided shot mode
-                bool shot_mode = (!is_zero(packet.param1) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::GUIDED_NOGPS));
+                bool shot_mode = (!is_zero(packet.param1) && (copter.flightmode->mode_number() == Mode::Number::GUIDED));
 
                 if (!shot_mode) {
 #if MODE_BRAKE_ENABLED == ENABLED
