@@ -13,7 +13,6 @@
 // Frame types
 #define UNDEFINED_FRAME 0
 #define MULTICOPTER_FRAME 1
-#define HELI_FRAME 2
 
 // Tuning enumeration
 enum tuning_func {
@@ -26,7 +25,6 @@ enum tuning_func {
     TUNING_THROTTLE_RATE_KP =            7, // throttle rate controller's P term (desired rate to acceleration or motor output)
     TUNING_WP_SPEED =                   10, // maximum speed to next way point (0 to 10m/s)
     TUNING_LOITER_POSITION_KP =         12, // loiter distance controller's P term (position error to speed)
-    TUNING_HELI_EXTERNAL_GYRO =         13, // TradHeli specific external tail gyro gain
     TUNING_ALTITUDE_HOLD_KP =           14, // altitude hold controller's P term (alt error to desired rate)
     TUNING_RATE_ROLL_PITCH_KD =         21, // body frame roll/pitch rate controller's D term
     TUNING_VEL_XY_KP =                  22, // loiter rate controller's P term (speed error to tilt angle)
@@ -103,7 +101,6 @@ enum LoggingParameters {
      LOG_DATA_UINT32_MSG,
      LOG_DATA_FLOAT_MSG,
      LOG_PARAMTUNE_MSG,
-     LOG_HELI_MSG,
      LOG_GUIDED_POSITION_TARGET_MSG,
      LOG_SYSIDD_MSG,
      LOG_SYSIDS_MSG,

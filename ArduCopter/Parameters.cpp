@@ -20,12 +20,7 @@
  *
  */
 
-#if FRAME_CONFIG == HELI_FRAME
-// 6 here is AP_Motors::MOTOR_FRAME_HELI
-#define DEFAULT_FRAME_CLASS 6
-#else
 #define DEFAULT_FRAME_CLASS 0
-#endif
 
 const AP_Param::Info Copter::var_info[] = {
     // @Param: FORMAT_VERSION
@@ -437,12 +432,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(landinggear,    "LGR_", AP_LandingGear),
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-    // @Group: IM_
-    // @Path: ../libraries/AC_InputManager/AC_InputManager_Heli.cpp
-    GOBJECT(input_manager, "IM_", AC_InputManager_Heli),
-#endif
-
     // @Group: COMPASS_
     // @Path: ../libraries/AP_Compass/AP_Compass.cpp
     GOBJECT(compass,        "COMPASS_", Compass),
@@ -467,11 +456,8 @@ const AP_Param::Info Copter::var_info[] = {
 
     // @Group: ATC_
     // @Path: ../libraries/AC_AttitudeControl/AC_AttitudeControl.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
-#if FRAME_CONFIG == HELI_FRAME
-    GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_Heli),
-#else
+
     GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_Multi),
-#endif
 
     // @Group: PSC
     // @Path: ../libraries/AC_AttitudeControl/AC_PosControl.cpp
@@ -582,15 +568,9 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(rally,      "RALLY_",   AP_Rally_Copter),
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-    // @Group: H_
-    // @Path: ../libraries/AP_Motors/AP_MotorsHeli_Single.cpp,../libraries/AP_Motors/AP_MotorsHeli_Dual.cpp,../libraries/AP_Motors/AP_MotorsHeli.cpp
-    GOBJECTVARPTR(motors, "H_",        &copter.motors_var_info),
-#else
     // @Group: MOT_
     // @Path: ../libraries/AP_Motors/AP_MotorsMulticopter.cpp
     GOBJECTVARPTR(motors, "MOT_",      &copter.motors_var_info),
-#endif
 
     // @Group: RCMAP_
     // @Path: ../libraries/AP_RCMapper/AP_RCMapper.cpp
@@ -995,7 +975,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("TKOFF_SLEW_TIME", 57, ParametersG2, takeoff_throttle_slew_time, 2.0),
 
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
+#if HAL_WITH_ESC_TELEM
     // @Param: TKOFF_RPM_MIN
     // @DisplayName: Takeoff Check RPM minimum
     // @Description: Takeoff is not permitted until motors report at least this RPM.  Set to zero to disable check
@@ -1255,12 +1235,10 @@ void Copter::convert_pid_parameters(void)
     // and motor libraries switch to accept inputs in -1 to +1 range instead of -4500 ~ +4500
     float pid_scaler = 1.27f;
 
-#if FRAME_CONFIG != HELI_FRAME
     // Multicopter x-frame gains are 40% lower because -1 or +1 input to motors now results in maximum rotation
     if (g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_X || g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_V || g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_H) {
         pid_scaler = 0.9f;
     }
-#endif
 
     // scale PID gains
     for (const auto &info : pid_conversion_info) {

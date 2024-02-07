@@ -11,11 +11,7 @@ MAV_TYPE GCS_Copter::frame_type() const
       information and won't display UIs such as flight mode
       selection
     */
-#if FRAME_CONFIG == HELI_FRAME
-    const MAV_TYPE mav_type_default = MAV_TYPE_HELICOPTER;
-#else
     const MAV_TYPE mav_type_default = MAV_TYPE_QUADROTOR;
-#endif
     if (copter.motors == nullptr) {
         return mav_type_default;
     }

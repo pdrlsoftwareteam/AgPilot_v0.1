@@ -46,39 +46,18 @@ void Copter::update_land_detector()
         // if disarmed, always landed.
         set_land_complete(true);
     } else if (ap.land_complete) {
-#if FRAME_CONFIG == HELI_FRAME
-        // if rotor speed and collective pitch are high then clear landing flag
-        if (!flightmode->is_taking_off() && motors->get_takeoff_collective() && motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
-#else
         // if throttle output is high then clear landing flag
         if (!flightmode->is_taking_off() && motors->get_throttle_out() > get_non_takeoff_throttle() && motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
             // this should never happen because take-off should be detected at the flight mode level
             // this here to highlight there is a bug or missing take-off detection
             INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
-#endif
             set_land_complete(false);
         }
     } else if (standby_active) {
         // land detector will not run in standby mode
         land_detector_count = 0;
     } else {
-
         float land_trigger_sec = LAND_DETECTOR_TRIGGER_SEC;
-#if FRAME_CONFIG == HELI_FRAME
-        // check for both manual collective modes and modes that use altitude hold. For manual collective (called throttle
-        // because multi's use throttle), check that collective pitch is below land min collective position or throttle stick is zero.
-        // Including the throttle zero check will ensure the conditions where stabilize stick zero position was not below collective min. For modes
-        // that use altitude hold, check that the pilot is commanding a descent and collective is at min allowed for altitude hold modes.
-
-        // check if landing
-        const bool landing = flightmode->is_landing();
-        bool motor_at_lower_limit = (flightmode->has_manual_throttle() && (motors->get_below_land_min_coll() || heli_flags.coll_stk_low) && fabsf(ahrs.get_roll()) < M_PI/2.0f)
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-                                    || (flightmode->mode_number() == Mode::Number::AUTOROTATE && motors->get_below_land_min_coll())
-#endif
-                                    || ((!force_flying || landing) && motors->limit.throttle_lower && pos_control->get_vel_desired_cms().z < 0.0f);
-        bool throttle_mix_at_min = true;
-#else
         // check that the average throttle output is near minimum (less than 12.5% hover throttle)
         bool motor_at_lower_limit = motors->limit.throttle_lower;
         bool throttle_mix_at_min = attitude_control->is_throttle_mix_min();
@@ -88,7 +67,6 @@ void Copter::update_land_detector()
             land_trigger_sec = LAND_AIRMODE_DETECTOR_TRIGGER_SEC;
             throttle_mix_at_min = true;
         }
-#endif
 
         uint8_t land_detector_scalar = 1;
 #if AP_LANDINGGEAR_ENABLED
@@ -180,7 +158,6 @@ void Copter::set_land_complete_maybe(bool b)
 //  has no effect when throttle is above hover throttle
 void Copter::update_throttle_mix()
 {
-#if FRAME_CONFIG != HELI_FRAME
     // if disarmed or landed prioritise throttle
     if (!motors->armed() || ap.land_complete) {
         attitude_control->set_throttle_mix_min();
@@ -220,5 +197,4 @@ void Copter::update_throttle_mix()
             attitude_control->set_throttle_mix_min();
         }
     }
-#endif
 }
