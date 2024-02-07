@@ -205,6 +205,9 @@ void AP_Camera::handle_message(mavlink_channel_t chan, const mavlink_message_t &
 MAV_RESULT AP_Camera::handle_command_long(const mavlink_command_long_t &packet)
 {
     switch (packet.command) {
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:
+        configure(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6, packet.param7);
+        return MAV_RESULT_ACCEPTED;
     case MAV_CMD_DO_DIGICAM_CONTROL:
         control(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6);
         return MAV_RESULT_ACCEPTED;
