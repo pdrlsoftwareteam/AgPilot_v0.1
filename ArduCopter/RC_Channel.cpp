@@ -276,31 +276,10 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::MOTOR_INTERLOCK:
-#if FRAME_CONFIG == HELI_FRAME
-            // The interlock logic for ROTOR_CONTROL_MODE_PASSTHROUGH is handled 
-            // in heli_update_rotor_speed_targets.  Otherwise turn on when above low.
-            if (copter.motors->get_rsc_mode() != ROTOR_CONTROL_MODE_PASSTHROUGH) {
-                copter.ap.motor_interlock_switch = (ch_flag == AuxSwitchPos::HIGH || ch_flag == AuxSwitchPos::MIDDLE);
-            }
-#else
             copter.ap.motor_interlock_switch = (ch_flag == AuxSwitchPos::HIGH || ch_flag == AuxSwitchPos::MIDDLE);
-#endif
             break;
 			
         case AUX_FUNC::TURBINE_START:
-#if FRAME_CONFIG == HELI_FRAME     
-           switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.motors->set_turb_start(true);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    // nothing
-                    break;
-                case AuxSwitchPos::LOW:
-                    copter.motors->set_turb_start(false);
-                    break;
-           }
-#endif
            break;
 		 
         case AUX_FUNC::BRAKE:
@@ -332,23 +311,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::INVERTED:
-#if FRAME_CONFIG == HELI_FRAME
-            switch (ch_flag) {
-            case AuxSwitchPos::HIGH:
-                copter.motors->set_inverted_flight(true);
-                copter.attitude_control->set_inverted_flight(true);
-                copter.heli_flags.inverted_flight = true;
-                break;
-            case AuxSwitchPos::MIDDLE:
-                // nothing
-                break;
-            case AuxSwitchPos::LOW:
-                copter.motors->set_inverted_flight(false);
-                copter.attitude_control->set_inverted_flight(false);
-                copter.heli_flags.inverted_flight = false;
-                break;
-            }
-#endif
             break;
 
         case AUX_FUNC::WINCH_ENABLE:

@@ -167,20 +167,6 @@ public:
         k_param_single_servo_4,         // 78 - remove
 
         //
-        // 80: Heli
-        //
-        k_param_heli_servo_1 = 80,  // remove
-        k_param_heli_servo_2,       // remove
-        k_param_heli_servo_3,       // remove
-        k_param_heli_servo_4,       // remove
-        k_param_heli_pitch_ff,      // remove
-        k_param_heli_roll_ff,       // remove
-        k_param_heli_yaw_ff,        // remove
-        k_param_heli_stab_col_min,  // remove
-        k_param_heli_stab_col_max,  // remove
-        k_param_heli_servo_rsc,     // 89 = full! - remove
-
-        //
         // 90: misc2
         //
         k_param_motors = 90,
@@ -625,7 +611,7 @@ public:
 
     // ramp time of throttle during take-off
     AP_Float takeoff_throttle_slew_time;
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
+#if HAL_WITH_ESC_TELEM
     AP_Int16 takeoff_rpm_min;
 #endif
 

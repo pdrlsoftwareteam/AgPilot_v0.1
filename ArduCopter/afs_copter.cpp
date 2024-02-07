@@ -43,11 +43,9 @@ void AP_AdvancedFailsafe_Copter::setup_IO_failsafe(void)
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_none, SRV_Channel::Limit::TRIM);
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_manual, SRV_Channel::Limit::TRIM);
 
-#if FRAME_CONFIG != HELI_FRAME
     // setup AP_Motors outputs for failsafe
     uint32_t mask = copter.motors->get_motor_mask();
     hal.rcout->set_failsafe_pwm(mask, copter.motors->get_pwm_output_min());
-#endif
 }
 
 /*

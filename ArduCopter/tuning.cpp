@@ -104,11 +104,6 @@ void Copter::tuning()
         wp_nav->set_speed_xy(tuning_value);
         break;
 
-#if FRAME_CONFIG == HELI_FRAME
-    case TUNING_HELI_EXTERNAL_GYRO:
-        motors->ext_gyro_gain(tuning_value);
-        break;
-
     case TUNING_RATE_PITCH_FF:
         attitude_control->get_rate_pitch_pid().ff(tuning_value);
         break;
@@ -120,7 +115,6 @@ void Copter::tuning()
     case TUNING_RATE_YAW_FF:
         attitude_control->get_rate_yaw_pid().ff(tuning_value);
         break;
-#endif
 
     case TUNING_DECLINATION:
         compass.set_declination(ToRad(tuning_value), false);     // 2nd parameter is false because we do not want to save to eeprom because this would have a performance impact
@@ -160,11 +154,9 @@ void Copter::tuning()
         attitude_control->get_rate_roll_pid().kD(tuning_value);
         break;
 
-#if FRAME_CONFIG != HELI_FRAME
     case TUNING_RATE_MOT_YAW_HEADROOM:
         motors->set_yaw_headroom(tuning_value);
         break;
-#endif
 
     case TUNING_RATE_YAW_FILT:
         attitude_control->get_rate_yaw_pid().filt_E_hz(tuning_value);

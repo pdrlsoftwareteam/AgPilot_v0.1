@@ -85,10 +85,6 @@ bool ModeSystemId::init(bool ignore_checks)
         return false;
     }
 
-#if FRAME_CONFIG == HELI_FRAME
-    copter.input_manager.set_use_stab_col(true);
-#endif
-
     att_bf_feedforward = attitude_control->get_bf_feedforward();
     waveform_time = 0.0f;
     time_const_freq = 2.0f / frequency_start; // Two full cycles at the starting frequency
@@ -130,7 +126,7 @@ void ModeSystemId::run()
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::SHUT_DOWN);
     // Tradheli doesn't set spool state to ground idle when throttle stick is zero.  Ground idle only set when
     // motor interlock is disabled.
-    } else if (copter.ap.throttle_zero && !copter.is_tradheli()) {
+    } else if (copter.ap.throttle_zero) {
         // Attempting to Land
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
     } else {
@@ -168,11 +164,7 @@ void ModeSystemId::run()
     }
 
     // get pilot's desired throttle
-#if FRAME_CONFIG == HELI_FRAME
-    float pilot_throttle_scaled = copter.input_manager.get_pilot_desired_collective(channel_throttle->get_control_in());
-#else
     float pilot_throttle_scaled = get_pilot_desired_throttle();
-#endif
 
     if ((systemid_state == SystemIDModeState::SYSTEMID_STATE_TESTING) &&
         (!is_positive(frequency_start) || !is_positive(frequency_stop) || is_negative(time_fade_in) || !is_positive(time_record) || is_negative(time_fade_out) || (time_record <= time_const_freq))) {
@@ -261,11 +253,7 @@ void ModeSystemId::run()
     attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
 
     // output pilot's throttle
-    if (copter.is_tradheli()) {
-        attitude_control->set_throttle_out(pilot_throttle_scaled, false, g.throttle_filt);
-    } else {
         attitude_control->set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
-    }
 
     if (log_subsample <= 0) {
         log_data();
