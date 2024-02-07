@@ -360,8 +360,11 @@ bool AP_Mission::verify_command(const Mission_Command& cmd)
     switch (cmd.id) {
     // do-commands always return true for verify:
     case MAV_CMD_DO_SET_SERVO:
+    case MAV_CMD_DO_SET_RELAY:
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:
     case MAV_CMD_DO_DIGICAM_CONTROL:
     case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
+    case MAV_CMD_DO_PARACHUTE:
     case MAV_CMD_DO_SEND_SCRIPT_MESSAGE:
     case MAV_CMD_DO_SPRAYER:
     case MAV_CMD_DO_AUX_FUNCTION:
@@ -391,8 +394,10 @@ bool AP_Mission::start_command(const Mission_Command& cmd)
     case MAV_CMD_DO_AUX_FUNCTION:
         return start_command_do_aux_function(cmd);
     case MAV_CMD_DO_SET_SERVO:
+    case MAV_CMD_DO_SET_RELAY:
         return start_command_do_servorelayevents(cmd);
 #if AP_CAMERA_ENABLED
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:
     case MAV_CMD_DO_DIGICAM_CONTROL:
     case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
     case MAV_CMD_IMAGE_START_CAPTURE:
@@ -400,6 +405,8 @@ bool AP_Mission::start_command(const Mission_Command& cmd)
     case MAV_CMD_SET_CAMERA_FOCUS:
         return start_command_camera(cmd);
 #endif
+    case MAV_CMD_DO_PARACHUTE:
+        return start_command_parachute(cmd);
     case MAV_CMD_DO_SEND_SCRIPT_MESSAGE:
         return start_command_do_scripting(cmd);
     case MAV_CMD_DO_SPRAYER:
@@ -1045,6 +1052,11 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.p1 = packet.param1;                         // p1=0 means use current location, p=1 means use provided location
         break;
 
+    case MAV_CMD_DO_SET_RELAY:                          // MAV ID: 181
+        cmd.content.relay.num = packet.param1;          // relay number
+        cmd.content.relay.state = packet.param2;        // 0:off, 1:on
+        break;
+
     case MAV_CMD_DO_SET_SERVO:                          // MAV ID: 183
         cmd.content.servo.channel = packet.param1;      // channel
         cmd.content.servo.pwm = packet.param2;          // PWM
@@ -1058,6 +1070,16 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
 
     case MAV_CMD_DO_SET_ROI:                            // MAV ID: 201
         cmd.p1 = packet.param1;                         // 0 = no roi, 1 = next waypoint, 2 = waypoint number, 3 = fixed location, 4 = given target (not supported)
+        break;
+
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:                  // MAV ID: 202
+        cmd.content.digicam_configure.shooting_mode = packet.param1;
+        cmd.content.digicam_configure.shutter_speed = packet.param2;
+        cmd.content.digicam_configure.aperture = packet.param3;
+        cmd.content.digicam_configure.ISO = packet.param4;
+        cmd.content.digicam_configure.exposure_type = packet.x;
+        cmd.content.digicam_configure.cmd_id = packet.y;
+        cmd.content.digicam_configure.engine_cutoff_time = packet.z;
         break;
 
     case MAV_CMD_DO_DIGICAM_CONTROL:                    // MAV ID: 203
@@ -1087,6 +1109,10 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
     case MAV_CMD_DO_AUX_FUNCTION:
         cmd.content.auxfunction.function = packet.param1;
         cmd.content.auxfunction.switchpos = packet.param2;
+        break;
+
+    case MAV_CMD_DO_PARACHUTE:                         // MAV ID: 208
+        cmd.p1 = packet.param1;                        // action 0=disable, 1=enable, 2=release.  See PARACHUTE_ACTION enum
         break;
 
     case MAV_CMD_NAV_ALTITUDE_WAIT:                     // MAV ID: 83
@@ -1448,6 +1474,11 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         packet.param1 = cmd.p1;                         // p1=0 means use current location, p=1 means use provided location
         break;
 
+    case MAV_CMD_DO_SET_RELAY:                          // MAV ID: 181
+        packet.param1 = cmd.content.relay.num;          // relay number
+        packet.param2 = cmd.content.relay.state;        // 0:off, 1:on
+        break;
+
     case MAV_CMD_DO_SET_SERVO:                          // MAV ID: 183
         packet.param1 = cmd.content.servo.channel;      // channel
         packet.param2 = cmd.content.servo.pwm;          // PWM
@@ -1461,6 +1492,16 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
 
     case MAV_CMD_DO_SET_ROI:                            // MAV ID: 201
         packet.param1 = cmd.p1;                         // 0 = no roi, 1 = next waypoint, 2 = waypoint number, 3 = fixed location, 4 = given target (not supported)
+        break;
+
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:                  // MAV ID: 202
+        packet.param1 = cmd.content.digicam_configure.shooting_mode;
+        packet.param2 = cmd.content.digicam_configure.shutter_speed;
+        packet.param3 = cmd.content.digicam_configure.aperture;
+        packet.param4 = cmd.content.digicam_configure.ISO;
+        packet.x = cmd.content.digicam_configure.exposure_type;
+        packet.y = cmd.content.digicam_configure.cmd_id;
+        packet.z = cmd.content.digicam_configure.engine_cutoff_time;
         break;
 
     case MAV_CMD_DO_DIGICAM_CONTROL:                    // MAV ID: 203
@@ -1485,6 +1526,10 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
 
     case MAV_CMD_DO_FENCE_ENABLE:                       // MAV ID: 207
         packet.param1 = cmd.p1;                         // action 0=disable, 1=enable
+        break;
+
+    case MAV_CMD_DO_PARACHUTE:                          // MAV ID: 208
+        packet.param1 = cmd.p1;                         // action 0=disable, 1=enable, 2=release.  See PARACHUTE_ACTION enum
         break;
 
     case MAV_CMD_DO_SPRAYER:
@@ -2257,6 +2302,7 @@ bool AP_Mission::is_landing_type_cmd(uint16_t id) const
     switch (id) {
     case MAV_CMD_NAV_LAND:
     case MAV_CMD_NAV_VTOL_LAND:
+    case MAV_CMD_DO_PARACHUTE:
         return true;
     default:
         return false;
@@ -2300,6 +2346,10 @@ const char *AP_Mission::Mission_Command::type() const
         return "SetHome";
     case MAV_CMD_DO_SET_SERVO:
         return "SetServo";
+    case MAV_CMD_DO_SET_RELAY:
+        return "SetRelay";
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:
+        return "DigiCamCfg";
     case MAV_CMD_DO_DIGICAM_CONTROL:
         return "DigiCamCtrl";
     case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
@@ -2334,6 +2384,8 @@ const char *AP_Mission::Mission_Command::type() const
         return "Delay";
     case MAV_CMD_NAV_PAYLOAD_PLACE:
         return "PayloadPlace";
+    case MAV_CMD_DO_PARACHUTE:
+        return "Parachute";
     case MAV_CMD_DO_SPRAYER:
         return "Sprayer";
     case MAV_CMD_DO_AUX_FUNCTION:

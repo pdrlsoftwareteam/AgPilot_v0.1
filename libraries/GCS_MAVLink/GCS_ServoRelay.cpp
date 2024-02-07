@@ -18,6 +18,12 @@ MAV_RESULT GCS_MAVLINK::handle_servorelay_message(const mavlink_command_long_t &
         }
         break;
 
+    case MAV_CMD_DO_SET_RELAY:
+        if (handler->do_set_relay(packet.param1, packet.param2)) {
+            result = MAV_RESULT_ACCEPTED;
+        }
+        break;
+
     default:
         result = MAV_RESULT_UNSUPPORTED;
         break;
