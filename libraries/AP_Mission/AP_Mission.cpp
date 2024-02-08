@@ -466,6 +466,7 @@ bool AP_Mission::is_nav_cmd(const Mission_Command& cmd)
     // NAV commands all have ids below MAV_CMD_NAV_LAST, plus some exceptions
     return (cmd.id <= MAV_CMD_NAV_LAST ||
             cmd.id == MAV_CMD_NAV_SET_YAW_SPEED ||
+            cmd.id == MAV_CMD_NAV_SCRIPT_TIME ||
             cmd.id == MAV_CMD_NAV_ATTITUDE_TIME);
 }
 
@@ -869,6 +870,9 @@ bool AP_Mission::write_cmd_to_storage(uint16_t index, const Mission_Command& cmd
         // format_conversion), 0 otherwise
         uint8_t tag_byte = 0;
         // currently the only converted structure is NAV_SCRIPT_TIME
+        if (cmd.id == MAV_CMD_NAV_SCRIPT_TIME) {
+            tag_byte = 1;
+        }
         _storage.write_byte(pos_in_storage, tag_byte);
         _storage.write_uint16(pos_in_storage+1, cmd.id);
         _storage.write_uint16(pos_in_storage+3, cmd.p1);
@@ -1173,6 +1177,17 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.content.scripting.p2 = packet.param3;
         cmd.content.scripting.p3 = packet.param4;
         break;
+
+#if AP_SCRIPTING_ENABLED
+    case MAV_CMD_NAV_SCRIPT_TIME:
+        cmd.content.nav_script_time.command = packet.param1;
+        cmd.content.nav_script_time.timeout_s = packet.param2;
+        cmd.content.nav_script_time.arg1.set(packet.param3);
+        cmd.content.nav_script_time.arg2.set(packet.param4);
+        cmd.content.nav_script_time.arg3 = int16_t(packet.x);
+        cmd.content.nav_script_time.arg4 = int16_t(packet.y);
+        break;
+#endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
         cmd.content.nav_attitude_time.time_sec = constrain_float(packet.param1, 0, UINT16_MAX);
@@ -1595,6 +1610,17 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         packet.param3 = cmd.content.scripting.p2;
         packet.param4 = cmd.content.scripting.p3;
         break;
+
+#if AP_SCRIPTING_ENABLED
+    case MAV_CMD_NAV_SCRIPT_TIME:
+        packet.param1 = cmd.content.nav_script_time.command;
+        packet.param2 = cmd.content.nav_script_time.timeout_s;
+        packet.param3 = cmd.content.nav_script_time.arg1.get();
+        packet.param4 = cmd.content.nav_script_time.arg2.get();
+        packet.x = cmd.content.nav_script_time.arg3;
+        packet.y = cmd.content.nav_script_time.arg4;
+        break;
+#endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
         packet.param1 = cmd.content.nav_attitude_time.time_sec;
@@ -2404,6 +2430,10 @@ const char *AP_Mission::Mission_Command::type() const
         return "Tag";
     case MAV_CMD_DO_GO_AROUND:
         return "Go Around";
+#if AP_SCRIPTING_ENABLED
+    case MAV_CMD_NAV_SCRIPT_TIME:
+        return "NavScriptTime";
+#endif
     case MAV_CMD_NAV_ATTITUDE_TIME:
         return "NavAttitudeTime";
     case MAV_CMD_DO_PAUSE_CONTINUE:
@@ -2619,7 +2649,22 @@ bool AP_Mission::calc_rewind_pos(Mission_Command& rewind_cmd)
 */
 void AP_Mission::format_conversion(uint8_t tag_byte, const Mission_Command &cmd, PackedContent &packed_content) const
 {
-	// removed MAV_CMD_NAV_SCRIPT_TIME comand
+    // currently only one conversion needed, more can be added
+#if AP_SCRIPTING_ENABLED
+    if (tag_byte == 0 && cmd.id == MAV_CMD_NAV_SCRIPT_TIME) {
+        // PARAMETER_CONVERSION: conversion code added Oct 2022
+        struct nav_script_time_Command_tag0 old_fmt;
+        struct nav_script_time_Command new_fmt;
+        memcpy((void*)&old_fmt, packed_content.bytes, sizeof(old_fmt));
+        new_fmt.command = old_fmt.command;
+        new_fmt.timeout_s = old_fmt.timeout_s;
+        new_fmt.arg1.set(old_fmt.arg1);
+        new_fmt.arg2.set(old_fmt.arg2);
+        new_fmt.arg3 = 0;
+        new_fmt.arg4 = 0;
+        memcpy(packed_content.bytes, (void*)&new_fmt, sizeof(new_fmt));
+    }
+#endif
 }
 
 // singleton instance
