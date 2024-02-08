@@ -359,13 +359,8 @@ bool AP_Mission::verify_command(const Mission_Command& cmd)
 {
     switch (cmd.id) {
     // do-commands always return true for verify:
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:
-#endif
     case MAV_CMD_DO_SET_SERVO:
     case MAV_CMD_DO_SET_RELAY:
-    case MAV_CMD_DO_REPEAT_SERVO:
-    case MAV_CMD_DO_REPEAT_RELAY:
     case MAV_CMD_DO_DIGICAM_CONFIGURE:
     case MAV_CMD_DO_DIGICAM_CONTROL:
     case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
@@ -379,8 +374,6 @@ bool AP_Mission::verify_command(const Mission_Command& cmd)
     case MAV_CMD_IMAGE_START_CAPTURE:
     case MAV_CMD_SET_CAMERA_ZOOM:
     case MAV_CMD_SET_CAMERA_FOCUS:
-    case MAV_CMD_VIDEO_START_CAPTURE:
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
         return true;
     default:
         return _cmd_verify_fn(cmd);
@@ -400,14 +393,8 @@ bool AP_Mission::start_command(const Mission_Command& cmd)
     switch (cmd.id) {
     case MAV_CMD_DO_AUX_FUNCTION:
         return start_command_do_aux_function(cmd);
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:
-        return start_command_do_gripper(cmd);
-#endif
     case MAV_CMD_DO_SET_SERVO:
     case MAV_CMD_DO_SET_RELAY:
-    case MAV_CMD_DO_REPEAT_SERVO:
-    case MAV_CMD_DO_REPEAT_RELAY:
         return start_command_do_servorelayevents(cmd);
 #if AP_CAMERA_ENABLED
     case MAV_CMD_DO_DIGICAM_CONFIGURE:
@@ -416,8 +403,6 @@ bool AP_Mission::start_command(const Mission_Command& cmd)
     case MAV_CMD_IMAGE_START_CAPTURE:
     case MAV_CMD_SET_CAMERA_ZOOM:
     case MAV_CMD_SET_CAMERA_FOCUS:
-    case MAV_CMD_VIDEO_START_CAPTURE:
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
         return start_command_camera(cmd);
 #endif
     case MAV_CMD_DO_PARACHUTE:
@@ -822,12 +807,8 @@ bool AP_Mission::stored_in_location(uint16_t id)
     switch (id) {
     case MAV_CMD_NAV_WAYPOINT:
     case MAV_CMD_NAV_LOITER_UNLIM:
-    case MAV_CMD_NAV_LOITER_TURNS:
-    case MAV_CMD_NAV_LOITER_TIME:
     case MAV_CMD_NAV_LAND:
     case MAV_CMD_NAV_TAKEOFF:
-    case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:
-    case MAV_CMD_NAV_LOITER_TO_ALT:
     case MAV_CMD_NAV_SPLINE_WAYPOINT:
     case MAV_CMD_NAV_GUIDED_ENABLE:
     case MAV_CMD_DO_SET_HOME:
@@ -1007,32 +988,6 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.content.location.loiter_ccw = (packet.param3 < 0);    // -1 = counter clockwise, +1 = clockwise
         break;
 
-    case MAV_CMD_NAV_LOITER_TURNS: {                    // MAV ID: 18
-        // number of turns is stored in the lowest bits.  radii below
-        // 255m are stored in the top 8 bits as an 8-bit integer.
-        // Radii above 255m are stored divided by 10 and a bit set in
-        // storage so that on retrieval they are multiplied by 10
-        cmd.p1 = MIN(255, packet.param1); // store number of times to circle in low p1
-        uint8_t radius_m;
-        const float abs_radius = fabsf(packet.param3);
-        if (abs_radius <= 255) {
-            radius_m = abs_radius;
-        } else {
-            radius_m = MIN(255, abs_radius * 0.1);
-            cmd.type_specific_bits = 1U << 0;
-        }
-        cmd.p1 |= (radius_m<<8);   // store radius in high byte of p1
-        cmd.content.location.loiter_ccw = (packet.param3 < 0);
-        cmd.content.location.loiter_xtrack = (packet.param4 > 0); // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
-    }
-    break;
-
-    case MAV_CMD_NAV_LOITER_TIME:                       // MAV ID: 19
-        cmd.p1 = packet.param1;                         // loiter time in seconds uses all 16 bits, 8bit seconds is too small. No room for radius.
-        cmd.content.location.loiter_ccw = (packet.param3 < 0);
-        cmd.content.location.loiter_xtrack = (packet.param4 > 0); // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
-        break;
-
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:                  // MAV ID: 20
         break;
 
@@ -1045,19 +1000,6 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
 
     case MAV_CMD_NAV_TAKEOFF:                           // MAV ID: 22
         cmd.p1 = packet.param1;                         // minimum pitch (plane only)
-        break;
-
-    case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:           // MAV ID: 30
-        cmd.p1 = packet.param1;                         // Climb/Descend
-        // 0 = Neutral, cmd complete at +/- 5 of indicated alt.
-        // 1 = Climb, cmd complete at or above indicated alt.
-        // 2 = Descend, cmd complete at or below indicated alt.
-        break;
-
-    case MAV_CMD_NAV_LOITER_TO_ALT:                     // MAV ID: 31
-        cmd.p1 = fabsf(packet.param2);                  // param2 is radius in meters
-        cmd.content.location.loiter_ccw = (packet.param2 < 0);
-        cmd.content.location.loiter_xtrack = (packet.param4 > 0); // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
         break;
 
     case MAV_CMD_NAV_SPLINE_WAYPOINT:                   // MAV ID: 82
@@ -1119,22 +1061,9 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.content.relay.state = packet.param2;        // 0:off, 1:on
         break;
 
-    case MAV_CMD_DO_REPEAT_RELAY:                       // MAV ID: 182
-        cmd.content.repeat_relay.num = packet.param1;           // relay number
-        cmd.content.repeat_relay.repeat_count = packet.param2;  // count
-        cmd.content.repeat_relay.cycle_time = packet.param3;    // time converted from seconds to milliseconds
-        break;
-
     case MAV_CMD_DO_SET_SERVO:                          // MAV ID: 183
         cmd.content.servo.channel = packet.param1;      // channel
         cmd.content.servo.pwm = packet.param2;          // PWM
-        break;
-
-    case MAV_CMD_DO_REPEAT_SERVO:                       // MAV ID: 184
-        cmd.content.repeat_servo.channel = packet.param1;      // channel
-        cmd.content.repeat_servo.pwm = packet.param2;          // PWM
-        cmd.content.repeat_servo.repeat_count = packet.param3; // count
-        cmd.content.repeat_servo.cycle_time = packet.param4;   // time in seconds
         break;
 
     case MAV_CMD_DO_LAND_START:                         // MAV ID: 189
@@ -1188,28 +1117,6 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
 
     case MAV_CMD_DO_PARACHUTE:                         // MAV ID: 208
         cmd.p1 = packet.param1;                        // action 0=disable, 1=enable, 2=release.  See PARACHUTE_ACTION enum
-        break;
-
-    case MAV_CMD_DO_INVERTED_FLIGHT:                    // MAV ID: 210
-        cmd.p1 = packet.param1;                         // normal=0 inverted=1
-        break;
-
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:                            // MAV ID: 211
-        cmd.content.gripper.num = packet.param1;        // gripper number
-        cmd.content.gripper.action = packet.param2;     // action 0=release, 1=grab.  See GRIPPER_ACTION enum
-        break;
-#endif
-
-    case MAV_CMD_DO_GUIDED_LIMITS:                      // MAV ID: 222
-        cmd.p1 = packet.param1;                         // max time in seconds the external controller will be allowed to control the vehicle
-        cmd.content.guided_limits.alt_min = packet.param2;  // min alt below which the command will be aborted.  0 for no lower alt limit
-        cmd.content.guided_limits.alt_max = packet.param3;  // max alt above which the command will be aborted.  0 for no upper alt limit
-        cmd.content.guided_limits.horiz_max = packet.param4;// max horizontal distance the vehicle can move before the command will be aborted.  0 for no horizontal limit
-        break;
-
-    case MAV_CMD_DO_AUTOTUNE_ENABLE:                    // MAV ID: 211
-        cmd.p1 = packet.param1;                         // disable=0 enable=1
         break;
 
     case MAV_CMD_NAV_ALTITUDE_WAIT:                     // MAV ID: 83
@@ -1317,14 +1224,6 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
     case MAV_CMD_SET_CAMERA_FOCUS:
         cmd.content.set_camera_focus.focus_type = packet.param1;
         cmd.content.set_camera_focus.focus_value = packet.param2;
-        break;
-
-    case MAV_CMD_VIDEO_START_CAPTURE:
-        cmd.content.video_start_capture.video_stream_id = packet.param1;
-        break;
-
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
-        cmd.content.video_stop_capture.video_stream_id = packet.param1;
         break;
 
     default:
@@ -1528,28 +1427,6 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         }
         break;
 
-    case MAV_CMD_NAV_LOITER_TURNS:                      // MAV ID: 18
-        packet.param1 = LOWBYTE(cmd.p1);                // number of times to circle is held in low byte of p1
-        packet.param3 = HIGHBYTE(cmd.p1);               // radius is held in high byte of p1
-        if (cmd.content.location.loiter_ccw) {
-            packet.param3 = -packet.param3;
-        }
-        if (cmd.type_specific_bits & (1U<<0)) {
-            packet.param3 *= 10;
-        }
-        packet.param4 = cmd.content.location.loiter_xtrack; // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
-        break;
-
-    case MAV_CMD_NAV_LOITER_TIME:                       // MAV ID: 19
-        packet.param1 = cmd.p1;                         // loiter time in seconds
-        if (cmd.content.location.loiter_ccw) {
-            packet.param3 = -1;
-        } else {
-            packet.param3 = 1;
-        }
-        packet.param4 = cmd.content.location.loiter_xtrack; // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
-        break;
-
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:                  // MAV ID: 20
         break;
 
@@ -1560,21 +1437,6 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
 
     case MAV_CMD_NAV_TAKEOFF:                           // MAV ID: 22
         packet.param1 = cmd.p1;                         // minimum pitch (plane only)
-        break;
-
-    case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:           // MAV ID: 30
-        packet.param1 = cmd.p1;                         // Climb/Descend
-        // 0 = Neutral, cmd complete at +/- 5 of indicated alt.
-        // 1 = Climb, cmd complete at or above indicated alt.
-        // 2 = Descend, cmd complete at or below indicated alt.
-        break;
-
-    case MAV_CMD_NAV_LOITER_TO_ALT:                     // MAV ID: 31
-        packet.param2 = cmd.p1;                        // loiter radius(m)
-        if (cmd.content.location.loiter_ccw) {
-            packet.param2 = -packet.param2;
-        }
-        packet.param4 = cmd.content.location.loiter_xtrack; // 0 to xtrack from center of waypoint, 1 to xtrack from tangent exit location
         break;
 
     case MAV_CMD_NAV_SPLINE_WAYPOINT:                   // MAV ID: 82
@@ -1632,22 +1494,9 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         packet.param2 = cmd.content.relay.state;        // 0:off, 1:on
         break;
 
-    case MAV_CMD_DO_REPEAT_RELAY:                       // MAV ID: 182
-        packet.param1 = cmd.content.repeat_relay.num;           // relay number
-        packet.param2 = cmd.content.repeat_relay.repeat_count;  // count
-        packet.param3 = cmd.content.repeat_relay.cycle_time;    // time in seconds
-        break;
-
     case MAV_CMD_DO_SET_SERVO:                          // MAV ID: 183
         packet.param1 = cmd.content.servo.channel;      // channel
         packet.param2 = cmd.content.servo.pwm;          // PWM
-        break;
-
-    case MAV_CMD_DO_REPEAT_SERVO:                       // MAV ID: 184
-        packet.param1 = cmd.content.repeat_servo.channel;       // channel
-        packet.param2 = cmd.content.repeat_servo.pwm;           // PWM
-        packet.param3 = cmd.content.repeat_servo.repeat_count;  // count
-        packet.param4 = cmd.content.repeat_servo.cycle_time;    // time in milliseconds converted to seconds
         break;
 
     case MAV_CMD_DO_LAND_START:                         // MAV ID: 189
@@ -1705,28 +1554,6 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
     case MAV_CMD_DO_AUX_FUNCTION:
         packet.param1 = cmd.content.auxfunction.function;
         packet.param2 = cmd.content.auxfunction.switchpos;
-        break;
-
-    case MAV_CMD_DO_INVERTED_FLIGHT:                    // MAV ID: 210
-        packet.param1 = cmd.p1;                         // normal=0 inverted=1
-        break;
-
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:                            // MAV ID: 211
-        packet.param1 = cmd.content.gripper.num;        // gripper number
-        packet.param2 = cmd.content.gripper.action;     // action 0=release, 1=grab.  See GRIPPER_ACTION enum
-        break;
-#endif
-
-    case MAV_CMD_DO_GUIDED_LIMITS:                      // MAV ID: 222
-        packet.param1 = cmd.p1;                         // max time in seconds the external controller will be allowed to control the vehicle
-        packet.param2 = cmd.content.guided_limits.alt_min;  // min alt below which the command will be aborted.  0 for no lower alt limit
-        packet.param3 = cmd.content.guided_limits.alt_max;  // max alt above which the command will be aborted.  0 for no upper alt limit
-        packet.param4 = cmd.content.guided_limits.horiz_max;// max horizontal distance the vehicle can move before the command will be aborted.  0 for no horizontal limit
-        break;
-
-    case MAV_CMD_DO_AUTOTUNE_ENABLE:
-        packet.param1 = cmd.p1;                         // disable=0 enable=1
         break;
 
     case MAV_CMD_DO_SET_REVERSE:
@@ -1830,14 +1657,6 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
     case MAV_CMD_SET_CAMERA_FOCUS:
         packet.param1 = cmd.content.set_camera_focus.focus_type;
         packet.param2 = cmd.content.set_camera_focus.focus_value;
-        break;
-
-    case MAV_CMD_VIDEO_START_CAPTURE:
-        packet.param1 = cmd.content.video_start_capture.video_stream_id;
-        break;
-
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
-        packet.param1 = cmd.content.video_stop_capture.video_stream_id;
         break;
 
     default:
@@ -2539,14 +2358,8 @@ const char *AP_Mission::Mission_Command::type() const
         return "RTL";
     case MAV_CMD_NAV_LOITER_UNLIM:
         return "LoitUnlim";
-    case MAV_CMD_NAV_LOITER_TIME:
-        return "LoitTime";
     case MAV_CMD_NAV_GUIDED_ENABLE:
         return "GuidedEnable";
-    case MAV_CMD_NAV_LOITER_TURNS:
-        return "LoitTurns";
-    case MAV_CMD_NAV_LOITER_TO_ALT:
-        return "LoitAltitude";
     case MAV_CMD_NAV_SET_YAW_SPEED:
         return "SetYawSpd";
     case MAV_CMD_CONDITION_DELAY:
@@ -2561,10 +2374,6 @@ const char *AP_Mission::Mission_Command::type() const
         return "SetServo";
     case MAV_CMD_DO_SET_RELAY:
         return "SetRelay";
-    case MAV_CMD_DO_REPEAT_SERVO:
-        return "RepeatServo";
-    case MAV_CMD_DO_REPEAT_RELAY:
-        return "RepeatRelay";
     case MAV_CMD_DO_DIGICAM_CONFIGURE:
         return "DigiCamCfg";
     case MAV_CMD_DO_DIGICAM_CONTROL:
@@ -2577,26 +2386,18 @@ const char *AP_Mission::Mission_Command::type() const
         return "SetReverse";
     case MAV_CMD_DO_SET_RESUME_REPEAT_DIST:
         return "SetRepeatDist";
-    case MAV_CMD_DO_GUIDED_LIMITS:
-        return "GuidedLimits";
     case MAV_CMD_NAV_TAKEOFF:
         return "Takeoff";
     case MAV_CMD_NAV_LAND:
         return "Land";
-    case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:
-        return "ContinueAndChangeAlt";
     case MAV_CMD_NAV_ALTITUDE_WAIT:
         return "AltitudeWait";
     case MAV_CMD_NAV_VTOL_TAKEOFF:
         return "VTOLTakeoff";
     case MAV_CMD_NAV_VTOL_LAND:
         return "VTOLLand";
-    case MAV_CMD_DO_INVERTED_FLIGHT:
-        return "InvertedFlight";
     case MAV_CMD_DO_FENCE_ENABLE:
         return "FenceEnable";
-    case MAV_CMD_DO_AUTOTUNE_ENABLE:
-        return "AutoTuneEnable";
     case MAV_CMD_DO_VTOL_TRANSITION:
         return "VTOLTransition";
     case MAV_CMD_DO_ENGINE_CONTROL:
@@ -2607,10 +2408,6 @@ const char *AP_Mission::Mission_Command::type() const
         return "LandStart";
     case MAV_CMD_NAV_DELAY:
         return "Delay";
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:
-        return "Gripper";
-#endif
     case MAV_CMD_NAV_PAYLOAD_PLACE:
         return "PayloadPlace";
     case MAV_CMD_DO_PARACHUTE:
@@ -2649,10 +2446,6 @@ const char *AP_Mission::Mission_Command::type() const
         return "SetCameraZoom";
     case MAV_CMD_SET_CAMERA_FOCUS:
         return "SetCameraFocus";
-    case MAV_CMD_VIDEO_START_CAPTURE:
-        return "VideoStartCapture";
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
-        return "VideoStopCapture";
     default:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
         AP_HAL::panic("Mission command with ID %u has no string", id);

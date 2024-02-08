@@ -65,7 +65,6 @@ MAV_RESULT AP_Frsky_MAVliteMsgHandler::handle_command(const mavlink_command_long
         //case MAV_CMD_DO_DIGICAM_CONFIGURE:
         //case MAV_CMD_DO_DIGICAM_CONTROL:
         //case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
-        //case MAV_CMD_DO_GRIPPER:
         //case MAV_CMD_DO_MOUNT_CONFIGURE:
         //case MAV_CMD_DO_MOUNT_CONTROL:
         //case MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES:
@@ -84,9 +83,7 @@ MAV_RESULT AP_Frsky_MAVliteMsgHandler::handle_command(const mavlink_command_long
         //case MAV_CMD_GET_MESSAGE_INTERVAL:
         //case MAV_CMD_REQUEST_MESSAGE:
         //case MAV_CMD_DO_SET_SERVO:
-        //case MAV_CMD_DO_REPEAT_SERVO:
         //case MAV_CMD_DO_SET_RELAY:
-        //case MAV_CMD_DO_REPEAT_RELAY:
         //case MAV_CMD_DO_FLIGHTTERMINATION:
         //case MAV_CMD_COMPONENT_ARM_DISARM:
         //case MAV_CMD_FIXED_MAG_CAL_YAW:
