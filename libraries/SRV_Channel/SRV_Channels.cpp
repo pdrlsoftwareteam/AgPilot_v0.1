@@ -380,19 +380,11 @@ SRV_Channels::SRV_Channels(void)
 #if AP_ROBOTISSERVO_ENABLED
     robotis_ptr = &robotis;
 #endif // AP_ROBOTISSERVO_ENABLED
-
-#if HAL_SUPPORT_RCOUT_SERIAL
-    blheli_ptr = &blheli;
-#endif
 }
 
 // SRV_Channels initialization
 void SRV_Channels::init(uint32_t motor_mask, AP_HAL::RCOutput::output_mode mode)
 {
-    // initialize BLHeli late so that all of the masks it might setup don't get trodden on by motor initialization
-#if HAL_SUPPORT_RCOUT_SERIAL
-    blheli_ptr->init(motor_mask, mode);
-#endif
 #ifndef HAL_BUILD_AP_PERIPH
     hal.rcout->set_dshot_rate(_singleton->dshot_rate, AP::scheduler().get_loop_rate_hz());
 #endif
@@ -513,11 +505,6 @@ void SRV_Channels::push()
 #if AP_ROBOTISSERVO_ENABLED
     // give robotis library a chance to update
     robotis_ptr->update();
-#endif
-
-#if HAL_SUPPORT_RCOUT_SERIAL
-    // give blheli telemetry a chance to update
-    blheli_ptr->update_telemetry();
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
