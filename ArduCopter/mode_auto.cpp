@@ -649,6 +649,12 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         do_payload_place(cmd);
         break;
 
+#if AP_SCRIPTING_ENABLED
+	case MAV_CMD_NAV_SCRIPT_TIME:
+		do_nav_script_time(cmd);
+		break;
+#endif
+
     case MAV_CMD_NAV_ATTITUDE_TIME:
         do_nav_attitude_time(cmd);
         break;
@@ -866,6 +872,12 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
      case MAV_CMD_NAV_DELAY:
         cmd_complete = verify_nav_delay(cmd);
         break;
+
+#if AP_SCRIPTING_ENABLED
+	case MAV_CMD_NAV_SCRIPT_TIME:
+		cmd_complete = verify_nav_script_time();
+		break;
+#endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
         cmd_complete = verify_nav_attitude_time(cmd);
