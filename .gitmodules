@@ -34,3 +34,6 @@
 [submodule "modules/DroneCAN/libcanard"]
 	path = modules/DroneCAN/libcanard
 	url = https://github.com/DroneCAN/libcanard
+[submodule "modules/bhumi_mavlink"]
+	path = modules/bhumi_mavlink
+	url = https://github.com/pdrlsoftwareteam/bhumi_mavlink.git
