@@ -40,7 +40,7 @@ function install_pymavlink() {
     if [ $pymavlink_installed -eq 0 ]; then
         echo "Installing pymavlink"
         git submodule update --init --recursive --depth 1
-        (cd modules/mavlink/pymavlink && python setup.py build install --user)
+        (cd modules/bhumi_mavlink/pymavlink && python setup.py build install --user)
         pymavlink_installed=1
     fi
 }

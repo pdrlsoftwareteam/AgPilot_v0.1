@@ -201,7 +201,7 @@ def build_parameters():
 
 def mavtogpx_filepath():
     """Get mavtogpx script path."""
-    return util.reltopdir("modules/mavlink/pymavlink/tools/mavtogpx.py")
+    return util.reltopdir("modules/bhumi_mavlink/pymavlink/tools/mavtogpx.py")
 
 
 def convert_gpx():
