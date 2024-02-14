@@ -41,7 +41,7 @@ root_dir = os.path.realpath(os.path.join(autotest_dir, '../..'))
 try:
     from pymavlink import mavextra
 except ImportError:
-    sys.path.append(os.path.join(root_dir, "modules/mavlink"))
+    sys.path.append(os.path.join(root_dir, "modules/bhumi_mavlink"))
     from pymavlink import mavextra
 
 os.environ["SIM_VEHICLE_SESSION"] = binascii.hexlify(os.urandom(8)).decode()

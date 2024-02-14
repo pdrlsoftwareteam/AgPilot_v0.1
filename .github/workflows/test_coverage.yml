@@ -75,7 +75,7 @@ jobs:
           python -m pip install --progress-bar off --user mavproxy
           python -m pip uninstall -y pymavlink
           git submodule update --init --recursive --depth=1
-          (cd modules/mavlink/pymavlink && DISABLE_MAVNATIVE=True MDEF="$PWD/../message_definitions" python -m pip install --progress-bar off --user .)
+          (cd modules/bhumi_mavlink/pymavlink && DISABLE_MAVNATIVE=True MDEF="$PWD/../message_definitions" python -m pip install --progress-bar off --user .)
           if [[ ${{ matrix.config }} == "coverage" ]]; then
             Tools/scripts/run_coverage.py -f
           else
