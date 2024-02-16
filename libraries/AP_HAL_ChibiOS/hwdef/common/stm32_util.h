@@ -14,7 +14,7 @@
  */
 #pragma once
 
-#include "hal.h"
+#include "../../../../modules/ChibiOS/os/hal/include/hal.h"
 
 #ifndef AP_WATCHDOG_SAVE_FAULT_ENABLED
 #define AP_WATCHDOG_SAVE_FAULT_ENABLED 1
