@@ -115,7 +115,7 @@
 #define PROTO_EXTF_PROG_MULTI       0x35    // write bytes at external flash program address and increment
 #define PROTO_EXTF_READ_MULTI       0x36    // read bytes at address and increment
 #define PROTO_EXTF_GET_CRC          0x37	// compute & return a CRC of data in external flash
-
+#define PROTO_SEND_SECRET           0x41    // verify bootloader
 #define PROTO_CHIP_FULL_ERASE   0x40    // erase program area and reset program address, skip any flash wear optimization and force an erase
 
 #define PROTO_PROG_MULTI_MAX    64	// maximum PROG_MULTI size
@@ -147,6 +147,7 @@ static enum led_state led_state;
 
 volatile unsigned timer[NTIMERS];
 
+static int isVerified = 0;
 // keep back 32 bytes at the front of flash. This is long enough to allow for aligned
 // access on STM32H7
 #define RESERVE_LEAD_WORDS 8
@@ -611,6 +612,10 @@ bootloader(unsigned timeout)
             /* expect EOC */
             if (!wait_for_eoc(2)) {
                 goto cmd_bad;
+            }
+
+            if(isVerified != 1){
+                goto cmd_fail;
             }
 
             // once erase is done there is no going back, set timeout
@@ -1189,6 +1194,51 @@ bootloader(unsigned timeout)
             continue;
         }
             
+        case PROTO_SEND_SECRET : {
+            //          uint32_t inDat;
+            //          cin_word(&inDat,50);
+            //          if(memcmp((char*)inDat,"PDRL",4))
+            //          {
+            ////                if (!wait_for_eoc(2)) {
+            ////                    goto cmd_bad;
+            ////                }
+            //              if(*((uint8_t*)0x081C0000+16+16+16+16)== 1)
+            //                  isVerified = 1; // make bootloader to go ahead
+            //          }
+            if(cin(50) == 'P')
+                if(cin(50) == 'D')
+                    if(cin(50) == 'R')
+                    {
+                        int16_t lastCmd = cin(50);
+                        if(lastCmd == 'L')
+                        {
+                            if (!wait_for_eoc(2)) {
+                                goto cmd_bad;
+                            }
+    #ifdef STM32H743xx
+    //                      uint8_t* validSignatureFlag;
+    //                      validSignatureFlag = (uint8_t*)0x081C0000+32+32+32+32;
+    #elif defined(STM32F767xx)
+
+    #else
+                            // uint8_t* validSignatureFlag;
+                            // validSignatureFlag = (uint8_t*)0x081C0000+16+16+16+16;
+    #endif
+    //                      if(*validSignatureFlag == 1)
+                                isVerified = 1; // make bootloader to go ahead
+                        }
+                        else if(lastCmd == 'F')
+                        {
+                    if (!wait_for_eoc(2)) {
+                        goto cmd_bad;
+                    }
+                            isVerified = 1; // make bootloader to go ahead
+                        }
+                    }
+
+
+        }
+        break;    
         default:
             continue;
         }
