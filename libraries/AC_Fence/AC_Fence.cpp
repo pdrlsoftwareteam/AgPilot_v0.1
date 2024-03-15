@@ -1,7 +1,9 @@
 #include "AC_Fence.h"
 
 #if AP_FENCE_ENABLED
-
+#include <AP_LIBNPNT/AP_LIBNPNT.h>
+#include <AP_Vehicle/AP_Vehicle.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 #ifndef AC_FENCE_DUMMY_METHODS_ENABLED
@@ -26,7 +28,7 @@ extern const AP_HAL::HAL& hal;
 #endif
 
 // default boundaries
-#define AC_FENCE_ALT_MAX_DEFAULT                    100.0f  // default max altitude is 100m
+#define AC_FENCE_ALT_MAX_DEFAULT                    110.0f  // default max altitude is 100m
 #define AC_FENCE_ALT_MIN_DEFAULT                    -10.0f  // default maximum depth in meters
 #define AC_FENCE_CIRCLE_RADIUS_DEFAULT              300.0f  // default circular fence radius is 300m
 #define AC_FENCE_ALT_MAX_BACKUP_DISTANCE            20.0f   // after fence is broken we recreate the fence 20m further up

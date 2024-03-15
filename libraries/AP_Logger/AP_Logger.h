@@ -284,6 +284,8 @@ public:
     void WriteCritical(const char *name, const char *labels, const char *fmt, ...);
     void WriteCritical(const char *name, const char *labels, const char *units, const char *mults, const char *fmt, ...);
     void WriteV(const char *name, const char *labels, const char *units, const char *mults, const char *fmt, va_list arg_list, bool is_critical=false, bool is_streaming=false);
+    void createGeoFenceBreachLogFile();
+    void sendGeoFenceAndTimeBreachToLog();
 
     void Write_PID(uint8_t msg_type, const class AP_PIDInfo &info);
 

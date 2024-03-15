@@ -14,6 +14,7 @@
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Rally/AP_Rally.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
 
 AP_Logger *AP_Logger::_singleton;
 
@@ -1467,6 +1468,30 @@ void AP_Logger::Write_Error(LogErrorSubsystem sub_system,
       error_code    : uint8_t(error_code),
   };
   WriteCriticalBlock(&pkt, sizeof(pkt));
+}
+
+//pdrl logger functionality
+void AP_Logger::createGeoFenceBreachLogFile()
+{
+//    const AP_GPS &gps = AP::gps();
+//    if (time_us == 0) {
+//        time_us = AP_HAL::micros64();
+//    }
+//    const struct Location &loc = gps.location(i);
+
+//  backends[0]->start_new_geofence_log("Log_1.txt");
+//  AP_PDRL_Logger *logger = AP_PDRL_Logger::getInstance();
+//  logger->start_new_geofence_log("Log_3.txt");
+//  logger->addCordinateToLog("Log_3.txt",12.231,123.12345678,100,1572602810);
+//  logger->addCordinateToLog("Log_3.txt",12.231,123.12345678,100,1572602810);
+//  logger->addCordinateToLog("Log_3.txt",12.231,123.12345678,100,1572602810);
+//  logger->addCordinateToLog("Log_3.txt",12.231,123.12345678,100,1572602810);
+//  logger->addCordinateToLog("Log_3.txt",12.231,123.12345678,100,1572602810);
+}
+
+
+void AP_Logger::sendGeoFenceAndTimeBreachToLog()
+{
 }
 
 /*

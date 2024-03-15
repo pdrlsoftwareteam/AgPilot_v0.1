@@ -147,7 +147,7 @@ void AP_Mission::resume()
     }
 
     // rewind the mission wp if the repeat distance has been set via MAV_CMD_DO_SET_RESUME_REPEAT_DIST
-    if (_repeat_dist > 0 && _wp_index_history[LAST_WP_PASSED] != AP_MISSION_CMD_INDEX_NONE) {
+    if (/*_repeat_dist > 0 && */ _wp_index_history[LAST_WP_PASSED] != AP_MISSION_CMD_INDEX_NONE) {
         // if not already in a resume state calculate the position to rewind to
         Mission_Command tmp_cmd;
         if (!_flags.resuming_mission && calc_rewind_pos(tmp_cmd)) {
@@ -1960,7 +1960,7 @@ bool AP_Mission::advance_current_nav_cmd(uint16_t starting_index)
             }
             // save a loaded wp index in history array for when _repeat_dist is set via MAV_CMD_DO_SET_RESUME_REPEAT_DIST
             // and prevent history being re-written until vehicle returns to interrupted position
-            if (_repeat_dist > 0 && !_flags.resuming_mission && _nav_cmd.index != AP_MISSION_CMD_INDEX_NONE && !(_nav_cmd.content.location.lat == 0 && _nav_cmd.content.location.lng == 0)) {
+            if (/*_repeat_dist > 0 &&*/ !_flags.resuming_mission && _nav_cmd.index != AP_MISSION_CMD_INDEX_NONE && !(_nav_cmd.content.location.lat == 0 && _nav_cmd.content.location.lng == 0)) {
                 // update mission history. last index position is always the most recent wp loaded.
                 for (uint8_t i=0; i<AP_MISSION_MAX_WP_HISTORY-1; i++) {
                     _wp_index_history[i] = _wp_index_history[i+1];
