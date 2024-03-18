@@ -1476,9 +1476,9 @@ bool AP_InertialSensor::accel_calibrated_ok_all() const
 {
     // check each accelerometer has offsets saved
     for (uint8_t i=0; i<get_accel_count(); i++) {
-//        if (!_accel_id_ok[i]) {
-//            return false;
-//        }
+       if (!_accel_id_ok[i]) {
+           return false;
+       }
         // exactly 0.0 offset is extremely unlikely
         if (_accel_offset(i).get().is_zero()) {
             return false;
@@ -1488,12 +1488,12 @@ bool AP_InertialSensor::accel_calibrated_ok_all() const
             return false;
         }
     }
-//    for (uint8_t i=get_accel_count(); i<INS_MAX_INSTANCES; i++) {
-//        if (_accel_id(i) != 0) {
-//            // missing accel
-//            return false;
-//        }
-//    }
+   for (uint8_t i=get_accel_count(); i<INS_MAX_INSTANCES; i++) {
+       if (_accel_id(i) != 0) {
+           // missing accel
+           return false;
+       }
+   }
     
     // check calibrated accels matches number of accels (no unused accels should have offsets or scaling)
     if (get_accel_count() < INS_MAX_INSTANCES) {
