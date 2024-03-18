@@ -375,6 +375,10 @@ AP_GPS_UBLOX::_request_next_config(void)
         _unconfigured_messages & = ~CONFIG_RATE_RAW;
 #endif
         break;
+    case STEP_SECMSG:
+        if(!_have_version)
+            _request_uniqid();
+        break;
     case STEP_VERSION:
         if(!_have_version && !hal.util->get_soft_armed()) {
             _request_version();
@@ -946,6 +950,18 @@ int8_t AP_GPS_UBLOX::find_active_config_index(ConfigKey key) const
 bool
 AP_GPS_UBLOX::_parse_gps(void)
 {
+    if (_class == CLASS_SEC) {
+//      if(_msg_id == MSG_STATUS) {
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+                                             "u-blox Unique Id :%u%u%u%u%u",
+                                             (unsigned)_buffer.secmsg.uniqueId[0],
+                                             (unsigned)_buffer.secmsg.uniqueId[1],
+                                             (unsigned)_buffer.secmsg.uniqueId[2],
+                                             (unsigned)_buffer.secmsg.uniqueId[3],
+                                             (unsigned)_buffer.secmsg.uniqueId[4]);
+//      }
+
+    }
     if (_class == CLASS_ACK) {
         Debug("ACK %u", (unsigned)_msg_id);
 
@@ -1960,6 +1976,13 @@ void
 AP_GPS_UBLOX::_request_version(void)
 {
     _send_message(CLASS_MON, MSG_MON_VER, nullptr, 0);
+}
+
+void
+AP_GPS_UBLOX::_request_uniqid(void)
+{
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO,"Requesting GPS uniqueid");
+    _send_message(CLASS_SEC, MSG_STATUS, nullptr, 0);
 }
 
 void

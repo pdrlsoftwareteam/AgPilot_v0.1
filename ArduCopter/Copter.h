@@ -34,6 +34,10 @@
 #include <StorageManager/StorageManager.h>  // library for Management for hal.storage to allow for backwards compatible mapping of storage offsets to available storage
 
 // Application dependencies
+#include <AP_KEYSTORE/AP_KEYSTORE.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
+#include <AP_LIBNPNT/AP_LIBNPNT.h>
 #include <AP_Logger/AP_Logger.h>            // ArduPilot Mega Flash Memory Library
 #include <AP_Math/AP_Math.h>                // ArduPilot Mega Vector/Matrix math Library
 #include <AP_AccelCal/AP_AccelCal.h>        // interface and maths for accelerometer calibration

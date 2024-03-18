@@ -531,6 +531,8 @@ public:
 
     static void set_hide_disabled_groups(bool value) { _hide_disabled_groups = value; }
 
+    static bool verifySha256Checksum();
+
     // set frame type flags. Used to unhide frame specific parameters
     static void set_frame_type_flags(uint16_t flags_to_set) {
         invalidate_count();

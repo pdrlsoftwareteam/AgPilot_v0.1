@@ -328,7 +328,7 @@ const AP_Param::Info Copter::var_info[] = {
     // @Values: 0:Plus, 1:X, 2:V, 3:H, 4:V-Tail, 5:A-Tail, 10:Y6B, 11:Y6F, 12:BetaFlightX, 13:DJIX, 14:ClockwiseX, 15: I, 18: BetaFlightXReversed, 19:Y4
     // @User: Standard
     // @RebootRequired: True
-    GSCALAR(frame_type, "FRAME_TYPE", HAL_FRAME_TYPE_DEFAULT),
+    GSCALAR(frame_type, "FRAME_TYPE", 1),
 
     // @Group: ARMING_
     // @Path: ../libraries/AP_Arming/AP_Arming.cpp
@@ -742,7 +742,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Values: 0:Undefined, 1:Quad, 2:Hexa, 3:Octa, 4:OctaQuad, 5:Y6, 6:Heli, 7:Tri, 8:SingleCopter, 9:CoaxCopter, 10:BiCopter, 11:Heli_Dual, 12:DodecaHexa, 13:HeliQuad, 14:Deca, 15:Scripting Matrix, 16:6DoF Scripting, 17:Dynamic Scripting Matrix
     // @User: Standard
     // @RebootRequired: True
-    AP_GROUPINFO("FRAME_CLASS", 15, ParametersG2, frame_class, DEFAULT_FRAME_CLASS),
+    AP_GROUPINFO("FRAME_CLASS", 15, ParametersG2, frame_class, 2),
 
     // @Group: SERVO
     // @Path: ../libraries/SRV_Channel/SRV_Channels.cpp
