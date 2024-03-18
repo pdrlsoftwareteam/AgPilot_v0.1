@@ -98,4 +98,4 @@ def configure(cfg):
     cfg.check_python_version(minver=(2,7,0))
 
     env = cfg.env
-    env.MAVLINK_DIR = cfg.srcnode.make_node('modules/mavlink/').abspath()
+    env.MAVLINK_DIR = cfg.srcnode.make_node('modules/bhumi_mavlink/').abspath()
