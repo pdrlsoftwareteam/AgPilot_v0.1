@@ -212,6 +212,7 @@ protected:
     static float auto_takeoff_no_nav_alt_cm;
 
     // auto takeoff variables
+    static float auto_takeoff_start_alt_cm;     // start altitude expressed as cm above ekf origin
     static float auto_takeoff_complete_alt_cm;  // completion altitude expressed in cm above ekf origin or above terrain (depending upon auto_takeoff_terrain_alt)
     static bool auto_takeoff_terrain_alt;       // true if altitudes are above terrain
     static bool auto_takeoff_complete;          // true when takeoff is complete
@@ -453,6 +454,7 @@ private:
     bool check_for_mission_change();    // detect external changes to mission
 
     void takeoff_run();
+    bool updateAltitude(float climb_rate_cms);
     void wp_run();
     void land_run();
     void rtl_run();
@@ -535,6 +537,8 @@ private:
     uint16_t loiter_time_max;                // How long we should stay in Loiter Mode for mission scripting (time in seconds)
     uint32_t loiter_time;                    // How long have we been loitering - The start time in millis
 
+    bool was_spraying = false;
+
     struct {
         bool reached_destination_xy : 1;
         bool loiter_start_done : 1;
@@ -550,6 +554,9 @@ private:
     // Delay Mission Scripting Command
     int32_t condition_value;  // used in condition commands (eg delay, change alt, etc.)
     uint32_t condition_start;
+
+    uint32_t nav_delay_time_semiauto;
+    float last_alt_offset = 0;
 
     enum class State {
         FlyToLocation = 0,
