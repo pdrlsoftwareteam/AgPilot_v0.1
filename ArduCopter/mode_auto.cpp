@@ -67,6 +67,8 @@ bool ModeAuto::init(bool ignore_checks)
 // stop mission when we leave auto mode
 void ModeAuto::exit()
 {
+//	wp_nav->resetAutomode();
+//	wp_nav->resetWaypointZ(copter.current_loc.alt);
     if (copter.mode_auto.mission.state() == AP_Mission::MISSION_RUNNING) {
         copter.mode_auto.mission.stop();
     }
@@ -383,6 +385,8 @@ bool ModeAuto::wp_start(const Location& dest_loc)
 // auto_land_start - initialises controller to implement a landing
 void ModeAuto::land_start()
 {
+	wp_nav->resetAutomode();
+	wp_nav->resetWaypointZ(copter.current_loc.alt);
     // set horizontal speed and acceleration limits
     pos_control->set_max_speed_accel_xy(wp_nav->get_default_speed_xy(), wp_nav->get_wp_acceleration());
     pos_control->set_correction_speed_accel_xy(wp_nav->get_default_speed_xy(), wp_nav->get_wp_acceleration());
@@ -721,6 +725,7 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
 // exit_mission - function that is called once the mission completes
 void ModeAuto::exit_mission()
 {
+    wp_nav->resetAutomode();
     // play a tone
     AP_Notify::events.mission_complete = 1;
     // if we are not on the ground switch to loiter or land
@@ -932,6 +937,35 @@ void ModeAuto::takeoff_run()
 }
 
 // auto_wp_run - runs the auto waypoint controller
+bool ModeAuto::updateAltitude(float climb_rate_cms)
+{
+
+    float alt_error_cm = climb_rate_cms;
+ 
+//    land_run_horizontal_control();
+
+    // Compute a vertical velocity demand such that the vehicle
+    // approaches the desired altitude.
+    float target_climb_rate = sqrt_controller(
+        alt_error_cm,
+        pos_control->get_pos_z_p().kP(),
+        pos_control->get_max_accel_z_cmss(),
+        G_Dt);
+    target_climb_rate = constrain_float(target_climb_rate, pos_control->get_max_speed_down_cms(), pos_control->get_max_speed_up_cms());
+
+    // get avoidance adjusted climb rate
+    target_climb_rate = get_avoidance_adjusted_climbrate(target_climb_rate);
+
+    // update the vertical offset based on the surface measurement
+    copter.surface_tracking.update_surface_offset();
+
+    // Send the commanded climb rate to the position controller
+    pos_control->set_pos_target_z_from_climb_rate_cm(target_climb_rate);
+
+    return true;
+}
+
+// auto_wp_run - runs the auto waypoint controller
 //      called by auto_run at 100hz or more
 void ModeAuto::wp_run()
 {
@@ -941,11 +975,63 @@ void ModeAuto::wp_run()
         return;
     }
 
+    if (g2.auto_man_alt != 1) {
+        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        // run waypoint controller
+        copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
+    }
+    else{
+        // get pilot desired climb rate alt control Alt_Hold
+
+        float target_climb_rate = get_pilot_desired_climb_rate(channel_throttle->get_control_in());
+        target_climb_rate = constrain_float(target_climb_rate, -get_pilot_speed_dn(), g.pilot_speed_up);
+
+        // // get avoidance adjusted climb rate
+        if(is_zero(target_climb_rate) && wp_nav->getSemiAutoOverrideAltitude())
+        {
+            wp_nav->setSemiAutoOverrideAltitude(false);
+            nav_delay_time_semiauto = millis();
+        }
     // set motors to full range
     motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
+		float terr_offset = 0.0f;
+        if(wp_nav->origin_and_destination_are_terrain_alt() == true)
+		      wp_nav->get_terrain_offset(terr_offset);
+
     // run waypoint controller
+        if(is_zero(target_climb_rate))
+        {
+            uint32_t now = millis();
+            if ((now - nav_delay_time_semiauto) > 3000)
+            {
+                nav_delay_time_semiauto = 0;
+                last_alt_offset = inertial_nav.get_position_neu_cm().z-terr_offset;
+            }
+            else
+            {
+                wp_nav->resetWaypointZ((float)last_alt_offset);
+            }
+        }
+        else
+        {
+        	wp_nav->resetAutomode(true);
+            target_climb_rate = sqrt_controller(
+            	target_climb_rate,
+                pos_control->get_pos_z_p().kP(),
+                pos_control->get_max_accel_z_cmss(),
+                G_Dt);
+            target_climb_rate = constrain_float(target_climb_rate, pos_control->get_max_speed_down_cms(), pos_control->get_max_speed_up_cms());
+            last_alt_offset = last_alt_offset + target_climb_rate * g2.auto_man_thr_fact;
+        	wp_nav->resetWaypointZ((float)last_alt_offset);
+            wp_nav->setSemiAutoOverrideAltitude(true);
+        }
+    }
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
+    if(wp_nav->check_avoidance_status())
+    {
+    	copter.failsafe_obstacle_on_event();
+    }
 
     // WP_Nav has set the vertical position control targets
     // run the vertical position controller and set output throttle
@@ -1400,6 +1486,9 @@ bool ModeAuto::shift_alt_to_current_alt(Location& target_loc) const
 // do_takeoff - initiate takeoff navigation command
 void ModeAuto::do_takeoff(const AP_Mission::Mission_Command& cmd)
 {
+    wp_nav->setSemiAutoOverrideAltitude(false,true);
+    wp_nav->resetAutomode();
+    wp_nav->resetWaypointZ(0);
     // Set wp navigation target to safe altitude above current position
     takeoff_start(cmd.content.location);
 }
@@ -1424,6 +1513,11 @@ Location ModeAuto::loc_from_cmd(const AP_Mission::Mission_Command& cmd, const Lo
             // default to default_loc's altitude and frame
             ret.set_alt_cm(default_loc.alt, default_loc.get_alt_frame());
         }
+    }
+    int32_t offstZ = wp_nav->getLastZoffsetCm();
+    if(offstZ)
+    {
+    	ret.alt = offstZ;
     }
     return ret;
 }
@@ -1913,6 +2007,8 @@ void ModeAuto::do_payload_place(const AP_Mission::Mission_Command& cmd)
 // do_RTL - start Return-to-Launch
 void ModeAuto::do_RTL(void)
 {
+	wp_nav->resetAutomode();
+	wp_nav->resetWaypointZ(copter.current_loc.alt);
     // start rtl in auto flight mode
     rtl_start();
 }
@@ -1962,6 +2058,9 @@ bool ModeAuto::verify_land()
                   leaves mission state machine in the current NAV_LAND
                   mission item. After disarming the mission will reset
                 */
+                wp_nav->setSemiAutoOverrideAltitude(false,true);
+                wp_nav->resetAutomode();
+                wp_nav->resetWaypointZ(0);
                 copter.arming.disarm(AP_Arming::Method::LANDED);
                 retval = false;
             }
