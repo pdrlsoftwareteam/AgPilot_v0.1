@@ -81,6 +81,9 @@
 #undef FORCE_VERSION_H_INCLUDE
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+AP_KEYSTORE *keyStore = AP_KEYSTORE::getInstance();
+AP_PDRL_Logger *pdrl_logger = AP_PDRL_Logger::getInstance();
+AP_LIBNPNT *libnpnt = AP_LIBNPNT::getInstance();
 
 #define SCHED_TASK(func, _interval_ticks, _max_time_micros, _prio) SCHED_TASK_CLASS(Copter, &copter, func, _interval_ticks, _max_time_micros, _prio)
 #define FAST_TASK(func) FAST_TASK_CLASS(Copter, &copter, func)
@@ -600,6 +603,7 @@ void Copter::one_hz_loop()
         Log_Write_Data(LogDataID::AP_STATE, ap.value);
     }
 
+    PdrlBootPlugin::handleChecksumStatus();
     if (!motors->armed()) {
         update_using_interlock();
 

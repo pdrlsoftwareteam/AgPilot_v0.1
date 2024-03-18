@@ -287,7 +287,7 @@ SITL::SerialDevice *SITL_State::create_serial_sim(const char *name, const char *
         }
         blping = new SITL::RF_BLping();
         return blping;
-    }else if (streq(name, "USD1_v0")) {
+    } else if (streq(name, "USD1_v0")) {
         if (USD1_v0 != nullptr) {
             AP_HAL::panic("Only one USD1_v0 at a time");
         }

@@ -324,6 +324,9 @@ public:
     uint16_t mission_item_reached_index = AP_MISSION_CMD_INDEX_NONE;
 
     // common send functions
+    void send_key_tranfer(void) const;
+    void send_ack_for_command(void) const;
+    void send_command_tranfer() const;
     void send_heartbeat(void) const;
     void send_meminfo(void);
     void send_fence_status() const;
@@ -606,6 +609,8 @@ protected:
 
     bool telemetry_delayed() const;
     virtual uint32_t telem_delay() const = 0;
+    void handle_data_transfer(const mavlink_message_t &msg);
+    void handle_command_transfer(const mavlink_message_t &msg);
 
     MAV_RESULT handle_command_run_prearm_checks(const mavlink_command_long_t &packet);
     MAV_RESULT handle_command_preflight_set_sensor_offsets(const mavlink_command_long_t &packet);

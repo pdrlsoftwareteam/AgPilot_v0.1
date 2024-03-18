@@ -209,6 +209,8 @@ void Copter::init_ardupilot()
         set_mode(Mode::Number::STABILIZE, ModeReason::UNAVAILABLE);
     }
 
+    AP_Param::verifySha256Checksum();
+
     // flag that initialisation has completed
     ap.initialised = true;
 }
