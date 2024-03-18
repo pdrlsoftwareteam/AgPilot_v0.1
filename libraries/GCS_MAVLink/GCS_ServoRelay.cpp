@@ -18,20 +18,8 @@ MAV_RESULT GCS_MAVLINK::handle_servorelay_message(const mavlink_command_long_t &
         }
         break;
 
-    case MAV_CMD_DO_REPEAT_SERVO:
-        if (handler->do_repeat_servo(packet.param1, packet.param2, packet.param3, packet.param4 * 1000)) {
-            result = MAV_RESULT_ACCEPTED;
-        }
-        break;
-
     case MAV_CMD_DO_SET_RELAY:
         if (handler->do_set_relay(packet.param1, packet.param2)) {
-            result = MAV_RESULT_ACCEPTED;
-        }
-        break;
-
-    case MAV_CMD_DO_REPEAT_RELAY:
-        if (handler->do_repeat_relay(packet.param1, packet.param2, packet.param3 * 1000)) {
             result = MAV_RESULT_ACCEPTED;
         }
         break;

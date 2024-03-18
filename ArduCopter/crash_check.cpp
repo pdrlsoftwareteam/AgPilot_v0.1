@@ -41,11 +41,6 @@ void Copter::crash_check()
         return;
     }
 
-    // return immediately if we are not in an angle stabilize flight mode or we are flipping
-    if (flightmode->mode_number() == Mode::Number::ACRO || flightmode->mode_number() == Mode::Number::FLIP) {
-        crash_counter = 0;
-        return;
-    }
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     //return immediately if in autorotation mode
@@ -270,12 +265,6 @@ void Copter::parachute_check()
 
     if (parachute.release_initiated()) {
         copter.arming.disarm(AP_Arming::Method::PARACHUTE_RELEASE);
-        return;
-    }
-
-    // return immediately if we are not in an angle stabilize flight mode or we are flipping
-    if (flightmode->mode_number() == Mode::Number::ACRO || flightmode->mode_number() == Mode::Number::FLIP) {
-        control_loss_count = 0;
         return;
     }
 
