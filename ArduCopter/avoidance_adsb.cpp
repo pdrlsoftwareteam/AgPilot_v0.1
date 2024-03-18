@@ -24,11 +24,7 @@ MAV_COLLISION_ACTION AP_Avoidance_Copter::handle_avoidance(const AP_Avoidance::O
     }
 
     // take no action in some flight modes
-    if (copter.flightmode->mode_number() == Mode::Number::LAND ||
-#if MODE_THROW_ENABLED == ENABLED
-        copter.flightmode->mode_number() == Mode::Number::THROW ||
-#endif
-        copter.flightmode->mode_number() == Mode::Number::FLIP) {
+    if (copter.flightmode->mode_number() == Mode::Number::LAND) {
         actual_action = MAV_COLLISION_ACTION_NONE;
     }
 

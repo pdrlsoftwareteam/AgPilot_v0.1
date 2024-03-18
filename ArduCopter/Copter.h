@@ -47,7 +47,6 @@
 #include <AP_Mission/AP_Mission_ChangeDetector.h>               // Mission command change detection library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>        // Attitude control library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Heli.h>         // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>                   // Position control library
 #include <AC_AttitudeControl/AC_CommandModel.h>                 // Command model library
 #include <AP_Motors/AP_Motors.h>            // AP Motors library
@@ -63,12 +62,10 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
 #include <AP_LandingGear/AP_LandingGear.h>  // Landing Gear library
 #include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-#include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
 #include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
 #include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
 #include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
-#include <AC_AutoTune/AC_AutoTune_Heli.h>   // ArduCopter autotune library. support for autotune of helicopters.
 #include <AP_Parachute/AP_Parachute.h>      // ArduPilot parachute release library
 #include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
@@ -80,17 +77,9 @@
 #include "defines.h"
 #include "config.h"
 
-#if FRAME_CONFIG == HELI_FRAME
-    #define AC_AttitudeControl_t AC_AttitudeControl_Heli
-#else
     #define AC_AttitudeControl_t AC_AttitudeControl_Multi
-#endif
 
-#if FRAME_CONFIG == HELI_FRAME
- #define MOTOR_CLASS AP_MotorsHeli
-#else
  #define MOTOR_CLASS AP_MotorsMulticopter
-#endif
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
  #include <AC_Autorotation/AC_Autorotation.h> // Autorotation controllers
@@ -122,9 +111,6 @@
 #if PRECISION_LANDING == ENABLED
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
- # include <AP_Follow/AP_Follow.h>
 #endif
 #if AP_TERRAIN_AVAILABLE
  # include <AP_Terrain/AP_Terrain.h>
@@ -196,39 +182,27 @@ public:
     friend class AP_AdvancedFailsafe_Copter;
 #endif
     friend class AP_Arming_Copter;
-    friend class ToyMode;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
     friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAcro;
-    friend class ModeAcro_Heli;
     friend class ModeAltHold;
     friend class ModeAuto;
-    friend class ModeAutoTune;
     friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
-    friend class ModeDrift;
-    friend class ModeFlip;
     friend class ModeFlowHold;
-    friend class ModeFollow;
     friend class ModeGuided;
     friend class ModeLand;
     friend class ModeLoiter;
     friend class ModePosHold;
     friend class ModeRTL;
     friend class ModeSmartRTL;
-    friend class ModeSport;
     friend class ModeStabilize;
-    friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    friend class ModeThrow;
     friend class ModeZigZag;
-    friend class ModeAutorotate;
-    friend class ModeTurtle;
 
     Copter(void);
 
@@ -539,10 +513,6 @@ private:
 #endif
 
     // Pilot Input Management Library
-    // Only used for Helicopter for now
-#if FRAME_CONFIG == HELI_FRAME
-    AC_InputManager_Heli input_manager;
-#endif
 
 #if HAL_ADSB_ENABLED
     AP_ADSB adsb;
@@ -560,24 +530,6 @@ private:
     // Top-level logic
     // setup the var_info table
     AP_Param param_loader;
-
-#if FRAME_CONFIG == HELI_FRAME
-    // Mode filter to reject RC Input glitches.  Filter size is 5, and it draws the 4th element, so it can reject 3 low glitches,
-    // and 1 high glitch.  This is because any "off" glitches can be highly problematic for a helicopter running an ESC
-    // governor.  Even a single "off" frame can cause the rotor to slow dramatically and take a long time to restart.
-    ModeFilterInt16_Size5 rotor_speed_deglitch_filter {4};
-
-    // Tradheli flags
-    typedef struct {
-        uint8_t dynamic_flight          : 1;    // 0   // true if we are moving at a significant speed (used to turn on/off leaky I terms)
-        uint8_t inverted_flight         : 1;    // 1   // true for inverted flight mode
-        uint8_t in_autorotation         : 1;    // 2   // true when heli is in autorotation
-        bool coll_stk_low                  ;    // 3   // true when collective stick is on lower limit
-    } heli_flags_t;
-    heli_flags_t heli_flags;
-
-    int16_t hover_roll_trim_scalar_slew;
-#endif
 
     // ground effect detector
     struct {
@@ -796,17 +748,6 @@ private:
     void fence_check();
 #endif
 
-    // heli.cpp
-    void heli_init();
-    void check_dynamic_flight(void);
-    bool should_use_landing_swash() const;
-    void update_heli_control_dynamics(void);
-    void heli_update_landing_swash();
-    float get_pilot_desired_rotor_speed() const;
-    void heli_update_rotor_speed_targets();
-    void heli_update_autorotation();
-    void update_collective_low_flag(int16_t throttle_control);
-
     // inertia.cpp
     void read_inertia();
 
@@ -837,9 +778,6 @@ private:
     void Log_Write_Data(LogDataID id, float value);
     void Log_Write_Parameter_Tuning(uint8_t param, float tuning_val, float tune_min, float tune_max);
     void Log_Video_Stabilisation();
-#if FRAME_CONFIG == HELI_FRAME
-    void Log_Write_Heli(void);
-#endif
     void Log_Write_Guided_Position_Target(ModeGuided::SubMode submode, const Vector3f& pos_target, bool terrain_alt, const Vector3f& vel_target, const Vector3f& accel_target);
     void Log_Write_Guided_Attitude_Target(ModeGuided::SubMode target_type, float roll, float pitch, float yaw, const Vector3f &ang_vel, float thrust, float climb_rate);
     void Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitude, float frequency_start, float frequency_stop, float time_fade_in, float time_const_freq, float time_record, float time_fade_out);
@@ -885,7 +823,6 @@ private:
     void convert_prx_parameters();
 #endif
     void convert_lgr_parameters(void);
-    void convert_tradheli_parameters(void) const;
 
     // precision_landing.cpp
     void init_precland();
@@ -930,7 +867,6 @@ private:
     bool should_log(uint32_t mask);
     const char* get_frame_string() const;
     void allocate_motors(void);
-    bool is_tradheli() const;
 
     // terrain.cpp
     void terrain_update();
@@ -950,34 +886,15 @@ private:
     void userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag);
 
-#if MODE_ACRO_ENABLED == ENABLED
-#if FRAME_CONFIG == HELI_FRAME
-    ModeAcro_Heli mode_acro;
-#else
-    ModeAcro mode_acro;
-#endif
-#endif
     ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
-#endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ModeAutoTune mode_autotune;
 #endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;
 #endif
 #if MODE_CIRCLE_ENABLED == ENABLED
     ModeCircle mode_circle;
-#endif
-#if MODE_DRIFT_ENABLED == ENABLED
-    ModeDrift mode_drift;
-#endif
-#if MODE_FLIP_ENABLED == ENABLED
-    ModeFlip mode_flip;
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ModeFollow mode_follow;
 #endif
 #if MODE_GUIDED_ENABLED == ENABLED
     ModeGuided mode_guided;
@@ -992,42 +909,21 @@ private:
 #if MODE_RTL_ENABLED == ENABLED
     ModeRTL mode_rtl;
 #endif
-#if FRAME_CONFIG == HELI_FRAME
-    ModeStabilize_Heli mode_stabilize;
-#else
     ModeStabilize mode_stabilize;
-#endif
-#if MODE_SPORT_ENABLED == ENABLED
-    ModeSport mode_sport;
-#endif
+
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ModeSystemId mode_systemid;
 #endif
 #if HAL_ADSB_ENABLED
     ModeAvoidADSB mode_avoid_adsb;
 #endif
-#if MODE_THROW_ENABLED == ENABLED
-    ModeThrow mode_throw;
-#endif
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-    ModeGuidedNoGPS mode_guided_nogps;
-#endif
+
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
-#endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ModeFlowHold mode_flowhold;
 #endif
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ModeZigZag mode_zigzag;
 #endif
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-    ModeAutorotate mode_autorotate;
-#endif
-#if MODE_TURTLE_ENABLED == ENABLED
-    ModeTurtle mode_turtle;
-#endif
-
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);

@@ -301,31 +301,6 @@ void Copter::Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitu
 #endif
 }
 
-#if FRAME_CONFIG == HELI_FRAME
-struct PACKED log_Heli {
-    LOG_PACKET_HEADER;
-    uint64_t time_us;
-    float    desired_rotor_speed;
-    float    main_rotor_speed;
-    float    governor_output;
-    float    control_output;
-};
-
-// Write an helicopter packet
-void Copter::Log_Write_Heli()
-{
-    struct log_Heli pkt_heli = {
-        LOG_PACKET_HEADER_INIT(LOG_HELI_MSG),
-        time_us                 : AP_HAL::micros64(),
-        desired_rotor_speed     : motors->get_desired_rotor_speed(),
-        main_rotor_speed        : motors->get_main_rotor_speed(),
-        governor_output         : motors->get_governor_output(),
-        control_output          : motors->get_control_output(),
-    };
-    logger.WriteBlock(&pkt_heli, sizeof(pkt_heli));
-}
-#endif
-
 // guided position target logging
 struct PACKED log_Guided_Position_Target {
     LOG_PACKET_HEADER;
@@ -489,10 +464,6 @@ const struct LogStructure Copter::log_structure[] = {
 // @Field: ERRPM: Estimated rotor speed
 // @Field: Gov: Governor Output
 // @Field: Throt: Throttle output
-#if FRAME_CONFIG == HELI_FRAME
-    { LOG_HELI_MSG, sizeof(log_Heli),
-      "HELI",  "Qffff",        "TimeUS,DRRPM,ERRPM,Gov,Throt", "s----", "F----" , true },
-#endif
 
 // @LoggerMessage: SIDD
 // @Description: System ID data
@@ -592,10 +563,6 @@ void Copter::Log_Write_Guided_Attitude_Target(ModeGuided::SubMode target_type, f
 void Copter::Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitude, float frequency_start, float frequency_stop, float time_fade_in, float time_const_freq, float time_record, float time_fade_out) {}
 void Copter::Log_Write_SysID_Data(float waveform_time, float waveform_sample, float waveform_freq, float angle_x, float angle_y, float angle_z, float accel_x, float accel_y, float accel_z) {}
 void Copter::Log_Write_Vehicle_Startup_Messages() {}
-
-#if FRAME_CONFIG == HELI_FRAME
-void Copter::Log_Write_Heli() {}
-#endif
 
 void Copter::log_init(void) {}
 

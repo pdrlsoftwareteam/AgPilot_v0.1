@@ -108,13 +108,6 @@ bool ModeGuided::allows_arming(AP_Arming::Method method) const
     return (copter.g2.guided_options & (uint32_t)Options::AllowArmingFromTX) != 0;
 };
 
-#if WEATHERVANE_ENABLED == ENABLED
-bool ModeGuided::allows_weathervaning() const
-{
-    return (copter.g2.guided_options.get() & (uint32_t)Options::AllowWeatherVaning) != 0;
-}
-#endif
-
 // initialises position controller to implement take-off
 // takeoff_alt_cm is interpreted as alt-above-home (in cm) or alt-above-terrain if a rangefinder is available
 bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
@@ -187,8 +180,6 @@ void ModeGuided::wp_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -672,8 +663,6 @@ void ModeGuided::pos_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -719,8 +708,6 @@ void ModeGuided::accel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -764,8 +751,6 @@ void ModeGuided::velaccel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -820,8 +805,6 @@ void ModeGuided::pause_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -850,8 +833,6 @@ void ModeGuided::posvelaccel_control_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (is_disarmed_or_landed()) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
@@ -940,8 +921,6 @@ void ModeGuided::angle_control_run()
 
     // if not armed set throttle to zero and exit immediately
     if (!motors->armed() || !copter.ap.auto_armed || (copter.ap.land_complete && !positive_thrust_or_climbrate)) {
-        // do not spool down tradheli when on the ground with motor interlock enabled
-        make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
         return;
     }
 
