@@ -643,9 +643,9 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         break;
 
 #if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        do_nav_script_time(cmd);
-        break;
+	case MAV_CMD_NAV_SCRIPT_TIME:
+		do_nav_script_time(cmd);
+		break;
 #endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
@@ -867,9 +867,9 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
         break;
 
 #if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        cmd_complete = verify_nav_script_time();
-        break;
+	case MAV_CMD_NAV_SCRIPT_TIME:
+		cmd_complete = verify_nav_script_time();
+		break;
 #endif
 
     case MAV_CMD_NAV_ATTITUDE_TIME:
