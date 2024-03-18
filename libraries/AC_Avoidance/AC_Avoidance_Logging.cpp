@@ -1,6 +1,7 @@
 #include "AC_Avoid.h"
 #include "AP_OADijkstra.h"
 #include "AP_OABendyRuler.h"
+#include "AP_OASmartAvoid.h"
 #include <AP_Logger/AP_Logger.h>
 
 void AP_OABendyRuler::Write_OABendyRuler(const uint8_t type, const bool active, const float target_yaw, const float target_pitch, const bool resist_chg, const float margin, const Location &final_dest, const Location &oa_dest) const
@@ -11,6 +12,32 @@ void AP_OABendyRuler::Write_OABendyRuler(const uint8_t type, const bool active, 
     
     const struct log_OABendyRuler pkt{
         LOG_PACKET_HEADER_INIT(LOG_OA_BENDYRULER_MSG),
+        time_us     : AP_HAL::micros64(),
+        type        : type,
+        active      : active,
+        target_yaw  : (uint16_t)wrap_360(target_yaw),
+        yaw         : (uint16_t)wrap_360(AP::ahrs().yaw_sensor * 0.01f),
+        target_pitch: (uint16_t)target_pitch,
+        resist_chg  : resist_chg,
+        margin      : margin,
+        final_lat   : final_dest.lat,
+        final_lng   : final_dest.lng,
+        final_alt   : got_final_dest ? final_alt : final_dest.alt,
+        oa_lat      : oa_dest.lat,
+        oa_lng      : oa_dest.lng,
+        oa_alt      : got_oa_dest ? oa_dest_alt : oa_dest.alt
+    };
+    AP::logger().WriteBlock(&pkt, sizeof(pkt));
+}
+
+void AP_OASmartAvoid::Write_OASmartAvoid(const uint8_t type, const bool active, const float target_yaw, const float target_pitch, const bool resist_chg, const float margin, const Location &final_dest, const Location &oa_dest) const
+{
+    int32_t oa_dest_alt, final_alt;
+    const bool got_oa_dest = oa_dest.get_alt_cm(Location::AltFrame::ABOVE_ORIGIN, oa_dest_alt);
+    const bool got_final_dest = final_dest.get_alt_cm(Location::AltFrame::ABOVE_ORIGIN, final_alt);
+
+    const struct log_OABendyRuler pkt{
+        LOG_PACKET_HEADER_INIT(LOG_OA_SMARTAVOID_MSG),
         time_us     : AP_HAL::micros64(),
         type        : type,
         active      : active,

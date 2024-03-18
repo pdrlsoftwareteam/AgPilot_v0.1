@@ -1158,6 +1158,16 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // extend to a new group
     AP_SUBGROUPEXTENSION("", 61, ParametersG2, var_info2),
 
+    // @Param: AUTO_MAN_ALT
+    // @DisplayName: Auto Manual Altitude Control
+    // @Description: This Behavior is based on the Auto and Alt_hold flight modes, which allows manual altitude control.While entering the height control the aircraft stops.it re starts the forward advance by giving it pitch input and continuing with the flight plan
+    // @Values: 0:Disabled,1:Enabled
+    // @User: Advanced
+    AP_GROUPINFO("AUTO_MAN_ALT", 63, ParametersG2, auto_man_alt, AUTO_MAN_ALT),
+
+    AP_GROUPINFO("AM_THR_FACT", 20, ParametersG2, auto_man_thr_fact, 0.002),
+    
+
     // ID 62 is reserved for the SHOW_... parameters from the Skybrush fork at
     // https://github.com/skybrush-io/ardupilot
 

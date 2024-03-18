@@ -451,6 +451,19 @@ void AC_WPNav::get_wp_stopping_point(Vector3f& stopping_point) const
     stopping_point = stop.tofloat();
 }
 
+void AC_WPNav::setSemiAutoOverrideAltitude(bool isSet,bool resetZoffset)
+{
+    _semiAutoOverrideAltitude  = isSet;
+    if(resetZoffset == true)
+        _lastZOffset = 0;
+}
+
+void AC_WPNav::resetWaypointZ(float zVal)
+{
+	 _lastZOffset = zVal;
+}
+
+
 /// advance_wp_target_along_track - move target location along track from origin to destination
 bool AC_WPNav::advance_wp_target_along_track(float dt)
 {
@@ -507,6 +520,10 @@ bool AC_WPNav::advance_wp_target_along_track(float dt)
         // update target position, velocity and acceleration
         target_pos = _origin;
         s_finished = _scurve_this_leg.advance_target_along_track(_scurve_prev_leg, _scurve_next_leg, _wp_radius_cm, get_corner_acceleration(), _flags.fast_waypoint, _track_scalar_dt * vel_scaler_dt * dt, target_pos, target_vel, target_accel);
+    	if(!is_zero(_lastZOffset) && _reset_auto_mode)
+    	{
+    		target_pos.z = _lastZOffset;
+    	}
     } else {
         // splinetarget_vel
         target_vel = curr_target_vel;
@@ -540,7 +557,9 @@ bool AC_WPNav::advance_wp_target_along_track(float dt)
                 _flags.reached_destination = true;
             } else {
                 // regular waypoints also require the copter to be within the waypoint radius
-                const Vector3f dist_to_dest = curr_pos - _destination;
+            	Vector3f dist_to_dest = curr_pos - _destination;
+            	if(!is_zero(_lastZOffset) && _reset_auto_mode)
+            		dist_to_dest.z = 0;
                 if (dist_to_dest.length_squared() <= sq(_wp_radius_cm)) {
                     _flags.reached_destination = true;
                 }

@@ -691,6 +691,9 @@ public:
     AP_Float pldp_range_finder_minimum_m;
     AP_Float pldp_delay_s;
     AP_Float pldp_descent_speed_ms;
+    // Auto Manual Alt param
+    AP_Int8 auto_man_alt;  // activate semi auto mode add a2sAndres
+    AP_Float auto_man_thr_fact;  // activate semi auto mode add a2sAndres
 };
 
 extern const AP_Param::Info        var_info[];
