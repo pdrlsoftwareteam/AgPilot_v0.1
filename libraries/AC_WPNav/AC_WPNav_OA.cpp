@@ -83,8 +83,8 @@ bool AC_WPNav_OA::update_wpnav()
         const Location origin_loc(_origin_oabak, _terrain_alt_oabak ? Location::AltFrame::ABOVE_TERRAIN : Location::AltFrame::ABOVE_ORIGIN);
         const Location destination_loc(_destination_oabak, _terrain_alt_oabak ? Location::AltFrame::ABOVE_TERRAIN : Location::AltFrame::ABOVE_ORIGIN);
         Location oa_origin_new, oa_destination_new;
-        AP_OAPathPlanner::OAPathPlannerUsed path_planner_used = AP_OAPathPlanner::OAPathPlannerUsed::None;
-        const AP_OAPathPlanner::OA_RetState oa_retstate = oa_ptr->mission_avoidance(current_loc, origin_loc, destination_loc, oa_origin_new, oa_destination_new, path_planner_used);
+        _path_planner_used = AP_OAPathPlanner::OAPathPlannerUsed::None;
+        const AP_OAPathPlanner::OA_RetState oa_retstate = oa_ptr->mission_avoidance(current_loc, origin_loc, destination_loc, oa_origin_new, oa_destination_new, _path_planner_used);
 
         switch (oa_retstate) {
 
@@ -114,7 +114,7 @@ bool AC_WPNav_OA::update_wpnav()
         case AP_OAPathPlanner::OA_SUCCESS:
 
             // handling of returned destination depends upon path planner used
-            switch (path_planner_used) {
+            switch (_path_planner_used) {
 
             case AP_OAPathPlanner::OAPathPlannerUsed::None:
                 // this should never happen.  this means the path planner has returned success but has failed to set the path planner used
@@ -194,6 +194,11 @@ bool AC_WPNav_OA::update_wpnav()
                 // return success without calling parent AC_WPNav
                 return true;
             }
+            case AP_OAPathPlanner::OAPathPlannerUsed::SmartAvoid: {
+                _oa_state = oa_retstate;
+                _oa_destination = oa_destination_new;
+                return true;
+            }
 
             }
         }
@@ -201,4 +206,18 @@ bool AC_WPNav_OA::update_wpnav()
 
     // run the non-OA update
     return AC_WPNav::update_wpnav();
+}
+
+bool AC_WPNav_OA::check_avoidance_status()
+{
+    switch (_path_planner_used) {
+    case AP_OAPathPlanner::OAPathPlannerUsed::SmartAvoid: {
+    	if(_oa_state == AP_OAPathPlanner::OA_SUCCESS)
+    		return true;
+    	break;
+    }
+    default:
+    	break;
+    }
+	return false;
 }
