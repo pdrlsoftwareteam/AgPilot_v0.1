@@ -1415,6 +1415,7 @@ bool AP_Param::is_read_only(void) const
 
 bool AP_Param::verifySha256Checksum()
 {
+    // Start section lockParamCount
     int lockParamCount = 5;
     const char pname[lockParamCount][17] = {
     		"FRAME_CLASS\0",
@@ -1424,6 +1425,7 @@ bool AP_Param::verifySha256Checksum()
 			"FENCE_RADIUS\0"
 
     };
+    // End section lockParamCount
 
    enum ap_var_type ptype;
 

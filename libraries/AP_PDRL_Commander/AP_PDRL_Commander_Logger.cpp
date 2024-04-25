@@ -928,7 +928,7 @@ int AP_PDRL_Logger::makeJsonAndSignLogFileLatest()
 
 		for(int i = 0; i < 32 ; i++)
 		{
-			if(asprintf(&hexVal,"%02x",oldLogFileHash[i]) != NULL)
+			if(asprintf(&hexVal,"%02x",oldLogFileHash[i]) > 0)
 			AP::FS().write(outPutFile_fd,hexVal,2);
 			free(hexVal);
 		}

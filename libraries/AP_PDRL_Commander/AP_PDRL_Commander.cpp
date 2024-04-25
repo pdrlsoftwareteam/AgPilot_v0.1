@@ -339,12 +339,15 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_SET_OPERATOR_ID:
 	{
-	// 	char oemName[] = "3z91vt18";
-	// 	if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-	// 	{
-	// 		lastUnlock = AP_HAL::millis();
-	// 		isUnlocked = true;
-	// 	}
+		// Start section oemName
+		char oemName[] = "3z91vt18";
+		// End section oemName
+
+		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+		{
+			lastUnlock = AP_HAL::millis();
+			isUnlocked = true;
+		}
 	}
 	break;
 
