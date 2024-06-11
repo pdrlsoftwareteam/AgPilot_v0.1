@@ -4,7 +4,7 @@
 
 #define COMPASS_CAL_NUM_SPHERE_PARAMS       4
 #define COMPASS_CAL_NUM_ELLIPSOID_PARAMS    9
-#define COMPASS_CAL_NUM_SAMPLES             300     // number of samples required before fitting begins
+#define COMPASS_CAL_NUM_SAMPLES             400     // number of samples required before fitting begins
 
 #define COMPASS_MAX_SCALE_FACTOR 1.5
 #define COMPASS_MIN_SCALE_FACTOR (1.0/COMPASS_MAX_SCALE_FACTOR)
@@ -16,6 +16,16 @@ public:
     // start or stop the calibration
     void start(bool retry, float delay, uint16_t offset_max, uint8_t compass_idx, float tolerance);
     void stop();
+
+
+    uint16_t _x_axis_sample_count = 0;
+    uint16_t _y_axis_sample_count = 0;
+    uint16_t _z_axis_sample_count = 0;
+    bool _x_axis_sample_count_finished = false;
+    bool _y_axis_sample_count_finished = false;
+    bool _z_axis_sample_count_finished = false;
+
+     static const uint16_t MAX_SAMPLES_PER_AXIS = 130;
 
     // Update point sample
     void new_sample(const Vector3f& sample);
@@ -189,6 +199,8 @@ private:
 
     // update the completion mask based on a single sample
     void update_completion_mask(const Vector3f& sample);
+
+    bool is_aligned_with_axis(const Vector3f& v, const Vector3f& axis, float tolerance);
 
     // reset and updated the completion mask using all samples in the sample buffer
     void update_completion_mask();
