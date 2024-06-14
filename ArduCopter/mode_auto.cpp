@@ -1028,10 +1028,6 @@ void ModeAuto::wp_run()
         }
     }
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
-    if(wp_nav->check_avoidance_status())
-    {
-    	copter.failsafe_obstacle_on_event();
-    }
 
     // WP_Nav has set the vertical position control targets
     // run the vertical position controller and set output throttle
