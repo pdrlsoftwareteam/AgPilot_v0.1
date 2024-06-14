@@ -294,7 +294,7 @@ void Copter::failsafe_terrain_on_event()
 
 void Copter::failsafe_obstacle_on_event()
 {
-    gcs().send_text(MAV_SEVERITY_CRITICAL,"Failsafe: Obstacle ahed");
+    gcs().send_text(MAV_SEVERITY_WARNING,"Warning: Obstacle ahead");
     AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILSAFE_OCCURRED);
 
 #if MODE_RTL_ENABLED == ENABLED
