@@ -139,6 +139,8 @@ public:
     // 10Hz from main loop
     void update(void);
 
+    float getDist();
+
     // Handle an incoming DISTANCE_SENSOR message (from a MAVLink enabled range finder)
     void handle_msg(const mavlink_message_t &msg);
 

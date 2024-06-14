@@ -36,6 +36,8 @@
 
 const AP_Param::GroupInfo AC_Avoid::var_info[] = {
 
+	    AP_GROUPINFO("FLAG", 10, AC_Avoid, _man_flag, false),
+
     // @Param: ENABLE
     // @DisplayName: Avoidance control enable/disable
     // @Description: Enabled/disable avoidance input sources
@@ -185,7 +187,7 @@ void AC_Avoid::adjust_velocity_fence(float kP, float accel_cmss, Vector3f &desir
 void AC_Avoid::adjust_velocity(Vector3f &desired_vel_cms, bool &backing_up, float kP, float accel_cmss, float kP_z, float accel_cmss_z, float dt)
 {
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag) {
         return;
     }
 
@@ -351,7 +353,7 @@ void AC_Avoid::adjust_velocity_z(float kP, float accel_cmss, float& climb_rate_c
 #ifdef AP_AVOID_ENABLE_Z
 
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag) {
         return;
     }
     

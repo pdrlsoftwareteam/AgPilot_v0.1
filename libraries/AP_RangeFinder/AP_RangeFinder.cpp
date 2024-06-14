@@ -44,6 +44,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
+#include "GCS_MAVLink/GCS.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -221,6 +222,18 @@ void RangeFinder::update(void)
 #if HAL_LOGGING_ENABLED
     Log_RFND();
 #endif
+}
+
+float RangeFinder::getDist(){
+	for (uint8_t i=0; i<num_instances; i++) {
+		if (drivers[i] != nullptr) {
+			if(drivers[i]->orientation() == 0){
+				return state[i].distance_m;
+			}
+		}
+	}
+	gcs().send_text(MAV_SEVERITY_INFO, "Front Oriented Distance Sensor Not Found");
+	return 0;
 }
 
 bool RangeFinder::_add_backend(AP_RangeFinder_Backend *backend, uint8_t instance, uint8_t serial_instance)

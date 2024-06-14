@@ -1,5 +1,7 @@
 #include "Copter.h"
-
+#include "GCS_MAVLink/GCS.h"
+#include "../libraries/AC_Avoidance/AP_OAPathPlanner.h"
+#include "../libraries/AC_Avoidance/AC_Avoid.h"
 #if MODE_AUTO_ENABLED == ENABLED
 
 /*
@@ -1027,7 +1029,26 @@ void ModeAuto::wp_run()
             wp_nav->setSemiAutoOverrideAltitude(true);
         }
     }
+        bool obs_Flag = AP::ac_avoid()->get_manFlag() || AP::ap_oapathplanner()->get_autoFlag();
+
+	if(g2.auto_obs_avoid && !obs_Flag)
+	{
+		float speedVal = wp_nav->check_avoidance_status();
+
+		if(is_zero(speedVal))
+		{
+			copter.failsafe_obstacle_on_event();
+		}
+		else
+		{
+			copter.failsafe_terrain_set_status(wp_nav->update_wpnav_oa(speedVal));
+		}
+	}
+	else
+	{
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
+	}
+	
 
     // WP_Nav has set the vertical position control targets
     // run the vertical position controller and set output throttle
