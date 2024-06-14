@@ -70,7 +70,7 @@ bool AC_WPNav_OA::update_wpnav()
     // run path planning around obstacles
     AP_OAPathPlanner *oa_ptr = AP_OAPathPlanner::get_singleton();
     Location current_loc;
-    if ((oa_ptr != nullptr) && AP::ahrs().get_location(current_loc)) {
+	if (((oa_ptr != nullptr) && AP::ahrs().get_location(current_loc)) && !oa_ptr->_auto_flag) {
 
         // backup _origin and _destination when not doing oa
         if (_oa_state == AP_OAPathPlanner::OA_NOT_REQUIRED) {
