@@ -853,6 +853,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
+#if MODE_ZIGZAG_ENABLED == ENABLED
+    // @Group: ZIGZ_
+    // @Path: mode_zigzag.cpp
+    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
+#endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     // @Param: AUTO_OPTIONS
@@ -998,6 +1003,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
     AP_GROUPINFO("AM_THR_FACT", 20, ParametersG2, auto_man_thr_fact, 0.002),
     
+	AP_GROUPINFO("AUTO_OBS_AVOID", 4, ParametersG2, auto_obs_avoid, 1),
+
 
     // ID 62 is reserved for the SHOW_... parameters from the Skybrush fork at
     // https://github.com/skybrush-io/ardupilot
