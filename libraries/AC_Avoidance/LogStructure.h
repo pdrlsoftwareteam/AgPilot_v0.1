@@ -3,7 +3,6 @@
 #include <AP_Logger/LogStructure.h>
 
 #define LOG_IDS_FROM_AVOIDANCE \
-	LOG_OA_SMARTAVOID_MSG, \
     LOG_OA_BENDYRULER_MSG, \
     LOG_OA_DIJKSTRA_MSG, \
     LOG_SIMPLE_AVOID_MSG, \
@@ -108,8 +107,6 @@ struct PACKED log_OD_Visgraph {
 };
 
 #define LOG_STRUCTURE_FROM_AVOIDANCE \
-	{ LOG_OA_SMARTAVOID_MSG, sizeof(log_OABendyRuler), \
-	  "OABR","QBBHHHBfLLiLLi","TimeUS,Type,Act,DYaw,Yaw,DP,RChg,Mar,DLt,DLg,DAlt,OLt,OLg,OAlt", "s-bddd-mDUmDUm", "F-------GGBGGB" , true }, \
     { LOG_OA_BENDYRULER_MSG, sizeof(log_OABendyRuler), \
       "OABR","QBBHHHBfLLiLLi","TimeUS,Type,Act,DYaw,Yaw,DP,RChg,Mar,DLt,DLg,DAlt,OLt,OLg,OAlt", "s-bddd-mDUmDUm", "F-------GGBGGB" , true }, \
     { LOG_OA_DIJKSTRA_MSG, sizeof(log_OADijkstra), \

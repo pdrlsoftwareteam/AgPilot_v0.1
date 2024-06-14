@@ -20,7 +20,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include "AP_OABendyRuler.h"
 #include "AP_OADijkstra.h"
-#include "AC_Avoid.h"
+
 extern const AP_HAL::HAL &hal;
 
 // parameter defaults
@@ -110,12 +110,6 @@ void AP_OAPathPlanner::init()
             AP_Param::load_object_from_eeprom(_oabendyruler, AP_OABendyRuler::var_info);
         }
         break;
-    case OA_PATHPLAN_SMART_AVOID:
-        if (_oasmartavoid == nullptr) {
-        	_oasmartavoid = new AP_OASmartAvoid();
-            AP_Param::load_object_from_eeprom(_oasmartavoid, AP_OASmartAvoid::var_info);
-        }
-    	break;
     }
 
     _oadatabase.init();
@@ -148,12 +142,6 @@ bool AP_OAPathPlanner::pre_arm_check(char *failure_msg, uint8_t failure_msg_len)
             return false;
         }
         break;
-    case OA_PATHPLAN_SMART_AVOID:
-        if (_oasmartavoid == nullptr) {
-            hal.util->snprintf(failure_msg, failure_msg_len, "BendyRuler OA requires reboot");
-            return false;
-        }
-    	break;
     }
     return true;
 }
@@ -374,19 +362,6 @@ void AP_OAPathPlanner::avoidance_thread()
             }
             path_planner_used = OAPathPlannerUsed::Dijkstras;
 #endif
-            break;
-        }
-        case OA_PATHPLAN_SMART_AVOID:{
-            if (_oasmartavoid == nullptr) {
-                continue;
-            }
-            _oasmartavoid->set_config(AP::ac_avoid()->get_margin());
-
-            AP_OASmartAvoid::OASmartType smart_type;
-            if (_oasmartavoid->update(avoidance_request2.current_loc, avoidance_request2.destination, avoidance_request2.ground_speed_vec, origin_new, destination_new, smart_type, false)) {
-                res = OA_SUCCESS;
-            }
-            path_planner_used = OAPathPlannerUsed::SmartAvoid;
             break;
         }
 
