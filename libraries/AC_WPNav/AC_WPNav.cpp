@@ -1,5 +1,9 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AC_WPNav.h"
+#include "AP_RangeFinder/AP_RangeFinder.h"
+#include <AC_Avoidance/AP_OAPathPlanner.h>
+#include "GCS_MAVLink/GCS.h"
+
 
 extern const AP_HAL::HAL& hal;
 
@@ -602,7 +606,38 @@ int32_t AC_WPNav::get_wp_bearing_to_destination() const
 {
     return get_bearing_cd(_inav.get_position_xy_cm(), _destination.xy());
 }
+bool AC_WPNav::update_wpnav_oa(float speed_factor)
+{
+	bool ret = true;
 
+/// update_wpnav - run the wp controller - should be called at 100hz or higher
+	if (_check_wp_speed_change) {
+		if (!is_equal(_wp_speed_cms.get() * speed_factor, _last_wp_speed_cms)) {
+			set_speed_xy(_wp_speed_cms * speed_factor);
+			_last_wp_speed_cms = _wp_speed_cms * speed_factor;
+		}
+	}
+	if (!is_equal(_wp_speed_up_cms.get() * speed_factor, _last_wp_speed_up_cms)) {
+		set_speed_up(_wp_speed_up_cms * speed_factor);
+		_last_wp_speed_up_cms = _wp_speed_up_cms * speed_factor;
+	}
+	if (!is_equal(_wp_speed_down_cms.get() * speed_factor, _last_wp_speed_down_cms)) {
+		set_speed_down(_wp_speed_down_cms * speed_factor);
+		_last_wp_speed_down_cms = _wp_speed_down_cms * speed_factor;
+	}
+
+	// advance the target if necessary
+	if (!advance_wp_target_along_track(_pos_control.get_dt())) {
+		// To-Do: handle inability to advance along track (probably because of missing terrain data)
+		ret = false;
+	}
+
+	_pos_control.update_xy_controller();
+
+	_wp_last_update = AP_HAL::millis();
+
+	return ret;
+}
 /// update_wpnav - run the wp controller - should be called at 100hz or higher
 bool AC_WPNav::update_wpnav()
 {
@@ -635,6 +670,38 @@ bool AC_WPNav::update_wpnav()
     _wp_last_update = AP_HAL::millis();
 
     return ret;
+}
+
+float AC_WPNav::check_avoidance_status()
+{
+	float margin = AP::ap_oapathplanner()->getMargin();
+	float maxMargin = margin + 5.0;
+	float distVal = AP::rangefinder()->getDist();
+
+    if(is_zero(distVal))
+    {
+    	return 1;
+    }
+	float range_length = maxMargin - margin;
+
+	float interval_size = 0.1;
+
+	float num_intervals = range_length / interval_size;
+
+	float var;
+
+	if (distVal >= maxMargin) {
+		var = 1.0;
+	} else if (distVal <= margin) {
+		var = 0.0;
+	} else {
+		float interval_index = (distVal - margin) / interval_size;
+		var = interval_index / num_intervals;
+		var/=6;
+	}
+
+	return var;
+
 }
 
 // returns true if update_wpnav has been run very recently

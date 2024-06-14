@@ -6,6 +6,8 @@
  */
 #include "AP_PDRL_Commander.h"
 #include "AP_LIBNPNT/PdrlBootPlugin.h"
+#include "AC_Avoidance/AP_OAPathPlanner.h"
+#include "AC_Avoidance/AC_Avoid.h"
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
 #include "hal.h"
 #include "hwdef.h"
@@ -402,6 +404,18 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		break;
 
 	case COMMAND_SET_FLIGHT_PAYLOAD_DETAILS:
+	{
+		uint8_t flag_Status[100];
+		strcpy((char*)flag_Status,"OBSTACLE_FLAG");
+
+		flag_Status[13] = 0x41;
+		flag_Status[14] = AP::ac_avoid()->get_manFlag();
+		flag_Status[15] = 0x4F;
+		flag_Status[16] = AP::ap_oapathplanner()->get_autoFlag();
+		sendCommand(0,COMMAND_GET_FLIGHT_PAYLOAD_DETAILS,COMMAND_TYPE_GET,0,17,2,flag_Status);
+//		gcs().send_text(MAV_SEVERITY_ERROR, "Sent flag status");
+
+	}
 		break;
 
 	case COMMAND_GET_FLIGHT_PAYLOAD_DETAILS:

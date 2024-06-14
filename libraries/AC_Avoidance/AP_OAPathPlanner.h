@@ -27,7 +27,10 @@ public:
 
     // perform any required initialisation
     void init();
-
+    uint8_t get_autoFlag()
+    {
+    	return _auto_flag;
+    }
     /// returns true if all pre-takeoff checks have completed successfully
     bool pre_arm_check(char *failure_msg, uint8_t failure_msg_len) const;
 
@@ -108,7 +111,12 @@ private:
     AP_Int8 _type;                  // avoidance algorithm to be used
     AP_Float _margin_max;           // object avoidance will ignore objects more than this many meters from vehicle
     AP_Int16 _options;              // Bitmask for options while recovering from Object Avoidance
-    
+public:// Bitmask for options while recovering from Object Avoidance
+    AP_Int8 _auto_flag;
+    float getMargin(){
+    	return _margin_max;
+    }
+private:
     // internal variables used by front end
     HAL_Semaphore _rsem;            // semaphore for multi-thread use of avoidance_request and avoidance_result
     bool _thread_created;           // true once background thread has been created

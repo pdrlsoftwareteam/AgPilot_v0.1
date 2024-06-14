@@ -292,6 +292,20 @@ void Copter::failsafe_terrain_on_event()
     }
 }
 
+void Copter::failsafe_obstacle_on_event()
+{
+    gcs().send_text(MAV_SEVERITY_WARNING,"Warning: Obstacle ahead");
+    AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILSAFE_OCCURRED);
+
+#if MODE_RTL_ENABLED == ENABLED
+    if (flightmode->mode_number() == Mode::Number::RTL) {
+        mode_rtl.restart_without_terrain();
+#endif
+    } else {
+    	set_mode_loiter_or_RTL(ModeReason::FAILSAFE);
+    }
+}
+
 // check for gps glitch failsafe
 void Copter::gpsglitch_check()
 {
@@ -441,6 +455,21 @@ void Copter::set_mode_brake_or_land_with_pause(ModeReason reason)
 
     gcs().send_text(MAV_SEVERITY_WARNING, "Trying Land Mode");
     set_mode_land_with_pause(reason);
+}
+
+// Sets mode to Brake or LAND with 4 second delay before descent starts
+// This can come from failsafe or RC option
+void Copter::set_mode_loiter_or_RTL(ModeReason reason)
+{
+#if MODE_AUTO_ENABLED == ENABLED
+    if (set_mode(Mode::Number::LOITER, reason)) {
+        AP_Notify::events.failsafe_mode_change = 1;
+        return;
+    }
+#endif
+
+    gcs().send_text(MAV_SEVERITY_WARNING, "Trying RTL Mode");
+    set_mode_RTL_or_land_with_pause(reason);
 }
 
 bool Copter::should_disarm_on_failsafe() {

@@ -623,6 +623,7 @@ public:
     // Auto Manual Alt param
     AP_Int8 auto_man_alt;  // activate semi auto mode add a2sAndres
     AP_Float auto_man_thr_fact;  // activate semi auto mode add a2sAndres
+    AP_Int8 auto_obs_avoid;
 };
 
 extern const AP_Param::Info        var_info[];
