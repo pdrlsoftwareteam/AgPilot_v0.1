@@ -9,50 +9,51 @@
 
 #if AP_RANGEFINDER_USD1_CAN_ENABLED
 
-class USD1_MultiCAN;
-
-class AP_RangeFinder_USD1_CAN : public AP_RangeFinder_Backend {
+class AP_RangeFinder_USD1_CAN :  public AP_RangeFinder_Backend {
 public:
-    friend class USD1_MultiCAN;
-
-    AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params);
+    AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint8_t mlowerByte = 0, uint8_t muppertByte = 0, uint8_t msensId = 0);
 
     void update() override;
-
-    // handler for incoming frames
-    bool handle_frame(AP_HAL::CANFrame &frame);
-
-    static const struct AP_Param::GroupInfo var_info[];
-
-
+    
 protected:
     virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
         return MAV_DISTANCE_SENSOR_RADAR;
     }
-private:
+public:
     float _distance_sum;
     uint32_t _distance_count;
-    int32_t last_recv_id = -1;
-
-    AP_Int32 receive_id;
-
-    static USD1_MultiCAN *multican;
-    AP_RangeFinder_USD1_CAN *next;
+    uint8_t _sensId = 0;
+    uint8_t _lowerByte=0, _upperByte=0;
+    HAL_Semaphore *_msem;
 };
 
-// a class to allow for multiple USD1_CAN backends with one
-// CANSensor driver
-class USD1_MultiCAN : public CANSensor {
+
+class AP_CANDataDistribuer : public CANSensor
+{
+	static AP_CANDataDistribuer *instance;
+	AP_RangeFinder_USD1_CAN *rngfndInst[3];
+	uint8_t totalDeviceHandled = 0;
 public:
-    USD1_MultiCAN() : CANSensor("USD1") {
-        register_driver(AP_CANManager::Driver_Type_USD1);
-    }
+	static AP_CANDataDistribuer* getInstance(){
+		if(instance == nullptr)
+			instance = new AP_CANDataDistribuer();
+		return instance;
+	}
+
+	AP_CANDataDistribuer();
+	void addCANDataListener(AP_RangeFinder_USD1_CAN * mrngFndInst)
+	{
+		if(totalDeviceHandled<3)
+		{
+			rngfndInst[totalDeviceHandled] = mrngFndInst;
+			totalDeviceHandled++;
+		}
+	}
 
     // handler for incoming frames
     void handle_frame(AP_HAL::CANFrame &frame) override;
 
-    HAL_Semaphore sem;
-    AP_RangeFinder_USD1_CAN *drivers;
 };
+
 
 #endif  // AP_RANGEFINDER_USD1_CAN_ENABLED
