@@ -1,47 +1,20 @@
 #include "AP_RangeFinder_USD1_CAN.h"
-#include <AP_BoardConfig/AP_BoardConfig.h>
 
 #if AP_RANGEFINDER_USD1_CAN_ENABLED
 
 #include <AP_HAL/AP_HAL.h>
 
-const AP_Param::GroupInfo AP_RangeFinder_USD1_CAN::var_info[] = {
-
-    // @Param: RECV_ID
-    // @DisplayName: CAN receive ID
-    // @Description: The receive ID of the CAN frames. A value of zero means all IDs are accepted.
-    // @Range: 0 65535
-    // @User: Advanced
-    AP_GROUPINFO("RECV_ID", 12, AP_RangeFinder_USD1_CAN, receive_id, 0),
-
-    AP_GROUPEND
-};
-
-USD1_MultiCAN *AP_RangeFinder_USD1_CAN::multican;
-
 /*
   constructor
  */
-AP_RangeFinder_USD1_CAN::AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params) :
+AP_RangeFinder_USD1_CAN::AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint8_t mlowerByte, uint8_t mupperByte, uint8_t msensId) :
     AP_RangeFinder_Backend(_state, _params)
 {
-    if (multican == nullptr) {
-        multican = new USD1_MultiCAN();
-        if (multican == nullptr) {
-            AP_BoardConfig::allocation_error("USD1_CAN");
-        }
-    }
-
-    {
-        // add to linked list of drivers
-        WITH_SEMAPHORE(multican->sem);
-        auto *prev = multican->drivers;
-        next = prev;
-        multican->drivers = this;
-    }
-
-    AP_Param::setup_object_defaults(this, var_info);
-    state.var_info = var_info;
+	_lowerByte = mlowerByte;
+	_upperByte = mupperByte;
+	_sensId = msensId;
+	_msem = &_sem;
+	AP_CANDataDistribuer::getInstance()->addCANDataListener(this);
 }
 
 // update state
@@ -61,36 +34,28 @@ void AP_RangeFinder_USD1_CAN::update(void)
     }
 }
 
-// handler for incoming frames. These come in at 100Hz
-bool AP_RangeFinder_USD1_CAN::handle_frame(AP_HAL::CANFrame &frame)
+//CAN data distributer
+AP_CANDataDistribuer *AP_CANDataDistribuer::instance = nullptr;
+AP_CANDataDistribuer::AP_CANDataDistribuer():
+CANSensor("USD1")
 {
-    WITH_SEMAPHORE(_sem);
-    const uint16_t id = frame.id & AP_HAL::CANFrame::MaskStdID;
-    if (receive_id != 0 && id != uint16_t(receive_id.get())) {
-        // incorrect receive ID
-        return false;
-    }
-    if (last_recv_id != -1 && id != last_recv_id) {
-        // changing ID
-        return false;
-    }
-    last_recv_id = id;
-
-    const uint16_t dist_cm = (frame.data[0]<<8) | frame.data[1];
-    _distance_sum += dist_cm * 0.01;
-    _distance_count++;
-    return true;
+    register_driver(AP_CANManager::Driver_Type_USD1);
 }
 
-// handle frames from CANSensor, passing to the drivers
-void USD1_MultiCAN::handle_frame(AP_HAL::CANFrame &frame)
+// handler for incoming frames. These come in at 100Hz
+void AP_CANDataDistribuer::handle_frame(AP_HAL::CANFrame &frame)
 {
-    WITH_SEMAPHORE(sem);
-    for (auto *d = drivers; d; d=d->next) {
-        if (d->handle_frame(frame)) {
-            break;
-        }
-    }
+    for(int i = 0; i < totalDeviceHandled;i++)
+	{
+    	if(rngfndInst[i]->_sensId == frame.id)
+    	{
+            WITH_SEMAPHORE(rngfndInst[i]->_msem);
+    		const uint16_t dist_cm = (frame.data[rngfndInst[i]->_lowerByte]<<8) | frame.data[rngfndInst[i]->_upperByte];
+    		rngfndInst[i]->_distance_sum += dist_cm * 0.01;
+    		rngfndInst[i]->_distance_count = rngfndInst[i]->_distance_count + 1;
+    		return;
+    	}
+	}
 }
 
 #endif  // AP_RANGEFINDER_USD1_CAN_ENABLED
