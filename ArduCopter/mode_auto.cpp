@@ -25,6 +25,11 @@
 bool ModeAuto::init(bool ignore_checks)
 {
     auto_RTL = false;
+        if(copter.flightmode->mode_number() == Mode::Number::LOITER)
+    {
+        wp_nav->resetWaypointZ(copter.current_loc.alt);
+ 
+    }
     if (mission.num_commands() > 1 || ignore_checks) {
         // reject switching to auto mode if landed with motors armed but first command is not a takeoff (reduce chance of flips)
         if (motors->armed() && copter.ap.land_complete && !mission.starts_with_takeoff_cmd()) {
@@ -69,8 +74,8 @@ bool ModeAuto::init(bool ignore_checks)
 // stop mission when we leave auto mode
 void ModeAuto::exit()
 {
-//	wp_nav->resetAutomode();
-//	wp_nav->resetWaypointZ(copter.current_loc.alt);
+	wp_nav->resetAutomode();
+	wp_nav->resetWaypointZ(copter.current_loc.alt);
     if (copter.mode_auto.mission.state() == AP_Mission::MISSION_RUNNING) {
         copter.mode_auto.mission.stop();
     }
@@ -941,10 +946,7 @@ void ModeAuto::takeoff_run()
 // auto_wp_run - runs the auto waypoint controller
 bool ModeAuto::updateAltitude(float climb_rate_cms)
 {
-
     float alt_error_cm = climb_rate_cms;
- 
-//    land_run_horizontal_control();
 
     // Compute a vertical velocity demand such that the vehicle
     // approaches the desired altitude.
@@ -980,7 +982,6 @@ void ModeAuto::wp_run()
     if (g2.auto_man_alt != 1) {
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
         // run waypoint controller
-        copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
     }
     else{
         // get pilot desired climb rate alt control Alt_Hold
@@ -1029,7 +1030,8 @@ void ModeAuto::wp_run()
             wp_nav->setSemiAutoOverrideAltitude(true);
         }
     }
-        bool obs_Flag = AP::ac_avoid()->get_manFlag() || AP::ap_oapathplanner()->get_autoFlag();
+    
+	bool obs_Flag = AP::ac_avoid()->get_manFlag() || AP::ap_oapathplanner()->get_autoFlag();
 
 	if(g2.auto_obs_avoid && !obs_Flag)
 	{
