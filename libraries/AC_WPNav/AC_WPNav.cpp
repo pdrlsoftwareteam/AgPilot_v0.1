@@ -3,7 +3,7 @@
 #include "AP_RangeFinder/AP_RangeFinder.h"
 #include <AC_Avoidance/AP_OAPathPlanner.h>
 #include "GCS_MAVLink/GCS.h"
-
+#include "AP_Proximity/AP_Proximity.h"
 
 extern const AP_HAL::HAL& hal;
 
@@ -606,6 +606,8 @@ int32_t AC_WPNav::get_wp_bearing_to_destination() const
 {
     return get_bearing_cd(_inav.get_position_xy_cm(), _destination.xy());
 }
+
+/// update_wpnav - run the wp controller - should be called at 100hz or higher
 bool AC_WPNav::update_wpnav_oa(float speed_factor)
 {
 	bool ret = true;
@@ -674,9 +676,35 @@ bool AC_WPNav::update_wpnav()
 
 float AC_WPNav::check_avoidance_status()
 {
-	float margin = AP::ap_oapathplanner()->getMargin();
+	    AP_AHRS &ahrs = AP::ahrs();
+    float margin;
+    static int now = AP_HAL::millis();
+    float distVal = 0;
+    if((ahrs.groundspeed()) <= 3)
+    {
+        margin = 7.0;//meter
+    }
+    else
+    {
+        margin = ahrs.groundspeed() + 5.0;
+    }
 	float maxMargin = margin + 5.0;
-	float distVal = AP::rangefinder()->getDist();
+
+    if((int)AP::rangefinder()->get_type(1) == 38){
+    	distVal = AP::rangefinder()->getDist();
+    }
+    else if((int)AP::proximity()->get_type(0) != 0){
+    	distVal = AP::proximity()->getDist();
+    }
+    else
+    {
+    	if(AP_HAL::millis() - now > 5000)
+    		{
+//    		printf("%f",distVal);
+    			now = AP_HAL::millis();
+    			gcs().send_text(MAV_SEVERITY_INFO, "RangeFinder or Proximity Sensor Not Found");
+    		}
+    }
 
     if(is_zero(distVal))
     {
@@ -697,13 +725,17 @@ float AC_WPNav::check_avoidance_status()
 	} else {
 		float interval_index = (distVal - margin) / interval_size;
 		var = interval_index / num_intervals;
+ 
+        if(ahrs.groundspeed() < 3.0){
+            var/=3;
+        }
+        else{
 		var/=6;
 	}
+    }
 
 	return var;
-
 }
-
 // returns true if update_wpnav has been run very recently
 bool AC_WPNav::is_active() const
 {

@@ -29,6 +29,7 @@
 #include "AP_Proximity_DroneCAN.h"
 
 #include <AP_Logger/AP_Logger.h>
+#include "GCS_MAVLink/GCS.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -228,6 +229,15 @@ void AP_Proximity::update()
     boundary.check_face_timeout();
 }
 
+float AP_Proximity::getDist(){
+
+	    Proximity_Distance_Array dist_array{};
+	    get_horizontal_distances(dist_array);
+	    return dist_array.distance[0];
+//	    printf("prx dist: %f\n",dist_array.distance[0]);
+//		gcs().send_text(MAV_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
+
+}
 AP_Proximity::Type AP_Proximity::get_type(uint8_t instance) const
 {
     if (instance < PROXIMITY_MAX_INSTANCES) {
