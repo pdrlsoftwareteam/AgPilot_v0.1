@@ -382,12 +382,13 @@ void AC_PosControl::input_pos_xyz(const Vector3p& pos, float pos_offset_z, float
                         jerk_max_z_cmsss, _dt, false);
 
     // update the vertical position, velocity and acceleration offsets
-    update_pos_offset_z(pos_offset_z);
 
     // add terrain offsets
     _pos_target.z += _pos_offset_z;
     _vel_desired.z += _vel_offset_z;
     _accel_desired.z += _accel_offset_z;
+    update_pos_offset_z(pos_offset_z);
+
 }
 
 
@@ -831,12 +832,13 @@ void AC_PosControl::set_pos_target_z_from_climb_rate_cm(float vel)
     input_vel_accel_z(vel_temp, 0.0);
 
     // update the vertical position, velocity and acceleration offsets
-    update_pos_offset_z(_pos_offset_target_z);
 
     // add terrain offsets
     _pos_target.z += _pos_offset_z;
     _vel_desired.z += _vel_offset_z;
     _accel_desired.z += _accel_offset_z;
+    update_pos_offset_z(_pos_offset_target_z);
+
 }
 
 /// land_at_climb_rate_cm - adjusts target up or down using a commanded climb rate in cm/s
