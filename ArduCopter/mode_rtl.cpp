@@ -12,6 +12,7 @@
 // rtl_init - initialise rtl controller
 bool ModeRTL::init(bool ignore_checks)
 {
+	g2._spray_enabled = false;
     if (!ignore_checks) {
         if (!AP::ahrs().home_is_set()) {
             return false;

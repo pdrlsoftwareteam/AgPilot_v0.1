@@ -235,10 +235,10 @@ void CompassCalibrator::pull_sample()
             update_completion_mask(mag_sample.get());
             _sample_buffer[_samples_collected] = mag_sample;
             _samples_collected++;
-            if(_samples_collected >= 400)
-            {
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "samples are collected");
-            }
+//            if(_samples_collected >= 400)
+//            {
+//                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "samples are collected");
+//            }
         }
     }
 
@@ -312,19 +312,19 @@ void CompassCalibrator::update_completion_mask(const Vector3f& v) {
     }
     if(_x_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_x_axis_sample_count_finished)
     {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "X axis samples are collected");
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "X axis samples are collected");
         _x_axis_sample_count_finished = true;
     }
 
     if(_y_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_y_axis_sample_count_finished)
     {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Y axis samples are collected");
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Y axis samples are collected");
         _y_axis_sample_count_finished = true;
     }
 
     if(_z_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_z_axis_sample_count_finished)
     {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Z axis samples are collected");
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Z axis samples are collected");
         _z_axis_sample_count_finished = true;
     }
 }

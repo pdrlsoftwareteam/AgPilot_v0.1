@@ -113,9 +113,6 @@ private:
     AP_Int16 _options;              // Bitmask for options while recovering from Object Avoidance
 public:// Bitmask for options while recovering from Object Avoidance
     AP_Int8 _auto_flag;
-    float getMargin(){
-    	return _margin_max;
-    }
 private:
     // internal variables used by front end
     HAL_Semaphore _rsem;            // semaphore for multi-thread use of avoidance_request and avoidance_result

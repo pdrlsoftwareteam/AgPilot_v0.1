@@ -1495,11 +1495,54 @@ void AP_PDRL_Logger::signLogFile(char* inFilePath,size_t len)
 
 void AP_PDRL_Logger::logStrToFile(char* logBuff,size_t len)
 {
-	uint64_t currenttime;
-	currenttime = AP::gps().time_epoch_usec();
-	char lineBuf[100];
-	snprintf(lineBuf,sizeof(lineBuf),"[%llu] ",(unsigned long long)currenttime);
-	strcat(lineBuf,logBuff);
+   uint16_t year;
+    uint8_t month, day, hour, min, sec;
+    uint16_t ms;
+    char datetimeBuf[50];
+
+    // First, try to get local time from RTC
+    if (AP::rtc().get_local_date_time(year, month, day, hour, min, sec, ms)) {
+        // Format the local date and time as "YYYY-MM-DD HH:MM:SS.mmm"
+    	month+=1;
+        snprintf(datetimeBuf, sizeof(datetimeBuf), "%04u-%02u-%02u %02u:%02u:%02u.%03u",
+                 year, month, day, hour, min, sec, ms);
+      //  gcs().send_text(MAV_SEVERITY_INFO, "Using RTC Time: %s", datetimeBuf);
+    }
+    else
+    {
+        // If RTC time is not available, fallback to GPS time
+        uint64_t gps_time_usec = AP::gps().time_epoch_usec();
+        if (gps_time_usec != 0) {
+            // Convert microseconds to seconds for easier handling
+            time_t gps_time_sec = gps_time_usec / 1000000;
+
+            // Define the offset for IST (UTC + 5:30)
+            int64_t ist_offset_sec = 5 * 3600 + 30 * 60;
+
+            // Calculate IST time
+            time_t ist_time_sec = gps_time_sec + ist_offset_sec;
+
+            // Convert IST time to struct tm
+            struct tm *ist_tm = gmtime(&ist_time_sec);
+
+            // Format the date and time as "YYYY-MM-DD HH:MM:SS"
+            strftime(datetimeBuf, sizeof(datetimeBuf), "%Y-%m-%d %H:%M:%S", ist_tm);
+
+           // gcs().send_text(MAV_SEVERITY_INFO, "Using GPS Time: %s", datetimeBuf);
+        }
+        else
+        {
+            // Fallback if neither RTC nor GPS time is available
+            strcpy(datetimeBuf, "No valid time available");
+           // gcs().send_text(MAV_SEVERITY_INFO, "Failed to retrieve both RTC and GPS time");
+        }
+    }
+
+    // Prepare the log line with the obtained date and time
+    char lineBuf[200];
+    snprintf(lineBuf, sizeof(lineBuf), "[%s] %s", datetimeBuf, logBuff);
+
+    // Write to the log file
 	int logFileFd = AP::FS().open("BOOTLOGS.txt",O_APPEND | O_CREAT | O_WRONLY);
 	AP::FS().write(logFileFd,lineBuf,strlen(lineBuf));
 	AP::FS().close(logFileFd);
