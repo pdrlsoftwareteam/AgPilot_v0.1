@@ -514,6 +514,11 @@ public:
     /// update - ensures the command queues are loaded with the next command and calls main programs command_init and command_verify functions to progress the mission
     ///     should be called at 10hz or higher
     void update();
+    bool reason = false;
+    void set_pauseReason(bool val)
+    {
+    	reason = val;
+    }
 
     ///
     /// public command methods

@@ -35,6 +35,7 @@ AP_BattMonitor_FuelFlow::AP_BattMonitor_FuelFlow(AP_BattMonitor &mon,
     // we can't tell if it is healthy as we expect zero pulses when no
     // fuel is flowing
     _state.healthy = true;
+      _state.has_time_remaining = true;
 }
 
 /*
@@ -126,6 +127,7 @@ void AP_BattMonitor_FuelFlow::read()
 
     // map consumed_wh using fixed voltage of 1
     _state.consumed_wh = _state.consumed_mah;
+    _state.time_remaining += state.pulse_count;
 }
 
 #endif  // AP_BATTERY_FUELFLOW_ENABLED

@@ -225,14 +225,34 @@ void RangeFinder::update(void)
 }
 
 float RangeFinder::getDist(){
+	float front_dist = -1;
+	float back_dist = -1;
+
 	for (uint8_t i=0; i<num_instances; i++) {
 		if (drivers[i] != nullptr) {
 			if(drivers[i]->orientation() == 0){
-				return state[i].distance_m;
+				front_dist = state[i].distance_m;
+			} else if (drivers[i]->orientation() == 4) {  // Back sensor
+				back_dist = state[i].distance_m;
 			}
 		}
 	}
-	gcs().send_text(MAV_SEVERITY_INFO, "Front Oriented Distance Sensor Not Found");
+
+	// If both front and back are available, return the shortest distance
+	if (front_dist > 0 && back_dist > 0) {
+		return (front_dist < back_dist) ? front_dist : back_dist;
+	}
+
+	// If only the front sensor is available, return its distance
+	if (front_dist > 0) {
+		return front_dist;
+	}
+
+	// If only the back sensor is available, return its distance
+	if (back_dist > 0) {
+		return back_dist;
+	}
+
 	return 0;
 }
 
