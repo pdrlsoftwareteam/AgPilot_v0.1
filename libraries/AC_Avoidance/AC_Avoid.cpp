@@ -37,6 +37,7 @@
 const AP_Param::GroupInfo AC_Avoid::var_info[] = {
 
 	    AP_GROUPINFO("FLAG", 10, AC_Avoid, _man_flag, false),
+		AP_GROUPINFO("ALT", 11, AC_Avoid, _min_alt_avoid, 300.0),
 
     // @Param: ENABLE
     // @DisplayName: Avoidance control enable/disable
@@ -186,10 +187,16 @@ void AC_Avoid::adjust_velocity_fence(float kP, float accel_cmss, Vector3f &desir
 */
 void AC_Avoid::adjust_velocity(Vector3f &desired_vel_cms, bool &backing_up, float kP, float accel_cmss, float kP_z, float accel_cmss_z, float dt)
 {
+	float _curr_alt;
+    AP::ahrs().get_relative_position_D_home(_curr_alt);
+    _curr_alt = -_curr_alt * 100; // translate Down to Up
+    //printf("curr_alt: %f\n",_curr_alt);
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED || _man_flag) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag || (_curr_alt < _min_alt_avoid)) {
+     //   printf("Not going to work\n");
         return;
     }
+    //printf("Going to work\n");
 
     // make a copy of input velocity, because desired_vel_cms might be changed
     const Vector3f desired_vel_cms_original = desired_vel_cms;
@@ -352,8 +359,12 @@ void AC_Avoid::adjust_velocity_z(float kP, float accel_cmss, float& climb_rate_c
 {
 #ifdef AP_AVOID_ENABLE_Z
 
+	float _curr_alt;
+    AP::ahrs().get_relative_position_D_home(_curr_alt);
+    _curr_alt = -_curr_alt * 100; // translate Down to Up
+
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED || _man_flag) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag || (_curr_alt < _min_alt_avoid)) {
         return;
     }
     

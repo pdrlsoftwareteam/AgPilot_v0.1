@@ -25,10 +25,25 @@
 bool ModeAuto::init(bool ignore_checks)
 {
     auto_RTL = false;
+    int32_t alt_target_cm;
+
         if(copter.flightmode->mode_number() == Mode::Number::LOITER)
     {
+            // If the origin and destination use terrain altitude
+             if (wp_nav->origin_and_destination_are_terrain_alt())
+             {
+
+                 if (copter.get_rangefinder_height_interpolated_cm(alt_target_cm))
+                 {
+                     wp_nav->resetWaypointZ(alt_target_cm);
+                 }
+             }
+        else
+             {
+                 // Reset to the current altitude if not using terrain altitude
         wp_nav->resetWaypointZ(copter.current_loc.alt);
- 
+    }
+
     }
     if (mission.num_commands() > 1 || ignore_checks) {
         // reject switching to auto mode if landed with motors armed but first command is not a takeoff (reduce chance of flips)
@@ -74,8 +89,29 @@ bool ModeAuto::init(bool ignore_checks)
 // stop mission when we leave auto mode
 void ModeAuto::exit()
 {
-	wp_nav->resetAutomode();
+	if(AP::sprayer()->get_status())
+	{
+		g2._spray_enabled = true;
+	}
+	else
+	{
+		g2._spray_enabled = false;
+	}
+    wp_nav->resetAutomode();
+    	if (wp_nav->origin_and_destination_are_terrain_alt())
+	{
+
+	int32_t alt_target_cm;
+	if (copter.get_rangefinder_height_interpolated_cm(alt_target_cm))
+	{
+		wp_nav->resetWaypointZ(alt_target_cm);
+	}
+	}
+else
+{
+
 	wp_nav->resetWaypointZ(copter.current_loc.alt);
+}
     if (copter.mode_auto.mission.state() == AP_Mission::MISSION_RUNNING) {
         copter.mode_auto.mission.stop();
     }
@@ -115,7 +151,6 @@ void ModeAuto::run()
                 }
             }
         }
-
         mission.update();
     }
 
@@ -392,9 +427,24 @@ bool ModeAuto::wp_start(const Location& dest_loc)
 // auto_land_start - initialises controller to implement a landing
 void ModeAuto::land_start()
 {
+	g2._spray_enabled = false;
 	wp_nav->resetAutomode();
+
+	// If the origin and destination use terrain altitude
+	if (wp_nav->origin_and_destination_are_terrain_alt())
+	{
+		// Attempt to get the altitude in cm above terrain
+	int32_t alt_target_cm;
+		if (copter.get_rangefinder_height_interpolated_cm(alt_target_cm))
+		{
+			wp_nav->resetWaypointZ(alt_target_cm);
+		}
+		}
+	else
+	{
+		// Reset to the current altitude if not using terrain altitude
 	wp_nav->resetWaypointZ(copter.current_loc.alt);
-    // set horizontal speed and acceleration limits
+	}	// set horizontal speed and acceleration limits
     pos_control->set_max_speed_accel_xy(wp_nav->get_default_speed_xy(), wp_nav->get_wp_acceleration());
     pos_control->set_correction_speed_accel_xy(wp_nav->get_default_speed_xy(), wp_nav->get_wp_acceleration());
 
@@ -979,6 +1029,14 @@ void ModeAuto::wp_run()
         return;
     }
 
+//    printf("before: %d\n",AP::sprayer()->get_status());
+    if(g2._spray_enabled)
+    {
+        AP::sprayer()->run(true);
+        g2._spray_enabled = false;
+    }
+//    printf("after running: %d\tspraying: %d\n",AP::sprayer()->running(),AP::sprayer()->running());
+
     if (g2.auto_man_alt != 1) {
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
         // run waypoint controller
@@ -1039,6 +1097,7 @@ void ModeAuto::wp_run()
 
 		if(is_zero(speedVal))
 		{
+			mission.set_pauseReason(true);
 			copter.failsafe_obstacle_on_event();
 		}
 		else
@@ -1082,6 +1141,8 @@ void ModeAuto::land_run()
 //      called by auto_run at 100hz or more
 void ModeAuto::rtl_run()
 {
+	wp_nav->resetAutomode();
+	wp_nav->resetWaypointZ(copter.current_loc.alt);
     // call regular rtl flight mode run function
     copter.mode_rtl.run(false);
 }
@@ -1628,7 +1689,7 @@ bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const
 void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
 {
     // To-Do: check if we have already landed
-
+	g2._spray_enabled = false;
     // if location provided we fly to that location at current altitude
     if (cmd.content.location.lat != 0 || cmd.content.location.lng != 0) {
         // set state to fly to location
@@ -1662,39 +1723,9 @@ void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
 // note: caller should set yaw_mode
 void ModeAuto::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
 {
-    // convert back to location
-    Location target_loc(cmd.content.location);
-
-    // use current location if not provided
-    if (target_loc.lat == 0 && target_loc.lng == 0) {
-        // To-Do: make this simpler
-        Vector3f temp_pos;
-        copter.wp_nav->get_wp_stopping_point_xy(temp_pos.xy());
-        const Location temp_loc(temp_pos, Location::AltFrame::ABOVE_ORIGIN);
-        target_loc.lat = temp_loc.lat;
-        target_loc.lng = temp_loc.lng;
-    }
-
-    // use current altitude if not provided
-    // To-Do: use z-axis stopping point instead of current alt
-    if (target_loc.alt == 0) {
-        // set to current altitude but in command's alt frame
-        int32_t curr_alt;
-        if (copter.current_loc.get_alt_cm(target_loc.get_alt_frame(),curr_alt)) {
-            target_loc.set_alt_cm(curr_alt, target_loc.get_alt_frame());
-        } else {
-            // default to current altitude as alt-above-home
-            target_loc.set_alt_cm(copter.current_loc.alt,
-                                  copter.current_loc.get_alt_frame());
-        }
-    }
-
-    // start way point navigator and provide it the desired location
-    if (!wp_start(target_loc)) {
-        // failure to set next destination can only be because of missing terrain data
-        copter.failsafe_terrain_on_event();
+    AP::sprayer()->run(false);
+    loiter_run();
         return;
-    }
 }
 
 // do_circle - initiate moving in a circle
@@ -2026,9 +2057,24 @@ void ModeAuto::do_payload_place(const AP_Mission::Mission_Command& cmd)
 // do_RTL - start Return-to-Launch
 void ModeAuto::do_RTL(void)
 {
+	g2._spray_enabled = false;
 	wp_nav->resetAutomode();
+
+	// If the origin and destination use terrain altitude
+	if (wp_nav->origin_and_destination_are_terrain_alt())
+	{
+		// Attempt to get the altitude in cm above terrain
+	int32_t alt_target_cm;
+		if (copter.get_rangefinder_height_interpolated_cm(alt_target_cm))
+		{
+			wp_nav->resetWaypointZ(alt_target_cm);
+		}
+		}
+	else
+	{
+		// Reset to the current altitude if not using terrain altitude
 	wp_nav->resetWaypointZ(copter.current_loc.alt);
-    // start rtl in auto flight mode
+	}	// start rtl in auto flight mode
     rtl_start();
 }
 

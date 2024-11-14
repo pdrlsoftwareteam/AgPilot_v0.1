@@ -27,14 +27,14 @@ const AP_Param::GroupInfo AP_RTC::var_info[] = {
     // @Description: Specifies which sources of UTC time will be accepted
     // @Bitmask: 0:GPS,1:MAVLINK_SYSTEM_TIME,2:HW
     // @User: Advanced
-    AP_GROUPINFO("_TYPES",  1, AP_RTC, allowed_types, 1),
+    AP_GROUPINFO("_TYPES",  1, AP_RTC, allowed_types, 7),
 
     // @Param: _TZ_MIN
     // @DisplayName: Timezone offset from UTC
     // @Description: Adds offset in +- minutes from UTC to calculate local time
     // @Range: -720 +840
     // @User: Advanced
-    AP_GROUPINFO("_TZ_MIN",  2, AP_RTC, tz_min, 0),
+    AP_GROUPINFO("_TZ_MIN",  2, AP_RTC, tz_min, 330),
     
     AP_GROUPEND
 };
@@ -137,6 +137,74 @@ bool AP_RTC::get_local_time(uint8_t &hour, uint8_t &min, uint8_t &sec, uint16_t 
 
     return true;
 }
+bool AP_RTC::get_local_date_time(uint16_t &year, uint8_t &month, uint8_t &day,
+                                 uint8_t &hour, uint8_t &min, uint8_t &sec, uint16_t &ms) const
+{
+    // Get the local time in ms, adjusted for the timezone
+    uint64_t time_ms = 0;
+    if (!get_utc_usec(time_ms)) {
+        return false;
+    }
+
+    time_ms /= 1000U;  // Convert microseconds to milliseconds
+    time_ms += (tz_min * 60000);  // Apply timezone offset in ms
+
+    // Constants for date calculations
+    const uint32_t SECONDS_PER_MINUTE = 60;
+    const uint32_t SECONDS_PER_HOUR = 3600;
+    const uint32_t SECONDS_PER_DAY = 86400;
+    const uint32_t DAYS_PER_YEAR = 365;
+    const uint32_t DAYS_PER_LEAP_YEAR = 366;
+
+    // Days and seconds since the Unix epoch (January 1, 1970)
+    uint32_t total_seconds = time_ms / 1000U;
+    uint32_t days_since_epoch = total_seconds / SECONDS_PER_DAY;
+    uint32_t seconds_today = total_seconds % SECONDS_PER_DAY;
+
+    // Calculate time (hour, minute, second)
+    hour = seconds_today / SECONDS_PER_HOUR;
+    seconds_today %= SECONDS_PER_HOUR;
+    min = seconds_today / SECONDS_PER_MINUTE;
+    sec = seconds_today % SECONDS_PER_MINUTE;
+    ms = time_ms % 1000;
+
+    // Debug: Check the calculated time
+    hal.console->printf("Time: %02u:%02u:%02u.%03u\n", hour, min, sec, ms);
+
+    // Calculate the date (day, month, year)
+    int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    year = 1970;
+
+    while (days_since_epoch >= (is_leap_year(year) ? DAYS_PER_LEAP_YEAR : DAYS_PER_YEAR)) {
+        days_since_epoch -= (is_leap_year(year) ? DAYS_PER_LEAP_YEAR : DAYS_PER_YEAR);
+        year++;
+    }
+
+    // Handle leap year for February
+    if (is_leap_year(year)) {
+        days_per_month[1] = 29;
+    }
+
+    month = 0;
+    while (days_since_epoch >= days_per_month[month]) {
+        days_since_epoch -= days_per_month[month];
+        month++;
+    }
+
+    day = days_since_epoch + 1;  // Day of the month
+
+    // Debug: Check the calculated date
+    hal.console->printf("Date: %04u-%02u-%02u\n", year, month + 1, day); // month+1 to make it human-readable (1-based)
+
+    return true;
+}
+
+// Function to determine if a year is a leap year
+bool AP_RTC::is_leap_year(uint16_t year) const
+{
+    return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+}
+
 
 // get milliseconds from now to a target time of day expressed as
 // hour, min, sec, ms.  Match starts from first value that is not
