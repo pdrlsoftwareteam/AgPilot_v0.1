@@ -97,6 +97,7 @@ void ModeAuto::exit()
 	{
 		g2._spray_enabled = false;
 	}
+
     wp_nav->resetAutomode();
     	if (wp_nav->origin_and_destination_are_terrain_alt())
 	{
