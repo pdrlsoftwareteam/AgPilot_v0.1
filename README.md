@@ -5,3 +5,4 @@
 - Last waypoint altitude drop/gain issue in hover mode.
 - Obstacle avoidance skip for sertain altitude to avoid unstability while take-off feature added.
 - Timestamp in bootlogs.txt files using system time.
+
