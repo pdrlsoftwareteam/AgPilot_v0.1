@@ -467,7 +467,6 @@ void AC_WPNav::resetWaypointZ(float zVal)
 	 _lastZOffset = zVal;
 }
 
-
 /// advance_wp_target_along_track - move target location along track from origin to destination
 bool AC_WPNav::advance_wp_target_along_track(float dt)
 {
@@ -676,40 +675,35 @@ bool AC_WPNav::update_wpnav()
 
 float AC_WPNav::check_avoidance_status()
 {
-	    AP_AHRS &ahrs = AP::ahrs();
-    float margin;
-    static int now = AP_HAL::millis();
-    float distVal = 0;
-    if((ahrs.groundspeed()) <= 3)
-    {
-        margin = 7.0;//meter
-    }
-    else
-    {
-        margin = ahrs.groundspeed() + 5.0;
-    }
+AP_AHRS &ahrs = AP::ahrs();
+	float margin;
+	float distVal = 0;
+	if((ahrs.groundspeed()) <= 3)
+	{
+		margin = 7.0;//meter
+	}
+	else
+	{
+		margin = ahrs.groundspeed() + 5.0;
+	}
 	float maxMargin = margin + 5.0;
+	const float epsilon = 0.0001;
+	float dist = AP::rangefinder()->getDist();
 
-    if((int)AP::rangefinder()->get_type(1) == 38){
-    	distVal = AP::rangefinder()->getDist();
-    }
-    else if((int)AP::proximity()->get_type(0) != 0){
-    	distVal = AP::proximity()->getDist();
-    }
-    else
-    {
-    	if(AP_HAL::millis() - now > 5000)
-    		{
-//    		printf("%f",distVal);
-    			now = AP_HAL::millis();
-    			gcs().send_text(MAV_SEVERITY_INFO, "RangeFinder or Proximity Sensor Not Found");
-    		}
-    }
+	if((fabs(dist - (-1.0)) > epsilon) || (int)AP::proximity()->get_type(0))
+	{
+		if ((fabs(dist - (-1.0)) > epsilon)) {
+			distVal = AP::rangefinder()->getDist();
+		}
+		else if((int)AP::proximity()->get_type(0) != 0){
+			distVal = AP::proximity()->getDist();
+		}
+	}
 
-    if(is_zero(distVal))
-    {
-    	return 1;
-    }
+	if(is_zero(distVal))
+	{
+		return 1;
+	}
 	float range_length = maxMargin - margin;
 
 	float interval_size = 0.1;
@@ -725,15 +719,14 @@ float AC_WPNav::check_avoidance_status()
 	} else {
 		float interval_index = (distVal - margin) / interval_size;
 		var = interval_index / num_intervals;
- 
-        if(ahrs.groundspeed() < 3.0){
-            var/=3;
-        }
-        else{
-		var/=6;
-	}
-    }
 
+		if(ahrs.groundspeed() < 3.0){
+			var/=3;
+		}
+		else{
+			var/=6;
+		}
+	}
 	return var;
 }
 // returns true if update_wpnav has been run very recently

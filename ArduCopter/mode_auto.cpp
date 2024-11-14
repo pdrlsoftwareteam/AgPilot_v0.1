@@ -89,6 +89,15 @@ bool ModeAuto::init(bool ignore_checks)
 // stop mission when we leave auto mode
 void ModeAuto::exit()
 {
+	if(AP::sprayer()->get_status())
+	{
+		g2._spray_enabled = true;
+	}
+	else
+	{
+		g2._spray_enabled = false;
+	}
+
     wp_nav->resetAutomode();
     	if (wp_nav->origin_and_destination_are_terrain_alt())
 	{
@@ -419,6 +428,7 @@ bool ModeAuto::wp_start(const Location& dest_loc)
 // auto_land_start - initialises controller to implement a landing
 void ModeAuto::land_start()
 {
+	g2._spray_enabled = false;
 	wp_nav->resetAutomode();
 
 	// If the origin and destination use terrain altitude
@@ -1020,6 +1030,14 @@ void ModeAuto::wp_run()
         return;
     }
 
+//    printf("before: %d\n",AP::sprayer()->get_status());
+    if(g2._spray_enabled)
+    {
+        AP::sprayer()->run(true);
+        g2._spray_enabled = false;
+    }
+//    printf("after running: %d\tspraying: %d\n",AP::sprayer()->running(),AP::sprayer()->running());
+
     if (g2.auto_man_alt != 1) {
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
         // run waypoint controller
@@ -1080,6 +1098,7 @@ void ModeAuto::wp_run()
 
 		if(is_zero(speedVal))
 		{
+			mission.set_pauseReason(true);
 			copter.failsafe_obstacle_on_event();
 		}
 		else
@@ -1671,7 +1690,7 @@ bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const
 void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
 {
     // To-Do: check if we have already landed
-
+	g2._spray_enabled = false;
     // if location provided we fly to that location at current altitude
     if (cmd.content.location.lat != 0 || cmd.content.location.lng != 0) {
         // set state to fly to location
@@ -1705,7 +1724,7 @@ void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
 // note: caller should set yaw_mode
 void ModeAuto::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
 {
-
+    AP::sprayer()->run(false);
     loiter_run();
         return;
 }
@@ -2039,6 +2058,7 @@ void ModeAuto::do_payload_place(const AP_Mission::Mission_Command& cmd)
 // do_RTL - start Return-to-Launch
 void ModeAuto::do_RTL(void)
 {
+	g2._spray_enabled = false;
 	wp_nav->resetAutomode();
 
 	// If the origin and destination use terrain altitude

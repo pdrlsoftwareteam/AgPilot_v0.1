@@ -146,7 +146,9 @@ void AP_Mission::resume()
         return;
     }
 
-    // rewind the mission wp if the repeat distance has been set via MAV_CMD_DO_SET_RESUME_REPEAT_DIST
+	if(reason)
+	{
+		set_pauseReason(false);
     if (_repeat_dist > 0 && _wp_index_history[LAST_WP_PASSED] != AP_MISSION_CMD_INDEX_NONE) {
         // if not already in a resume state calculate the position to rewind to
         Mission_Command tmp_cmd;
@@ -163,6 +165,28 @@ void AP_Mission::resume()
             return;
         }
     }
+	}
+	else
+	{
+		if (_wp_index_history[LAST_WP_PASSED] != AP_MISSION_CMD_INDEX_NONE) {
+			// if not already in a resume state calculate the position to rewind to
+			Mission_Command tmp_cmd;
+			if (!_flags.resuming_mission && calc_rewind_pos(tmp_cmd)) {
+				_resume_cmd = tmp_cmd;
+			}
+
+			// resume mission to rewound position
+			if (_resume_cmd.index != AP_MISSION_CMD_INDEX_NONE && start_command(_resume_cmd)) {
+				_nav_cmd = _resume_cmd;
+				_flags.nav_cmd_loaded = true;
+				// set flag to prevent history being re-written
+				_flags.resuming_mission = true;
+				return;
+			}
+		}
+	}
+	// rewind the mission wp if the repeat distance has been set via MAV_CMD_DO_SET_RESUME_REPEAT_DIST
+
 
     // restart active navigation command. We run these on resume()
     // regardless of whether the mission was stopped, as we may be
@@ -1779,6 +1803,9 @@ bool AP_Mission::advance_current_nav_cmd(uint16_t starting_index)
             }
             // save a loaded wp index in history array for when _repeat_dist is set via MAV_CMD_DO_SET_RESUME_REPEAT_DIST
             // and prevent history being re-written until vehicle returns to interrupted position
+			if(reason)
+			{
+				set_pauseReason(false);
             if (_repeat_dist > 0 && !_flags.resuming_mission && _nav_cmd.index != AP_MISSION_CMD_INDEX_NONE && !(_nav_cmd.content.location.lat == 0 && _nav_cmd.content.location.lng == 0)) {
                 // update mission history. last index position is always the most recent wp loaded.
                 for (uint8_t i=0; i<AP_MISSION_MAX_WP_HISTORY-1; i++) {
@@ -1786,6 +1813,18 @@ bool AP_Mission::advance_current_nav_cmd(uint16_t starting_index)
                 }
                 _wp_index_history[AP_MISSION_MAX_WP_HISTORY-1] = _nav_cmd.index;
             }
+			}
+			else
+			{
+				if (!_flags.resuming_mission && _nav_cmd.index != AP_MISSION_CMD_INDEX_NONE && !(_nav_cmd.content.location.lat == 0 && _nav_cmd.content.location.lng == 0)) {
+					// update mission history. last index position is always the most recent wp loaded.
+					for (uint8_t i=0; i<AP_MISSION_MAX_WP_HISTORY-1; i++) {
+						_wp_index_history[i] = _wp_index_history[i+1];
+					}
+					_wp_index_history[AP_MISSION_MAX_WP_HISTORY-1] = _nav_cmd.index;
+				}
+			}
+
             // check if the vehicle is resuming and has returned to where it was interrupted
             if (_flags.resuming_mission && _nav_cmd.index == _wp_index_history[AP_MISSION_MAX_WP_HISTORY-1]) {
                 // vehicle has resumed previous position
