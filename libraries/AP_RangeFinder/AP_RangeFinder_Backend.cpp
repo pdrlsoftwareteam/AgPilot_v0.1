@@ -72,7 +72,7 @@ void AP_RangeFinder_Backend::set_status(RangeFinder::Status _status)
 
     // update valid count
     if (_status == RangeFinder::Status::Good) {
-        if (state.range_valid_count < 10) {
+        if (state.range_valid_count < 3) {
             state.range_valid_count++;
         }
     } else {
