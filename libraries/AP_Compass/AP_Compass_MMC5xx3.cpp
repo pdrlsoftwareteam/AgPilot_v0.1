@@ -115,7 +115,7 @@ bool AP_Compass_MMC5XX3::init()
 
     set_dev_id(compass_instance, dev->get_bus_id());
 
-    printf("Found a MMC5983 on 0x%x as compass %u\n", dev->get_bus_id(), compass_instance);
+    printf("Found a MMC5983 on 0x%x as compass %u\n", unsigned(dev->get_bus_id()), compass_instance);
 
     set_rotation(compass_instance, rotation);
 
@@ -249,6 +249,8 @@ void AP_Compass_MMC5XX3::timer()
             // low pass changes to the offset
             offset = offset * 0.5f + new_offset * 0.5f;
         }
+        // sensor is not FRD
+        field.y = -field.y;
 
         accumulate_sample(field, compass_instance);
 
@@ -288,6 +290,9 @@ void AP_Compass_MMC5XX3::timer()
                        float((data1[4] << 8) + data1[5]) - zero_offset};
         field *= counts_to_milliGauss;
         field -= offset;
+        // sensor is not FRD
+        field.y = -field.y;
+
         accumulate_sample(field, compass_instance);
 
         // we stay in STATE_MEASURE for measure_count_limit cycles

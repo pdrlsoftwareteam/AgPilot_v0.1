@@ -181,7 +181,7 @@ bool sdcard_retry(void)
         if (sdcard_init()) {
 #if HAVE_FILESYSTEM_SUPPORT
             // create APM directory
-            AP::FS().mkdir("/APM");
+            AP::FS().mkdir("/PDRL");
 #endif
         }
     }

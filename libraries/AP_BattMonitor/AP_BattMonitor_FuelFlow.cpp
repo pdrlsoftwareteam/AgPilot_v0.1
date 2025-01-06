@@ -6,7 +6,8 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <GCS_MAVLink/GCS.h>
-
+#include "AC_Sprayer/AC_Sprayer.h"
+#include "AP_AHRS/AP_AHRS.h"
 /*
   "battery" monitor for liquid fuel flow systems that give a pulse on
   a pin for fixed volumes of fuel.
@@ -62,6 +63,10 @@ void AP_BattMonitor_FuelFlow::irq_handler(uint8_t pin, bool pin_state, uint32_t 
 */
 void AP_BattMonitor_FuelFlow::read()
 {
+    static uint8_t pulse_count_history[5] = {0}; // Circular buffer for last 5 readings
+    static uint8_t count = 0;                   // Number of elements added to the history
+    static bool is_history_initialized = false; // Flag to indicate if history is fully initialized
+
     int8_t pin = _curr_pin;
     if (last_pin != pin) {
         // detach from last pin
@@ -128,6 +133,45 @@ void AP_BattMonitor_FuelFlow::read()
     // map consumed_wh using fixed voltage of 1
     _state.consumed_wh = _state.consumed_mah;
     _state.time_remaining += state.pulse_count;
+
+    // Save history and check tank status only if the sprayer is enabled and ground speed is not zero
+    AP_AHRS &ahrs = AP::ahrs();
+
+    float gndSpeed = ahrs.groundspeed();
+
+    if (AP::sprayer()->spraying() && gndSpeed >= 1.0f ) {
+        // Update pulse count history
+        pulse_count_history[count % 5] = state.pulse_count;
+        count++;
+        if (count >= 5) {
+            is_history_initialized = true; // History is fully populated
+        }
+
+//        gcs().send_text(MAV_SEVERITY_WARNING, "%d %d %d %d %d",pulse_count_history[0],pulse_count_history[1],pulse_count_history[2],pulse_count_history[3],pulse_count_history[4]);
+
+        // Tank empty check
+        static uint32_t last_ms = AP_HAL::millis();
+        bool is_tank_empty = true;
+        if (is_history_initialized) {
+            for (uint8_t i = 0; i < 5; i++) {
+                if (pulse_count_history[i] > 2) {
+                    is_tank_empty = false;
+                    break;
+                }
+            }
+        } else {
+            // If not fully initialized, consider tank not empty
+            is_tank_empty = false;
+        }
+
+        if (is_tank_empty && (AP_HAL::millis() - last_ms > 2000)) {
+            static int gcs_count = 0;
+            gcs().send_text(MAV_SEVERITY_WARNING, "Pani Samplay %d", gcs_count++);
+			gcs().send_text(MAV_SEVERITY_INFO,"Tank Empty");
+
+            last_ms = AP_HAL::millis();
+        }
+    }
 }
 
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
