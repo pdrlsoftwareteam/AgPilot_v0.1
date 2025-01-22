@@ -2,24 +2,24 @@
 // Simple test for the GCS_MAVLink routing 
 //
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <GCS_MAVLink/GCS.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
 #include <GCS_MAVLink/GCS_Dummy.h>
-#include <AP_Common/AP_FWVersion.h>
-#include <AP_SerialManager/AP_SerialManager.h>
+#include <AG_Common/AG_FWVersion.h>
+#include <AG_SerialManager/AG_SerialManager.h>
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
-AP_SerialManager _serialmanager;
+AG_SerialManager _serialmanager;
 GCS_Dummy _gcs;
 
 extern mavlink_system_t mavlink_system;
 
-const AP_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
+const AG_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 
@@ -101,4 +101,4 @@ void loop(void)
     hal.scheduler->delay(1000);
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

@@ -2,13 +2,13 @@
 // Simple test for the StorageManager class
 //
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <StorageManager/StorageManager.h>
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 #define DO_INITIALISATION 1
 
@@ -99,4 +99,4 @@ void loop(void)
 
 
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

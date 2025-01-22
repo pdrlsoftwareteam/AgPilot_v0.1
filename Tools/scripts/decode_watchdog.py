@@ -74,7 +74,7 @@ class DecodeWatchDog(object):
 
         def decode(self):
             x = int(self.value)
-            # this list taken from AP_HAL_ChibiOS/system.cpp
+            # this list taken from AG_HAL_ChibiOS/system.cpp
             fault_types = {
                 1: "Reset",
                 2: "NMI",

@@ -39,14 +39,14 @@ class BoardList(object):
     def set_hwdef_dir(self):
         self.hwdef_dir = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
-            "..", "..", "libraries", "AP_HAL_ChibiOS", "hwdef")
+            "..", "..", "libraries", "AG_HAL_ChibiOS", "hwdef")
 
         if os.path.exists(self.hwdef_dir):
             return
 
         self.hwdef_dir = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
-            "libraries", "AP_HAL_ChibiOS", "hwdef")
+            "libraries", "AG_HAL_ChibiOS", "hwdef")
 
         if os.path.exists(self.hwdef_dir):
             # we're on the autotest server and have been copied in

@@ -44,7 +44,7 @@
 
 #pragma once
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include "FilterClass.h"
 
 // DigitalLPF implements the filter math

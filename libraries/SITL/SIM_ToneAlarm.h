@@ -14,13 +14,13 @@
  */
 /*
   simple tonealarm simulation class; note that the bulk of this is
-  actuall in AP_HAL_SITL at the moment in ToneAlarm_SF.h and
+  actuall in AG_HAL_SITL at the moment in ToneAlarm_SF.h and
   ToneAlarm_SF.cpp
 */
 
 #pragma once
 
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 #include "SITL_Input.h"
 
 #include "stdint.h"
@@ -30,12 +30,12 @@ namespace SITL {
 class ToneAlarm {
 public:
     ToneAlarm() {
-        AP_Param::setup_object_defaults(this, var_info);
+        AG_Param::setup_object_defaults(this, var_info);
     };
 
     void update(const struct sitl_input &input);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     bool is_enabled() const {return static_cast<bool>(_enable);}
 

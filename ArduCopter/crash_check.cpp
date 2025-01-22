@@ -87,7 +87,7 @@ void Copter::crash_check()
         // send message to gcs
         gcs().send_text(MAV_SEVERITY_EMERGENCY,"Crash: Disarming: AngErr=%.0f>%.0f, Accel=%.1f<%.1f", angle_error, CRASH_CHECK_ANGLE_DEVIATION_DEG, filtered_acc, CRASH_CHECK_ACCEL_MAX);
         // disarm motors
-        copter.arming.disarm(AP_Arming::Method::CRASH);
+        copter.arming.disarm(AG_Arming::Method::CRASH);
     }
 }
 
@@ -118,7 +118,7 @@ void Copter::thrust_loss_check()
     }
 
     // check for desired angle over 15 degrees
-    // todo: add thrust angle to AC_AttitudeControl
+    // todo: add thrust angle to AG_AttitudeControl
     const Vector3f angle_target = attitude_control->get_att_target_euler_cd();
     if (sq(angle_target.x) + sq(angle_target.y) > sq(THRUST_LOSS_CHECK_ANGLE_DEVIATION_CD)) {
         thrust_loss_counter = 0;
@@ -264,7 +264,7 @@ void Copter::parachute_check()
     }
 
     if (parachute.release_initiated()) {
-        copter.arming.disarm(AP_Arming::Method::PARACHUTE_RELEASE);
+        copter.arming.disarm(AG_Arming::Method::PARACHUTE_RELEASE);
         return;
     }
 
@@ -321,14 +321,14 @@ void Copter::parachute_check()
 void Copter::parachute_release()
 {
     // disarm motors
-    arming.disarm(AP_Arming::Method::PARACHUTE_RELEASE);
+    arming.disarm(AG_Arming::Method::PARACHUTE_RELEASE);
 
     // release parachute
     parachute.release();
 
 #if AP_LANDINGGEAR_ENABLED
     // deploy landing gear
-    landinggear.set_position(AP_LandingGear::LandingGear_Deploy);
+    landinggear.set_position(AG_LandingGear::LandingGear_Deploy);
 #endif
 }
 

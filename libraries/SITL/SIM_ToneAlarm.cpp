@@ -24,7 +24,7 @@
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo ToneAlarm::var_info[] = {
+const AG_Param::GroupInfo ToneAlarm::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: ToneAlarm enable/disable
@@ -41,5 +41,5 @@ const AP_Param::GroupInfo ToneAlarm::var_info[] = {
  */
 void ToneAlarm::update(const struct sitl_input &input)
 {
-    // currently all of the simulated buzzer logic is within AP_HAL_SITL
+    // currently all of the simulated buzzer logic is within AG_HAL_SITL
 }

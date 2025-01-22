@@ -17,15 +17,15 @@
 */
 
 #include "SIM_Sprayer.h"
-#include "AP_HAL/AP_HAL.h"
-#include "AP_Math/AP_Math.h"
+#include "AG_HAL/AG_HAL.h"
+#include "AG_Math/AG_Math.h"
 
 #include <stdio.h>
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo Sprayer::var_info[] = {
+const AG_Param::GroupInfo Sprayer::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Sprayer Sim enable/disable
@@ -58,7 +58,7 @@ void Sprayer::update(const struct sitl_input &input)
 {
     const int16_t pump_pwm = sprayer_pump_pin >= 1 ? input.servos[sprayer_pump_pin-1] : -1;
     const int16_t spinner_pwm = sprayer_spin_pin >= 1 ? input.servos[sprayer_spin_pin-1] : -1;
-    const uint64_t now = AP_HAL::micros64();
+    const uint64_t now = AG_HAL::micros64();
     const float dt = (now - last_update_us) * 1.0e-6f;
     if (pump_pwm >= 0) {
         // update remaining payload
@@ -106,7 +106,7 @@ void Sprayer::update(const struct sitl_input &input)
 
 bool Sprayer::should_report()
 {
-    if (AP_HAL::micros64() - last_report_us < report_interval) {
+    if (AG_HAL::micros64() - last_report_us < report_interval) {
         return false;
     }
 

@@ -1,10 +1,10 @@
 #include "GCS.h"
 
-#include "AP_ServoRelayEvents/AP_ServoRelayEvents.h"
+#include "AG_ServoRelayEvents/AG_ServoRelayEvents.h"
 
 MAV_RESULT GCS_MAVLINK::handle_servorelay_message(const mavlink_command_long_t &packet)
 {
-    AP_ServoRelayEvents *handler = AP::servorelayevents();
+    AG_ServoRelayEvents *handler = AP::servorelayevents();
     if (handler == nullptr) {
         return MAV_RESULT_UNSUPPORTED;
     }

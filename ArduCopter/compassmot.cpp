@@ -85,7 +85,7 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
                                  0, 0, 0, 0);
 
     // flash leds
-    AP_Notify::flags.esc_calibration = true;
+    AG_Notify::flags.esc_calibration = true;
 
     // warn user we are starting calibration
     gcs_chan.send_text(MAV_SEVERITY_INFO, "Starting calibration");
@@ -212,8 +212,8 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
             }
         }
 
-        if (AP_HAL::millis() - last_send_time > 500) {
-            last_send_time = AP_HAL::millis();
+        if (AG_HAL::millis() - last_send_time > 500) {
+            last_send_time = AG_HAL::millis();
             mavlink_msg_compassmot_status_send(gcs_chan.get_chan(),
                                                channel_throttle->get_control_in(),
                                                current,
@@ -249,7 +249,7 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     }
 
     // turn off notify leds
-    AP_Notify::flags.esc_calibration = false;
+    AG_Notify::flags.esc_calibration = false;
 
     // re-enable cpu failsafe
     failsafe_enable();

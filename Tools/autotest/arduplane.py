@@ -1135,7 +1135,7 @@ class AutoTestPlane(AutoTest):
 
         self.load_fence("CMAC-fence.txt")
 
-        self.set_parameter("RC7_OPTION", 11) # AC_Fence uses Aux switch functionality
+        self.set_parameter("RC7_OPTION", 11) # AG_Fence uses Aux switch functionality
         self.set_parameter("FENCE_ACTION", 4) # Fence action Brake
         self.set_rc_from_map({
             3: 1000,
@@ -2734,7 +2734,7 @@ class AutoTestPlane(AutoTest):
             raise NotAchievedException("Did not follow terrain")
 
     def Terrain(self):
-        '''test AP_Terrain'''
+        '''test AG_Terrain'''
         self.reboot_sitl()  # we know the terrain height at CMAC
 
         self.install_terrain_handlers_context()
@@ -3461,7 +3461,7 @@ class AutoTestPlane(AutoTest):
                      mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT))
 
         # Work out the approximate return point when no fence return point present
-        # Logic taken from AC_PolyFence_loader.cpp
+        # Logic taken from AG_PolyFence_loader.cpp
         min_loc = self.mav.location()
         max_loc = self.mav.location()
         for new_loc in locs:

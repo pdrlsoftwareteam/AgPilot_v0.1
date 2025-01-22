@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 #ifdef HAL_PERIPH_ENABLE_HWESC
 
@@ -14,7 +14,7 @@ class HWESC_Telem {
 public:
     HWESC_Telem();
 
-    void init(AP_HAL::UARTDriver *uart);
+    void init(AG_HAL::UARTDriver *uart);
     bool update();
 
     struct HWESC {
@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    AP_HAL::UARTDriver *uart;
+    AG_HAL::UARTDriver *uart;
 
     struct PACKED {
         uint8_t header; // 0x9B

@@ -6,7 +6,7 @@
  * Init and run calls for systemId, flight mode
  */
 
-const AP_Param::GroupInfo ModeSystemId::var_info[] = {
+const AG_Param::GroupInfo ModeSystemId::var_info[] = {
 
     // @Param: _AXIS
     // @DisplayName: System identification axis
@@ -66,7 +66,7 @@ const AP_Param::GroupInfo ModeSystemId::var_info[] = {
 
 ModeSystemId::ModeSystemId(void) : Mode()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 #define SYSTEM_ID_DELAY     1.0f      // time in seconds waited after system id mode change for frequency sweep injection
@@ -123,24 +123,24 @@ void ModeSystemId::run()
 
     if (!motors->armed()) {
         // Motors should be Stopped
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::SHUT_DOWN);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::SHUT_DOWN);
     // Tradheli doesn't set spool state to ground idle when throttle stick is zero.  Ground idle only set when
     // motor interlock is disabled.
     } else if (copter.ap.throttle_zero) {
         // Attempting to Land
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::GROUND_IDLE);
     } else {
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     }
 
     switch (motors->get_spool_state()) {
-    case AP_Motors::SpoolState::SHUT_DOWN:
+    case AG_Motors::SpoolState::SHUT_DOWN:
         // Motors Stopped
         attitude_control->reset_yaw_target_and_rate();
         attitude_control->reset_rate_controller_I_terms();
         break;
 
-    case AP_Motors::SpoolState::GROUND_IDLE:
+    case AG_Motors::SpoolState::GROUND_IDLE:
         // Landed
         // Tradheli initializes targets when going from disarmed to armed state. 
         // init_targets_on_arming is always set true for multicopter.
@@ -150,15 +150,15 @@ void ModeSystemId::run()
         }
         break;
 
-    case AP_Motors::SpoolState::THROTTLE_UNLIMITED:
+    case AG_Motors::SpoolState::THROTTLE_UNLIMITED:
         // clear landing flag above zero throttle
         if (!motors->limit.throttle_lower) {
             set_land_complete(false);
         }
         break;
 
-    case AP_Motors::SpoolState::SPOOLING_UP:
-    case AP_Motors::SpoolState::SPOOLING_DOWN:
+    case AG_Motors::SpoolState::SPOOLING_UP:
+    case AG_Motors::SpoolState::SPOOLING_DOWN:
         // do nothing
         break;
     }

@@ -53,13 +53,13 @@ void MS5525::check_conversion_accuracy(float P_Pa, float Temp_C, uint32_t D1, ui
     const float p_error = fabs(f_P_Pa - P_Pa);
     const float p_error_max = 0.1;
     if (p_error > p_error_max) {
-        AP_HAL::panic("Invalid pressure conversion: error %f Pa > %f Pa error max", p_error, p_error_max);
+        AG_HAL::panic("Invalid pressure conversion: error %f Pa > %f Pa error max", p_error, p_error_max);
     }
 
     const float t_error = fabs(f_Temp_C - Temp_C);
     const float t_error_max = 0.01;
     if (t_error > t_error_max) {
-        AP_HAL::panic("Invalid temperature conversion: error %f degC > %f degC error max", t_error, t_error_max);
+        AG_HAL::panic("Invalid temperature conversion: error %f degC > %f degC error max", t_error, t_error_max);
     }
 }
 
@@ -69,7 +69,7 @@ void MS5525::get_pressure_temperature_readings(float &P_Pa, float &Temp_C)
     sim_alt += 2 * rand_float();
 
     float sigma, delta, theta;
-    AP_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
 
     // To Do: Add a sensor board temperature offset parameter
     Temp_C = (KELVIN_TO_C(SSL_AIR_TEMPERATURE * theta)) + 25.0;

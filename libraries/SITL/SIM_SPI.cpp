@@ -64,7 +64,7 @@ void SPI::init()
             const auto &dev_j = spi_devices[j];
             if (dev_i.bus == dev_j.bus &&
                 dev_i.cs_pin == dev_j.cs_pin) {
-                AP_HAL::panic("Two devices on the same cs_pin on the same bus");
+                AG_HAL::panic("Two devices on the same cs_pin on the same bus");
             }
         }
     }
@@ -103,7 +103,7 @@ int SPI::ioctl(uint8_t bus, uint8_t cs_pin, uint8_t ioctl_type, void *data)
         count = 2;
         break;
     default:
-        AP_HAL::panic("Bad transaction type");
+        AG_HAL::panic("Bad transaction type");
     }
 
     return ioctl_transaction(bus, cs_pin, count, (spi_ioc_transfer*)data);

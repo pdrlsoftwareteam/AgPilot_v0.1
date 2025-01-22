@@ -17,48 +17,48 @@
   ranges, trim and reversal
  */
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Scheduler/AP_Scheduler.h>
-#include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Scheduler/AG_Scheduler.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
 
 #include "SRV_Channel.h"
-#include <AP_Logger/AP_Logger.h>
+#include <AG_Logger/AG_Logger.h>
 
 #if HAL_MAX_CAN_PROTOCOL_DRIVERS
-  #include <AP_CANManager/AP_CANManager.h>
-  #include <AP_UAVCAN/AP_UAVCAN.h>
+  #include <AG_CANManager/AG_CANManager.h>
+  #include <AG_UAVCAN/AG_UAVCAN.h>
 
   // To be replaced with macro saying if KDECAN library is included
   #if APM_BUILD_COPTER_OR_HELI || APM_BUILD_TYPE(APM_BUILD_ArduPlane) || APM_BUILD_TYPE(APM_BUILD_ArduSub)
-    #include <AP_KDECAN/AP_KDECAN.h>
+    #include <AG_KDECAN/AG_KDECAN.h>
   #endif
-  #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
+  #include <AG_PiccoloCAN/AG_PiccoloCAN.h>
 #endif
 
 #if NUM_SERVO_CHANNELS == 0
 #pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 SRV_Channel *SRV_Channels::channels;
 SRV_Channels *SRV_Channels::_singleton;
 
 #if AP_VOLZ_ENABLED
-AP_Volz_Protocol *SRV_Channels::volz_ptr;
+AG_Volz_Protocol *SRV_Channels::volz_ptr;
 #endif
 
 #ifndef HAL_BUILD_AP_PERIPH
-AP_SBusOut *SRV_Channels::sbus_ptr;
+AG_SBusOut *SRV_Channels::sbus_ptr;
 #endif
 
 #if AP_ROBOTISSERVO_ENABLED
-AP_RobotisServo *SRV_Channels::robotis_ptr;
+AG_RobotisServo *SRV_Channels::robotis_ptr;
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
-AP_FETtecOneWire *SRV_Channels::fetteconwire_ptr;
+AG_FETtecOneWire *SRV_Channels::fetteconwire_ptr;
 #endif
 
 uint16_t SRV_Channels::override_counter[NUM_SERVO_CHANNELS];
@@ -75,7 +75,7 @@ Bitmask<SRV_Channel::k_nr_aux_servo_functions> SRV_Channels::function_mask;
 SRV_Channels::srv_function SRV_Channels::functions[SRV_Channel::k_nr_aux_servo_functions];
 SRV_Channels::slew_list *SRV_Channels::_slew;
 
-const AP_Param::GroupInfo SRV_Channels::var_info[] = {
+const AG_Param::GroupInfo SRV_Channels::var_info[] = {
 #if (NUM_SERVO_CHANNELS >= 1)
     // @Group: 1_
     // @Path: SRV_Channel.cpp
@@ -191,26 +191,26 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
 
 #if AP_VOLZ_ENABLED
     // @Group: _VOLZ_
-    // @Path: ../AP_Volz_Protocol/AP_Volz_Protocol.cpp
-    AP_SUBGROUPINFO(volz, "_VOLZ_",  19, SRV_Channels, AP_Volz_Protocol),
+    // @Path: ../AG_Volz_Protocol/AG_Volz_Protocol.cpp
+    AP_SUBGROUPINFO(volz, "_VOLZ_",  19, SRV_Channels, AG_Volz_Protocol),
 #endif
 
 #ifndef HAL_BUILD_AP_PERIPH
     // @Group: _SBUS_
-    // @Path: ../AP_SBusOut/AP_SBusOut.cpp
-    AP_SUBGROUPINFO(sbus, "_SBUS_",  20, SRV_Channels, AP_SBusOut),
+    // @Path: ../AG_SBusOut/AG_SBusOut.cpp
+    AP_SUBGROUPINFO(sbus, "_SBUS_",  20, SRV_Channels, AG_SBusOut),
 #endif // HAL_BUILD_AP_PERIPH
 
 #if AP_ROBOTISSERVO_ENABLED
     // @Group: _ROB_
-    // @Path: ../AP_RobotisServo/AP_RobotisServo.cpp
-    AP_SUBGROUPINFO(robotis, "_ROB_",  22, SRV_Channels, AP_RobotisServo),
+    // @Path: ../AG_RobotisServo/AG_RobotisServo.cpp
+    AP_SUBGROUPINFO(robotis, "_ROB_",  22, SRV_Channels, AG_RobotisServo),
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
     // @Group: _FTW_
-    // @Path: ../AP_FETtecOneWire/AP_FETtecOneWire.cpp
-    AP_SUBGROUPINFO(fetteconwire, "_FTW_",  25, SRV_Channels, AP_FETtecOneWire),
+    // @Path: ../AG_FETtecOneWire/AG_FETtecOneWire.cpp
+    AP_SUBGROUPINFO(fetteconwire, "_FTW_",  25, SRV_Channels, AG_FETtecOneWire),
 #endif
 
     // @Param: _DSHOT_RATE
@@ -352,7 +352,7 @@ SRV_Channels::SRV_Channels(void)
     channels = obj_channels;
 
     // set defaults from the parameter table
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 
     // setup ch_num on channels
     for (uint8_t i=0; i<NUM_SERVO_CHANNELS; i++) {
@@ -383,7 +383,7 @@ SRV_Channels::SRV_Channels(void)
 }
 
 // SRV_Channels initialization
-void SRV_Channels::init(uint32_t motor_mask, AP_HAL::RCOutput::output_mode mode)
+void SRV_Channels::init(uint32_t motor_mask, AG_HAL::RCOutput::output_mode mode)
 {
 #ifndef HAL_BUILD_AP_PERIPH
     hal.rcout->set_dshot_rate(_singleton->dshot_rate, AP::scheduler().get_loop_rate_hz());
@@ -516,18 +516,18 @@ void SRV_Channels::push()
     uint8_t can_num_drivers = AP::can().get_num_drivers();
     for (uint8_t i = 0; i < can_num_drivers; i++) {
         switch (AP::can().get_driver_type(i)) {
-            case AP_CANManager::Driver_Type_UAVCAN: {
-                AP_UAVCAN *ap_uavcan = AP_UAVCAN::get_uavcan(i);
+            case AG_CANManager::Driver_Type_UAVCAN: {
+                AG_UAVCAN *ap_uavcan = AG_UAVCAN::get_uavcan(i);
                 if (ap_uavcan == nullptr) {
                     continue;
                 }
                 ap_uavcan->SRV_push_servos();
                 break;
             }
-            case AP_CANManager::Driver_Type_KDECAN: {
+            case AG_CANManager::Driver_Type_KDECAN: {
 // To be replaced with macro saying if KDECAN library is included
 #if APM_BUILD_COPTER_OR_HELI || APM_BUILD_TYPE(APM_BUILD_ArduPlane) || APM_BUILD_TYPE(APM_BUILD_ArduSub)
-                AP_KDECAN *ap_kdecan = AP_KDECAN::get_kdecan(i);
+                AG_KDECAN *ap_kdecan = AG_KDECAN::get_kdecan(i);
                 if (ap_kdecan == nullptr) {
                     continue;
                 }
@@ -536,8 +536,8 @@ void SRV_Channels::push()
                 break;
             }
 #if HAL_PICCOLO_CAN_ENABLE
-            case AP_CANManager::Driver_Type_PiccoloCAN: {
-                AP_PiccoloCAN *ap_pcan = AP_PiccoloCAN::get_pcan(i);
+            case AG_CANManager::Driver_Type_PiccoloCAN: {
+                AG_PiccoloCAN *ap_pcan = AG_PiccoloCAN::get_pcan(i);
                 if (ap_pcan == nullptr) {
                     continue;
                 }
@@ -545,8 +545,8 @@ void SRV_Channels::push()
                 break;
             }
 #endif
-            case AP_CANManager::Driver_Type_CANTester:
-            case AP_CANManager::Driver_Type_None:
+            case AG_CANManager::Driver_Type_CANTester:
+            case AG_CANManager::Driver_Type_None:
             default:
                 break;
         }
@@ -587,7 +587,7 @@ bool SRV_Channels::is_GPIO(uint8_t channel)
 void SRV_Channels::set_emergency_stop(bool state) {
 #if HAL_LOGGING_ENABLED
     if (state != emergency_stop) {
-        AP_Logger *logger = AP_Logger::get_singleton();
+        AG_Logger *logger = AG_Logger::get_singleton();
         if (logger && logger->logging_enabled()) {
             logger->Write_Event(state ? LogEvent::MOTORS_EMERGENCY_STOPPED : LogEvent::MOTORS_EMERGENCY_STOP_CLEARED);
         }

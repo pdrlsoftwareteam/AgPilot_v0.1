@@ -51,10 +51,10 @@ def _vehicle_index(vehicle):
         _vehicle_indexes[vehicle] = len(_vehicle_indexes) + 1
     return _vehicle_indexes[vehicle]
 
-# note that AP_NavEKF3_core.h is needed for AP_NavEKF3_feature.h
+# note that AG_NavEKF3_core.h is needed for AG_NavEKF3_feature.h
 _vehicle_macros = ['SKETCHNAME', 'SKETCH', 'APM_BUILD_DIRECTORY',
                    'APM_BUILD_TYPE', 'APM_BUILD_COPTER_OR_HELI',
-                   'AP_NavEKF3_core.h', 'lua_generated_bindings.h']
+                   'AG_NavEKF3_core.h', 'lua_generated_bindings.h']
 _macros_re = re.compile(r'\b(%s)\b' % '|'.join(_vehicle_macros))
 
 # some cpp files are not available at the time we run this check so need to be
@@ -169,11 +169,11 @@ class ap_library_check_headers(Task.Task):
     before  = 'cxx c'
     dispatched_headers = set()
     whitelist = (
-        'libraries/AP_Vehicle/AP_Vehicle_Type.h',
-        'libraries/AP_Common/AP_FWVersionDefine.h',
-        'libraries/AP_Scripting/lua_generated_bindings.h',
-        'libraries/AP_NavEKF3/AP_NavEKF3_feature.h',
-        'libraries/AP_LandingGear/AP_LandingGear_config.h',
+        'libraries/AG_Vehicle/AG_Vehicle_Type.h',
+        'libraries/AG_Common/AG_FWVersionDefine.h',
+        'libraries/AG_Scripting/lua_generated_bindings.h',
+        'libraries/AG_NavEKF3/AG_NavEKF3_feature.h',
+        'libraries/AG_LandingGear/AG_LandingGear_config.h',
     )
     whitelist = tuple(os.path.join(*p.split('/')) for p in whitelist)
 
@@ -265,8 +265,8 @@ def gsoap_library_check(bld, tasks):
     for t in tasks:
         if len(t.inputs) == 1:
             gsoap_tasks = []
-            for s in t.env.AP_LIB_EXTRA_SOURCES["AP_ONVIF"]:
-                gsoap_tasks.append(bld.bldnode.find_or_declare(os.path.join('libraries', "AP_ONVIF", s)))
+            for s in t.env.AP_LIB_EXTRA_SOURCES["AG_ONVIF"]:
+                gsoap_tasks.append(bld.bldnode.find_or_declare(os.path.join('libraries', "AG_ONVIF", s)))
 
             if t.inputs[0] in gsoap_tasks:
                 t.env.CXXFLAGS += [

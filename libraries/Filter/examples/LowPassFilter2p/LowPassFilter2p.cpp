@@ -3,13 +3,13 @@
  *       Code by Randy Mackay and Andrew Tridgell
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <Filter/Filter.h>                     // Filter library
 #include <Filter/LowPassFilter2p.h>
 
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 // craete an instance with 800Hz sample rate and 30Hz cutoff
 static LowPassFilter2pFloat low_pass_filter(800, 30);
@@ -38,4 +38,4 @@ void loop()
     hal.scheduler->delay(10000);
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

@@ -21,11 +21,11 @@
 */
 
 #include "SIM_Sailboat.h"
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include <string.h>
 #include <stdio.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 namespace SITL {
 

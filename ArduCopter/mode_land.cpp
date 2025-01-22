@@ -71,8 +71,8 @@ void ModeLand::run()
 void ModeLand::gps_run()
 {
     // disarm when the landing detector says we've landed
-    if (copter.ap.land_complete && motors->get_spool_state() == AP_Motors::SpoolState::GROUND_IDLE) {
-        copter.arming.disarm(AP_Arming::Method::LANDED);
+    if (copter.ap.land_complete && motors->get_spool_state() == AG_Motors::SpoolState::GROUND_IDLE) {
+        copter.arming.disarm(AG_Arming::Method::LANDED);
     }
 
     // Land State Machine Determination
@@ -80,7 +80,7 @@ void ModeLand::gps_run()
         make_safe_ground_handling();
     } else {
         // set motors to full range
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
         // pause before beginning land descent
         if (land_pause && millis()-land_start_time >= LAND_WITH_DELAY_MS) {
@@ -118,8 +118,8 @@ void ModeLand::nogps_run()
     }
 
     // disarm when the landing detector says we've landed
-    if (copter.ap.land_complete && motors->get_spool_state() == AP_Motors::SpoolState::GROUND_IDLE) {
-        copter.arming.disarm(AP_Arming::Method::LANDED);
+    if (copter.ap.land_complete && motors->get_spool_state() == AG_Motors::SpoolState::GROUND_IDLE) {
+        copter.arming.disarm(AG_Arming::Method::LANDED);
     }
 
     // Land State Machine Determination
@@ -127,7 +127,7 @@ void ModeLand::nogps_run()
         make_safe_ground_handling();
     } else {
         // set motors to full range
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
         // pause before beginning land descent
         if (land_pause && millis()-land_start_time >= LAND_WITH_DELAY_MS) {
@@ -157,7 +157,7 @@ void Copter::set_mode_land_with_pause(ModeReason reason)
     mode_land.set_land_pause(true);
 
     // alert pilot to mode change
-    AP_Notify::events.failsafe_mode_change = 1;
+    AG_Notify::events.failsafe_mode_change = 1;
 }
 
 // landing_with_GPS - returns true if vehicle is landing using GPS

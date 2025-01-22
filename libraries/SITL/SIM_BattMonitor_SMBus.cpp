@@ -1,6 +1,6 @@
 #include "SIM_BattMonitor_SMBus.h"
 
-#include <AP_Stats/AP_Stats.h>
+#include <AG_Stats/AG_Stats.h>
 
 SITL::SIM_BattMonitor_SMBus::SIM_BattMonitor_SMBus() :
     SMBusDevice()
@@ -76,7 +76,7 @@ SITL::SIM_BattMonitor_SMBus::SIM_BattMonitor_SMBus() :
 
 void SITL::SIM_BattMonitor_SMBus::update(const class Aircraft &aircraft)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_update_ms > 100) {
         const float millivolts = AP::sitl()->state.battery_voltage * 1000.0f;
         set_register(SMBusBattDevReg::VOLTAGE, uint16_t(millivolts));

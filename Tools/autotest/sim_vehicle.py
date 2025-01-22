@@ -772,9 +772,9 @@ def start_vehicle(binary, opts, stuff, spawns=None):
 
             progress("Adding parameters from (%s)" % (str(file),))
     if opts.OSDMSP:
-        path += "," + os.path.join(root_dir, "libraries/AP_MSP/Tools/osdtest.parm")
+        path += "," + os.path.join(root_dir, "libraries/AG_MSP/Tools/osdtest.parm")
         path += "," + os.path.join(autotest_dir, "default_params/msposd.parm")
-        subprocess.Popen([os.path.join(root_dir, "libraries/AP_MSP/Tools/msposd.py")])
+        subprocess.Popen([os.path.join(root_dir, "libraries/AG_MSP/Tools/msposd.py")])
 
     if path is not None and len(path) > 0:
         cmd.extend(["--defaults", path])
@@ -1156,7 +1156,7 @@ group_sim.add_option("-S", "--speedup",
                      type='int',
                      help="set simulation speedup (1 for wall clock time)")
 group_sim.add_option("-t", "--tracker-location",
-                     default='CMAC_PILOTSBOX',
+                     default='CMAG_PILOTSBOX',
                      type='string',
                      help="set antenna tracker start location")
 group_sim.add_option("-w", "--wipe-eeprom",

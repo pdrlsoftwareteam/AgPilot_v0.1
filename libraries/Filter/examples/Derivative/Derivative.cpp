@@ -2,14 +2,14 @@
  *       Example sketch to demonstrate use of DerivativeFilter library.
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <Filter/Filter.h>
 #include <Filter/DerivativeFilter.h>
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 #define USE_NOISE 0
 
@@ -31,13 +31,13 @@ static float noise(void)
 void loop()
 {
     hal.scheduler->delay(50);
-    float t = AP_HAL::millis() * 1.0e-3f;
+    float t = AG_HAL::millis() * 1.0e-3f;
     float s = sinf(t);
     s += noise();
-    uint32_t t1 = AP_HAL::micros();
+    uint32_t t1 = AG_HAL::micros();
     derivative.update(s, t1);
     float output = derivative.slope() * 1.0e6f;
     hal.console->printf("%f %f %f %f\n", (double)t, (double)output, (double)s, (double)cosf(t));
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

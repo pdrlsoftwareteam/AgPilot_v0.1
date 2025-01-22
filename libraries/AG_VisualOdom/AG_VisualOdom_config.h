@@ -1,0 +1,7 @@
+#pragma once
+
+#include <AG_HAL/AG_HAL_Boards.h>
+
+#ifndef HAL_VISUALODOM_ENABLED
+#define HAL_VISUALODOM_ENABLED (!HAL_MINIMIZE_FEATURES && BOARD_FLASH_SIZE > 1024)
+#endif

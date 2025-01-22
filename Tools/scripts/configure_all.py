@@ -36,7 +36,7 @@ def get_board_list():
     board_list = []
     # these are base builds, and don't build directly
     omit = []
-    dirname, dirlist, filenames = next(os.walk('libraries/AP_HAL_ChibiOS/hwdef'))
+    dirname, dirlist, filenames = next(os.walk('libraries/AG_HAL_ChibiOS/hwdef'))
     for d in dirlist:
         hwdef = os.path.join(dirname, d, 'hwdef.dat')
         if os.path.exists(hwdef) and not d in omit:
@@ -65,7 +65,7 @@ if args.start is not None:
     board_list = board_list[args.start-1:]
 
 def is_ap_periph(board):
-    hwdef = os.path.join('libraries/AP_HAL_ChibiOS/hwdef/%s/hwdef.dat' % board)
+    hwdef = os.path.join('libraries/AG_HAL_ChibiOS/hwdef/%s/hwdef.dat' % board)
     try:
         r = open(hwdef, 'r').read()
         if r.find('periph/hwdef.dat') != -1 or r.find('AP_PERIPH') != -1:
@@ -110,7 +110,7 @@ for board in board_list:
     if args.no_bl:
         continue
     # check for bootloader def
-    hwdef_bl = os.path.join('libraries/AP_HAL_ChibiOS/hwdef/%s/hwdef-bl.dat' % board)
+    hwdef_bl = os.path.join('libraries/AG_HAL_ChibiOS/hwdef/%s/hwdef-bl.dat' % board)
     if os.path.exists(hwdef_bl):
         print("Configuring bootloader for %s" % board)
         run_program([args.python, "waf", "configure", "--board", board, "--bootloader"], "configure: " + board + "-bl")

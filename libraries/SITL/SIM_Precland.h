@@ -15,16 +15,16 @@
 
 #pragma once
 #include "stdint.h"
-#include <AP_Param/AP_Param.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Common/Location.h>
+#include <AG_Param/AG_Param.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Common/Location.h>
 
 namespace SITL {
 
 class SIM_Precland {
 public:
     SIM_Precland() {
-        AP_Param::setup_object_defaults(this, var_info);
+        AG_Param::setup_object_defaults(this, var_info);
     };
 
     // update precland state
@@ -39,7 +39,7 @@ public:
     const Vector3d &get_target_position() const { return _target_pos; }
     bool is_enabled() const {return static_cast<bool>(_enable);}
     void set_default_location(float lat, float lon, int16_t yaw);
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     // enum for SIM_PLD_OPTIONS parameter
     enum class Option : uint8_t {

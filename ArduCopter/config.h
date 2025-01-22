@@ -518,7 +518,7 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// Fence, Rally and Terrain and AC_Avoidance defaults
+// Fence, Rally and Terrain and AG_Avoidance defaults
 //
 
 #ifndef AC_AVOID_ENABLED
@@ -575,7 +575,7 @@
 #endif
 
 #ifndef HAL_FRAME_TYPE_DEFAULT
-#define HAL_FRAME_TYPE_DEFAULT AP_Motors::MOTOR_FRAME_TYPE_X
+#define HAL_FRAME_TYPE_DEFAULT AG_Motors::MOTOR_FRAME_TYPE_X
 #endif
 
 #ifndef AC_CUSTOMCONTROL_MULTI_ENABLED

@@ -8,7 +8,7 @@ void MissionItemProtocol::init_send_requests(GCS_MAVLINK &_link,
                                              const int16_t _request_last)
 {
     // set variables to help handle the expected receiving of commands from the GCS
-    timelast_receive_ms = AP_HAL::millis();    // set time we last received commands to now
+    timelast_receive_ms = AG_HAL::millis();    // set time we last received commands to now
     receiving = true;              // record that we expect to receive commands
     request_i = _request_first;                 // reset the next expected command number to zero
     request_last = _request_last;         // record how many commands we expect to receive
@@ -18,7 +18,7 @@ void MissionItemProtocol::init_send_requests(GCS_MAVLINK &_link,
 
     link = &_link;
 
-    timelast_request_ms = AP_HAL::millis();
+    timelast_request_ms = AG_HAL::millis();
     link->send_message(next_item_ap_message_id());
 
     mission_item_warning_sent = false;
@@ -184,7 +184,7 @@ void MissionItemProtocol::handle_mission_request(GCS_MAVLINK &_link,
     }
 
     mavlink_mission_item_t ret_packet{};
-    ret = AP_Mission::convert_MISSION_ITEM_INT_to_MISSION_ITEM(item_int, ret_packet);
+    ret = AG_Mission::convert_MISSION_ITEM_INT_to_MISSION_ITEM(item_int, ret_packet);
     if (ret != MAV_MISSION_ACCEPTED) {
         send_mission_ack(_link, msg, ret);
         return;
@@ -234,7 +234,7 @@ void MissionItemProtocol::handle_mission_write_partial_list(GCS_MAVLINK &_link,
 void MissionItemProtocol::handle_mission_item(const mavlink_message_t &msg, const mavlink_mission_item_int_t &cmd)
 {
     if (link == nullptr) {
-        INTERNAL_ERROR(AP_InternalError::error_t::gcs_bad_missionprotocol_link);
+        INTERNAL_ERROR(AG_InternalError::error_t::gcs_bad_missionprotocol_link);
         return;
     }
 
@@ -275,7 +275,7 @@ void MissionItemProtocol::handle_mission_item(const mavlink_message_t &msg, cons
     }
 
     // update waypoint receiving state machine
-    timelast_receive_ms = AP_HAL::millis();
+    timelast_receive_ms = AG_HAL::millis();
     request_i++;
 
     if (request_i > request_last) {
@@ -303,7 +303,7 @@ void MissionItemProtocol::send_mission_ack(const mavlink_message_t &msg,
                                            MAV_MISSION_RESULT result) const
 {
     if (link == nullptr) {
-        INTERNAL_ERROR(AP_InternalError::error_t::gcs_bad_missionprotocol_link);
+        INTERNAL_ERROR(AG_InternalError::error_t::gcs_bad_missionprotocol_link);
         return;
     }
     send_mission_ack(*link, msg, result);
@@ -333,7 +333,7 @@ void MissionItemProtocol::queued_request_send()
         return;
     }
     if (link == nullptr) {
-        INTERNAL_ERROR(AP_InternalError::error_t::gcs_bad_missionprotocol_link);
+        INTERNAL_ERROR(AG_InternalError::error_t::gcs_bad_missionprotocol_link);
         return;
     }
     CHECK_PAYLOAD_SIZE2_VOID(link->get_chan(), MISSION_REQUEST);
@@ -343,7 +343,7 @@ void MissionItemProtocol::queued_request_send()
         dest_compid,
         request_i,
         mission_type());
-    timelast_request_ms = AP_HAL::millis();
+    timelast_request_ms = AG_HAL::millis();
 }
 
 void MissionItemProtocol::update()
@@ -353,11 +353,11 @@ void MissionItemProtocol::update()
         return;
     }
     if (link == nullptr) {
-        INTERNAL_ERROR(AP_InternalError::error_t::gcs_bad_missionprotocol_link);
+        INTERNAL_ERROR(AG_InternalError::error_t::gcs_bad_missionprotocol_link);
         return;
     }
     // stop waypoint receiving if timeout
-    const uint32_t tnow = AP_HAL::millis();
+    const uint32_t tnow = AG_HAL::millis();
     if (tnow - timelast_receive_ms > upload_timeout_ms) {
         receiving = false;
         timeout();

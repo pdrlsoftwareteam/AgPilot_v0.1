@@ -51,7 +51,7 @@ bool RC_Channels_Copter::has_valid_input() const
 // returns true if throttle arming checks should be run
 bool RC_Channels_Copter::arming_check_throttle() const {
     if ((copter.g.throttle_behavior & THR_BEHAVE_FEEDBACK_FROM_MID_STICK) != 0) {
-        // center sprung throttle configured, dont run AP_Arming check
+        // center sprung throttle configured, dont run AG_Arming check
         // Copter already checks this case in its own arming checks
         return false;
     }
@@ -199,7 +199,7 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
                 }
 
                 // create new mission command
-                AP_Mission::Mission_Command cmd  = {};
+                AG_Mission::Mission_Command cmd  = {};
 
                 // if the mission is empty save a takeoff command
                 if (copter.mode_auto.mission.num_commands() == 0) {
@@ -333,7 +333,7 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::WINCH_CONTROL:
-            // do nothing, used to control the rate of the winch and is processed within AP_Winch
+            // do nothing, used to control the rate of the winch and is processed within AG_Winch
             break;
 
 #ifdef USERHOOK_AUXSWITCH
@@ -527,7 +527,7 @@ void Copter::save_trim()
 void Copter::auto_trim_cancel()
 {
     auto_trim_counter = 0;
-    AP_Notify::flags.save_trim = false;
+    AG_Notify::flags.save_trim = false;
     gcs().send_text(MAV_SEVERITY_INFO, "AutoTrim cancelled");
 }
 
@@ -541,7 +541,7 @@ void Copter::auto_trim()
         }
 
         // flash the leds
-        AP_Notify::flags.save_trim = true;
+        AG_Notify::flags.save_trim = true;
 
         if (!auto_trim_started) {
             if (ap.land_complete) {
@@ -571,7 +571,7 @@ void Copter::auto_trim()
 
         // on last iteration restore leds and accel gains to normal
         if (auto_trim_counter == 0) {
-            AP_Notify::flags.save_trim = false;
+            AG_Notify::flags.save_trim = false;
             gcs().send_text(MAV_SEVERITY_INFO, "AutoTrim: Trims saved");
         }
     }

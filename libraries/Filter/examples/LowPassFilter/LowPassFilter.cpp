@@ -3,14 +3,14 @@
  *       Code by Randy Mackay. DIYDrones.com
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <Filter/Filter.h>                     // Filter library
 #include <Filter/LowPassFilter.h>      // LowPassFilter class (inherits from Filter class)
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 // create a global instance of the class
 LowPassFilterFloat low_pass_filter;
@@ -53,4 +53,4 @@ void loop()
     hal.scheduler->delay(10000);
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

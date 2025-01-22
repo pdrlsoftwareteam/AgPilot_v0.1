@@ -2,7 +2,7 @@
 
 #include <Filter/Filter.h>
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 TEST(ModeFilterTest, Int16_Size5)
 {

@@ -25,7 +25,7 @@
 #define HNF_MAX_HARMONICS 8
 
 // table of user settable parameters
-const AP_Param::GroupInfo HarmonicNotchFilterParams::var_info[] = {
+const AG_Param::GroupInfo HarmonicNotchFilterParams::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Harmonic Notch Filter enable
@@ -176,7 +176,7 @@ void HarmonicNotchFilter<T>::expand_filter_count(uint8_t num_notches)
     }
     /*
       note that we rely on the semaphore in
-      AP_InertialSensor_Backend.cpp to make this thread safe
+      AG_InertialSensor_Backend.cpp to make this thread safe
      */
     auto filters = new NotchFilter<T>[num_filters];
     if (filters == nullptr) {
@@ -324,7 +324,7 @@ void HarmonicNotchFilter<T>::reset()
  */
 HarmonicNotchFilterParams::HarmonicNotchFilterParams(void)
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 /*

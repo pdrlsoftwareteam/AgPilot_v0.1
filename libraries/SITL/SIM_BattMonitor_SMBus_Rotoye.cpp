@@ -1,5 +1,5 @@
 #include "SIM_BattMonitor_SMBus_Rotoye.h"
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 
 SITL::Rotoye::Rotoye() :
     SIM_BattMonitor_SMBus_Generic()
@@ -21,7 +21,7 @@ void SITL::Rotoye::update(const class Aircraft &aircraft)
 {
     SIM_BattMonitor_SMBus_Generic::update(aircraft);
 
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_temperature_update_ms > 1000) {
         last_temperature_update_ms = now;
         int16_t outside_temp = get_reg_value(SMBusBattRotoyeDevReg::TEMP);

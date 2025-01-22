@@ -18,17 +18,17 @@
 
 #include "MissionItemProtocol_Waypoints.h"
 
-#include <AP_Logger/AP_Logger.h>
-#include <AP_Mission/AP_Mission.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_Mission/AG_Mission.h>
 
 #include "GCS.h"
 
 MAV_MISSION_RESULT MissionItemProtocol_Waypoints::append_item(const mavlink_mission_item_int_t &mission_item_int)
 {
     // sanity check for DO_JUMP command
-    AP_Mission::Mission_Command cmd {};
+    AG_Mission::Mission_Command cmd {};
 
-    const MAV_MISSION_RESULT res = AP_Mission::mavlink_int_to_mission_cmd(mission_item_int, cmd);
+    const MAV_MISSION_RESULT res = AG_Mission::mavlink_int_to_mission_cmd(mission_item_int, cmd);
     if (res != MAV_MISSION_ACCEPTED) {
         return res;
     }
@@ -76,14 +76,14 @@ MAV_MISSION_RESULT MissionItemProtocol_Waypoints::get_item(const GCS_MAVLINK &_l
         return MAV_MISSION_ERROR;
     }
 
-    AP_Mission::Mission_Command cmd;
+    AG_Mission::Mission_Command cmd;
 
     // retrieve mission from eeprom
     if (!mission.read_cmd_from_storage(packet.seq, cmd)) {
         return MAV_MISSION_ERROR;
     }
 
-    if (!AP_Mission::mission_cmd_to_mavlink_int(cmd, ret_packet)) {
+    if (!AG_Mission::mission_cmd_to_mavlink_int(cmd, ret_packet)) {
         return MAV_MISSION_ERROR;
     }
 
@@ -110,9 +110,9 @@ uint16_t MissionItemProtocol_Waypoints::max_items() const {
 
 MAV_MISSION_RESULT MissionItemProtocol_Waypoints::replace_item(const mavlink_mission_item_int_t &mission_item_int)
 {
-    AP_Mission::Mission_Command cmd {};
+    AG_Mission::Mission_Command cmd {};
 
-    const MAV_MISSION_RESULT res = AP_Mission::mavlink_int_to_mission_cmd(mission_item_int, cmd);
+    const MAV_MISSION_RESULT res = AG_Mission::mavlink_int_to_mission_cmd(mission_item_int, cmd);
     if (res != MAV_MISSION_ACCEPTED) {
         return res;
     }

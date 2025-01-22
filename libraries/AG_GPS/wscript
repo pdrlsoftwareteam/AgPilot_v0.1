@@ -1,0 +1,4 @@
+
+# SBF driver needs double precision
+def configure(cfg):
+    cfg.env.DOUBLE_PRECISION_SOURCES['AG_GPS'] = ['AG_GPS_SBF.cpp']

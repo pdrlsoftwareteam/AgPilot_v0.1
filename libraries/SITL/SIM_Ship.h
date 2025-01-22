@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef AP_SIM_SHIP_ENABLED
 #define AP_SIM_SHIP_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
@@ -26,9 +26,9 @@
 
 #if AP_SIM_SHIP_ENABLED
 
-#include <AP_HAL/utility/Socket.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Common/Location.h>
+#include <AG_HAL/utility/Socket.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Common/Location.h>
 
 namespace SITL {
 
@@ -56,7 +56,7 @@ public:
     ShipSim();
     void update(void);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     /*
       get a ground speed adjustment for a landed vehicle based on

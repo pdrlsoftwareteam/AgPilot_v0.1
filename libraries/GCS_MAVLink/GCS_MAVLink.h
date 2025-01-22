@@ -2,7 +2,7 @@
 /// @brief	One size fits all header for MAVLink integration.
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 // we have separate helpers disabled to make it possible
 // to select MAVLink 1.0 in the arduino GUI build
@@ -41,7 +41,7 @@
 #include "include/mavlink/v2.0/mavlink_types.h"
 
 /// MAVLink stream used for uartA
-extern AP_HAL::UARTDriver	*mavlink_comm_port[MAVLINK_COMM_NUM_BUFFERS];
+extern AG_HAL::UARTDriver	*mavlink_comm_port[MAVLINK_COMM_NUM_BUFFERS];
 extern bool gcs_alternative_active[MAVLINK_COMM_NUM_BUFFERS];
 
 /// MAVLink system definition

@@ -3,20 +3,20 @@
  *       Based on original sketch by Jason Short. 2010
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <RC_Channel/RC_Channel.h>
 
 // we need a boardconfig created so that the io processor is available
 #if HAL_WITH_IO_MCU
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_IOMCU/AP_IOMCU.h>
-AP_BoardConfig BoardConfig;
+#include <AG_BoardConfig/AG_BoardConfig.h>
+#include <AG_IOMCU/AG_IOMCU.h>
+AG_BoardConfig BoardConfig;
 #endif
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 class RC_Channel_Example : public RC_Channel
 {
@@ -121,4 +121,4 @@ static void print_radio_values()
 }
 
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

@@ -16,27 +16,27 @@
   ArduPilot bootloader. This implements the same protocol originally
   developed for PX4, but builds on top of the ChibiOS HAL
 
-  It does not use the full AP_HAL API in order to keep the firmware
+  It does not use the full AG_HAL API in order to keep the firmware
   size below the maximum of 16kByte required for F4 based
   boards. Instead it uses the ChibiOS APIs directly
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include "ch.h"
 #include "hal.h"
 #include "hwdef.h"
-#include <AP_HAL_ChibiOS/hwdef/common/usbcfg.h>
-#include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
-#include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
+#include <AG_HAL_ChibiOS/hwdef/common/usbcfg.h>
+#include <AG_HAL_ChibiOS/hwdef/common/stm32_util.h>
+#include <AG_HAL_ChibiOS/hwdef/common/watchdog.h>
 #include "support.h"
 #include "bl_protocol.h"
 #include "flash_from_sd.h"
 #include "can.h"
 #include <stdio.h>
 #if EXT_FLASH_SIZE_MB
-#include <AP_FlashIface/AP_FlashIface_JEDEC.h>
+#include <AG_FlashIface/AG_FlashIface_JEDEC.h>
 #endif
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
+#include <AG_CheckFirmware/AG_CheckFirmware.h>
 
 extern "C" {
     int main(void);
@@ -58,7 +58,7 @@ struct boardinfo board_info = {
 #endif
 
 #if EXT_FLASH_SIZE_MB
-AP_FlashIface_JEDEC ext_flash;
+AG_FlashIface_JEDEC ext_flash;
 #endif
 
 int main(void)
@@ -196,8 +196,8 @@ int main(void)
 #else
     // CAN only
     while (true) {
-        uint32_t t0 = AP_HAL::millis();
-        while (timeout == 0 || AP_HAL::millis() - t0 <= timeout) {
+        uint32_t t0 = AG_HAL::millis();
+        while (timeout == 0 || AG_HAL::millis() - t0 <= timeout) {
             can_update();
             chThdSleep(chTimeMS2I(1));
         }

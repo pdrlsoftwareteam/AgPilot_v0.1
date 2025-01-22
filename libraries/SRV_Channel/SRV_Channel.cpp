@@ -17,16 +17,16 @@
   ranges, trim and reversal
  */
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
 #include "SRV_Channel.h"
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 SRV_Channel::servo_mask_t SRV_Channel::have_pwm_mask;
 
-const AP_Param::GroupInfo SRV_Channel::var_info[] = {
+const AG_Param::GroupInfo SRV_Channel::var_info[] = {
     // @Param: MIN
     // @DisplayName: Minimum PWM
     // @Description: minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.
@@ -78,7 +78,7 @@ const AP_Param::GroupInfo SRV_Channel::var_info[] = {
 
 SRV_Channel::SRV_Channel(void)
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
     // start with all pwm at zero
     have_pwm_mask = ~uint32_t(0);
 }

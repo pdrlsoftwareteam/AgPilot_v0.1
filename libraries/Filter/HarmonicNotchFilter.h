@@ -14,9 +14,9 @@
  */
 #pragma once
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include <cmath>
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 #include "NotchFilter.h"
 
 #define HNF_MAX_HARMONICS 8
@@ -112,7 +112,7 @@ public:
     bool hasOption(Options option) const { return _options & uint16_t(option); }
     // notch dynamic tracking mode
     HarmonicNotchDynamicMode tracking_mode(void) const { return HarmonicNotchDynamicMode(_tracking_mode.get()); }
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     // return minimum frequency ratio for throttle notch
     float freq_min_ratio(void) const {

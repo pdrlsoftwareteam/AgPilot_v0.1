@@ -18,7 +18,7 @@
 
 #include "SIM_Aircraft.h"
 #include <SITL/SITL.h>
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 #include <stdio.h>
 
 using namespace SITL;

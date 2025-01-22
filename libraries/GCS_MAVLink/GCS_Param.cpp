@@ -14,13 +14,13 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 #include "GCS.h"
-#include <AP_Logger/AP_Logger.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 // queue of pending parameter requests and replies
 ObjectBuffer<GCS_MAVLINK::pending_param_request> GCS_MAVLINK::param_requests(20);
@@ -44,8 +44,8 @@ GCS_MAVLINK::queued_param_send()
         return;
     }
 
-    const uint32_t tnow = AP_HAL::millis();
-    const uint32_t tstart = AP_HAL::micros();
+    const uint32_t tnow = AG_HAL::millis();
+    const uint32_t tstart = AG_HAL::micros();
 
     // use at most 30% of bandwidth on parameters
     const uint32_t link_bw = _port->bw_in_bytes_per_second();
@@ -82,10 +82,10 @@ GCS_MAVLINK::queued_param_send()
             _queued_parameter_count,
             _queued_parameter_index);
 
-        _queued_parameter = AP_Param::next_scalar(&_queued_parameter_token, &_queued_parameter_type);
+        _queued_parameter = AG_Param::next_scalar(&_queued_parameter_token, &_queued_parameter_type);
         _queued_parameter_index++;
 
-        if (AP_HAL::micros() - tstart > 1000) {
+        if (AG_HAL::micros() - tstart > 1000) {
             // don't use more than 1ms sending blocks of parameters
             break;
         }
@@ -103,7 +103,7 @@ bool GCS_MAVLINK::have_flow_control(void)
         return false;
     }
 
-    if (_port->get_flow_control() != AP_HAL::UARTDriver::FLOW_CONTROL_DISABLE) {
+    if (_port->get_flow_control() != AG_HAL::UARTDriver::FLOW_CONTROL_DISABLE) {
         return true;
     }
 
@@ -211,10 +211,10 @@ void GCS_MAVLINK::handle_param_request_list(const mavlink_message_t &msg)
     send_banner();
 
     // Start sending parameters - next call to ::update will kick the first one out
-    _queued_parameter = AP_Param::first(&_queued_parameter_token, &_queued_parameter_type);
+    _queued_parameter = AG_Param::first(&_queued_parameter_token, &_queued_parameter_type);
     _queued_parameter_index = 0;
-    _queued_parameter_count = AP_Param::count_parameters();
-    _queued_parameter_send_time_ms = AP_HAL::millis(); // avoid initial flooding
+    _queued_parameter_count = AG_Param::count_parameters();
+    _queued_parameter_send_time_ms = AG_HAL::millis(); // avoid initial flooding
 }
 
 void GCS_MAVLINK::handle_param_request_read(const mavlink_message_t &msg)
@@ -234,7 +234,7 @@ void GCS_MAVLINK::handle_param_request_read(const mavlink_message_t &msg)
     uint32_t saved_reserve_param_space_start_ms = reserve_param_space_start_ms;
     reserve_param_space_start_ms = 0; // bypass packet_overhead_chan reservation checking
     if (!HAVE_PAYLOAD_SPACE(chan, PARAM_VALUE)) {
-        reserve_param_space_start_ms = AP_HAL::millis();
+        reserve_param_space_start_ms = AG_HAL::millis();
     } else {
         reserve_param_space_start_ms = saved_reserve_param_space_start_ms;
     }
@@ -262,14 +262,14 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     enum ap_var_type var_type;
 
     // set parameter
-    AP_Param *vp;
+    AG_Param *vp;
     char key[AP_MAX_NAME_SIZE+1];
     strncpy(key, (char *)packet.param_id, AP_MAX_NAME_SIZE);
     key[AP_MAX_NAME_SIZE] = 0;
 
     // find existing param so we can get the old value
     uint16_t parameter_flags = 0;
-    vp = AP_Param::find(key, &var_type, &parameter_flags);
+    vp = AG_Param::find(key, &var_type, &parameter_flags);
     if (vp == nullptr || isnan(packet.param_value) || isinf(packet.param_value)) {
         return;
     }
@@ -279,7 +279,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     if (parameter_flags & AP_PARAM_FLAG_INTERNAL_USE_ONLY) {
         // the user can set BRD_OPTIONS to enable set of internal
         // parameters, for developer testing or unusual use cases
-        if (AP_BoardConfig::allow_set_internal_parameters()) {
+        if (AG_BoardConfig::allow_set_internal_parameters()) {
             parameter_flags &= ~AP_PARAM_FLAG_INTERNAL_USE_ONLY;
         }
     }
@@ -307,10 +307,10 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     vp->save(force_save);
 
     if (force_save && (parameter_flags & AP_PARAM_FLAG_ENABLE)) {
-        AP_Param::invalidate_count();
+        AG_Param::invalidate_count();
     }
     
-    AP_Logger *logger = AP_Logger::get_singleton();
+    AG_Logger *logger = AG_Logger::get_singleton();
     if (logger != nullptr) {
         logger->Write_Parameter(key, vp->cast_to_float(var_type));
     }
@@ -326,7 +326,7 @@ void GCS_MAVLINK::send_parameter_value(const char *param_name, ap_var_type param
         param_name,
         param_value,
         mav_param_type(param_type),
-        AP_Param::count_parameters(),
+        AG_Param::count_parameters(),
         -1);
 }
 
@@ -340,14 +340,14 @@ void GCS::send_parameter_value(const char *param_name, ap_var_type param_type, f
     memcpy(packet.param_id, param_name, to_copy);
     packet.param_value = param_value;
     packet.param_type = GCS_MAVLINK::mav_param_type(param_type);
-    packet.param_count = AP_Param::count_parameters();
+    packet.param_count = AG_Param::count_parameters();
     packet.param_index = -1;
 
     gcs().send_to_active_channels(MAVLINK_MSG_ID_PARAM_VALUE,
                                   (const char *)&packet);
 
-    // also log to AP_Logger
-    AP_Logger *logger = AP_Logger::get_singleton();
+    // also log to AG_Logger
+    AG_Logger *logger = AG_Logger::get_singleton();
     if (logger != nullptr) {
         logger->Write_Parameter(param_name, param_value);
     }
@@ -363,7 +363,7 @@ void GCS_MAVLINK::param_io_timer(void)
 
     // this is mostly a no-op, but doing this here means we won't
     // block the main thread counting parameters (~30ms on PH)
-    AP_Param::count_parameters();
+    AG_Param::count_parameters();
 
     if (param_replies.space() == 0) {
         // no room
@@ -376,18 +376,18 @@ void GCS_MAVLINK::param_io_timer(void)
     }
 
     struct pending_param_reply reply;
-    AP_Param *vp;
+    AG_Param *vp;
 
     if (req.param_index != -1) {
-        AP_Param::ParamToken token {};
-        vp = AP_Param::find_by_index(req.param_index, &reply.p_type, &token);
+        AG_Param::ParamToken token {};
+        vp = AG_Param::find_by_index(req.param_index, &reply.p_type, &token);
         if (vp == nullptr) {
             return;
         }
         vp->copy_name_token(token, reply.param_name, AP_MAX_NAME_SIZE, true);
     } else {
         strncpy(reply.param_name, req.param_name, AP_MAX_NAME_SIZE+1);
-        vp = AP_Param::find(req.param_name, &reply.p_type);
+        vp = AG_Param::find(req.param_name, &reply.p_type);
         if (vp == nullptr) {
             return;
         }
@@ -397,7 +397,7 @@ void GCS_MAVLINK::param_io_timer(void)
     reply.param_name[AP_MAX_NAME_SIZE] = 0;
     reply.value = vp->cast_to_float(reply.p_type);
     reply.param_index = req.param_index;
-    reply.count = AP_Param::count_parameters();
+    reply.count = AG_Param::count_parameters();
 
     // queue for transmission
     param_replies.push(reply);
@@ -423,7 +423,7 @@ uint8_t GCS_MAVLINK::send_parameter_async_replies()
         uint32_t saved_reserve_param_space_start_ms = reserve_param_space_start_ms;
         reserve_param_space_start_ms = 0; // bypass packet_overhead_chan reservation checking
         if (!HAVE_PAYLOAD_SPACE(reply.chan, PARAM_VALUE)) {
-            reserve_param_space_start_ms = AP_HAL::millis();
+            reserve_param_space_start_ms = AG_HAL::millis();
             return async_replies_sent_count;
         }
         reserve_param_space_start_ms = saved_reserve_param_space_start_ms;
@@ -436,7 +436,7 @@ uint8_t GCS_MAVLINK::send_parameter_async_replies()
             reply.count,
             reply.param_index);
 
-        _queued_parameter_send_time_ms = AP_HAL::millis();
+        _queued_parameter_send_time_ms = AG_HAL::millis();
         async_replies_sent_count++;
 
         if (!param_replies.pop()) {

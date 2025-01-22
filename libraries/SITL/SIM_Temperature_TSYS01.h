@@ -35,10 +35,10 @@ private:
 
     void set_state(State new_state) {
         state = new_state;
-        state_start_time_ms = AP_HAL::millis();
+        state_start_time_ms = AG_HAL::millis();
     }
     uint32_t time_in_state_ms() const {
-        return AP_HAL::millis() - state_start_time_ms;
+        return AG_HAL::millis() - state_start_time_ms;
     }
 
     float get_sim_temperature() const;

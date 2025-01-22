@@ -49,8 +49,8 @@ rc 2 1450
 
 #if HAL_SIM_PS_LIGHTWARE_SF45B_ENABLED
 
-#include <AP_Math/crc.h>
-#include <AP_InternalError/AP_InternalError.h>
+#include <AG_Math/crc.h>
+#include <AG_InternalError/AG_InternalError.h>
 
 namespace SITL {
 
@@ -206,7 +206,7 @@ private:
 
     uint8_t payload_length() const {
         if (_buflen < 3) {
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+            INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
         }
         return (_msg.packed_msgstream.flags >> 6) - 1;
     }

@@ -58,7 +58,7 @@ bool Copter::SurfaceTracking::get_target_alt_cm(float &target_alt_cm) const
         return false;
     }
     // check target has been updated recently
-    if (AP_HAL::millis() - last_update_ms > SURFACE_TRACKING_TIMEOUT_MS) {
+    if (AG_HAL::millis() - last_update_ms > SURFACE_TRACKING_TIMEOUT_MS) {
         return false;
     }
     target_alt_cm = (copter.pos_control->get_pos_target_z_cm() - copter.pos_control->get_pos_offset_z_cm());
@@ -73,7 +73,7 @@ void Copter::SurfaceTracking::set_target_alt_cm(float _target_alt_cm)
         return;
     }
     copter.pos_control->set_pos_offset_z_cm(copter.inertial_nav.get_position_z_up_cm() - _target_alt_cm);
-    last_update_ms = AP_HAL::millis();
+    last_update_ms = AG_HAL::millis();
 }
 
 bool Copter::SurfaceTracking::get_target_dist_for_logging(float &target_dist) const
@@ -101,12 +101,12 @@ void Copter::SurfaceTracking::set_surface(Surface new_surface)
     // check we have a range finder in the correct direction
     if ((new_surface == Surface::GROUND) && !copter.rangefinder.has_orientation(ROTATION_PITCH_270)) {
         copter.gcs().send_text(MAV_SEVERITY_WARNING, "SurfaceTracking: no downward rangefinder");
-        AP_Notify::events.user_mode_change_failed = 1;
+        AG_Notify::events.user_mode_change_failed = 1;
         return;
     }
     if ((new_surface == Surface::CEILING) && !copter.rangefinder.has_orientation(ROTATION_PITCH_90)) {
         copter.gcs().send_text(MAV_SEVERITY_WARNING, "SurfaceTracking: no upward rangefinder");
-        AP_Notify::events.user_mode_change_failed = 1;
+        AG_Notify::events.user_mode_change_failed = 1;
         return;
     }
     surface = new_surface;

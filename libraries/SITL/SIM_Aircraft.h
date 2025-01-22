@@ -20,7 +20,7 @@
 
 #if AP_SIM_ENABLED
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SITL.h"
 #include "SITL_Input.h"

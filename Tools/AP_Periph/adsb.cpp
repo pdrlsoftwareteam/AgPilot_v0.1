@@ -17,14 +17,14 @@
   module over the UART
  */
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 
 #ifdef HAL_PERIPH_ENABLE_ADSB
 
-#include <AP_SerialManager/AP_SerialManager.h>
+#include <AG_SerialManager/AG_SerialManager.h>
 
-extern const AP_HAL::HAL &hal;
+extern const AG_HAL::HAL &hal;
 
 # if !HAL_GCS_ENABLED
 
@@ -48,7 +48,7 @@ void AP_Periph_FW::adsb_init(void)
         if (uart == nullptr) {
             return;
         }
-        uart->begin(AP_SerialManager::map_baudrate(g.adsb_baudrate), 256, 256);
+        uart->begin(AG_SerialManager::map_baudrate(g.adsb_baudrate), 256, 256);
     }
 }
 

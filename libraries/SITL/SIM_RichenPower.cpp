@@ -16,21 +16,21 @@
   Simulator for the RichenPower Hybrid generators
 */
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SIM_RichenPower.h"
 #include "SITL.h"
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 
 #include <stdio.h>
 #include <errno.h>
 
 using namespace SITL;
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 // table of user settable parameters
-const AP_Param::GroupInfo RichenPower::var_info[] = {
+const AG_Param::GroupInfo RichenPower::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: RichenPower Generator sim enable/disable
@@ -51,7 +51,7 @@ const AP_Param::GroupInfo RichenPower::var_info[] = {
 
 RichenPower::RichenPower() : SerialDevice::SerialDevice()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 
     u.packet.magic1 = 0xAA;
     u.packet.magic2 = 0x55;
@@ -79,7 +79,7 @@ void RichenPower::update(const struct sitl_input &input)
 
 void RichenPower::update_control_pin(const struct sitl_input &input)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
 
     static const uint16_t INPUT_SERVO_PWM_STOP = 1200;
     static const uint16_t INPUT_SERVO_PWM_IDLE = 1500;
@@ -143,9 +143,9 @@ void RichenPower::update_control_pin(const struct sitl_input &input)
     _current_current = AP::sitl()->state.battery_current;
     _current_current = MIN(_current_current, max_current);
     if (_current_current > 1 && _state != State::RUN) {
-        AP_HAL::panic("Generator stalled due to high current demand");
+        AG_HAL::panic("Generator stalled due to high current demand");
     } else if (_current_current > max_current) {
-        AP_HAL::panic("Generator stalled due to high current demand (run)");
+        AG_HAL::panic("Generator stalled due to high current demand (run)");
     }
 
     // linear degradation in RPM up to maximum load
@@ -181,7 +181,7 @@ void RichenPower::RichenUnion::update_checksum()
 void RichenPower::update_send()
 {
     // just send a chunk of data at 1Hz:
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_sent_ms < 1000) {
         return;
     }
@@ -252,6 +252,6 @@ void RichenPower::update_send()
     // };
 
     if (write_to_autopilot((char*)u.parse_buffer, ARRAY_SIZE(u.parse_buffer)) != ARRAY_SIZE(u.parse_buffer)) {
-        AP_HAL::panic("Failed to write to autopilot: %s", strerror(errno));
+        AG_HAL::panic("Failed to write to autopilot: %s", strerror(errno));
     }
 }

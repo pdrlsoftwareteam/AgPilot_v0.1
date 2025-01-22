@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -32,13 +32,13 @@ Vicon::Vicon() :
     SerialDevice::SerialDevice()
 {
     if (!valid_channel(mavlink_ch)) {
-        AP_HAL::panic("Invalid mavlink channel");
+        AG_HAL::panic("Invalid mavlink channel");
     }
 }
 
 void Vicon::maybe_send_heartbeat()
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
 
     if (now - last_heartbeat_ms < 100) {
         // we only provide a heartbeat every so often
@@ -74,7 +74,7 @@ void Vicon::update_vicon_position_estimate(const Location &loc,
                                            const Vector3f &velocity,
                                            const Quaternion &attitude)
 {
-    const uint64_t now_us = AP_HAL::micros64();
+    const uint64_t now_us = AG_HAL::micros64();
 
     // calculate a random time offset to the time sent in the message
     // simulates a time difference between the remote computer and autopilot

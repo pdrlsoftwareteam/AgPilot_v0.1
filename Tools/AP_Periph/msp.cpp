@@ -3,12 +3,12 @@
   Thanks to input from Konstantin Sharlaimov
  */
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 
 #ifdef HAL_PERIPH_ENABLE_MSP
 
-void AP_Periph_FW::msp_init(AP_HAL::UARTDriver *_uart)
+void AP_Periph_FW::msp_init(AG_HAL::UARTDriver *_uart)
 {
     if (_uart) {
         msp.port.uart = _uart;
@@ -68,7 +68,7 @@ void AP_Periph_FW::send_msp_GPS(void)
 {
     MSP::msp_gps_data_message_t p;
 
-    if (gps.get_type(0) == AP_GPS::GPS_Type::GPS_TYPE_NONE) {
+    if (gps.get_type(0) == AG_GPS::GPS_Type::GPS_TYPE_NONE) {
         return;
     }
     if (msp.last_gps_ms == gps.last_message_time_ms(0)) {

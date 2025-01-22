@@ -23,7 +23,7 @@ using namespace SITL;
 void SerialRangeFinder::update(float range)
 {
     // just send a chunk of data at 5Hz:
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_sent_ms < reading_interval_ms()) {
         return;
     }
@@ -47,7 +47,7 @@ void SerialRangeFinder::send_temperature()
 {
     // Use the simple underwater model to get temperature
     float rho, delta, theta;
-    AP_Baro::SimpleUnderWaterAtmosphere(-0.5 * 0.001, rho, delta, theta); // get simulated temperature for 0.5m depth
+    AG_Baro::SimpleUnderWaterAtmosphere(-0.5 * 0.001, rho, delta, theta); // get simulated temperature for 0.5m depth
     const float temperature = Aircraft::rand_normal(KELVIN_TO_C(SSL_AIR_TEMPERATURE * theta), 1); // FIXME pick a stddev based on data sheet
 
     uint8_t data[255];

@@ -21,7 +21,7 @@ void SITL::InvensenseV3::update(const class Aircraft &aircraft)
         { xAccel, yAccel, zAccel },
         { p, q, r },
         21,  // temperature
-        AP_HAL::millis16()   // timestamp
+        AG_HAL::millis16()   // timestamp
     };
 
     for (uint8_t i=0; i<2; i++) {
@@ -78,17 +78,17 @@ int SITL::InvensenseV3::rdwr_fifo(I2C::i2c_rdwr_ioctl_data *&data)
     // check for block/FIFO read/write bits and pieces
     if (data->nmsgs == 2) {
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
         if (data->msgs[1].flags != I2C_M_RD) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
 
         const uint8_t len = data->msgs[1].len;
         if (len > value_lengths[addr]) {
             if (value_lengths[addr] != 0) {
                 // we expect reads and writes into the fifo to be the same size
-                AP_HAL::panic("Read of unexpected size");
+                AG_HAL::panic("Read of unexpected size");
             }
             return -1;
         }
@@ -118,14 +118,14 @@ void SITL::InvensenseV3::add_fifo(const char *name, uint8_t reg, I2CRegisters::R
 
     values[reg] = (char*)malloc(fifo_len); // allocate the fifo...
     if (values[reg] == nullptr) {
-        AP_HAL::panic("Failed to allocate FIFO...");
+        AG_HAL::panic("Failed to allocate FIFO...");
     }
 }
 
 void SITL::InvensenseV3::update_sample_count()
 {
     if (value_lengths[InvensenseV3DevReg::FIFO_DATA] % sizeof(FIFOData)) {
-        AP_HAL::panic("fifo data not multiple of sample size");
+        AG_HAL::panic("fifo data not multiple of sample size");
     }
     uint16_t samplecount = value_lengths[InvensenseV3DevReg::FIFO_DATA]/sizeof(FIFOData);
     set_block(InvensenseV3DevReg::FIFO_COUNTH, (uint8_t*)&samplecount, 2);
@@ -134,14 +134,14 @@ void SITL::InvensenseV3::update_sample_count()
 bool SITL::InvensenseV3::write_to_fifo(uint8_t fifo, uint8_t *value, uint8_t valuelen)
 {
     if (fifoname[fifo] == nullptr) {
-        AP_HAL::panic("Setting un-named fifo %u", fifo);
+        AG_HAL::panic("Setting un-named fifo %u", fifo);
     }
     // ::fprintf(stderr, "Setting %u (0x%02x) (%s) to 0x%02x (%c)\n", (unsigned)reg, (unsigned)reg, regname[reg], (unsigned)value, value);
     if (valuelen == 0) {
-        AP_HAL::panic("Zero-length values not permitted by spec");
+        AG_HAL::panic("Zero-length values not permitted by spec");
     }
     if (values[fifo] == nullptr) {
-        AP_HAL::panic("Write to unallocated FIFO");
+        AG_HAL::panic("Write to unallocated FIFO");
     }
     if (value_lengths[fifo] + valuelen > fifo_len) {
         // ::fprintf(stderr, "dropped\n");  // this happens a lot at startup
@@ -164,7 +164,7 @@ void SITL::InvensenseV3::add_block(const char *name, uint8_t addr, uint8_t len, 
     block_values[addr] = (char*)malloc(len);
     block_value_lengths[addr] = len;
     if (block_values[addr] == nullptr) {
-        AP_HAL::panic("Allocation failed for block (len=%u)", len);
+        AG_HAL::panic("Allocation failed for block (len=%u)", len);
     }
     if (mode == I2CRegisters::RegMode::RDONLY ||
         mode == I2CRegisters::RegMode::RDWR) {
@@ -179,10 +179,10 @@ void SITL::InvensenseV3::add_block(const char *name, uint8_t addr, uint8_t len, 
 void SITL::InvensenseV3::set_block(uint8_t addr, uint8_t *value, uint8_t valuelen)
 {
     if (blockname[addr] == nullptr) {
-        AP_HAL::panic("Setting un-named block %u", addr);
+        AG_HAL::panic("Setting un-named block %u", addr);
     }
     if (valuelen != block_value_lengths[addr]) {
-        AP_HAL::panic("Invalid block write got=%u want=%u", valuelen, block_value_lengths[addr]);
+        AG_HAL::panic("Invalid block write got=%u want=%u", valuelen, block_value_lengths[addr]);
     }
     memcpy(block_values[addr], value, valuelen);
 }
@@ -195,14 +195,14 @@ int SITL::InvensenseV3::rdwr_block(I2C::i2c_rdwr_ioctl_data *&data)
     if (data->nmsgs == 2) {
         // data read request
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
         if (data->msgs[1].flags != I2C_M_RD) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
 
         if (data->msgs[1].len != block_value_lengths[addr]) {
-            AP_HAL::panic("Block read length not equal to block length (got=%u want=%u)", data->msgs[1].len, block_value_lengths[addr]);
+            AG_HAL::panic("Block read length not equal to block length (got=%u want=%u)", data->msgs[1].len, block_value_lengths[addr]);
         }
         memcpy(&data->msgs[1].buf[0], block_values[addr], data->msgs[1].len);
         return 0;
@@ -211,9 +211,9 @@ int SITL::InvensenseV3::rdwr_block(I2C::i2c_rdwr_ioctl_data *&data)
     if (data->nmsgs == 1) {
         // data write request
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
-        AP_HAL::panic("block writes not implemented");
+        AG_HAL::panic("block writes not implemented");
     }
 
     return -1;

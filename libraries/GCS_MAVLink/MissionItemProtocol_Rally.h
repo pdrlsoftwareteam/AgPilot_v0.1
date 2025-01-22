@@ -1,6 +1,6 @@
 #pragma once
 
-#include <AP_Rally/AP_Rally.h>
+#include <AG_Rally/AG_Rally.h>
 
 #if HAL_RALLY_ENABLED
 
@@ -8,7 +8,7 @@
 
 class MissionItemProtocol_Rally : public MissionItemProtocol {
 public:
-    MissionItemProtocol_Rally(class AP_Rally &_rally) :
+    MissionItemProtocol_Rally(class AG_Rally &_rally) :
         rally(_rally) {}
     void truncate(const mavlink_mission_count_t &packet) override;
     MAV_MISSION_TYPE mission_type() const override { return MAV_MISSION_TYPE_RALLY; }
@@ -29,7 +29,7 @@ protected:
     bool clear_all_items() override WARN_IF_UNUSED;
 
 private:
-    AP_Rally &rally;
+    AG_Rally &rally;
 
     uint16_t item_count() const override;
     uint16_t max_items() const override;

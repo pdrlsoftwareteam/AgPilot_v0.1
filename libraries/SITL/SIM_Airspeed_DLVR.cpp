@@ -8,7 +8,7 @@ int SITL::Airspeed_DLVR::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
     if (msg.flags == I2C_M_RD) {
         // driver is attempting to receive reading...
         if (msg.len != 4) {
-            AP_HAL::panic("Unexpected message length (%u)", msg.len);
+            AG_HAL::panic("Unexpected message length (%u)", msg.len);
         }
 
         uint8_t status = 0;
@@ -48,13 +48,13 @@ int SITL::Airspeed_DLVR::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
         return 0;
     }
 
-    AP_HAL::panic("Should never be written to");
+    AG_HAL::panic("Should never be written to");
 }
 
 
 void SITL::Airspeed_DLVR::update(const class Aircraft &aircraft)
 {
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
     if (now_ms - last_update_ms < 50) { // 20Hz
         return;
     }
@@ -66,7 +66,7 @@ void SITL::Airspeed_DLVR::update(const class Aircraft &aircraft)
     sim_alt += 2 * rand_float();
 
     float sigma, delta, theta;
-    AP_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
 
     // To Do: Add a sensor board temperature offset parameter
     temperature = (KELVIN_TO_C(SSL_AIR_TEMPERATURE * theta)) + 25.0;

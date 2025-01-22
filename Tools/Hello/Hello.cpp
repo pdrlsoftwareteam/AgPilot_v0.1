@@ -3,12 +3,12 @@
   Andrew Tridgell September 2011
 */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 void setup()
 {
@@ -21,4 +21,4 @@ void loop()
     hal.console->printf("*\n");
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

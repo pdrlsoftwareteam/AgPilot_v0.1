@@ -25,9 +25,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 namespace SITL {
 

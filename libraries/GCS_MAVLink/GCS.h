@@ -7,22 +7,22 @@
 
 #if HAL_GCS_ENABLED
 
-#include <AP_AdvancedFailsafe/AP_AdvancedFailsafe_config.h>
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Common/AP_Common.h>
+#include <AG_AdvancedFailsafe/AG_AdvancedFailsafe_config.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Common/AG_Common.h>
 #include "GCS_MAVLink.h"
-#include <AP_Mission/AP_Mission.h>
+#include <AG_Mission/AG_Mission.h>
 #include <stdint.h>
 #include "MAVLink_routing.h"
-#include <AP_RTC/JitterCorrection.h>
-#include <AP_Common/Bitmask.h>
-#include <AP_LTM_Telem/AP_LTM_Telem.h>
-#include <AP_Devo_Telem/AP_Devo_Telem.h>
-#include <AP_Filesystem/AP_Filesystem_config.h>
-#include <AP_Frsky_Telem/AP_Frsky_config.h>
-#include <AP_GPS/AP_GPS.h>
-#include <AP_Mount/AP_Mount.h>
-#include <AP_SerialManager/AP_SerialManager.h>
+#include <AG_RTC/JitterCorrection.h>
+#include <AG_Common/Bitmask.h>
+#include <AG_LTM_Telem/AG_LTM_Telem.h>
+#include <AG_Devo_Telem/AG_Devo_Telem.h>
+#include <AG_Filesystem/AG_Filesystem_config.h>
+#include <AG_Frsky_Telem/AG_Frsky_config.h>
+#include <AG_GPS/AG_GPS.h>
+#include <AG_Mount/AG_Mount.h>
+#include <AG_SerialManager/AG_SerialManager.h>
 
 #include "ap_message.h"
 
@@ -114,7 +114,7 @@ public:
 
     GCS_MAVLINK_Parameters();
 
-    static const struct AP_Param::GroupInfo        var_info[];
+    static const struct AG_Param::GroupInfo        var_info[];
 
     // saveable rate of each stream
     AP_Int16        streamRates[GCS_MAVLINK_NUM_STREAM_RATES];
@@ -196,7 +196,7 @@ class GCS_MAVLINK
 public:
     friend class GCS;
 
-    GCS_MAVLINK(GCS_MAVLINK_Parameters &parameters, AP_HAL::UARTDriver &uart);
+    GCS_MAVLINK(GCS_MAVLINK_Parameters &parameters, AG_HAL::UARTDriver &uart);
     virtual ~GCS_MAVLINK() {}
 
     void        update_receive(uint32_t max_time_us=1000);
@@ -264,7 +264,7 @@ public:
     }
 
     // accessor for uart
-    AP_HAL::UARTDriver *get_uart() { return _port; }
+    AG_HAL::UARTDriver *get_uart() { return _port; }
 
     virtual uint8_t sysid_my_gcs() const = 0;
     virtual bool sysid_enforce() const { return false; }
@@ -460,7 +460,7 @@ public:
     static uint8_t packet_overhead_chan(mavlink_channel_t chan);
 
     // alternative protocol function handler
-    FUNCTOR_TYPEDEF(protocol_handler_fn_t, bool, uint8_t, AP_HAL::UARTDriver *);
+    FUNCTOR_TYPEDEF(protocol_handler_fn_t, bool, uint8_t, AG_HAL::UARTDriver *);
 
     struct stream_entries {
         const streams stream_id;
@@ -493,10 +493,10 @@ protected:
     virtual MAV_VTOL_STATE vtol_state() const { return MAV_VTOL_STATE_UNDEFINED; }
     virtual MAV_LANDED_STATE landed_state() const { return MAV_LANDED_STATE_UNDEFINED; }
 
-    // return a MAVLink parameter type given a AP_Param type
+    // return a MAVLink parameter type given a AG_Param type
     static MAV_PARAM_TYPE mav_param_type(enum ap_var_type t);
 
-    AP_Param *                  _queued_parameter;      ///< next parameter to
+    AG_Param *                  _queued_parameter;      ///< next parameter to
                                                         // be sent in queue
     mavlink_channel_t           chan;
     uint8_t packet_overhead(void) const { return packet_overhead_chan(chan); }
@@ -533,7 +533,7 @@ protected:
     // that the command has been received, rather than the GCS having to
     // rely on getting back an identical sequence number as some currently
     // do.
-    virtual void handle_mission_set_current(AP_Mission &mission, const mavlink_message_t &msg);
+    virtual void handle_mission_set_current(AG_Mission &mission, const mavlink_message_t &msg);
     void handle_mission_count(const mavlink_message_t &msg);
     void handle_mission_write_partial_list(const mavlink_message_t &msg);
     void handle_mission_item(const mavlink_message_t &msg);
@@ -654,7 +654,7 @@ protected:
     /*
       handle MAV_CMD_CAN_FORWARD and CAN_FRAME messages for CAN over MAVLink
      */
-    void can_frame_callback(uint8_t bus, const AP_HAL::CANFrame &);
+    void can_frame_callback(uint8_t bus, const AG_HAL::CANFrame &);
     MAV_RESULT handle_can_forward(const mavlink_command_long_t &packet, const mavlink_message_t &msg);
     void handle_can_frame(const mavlink_message_t &msg) const;
 
@@ -721,7 +721,7 @@ protected:
 
 private:
 
-    const AP_SerialManager::UARTState *uartstate;
+    const AG_SerialManager::UARTState *uartstate;
 
     // last time we got a non-zero RSSI from RADIO_STATUS
     static struct LastRadioStatus {
@@ -759,13 +759,13 @@ private:
     bool calibrate_gyros();
 
     /// The stream we are communicating over
-    AP_HAL::UARTDriver *_port;
+    AG_HAL::UARTDriver *_port;
 
     /// Perform queued sending operations
     ///
     enum ap_var_type            _queued_parameter_type; ///< type of the next
                                                         // parameter
-    AP_Param::ParamToken        _queued_parameter_token; ///AP_Param token for
+    AG_Param::ParamToken        _queued_parameter_token; ///AG_Param token for
                                                          // next() call
     uint16_t                    _queued_parameter_index; ///< next queued
                                                          // parameter's index
@@ -788,7 +788,7 @@ private:
     struct deferred_message_t {
         const ap_message id;
         uint16_t interval_ms;
-        uint16_t last_sent_ms; // from AP_HAL::millis16()
+        uint16_t last_sent_ms; // from AG_HAL::millis16()
     } deferred_message[3] = {
         { MSG_HEARTBEAT, },
         { MSG_NEXT_PARAM, },
@@ -805,7 +805,7 @@ private:
     struct deferred_message_bucket_t {
         Bitmask<MSG_LAST> ap_message_ids;
         uint16_t interval_ms;
-        uint16_t last_sent_ms; // from AP_HAL::millis16()
+        uint16_t last_sent_ms; // from AG_HAL::millis16()
     };
     deferred_message_bucket_t deferred_message_bucket[10];
     static const uint8_t no_bucket_to_send = -1;
@@ -965,7 +965,7 @@ private:
 
         // session specific info, currently only support a single session over all links
         int fd = -1;
-        FTP_FILE_MODE mode; // work around AP_Filesystem not supporting file modes
+        FTP_FILE_MODE mode; // work around AG_Filesystem not supporting file modes
         int16_t current_session;
         uint32_t last_send_ms;
         uint8_t need_banner_send_mask;
@@ -982,10 +982,10 @@ private:
     void ftp_worker(void);
     void ftp_push_replies(pending_ftp &reply);
 
-    void send_distance_sensor(const class AP_RangeFinder_Backend *sensor, const uint8_t instance) const;
+    void send_distance_sensor(const class AG_RangeFinder_Backend *sensor, const uint8_t instance) const;
 
-    virtual bool handle_guided_request(AP_Mission::Mission_Command &cmd) = 0;
-    virtual void handle_change_alt_request(AP_Mission::Mission_Command &cmd) {};
+    virtual bool handle_guided_request(AG_Mission::Mission_Command &cmd) = 0;
+    virtual void handle_change_alt_request(AG_Mission::Mission_Command &cmd) {};
     void handle_common_mission_message(const mavlink_message_t &msg);
 
     virtual void handle_manual_control_axes(const mavlink_manual_control_t &packet, const uint32_t tnow) {};
@@ -1088,7 +1088,7 @@ public:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
             // this is a serious problem, but we don't need to kill a
             // real vehicle
-            AP_HAL::panic("GCS must be singleton");
+            AG_HAL::panic("GCS must be singleton");
 #endif
         }
     };
@@ -1180,12 +1180,12 @@ public:
 
 #if AP_FRSKY_TELEM_ENABLED
     // frsky backend
-    class AP_Frsky_Telem *frsky;
+    class AG_Frsky_Telem *frsky;
 #endif
 
 #if AP_LTM_TELEM_ENABLED
     // LTM backend
-    AP_LTM_Telem ltm_telemetry;
+    AG_LTM_Telem ltm_telemetry;
 #endif
 
 #if AP_DEVO_TELEM_ENABLED
@@ -1231,7 +1231,7 @@ public:
 protected:
 
     virtual GCS_MAVLINK *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
-                                                 AP_HAL::UARTDriver &uart) = 0;
+                                                 AG_HAL::UARTDriver &uart) = 0;
 
     uint32_t control_sensors_present;
     uint32_t control_sensors_enabled;
@@ -1247,13 +1247,13 @@ private:
     static GCS *_singleton;
 
     void create_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
-                                    AP_HAL::UARTDriver &uart);
+                                    AG_HAL::UARTDriver &uart);
 
     char statustext_printf_buffer[256+1];
 
-    virtual AP_GPS::GPS_Status min_status_for_gps_healthy() const {
+    virtual AG_GPS::GPS_Status min_status_for_gps_healthy() const {
         // NO_FIX simply excludes NO_GPS
-        return AP_GPS::GPS_Status::NO_FIX;
+        return AG_GPS::GPS_Status::NO_FIX;
     }
 
     void update_sensor_status_flags();
@@ -1282,8 +1282,8 @@ private:
     struct {
         bool enabled;
         bool timer_installed;
-        AP_HAL::UARTDriver *port1;
-        AP_HAL::UARTDriver *port2;
+        AG_HAL::UARTDriver *port1;
+        AG_HAL::UARTDriver *port2;
         uint32_t start_ms;
         uint32_t last_ms;
         uint32_t last_port1_data_ms;

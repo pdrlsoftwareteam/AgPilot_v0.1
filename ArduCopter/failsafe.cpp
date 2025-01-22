@@ -34,7 +34,7 @@ void Copter::failsafe_disable()
 //
 void Copter::failsafe_check()
 {
-    uint32_t tnow = AP_HAL::micros();
+    uint32_t tnow = AG_HAL::micros();
 
     const uint16_t ticks = scheduler.ticks();
     if (ticks != failsafe_last_ticks) {

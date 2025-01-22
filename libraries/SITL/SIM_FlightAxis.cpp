@@ -29,10 +29,10 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Logger/AP_Logger.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Logger/AG_Logger.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -117,10 +117,10 @@ FlightAxis::FlightAxis(const char *frame_str) :
         controller_ip = colon+1;
     }
     for (uint8_t i=0; i<ARRAY_SIZE(sim_defaults); i++) {
-        AP_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
+        AG_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
         if (sim_defaults[i].save) {
             enum ap_var_type ptype;
-            AP_Param *p = AP_Param::find(sim_defaults[i].name, &ptype);
+            AG_Param *p = AG_Param::find(sim_defaults[i].name, &ptype);
             if (!p->configured()) {
                 p->save();
             }
@@ -128,7 +128,7 @@ FlightAxis::FlightAxis(const char *frame_str) :
     }
 
     if (!hal.scheduler->thread_create(FUNCTOR_BIND_MEMBER(&FlightAxis::socket_creator, void), "SocketCreator", 8192,
-                                      AP_HAL::Scheduler::PRIORITY_BOOST, 0)) {
+                                      AG_HAL::Scheduler::PRIORITY_BOOST, 0)) {
         printf("Failed to create socket_creator thread\n");
     }
 }

@@ -14,7 +14,7 @@
  */
 
 #include "GCS_MAVLink.h"
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <hal.h>
@@ -53,7 +53,7 @@ const struct GCS_MAVLINK::stream_entries GCS_MAVLINK::all_stream_entries[] = {
     MAV_STREAM_TERMINATOR // must have this at end of stream_entries
 };
 
-const struct AP_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
+const struct AG_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 

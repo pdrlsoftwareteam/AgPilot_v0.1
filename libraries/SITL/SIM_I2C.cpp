@@ -102,7 +102,7 @@ void I2C::init()
             const auto &dev_j = i2c_devices[j];
             if (dev_i.bus == dev_j.bus &&
                 dev_i.addr == dev_j.addr) {
-                AP_HAL::panic("Two devices at the same address on the same bus");
+                AG_HAL::panic("Two devices at the same address on the same bus");
             }
         }
     }

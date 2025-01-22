@@ -17,12 +17,12 @@
 /// @brief	handle routing of MAVLink packets by sysid/componentid
 
 #include <stdio.h>
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Common/AP_Common.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Common/AG_Common.h>
 #include "GCS.h"
 #include "MAVLink_routing.h"
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #define ROUTING_DEBUG 0
 
@@ -235,7 +235,7 @@ void MAVLink_routing::send_to_components(const char *pkt, const mavlink_msg_entr
 #endif
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
         if (entry->max_msg_len > pkt_len) {
-            AP_HAL::panic("Passed packet message length (%u > %u)",
+            AG_HAL::panic("Passed packet message length (%u > %u)",
                           entry->max_msg_len, pkt_len);
         }
 #endif

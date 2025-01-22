@@ -1,6 +1,6 @@
 #include "SIM_I2CDevice.h"
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef AP_SIM_TOSHIBALED_ENABLED
 #define AP_SIM_TOSHIBALED_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)

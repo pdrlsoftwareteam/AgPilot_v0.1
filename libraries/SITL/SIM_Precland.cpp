@@ -14,15 +14,15 @@
  */
 
 #include "SIM_Precland.h"
-#include "AP_HAL/AP_HAL.h"
-#include "AP_Math/AP_Math.h"
-#include "AP_Common/Location.h"
+#include "AG_HAL/AG_HAL.h"
+#include "AG_Math/AG_Math.h"
+#include "AG_Common/Location.h"
 #include <stdio.h>
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo SIM_Precland::var_info[] = {
+const AG_Param::GroupInfo SIM_Precland::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Preland device Sim enable/disable
@@ -161,7 +161,7 @@ void SIM_Precland::update(const Location &loc, const Vector3d &position)
         return;
     }
 
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - _last_update_ms < 1000.0f * (1.0f / _rate)) {
         return;
     }

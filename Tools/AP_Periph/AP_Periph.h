@@ -1,34 +1,34 @@
 #pragma once
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Param/AP_Param.h>
-#include <AP_GPS/AP_GPS.h>
-#include <AP_Compass/AP_Compass.h>
-#include <AP_Baro/AP_Baro.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Param/AG_Param.h>
+#include <AG_GPS/AG_GPS.h>
+#include <AG_Compass/AG_Compass.h>
+#include <AG_Baro/AG_Baro.h>
 #include "SRV_Channel/SRV_Channel.h"
-#include <AP_Notify/AP_Notify.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_BattMonitor/AP_BattMonitor.h>
-#include <AP_Airspeed/AP_Airspeed.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
-#include <AP_Proximity/AP_Proximity.h>
-#include <AP_EFI/AP_EFI.h>
-#include <AP_MSP/AP_MSP.h>
-#include <AP_MSP/msp.h>
-#include <AP_TemperatureSensor/AP_TemperatureSensor.h>
+#include <AG_Notify/AG_Notify.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_BattMonitor/AG_BattMonitor.h>
+#include <AG_Airspeed/AG_Airspeed.h>
+#include <AG_RangeFinder/AG_RangeFinder.h>
+#include <AG_Proximity/AG_Proximity.h>
+#include <AG_EFI/AG_EFI.h>
+#include <AG_MSP/AG_MSP.h>
+#include <AG_MSP/msp.h>
+#include <AG_TemperatureSensor/AG_TemperatureSensor.h>
 #include "../AP_Bootloader/app_comms.h"
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
+#include <AG_CheckFirmware/AG_CheckFirmware.h>
 #include "hwing_esc.h"
-#include <AP_CANManager/AP_CANManager.h>
-#include <AP_Scripting/AP_Scripting.h>
-#include <AP_HAL/CANIface.h>
-#include <AP_Stats/AP_Stats.h>
+#include <AG_CANManager/AG_CANManager.h>
+#include <AG_Scripting/AG_Scripting.h>
+#include <AG_HAL/CANIface.h>
+#include <AG_Stats/AG_Stats.h>
 
 
-#include <AP_NMEA_Output/AP_NMEA_Output.h>
+#include <AG_NMEA_Output/AG_NMEA_Output.h>
 #if HAL_NMEA_OUTPUT_ENABLED && !(HAL_GCS_ENABLED && defined(HAL_PERIPH_ENABLE_GPS))
     // Needs SerialManager + (AHRS or GPS)
-    #error "AP_NMEA_Output requires Serial/GCS and either AHRS or GPS. Needs HAL_GCS_ENABLED and HAL_PERIPH_ENABLE_GPS"
+    #error "AG_NMEA_Output requires Serial/GCS and either AHRS or GPS. Needs HAL_GCS_ENABLED and HAL_PERIPH_ENABLE_GPS"
 #endif
 
 #if HAL_GCS_ENABLED
@@ -78,7 +78,7 @@ public:
     static AP_Periph_FW* get_singleton()
     {
         if (_singleton == nullptr) {
-            AP_HAL::panic("AP_Periph_FW used before allocation.");
+            AG_HAL::panic("AP_Periph_FW used before allocation.");
         }
         return _singleton;
     }
@@ -122,21 +122,21 @@ public:
     static SLCAN::CANIface slcan_interface;
 #endif
 
-    AP_SerialManager serial_manager;
+    AG_SerialManager serial_manager;
 
 #if AP_STATS_ENABLED
-    AP_Stats node_stats;
+    AG_Stats node_stats;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_GPS
-    AP_GPS gps;
+    AG_GPS gps;
 #if HAL_NUM_CAN_IFACES >= 2
     int8_t gps_mb_can_port = -1;
 #endif
 #endif
 
 #if HAL_NMEA_OUTPUT_ENABLED
-    AP_NMEA_Output nmea;
+    AG_NMEA_Output nmea;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_MAG
@@ -144,13 +144,13 @@ public:
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_BARO
-    AP_Baro baro;
+    AG_Baro baro;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_BATTERY
     struct AP_Periph_Battery {
         void handle_battery_failsafe(const char* type_str, const int8_t action) { }
-        AP_BattMonitor lib{0, FUNCTOR_BIND_MEMBER(&AP_Periph_FW::AP_Periph_Battery::handle_battery_failsafe, void, const char*, const int8_t), nullptr};
+        AG_BattMonitor lib{0, FUNCTOR_BIND_MEMBER(&AP_Periph_FW::AP_Periph_Battery::handle_battery_failsafe, void, const char*, const int8_t), nullptr};
 
         uint32_t last_read_ms;
         uint32_t last_can_send_ms;
@@ -161,19 +161,19 @@ public:
     // This allows you to change the protocol and it continues to use the one at boot.
     // Without this, changing away from UAVCAN causes loss of comms and you can't
     // change the rest of your params or verify it succeeded.
-    AP_CANManager::Driver_Type can_protocol_cached[HAL_NUM_CAN_IFACES];
+    AG_CANManager::Driver_Type can_protocol_cached[HAL_NUM_CAN_IFACES];
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_MSP
     struct {
-        AP_MSP msp;
+        AG_MSP msp;
         MSP::msp_port_t port;
         uint32_t last_gps_ms;
         uint32_t last_baro_ms;
         uint32_t last_mag_ms;
         uint32_t last_airspeed_ms;
     } msp;
-    void msp_init(AP_HAL::UARTDriver *_uart);
+    void msp_init(AG_HAL::UARTDriver *_uart);
     void msp_sensor_update(void);
     void send_msp_packet(uint16_t cmd, void *p, uint16_t size);
     void send_msp_GPS(void);
@@ -193,7 +193,7 @@ public:
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_AIRSPEED
-    AP_Airspeed airspeed;
+    AG_Airspeed airspeed;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_RANGEFINDER
@@ -202,7 +202,7 @@ public:
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PRX
-    AP_Proximity proximity;
+    AG_Proximity proximity;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PWM_HARDPOINT
@@ -224,13 +224,13 @@ public:
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_EFI
-    AP_EFI efi;
+    AG_EFI efi;
     uint32_t efi_update_ms;
 #endif
     
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
 #if HAL_WITH_ESC_TELEM
-    AP_ESC_Telem esc_telem;
+    AG_ESC_Telem esc_telem;
     uint32_t last_esc_telem_update_ms;
     void esc_telem_update();
     uint32_t esc_telem_update_period_ms;
@@ -252,7 +252,7 @@ public:
 #endif
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
-    AP_TemperatureSensor temperature_sensor;
+    AG_TemperatureSensor temperature_sensor;
 #endif
 
 #if defined(HAL_PERIPH_ENABLE_NOTIFY) || defined(HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY)
@@ -260,7 +260,7 @@ public:
 #endif
 #ifdef HAL_PERIPH_ENABLE_NOTIFY
     // notification object for LEDs, buzzers etc
-    AP_Notify notify;
+    AG_Notify notify;
     uint64_t vehicle_state = 1; // default to initialisation
     float yaw_earth;
     uint32_t last_vehicle_state;
@@ -275,21 +275,21 @@ public:
 #endif
 
 #if AP_SCRIPTING_ENABLED
-    AP_Scripting scripting;
+    AG_Scripting scripting;
 #endif
 
 #if HAL_LOGGING_ENABLED
     static const struct LogStructure log_structure[];
-    AP_Logger logger;
+    AG_Logger logger;
 #endif
 
 #if HAL_GCS_ENABLED
     GCS_Periph _gcs;
 #endif
     // setup the var_info table
-    AP_Param param_loader{var_info};
+    AG_Param param_loader{var_info};
 
-    static const AP_Param::Info var_info[];
+    static const AG_Param::Info var_info[];
 
     uint32_t last_mag_update_ms;
     uint32_t last_gps_update_ms;

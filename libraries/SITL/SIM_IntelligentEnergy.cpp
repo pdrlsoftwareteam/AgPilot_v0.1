@@ -16,11 +16,11 @@
   Simulator for the RichenPower Hybrid generators
 */
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SIM_IntelligentEnergy.h"
 #include "SITL.h"
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 
 #include <stdio.h>
 #include <errno.h>

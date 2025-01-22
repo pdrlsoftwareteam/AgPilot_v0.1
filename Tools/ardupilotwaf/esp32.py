@@ -30,7 +30,7 @@ def configure(cfg):
 
     #define env and location for the cmake esp32 file
     env = cfg.env
-    env.AP_HAL_ESP32 = srcpath('libraries/AP_HAL_ESP32/targets/esp-idf')
+    env.AG_HAL_ESP32 = srcpath('libraries/AG_HAL_ESP32/targets/esp-idf')
     env.AP_PROGRAM_FEATURES += ['esp32_ap_program']
 
     env.ESP_IDF_PREFIX_REL = 'esp-idf'
@@ -51,7 +51,7 @@ def configure(cfg):
     try:
         env.DEFAULT_PARAMETERS = os.environ['DEFAULT_PARAMETERS']
     except:
-        env.DEFAULT_PARAMETERS = cfg.srcnode.abspath()+"/libraries/AP_HAL_ESP32/boards/defaults.parm"
+        env.DEFAULT_PARAMETERS = cfg.srcnode.abspath()+"/libraries/AG_HAL_ESP32/boards/defaults.parm"
     print("USING DEFAULT_PARAMETERS:"+str(env.DEFAULT_PARAMETERS))
 
     #env.append_value('GIT_SUBMODULES', 'esp_idf')
@@ -66,7 +66,7 @@ def pre_build(self):
     esp_idf = self.cmake(
             name='esp-idf',
             cmake_vars=lib_vars,
-            cmake_src='libraries/AP_HAL_ESP32/targets/esp-idf',
+            cmake_src='libraries/AG_HAL_ESP32/targets/esp-idf',
             cmake_bld='esp-idf_build',
             )
 

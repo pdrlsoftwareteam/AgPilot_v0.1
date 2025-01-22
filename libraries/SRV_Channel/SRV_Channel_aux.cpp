@@ -17,15 +17,15 @@
  */
 #include "SRV_Channel.h"
 
-#include <AP_Math/AP_Math.h>
-#include <AP_HAL/AP_HAL.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_HAL/AG_HAL.h>
 #include <RC_Channel/RC_Channel.h>
 
 #if NUM_SERVO_CHANNELS == 0
 #pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 /// map a function to a servo channel and output it
 void SRV_Channel::output_ch(void)
@@ -481,7 +481,7 @@ SRV_Channels::function_assigned(SRV_Channel::Aux_servo_function_t function)
 
 /*
   set servo_out and angle_min/max, then calc_pwm and output a
-  value. This is used to move a AP_Mount servo
+  value. This is used to move a AG_Mount servo
  */
 void
 SRV_Channels::move_servo(SRV_Channel::Aux_servo_function_t function,

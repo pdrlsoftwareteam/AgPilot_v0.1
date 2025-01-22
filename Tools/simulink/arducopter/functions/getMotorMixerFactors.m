@@ -65,7 +65,7 @@ function [num_motors, axis_facs_motors] = getMotorMixerFactors(frame_class, fram
     % Leave function if axis factors are not yet defined for frame
     if isempty(axis_facs_motors_pre)
         disp("Motor axis factors are not yet defined for frame class!");
-        disp("The factors can be found in the setup_motors function within AP_MotorsMatrix.cpp.");
+        disp("The factors can be found in the setup_motors function within AG_MotorsMatrix.cpp.");
        return;        
     end
     
@@ -89,12 +89,12 @@ function [num_motors, axis_facs_motors] = getMotorMixerFactors(frame_class, fram
         % The factors for yaw can be acquired directly from the preliminary
         % array
         axis_facs_motors.yaw(1,i) = axis_facs_motors_pre{i}(2);
-        % The factors for throttle are 1.0 by default (see AP_MotorsMatrix.h,
+        % The factors for throttle are 1.0 by default (see AG_MotorsMatrix.h,
         % line 87)
         axis_facs_motors.throttle(1,i) = 1.0;
     end
     
-    %% Normalization of factors (AP_MotorsMatrix.cpp, line 1218)
+    %% Normalization of factors (AG_MotorsMatrix.cpp, line 1218)
     roll_fac_max = 0.0;
     pitch_fac_max = 0.0;
     yaw_fac_max = 0.0;

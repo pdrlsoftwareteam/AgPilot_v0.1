@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef FORCE_VERSION_H_INCLUDE
-#error version.h should never be included directly. You probably want to include AP_Common/AP_FWVersion.h
+#error version.h should never be included directly. You probably want to include AG_Common/AG_FWVersion.h
 #endif
 
 #include "ap_version.h"
@@ -16,4 +16,4 @@
 #define FW_PATCH 4
 #define FW_TYPE FIRMWARE_VERSION_TYPE_OFFICIAL
 
-#include <AP_Common/AP_FWVersionDefine.h>
+#include <AG_Common/AG_FWVersionDefine.h>

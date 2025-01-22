@@ -14,8 +14,8 @@ void Copter::arm_motors_check()
     static int16_t arming_counter;
 
     // check if arming/disarm using rudder is allowed
-    AP_Arming::RudderArming arming_rudder = arming.get_rudder_arming_type();
-    if (arming_rudder == AP_Arming::RudderArming::IS_DISABLED) {
+    AG_Arming::RudderArming arming_rudder = arming.get_rudder_arming_type();
+    if (arming_rudder == AG_Arming::RudderArming::IS_DISABLED) {
         return;
     }
 
@@ -45,7 +45,7 @@ void Copter::arm_motors_check()
         // arm the motors and configure for flight
         if (arming_counter == ARM_DELAY && !motors->armed()) {
             // reset arming counter if arming fail
-            if (!arming.arm(AP_Arming::Method::RUDDER)) {
+            if (!arming.arm(AG_Arming::Method::RUDDER)) {
                 arming_counter = 0;
             }
         }
@@ -60,7 +60,7 @@ void Copter::arm_motors_check()
         }
 
     // full left and rudder disarming is enabled
-    } else if ((yaw_in < -4000) && (arming_rudder == AP_Arming::RudderArming::ARMDISARM)) {
+    } else if ((yaw_in < -4000) && (arming_rudder == AG_Arming::RudderArming::ARMDISARM)) {
         if (!flightmode->has_manual_throttle() && !ap.land_complete) {
             arming_counter = 0;
             return;
@@ -73,7 +73,7 @@ void Copter::arm_motors_check()
 
         // disarm the motors
         if (arming_counter == DISARM_DELAY && motors->armed()) {
-            arming.disarm(AP_Arming::Method::RUDDER);
+            arming.disarm(AG_Arming::Method::RUDDER);
         }
 
     // Yaw is centered so reset arming counter
@@ -96,7 +96,7 @@ void Copter::auto_disarm_check()
     }
 
     // if the rotor is still spinning, don't initiate auto disarm
-    if (motors->get_spool_state() > AP_Motors::SpoolState::GROUND_IDLE) {
+    if (motors->get_spool_state() > AG_Motors::SpoolState::GROUND_IDLE) {
         auto_disarm_begin = tnow_ms;
         return;
     }
@@ -124,7 +124,7 @@ void Copter::auto_disarm_check()
 
     // disarm once timer expires
     if ((tnow_ms-auto_disarm_begin) >= disarm_delay_ms) {
-        arming.disarm(AP_Arming::Method::DISARMDELAY);
+        arming.disarm(AG_Arming::Method::DISARMDELAY);
         auto_disarm_begin = tnow_ms;
     }
 }
@@ -194,8 +194,8 @@ void Copter::lost_vehicle_check()
     // ensure throttle is down, motors not armed, pitch and roll rc at max. Note: rc1=roll rc2=pitch
     if (ap.throttle_zero && !motors->armed() && (channel_roll->get_control_in() > 4000) && (channel_pitch->get_control_in() > 4000)) {
         if (soundalarm_counter >= LOST_VEHICLE_DELAY) {
-            if (AP_Notify::flags.vehicle_lost == false) {
-                AP_Notify::flags.vehicle_lost = true;
+            if (AG_Notify::flags.vehicle_lost == false) {
+                AG_Notify::flags.vehicle_lost = true;
                 gcs().send_text(MAV_SEVERITY_NOTICE,"Locate Copter alarm");
             }
         } else {
@@ -203,8 +203,8 @@ void Copter::lost_vehicle_check()
         }
     } else {
         soundalarm_counter = 0;
-        if (AP_Notify::flags.vehicle_lost == true) {
-            AP_Notify::flags.vehicle_lost = false;
+        if (AG_Notify::flags.vehicle_lost == true) {
+            AG_Notify::flags.vehicle_lost = false;
         }
     }
 }

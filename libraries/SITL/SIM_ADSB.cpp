@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include "SIM_Aircraft.h"
-#include <AP_HAL_SITL/SITL_State.h>
+#include <AG_HAL_SITL/SITL_State.h>
 
 namespace SITL {
 
@@ -58,7 +58,7 @@ void ADSB_Vehicle::update(float delta_t)
         type = (ADSB_EMITTER_TYPE)(rand() % (ADSB_EMITTER_TYPE_POINT_OBSTACLE + 1));
         // don't allow surface emitters to move
         if (type == ADSB_EMITTER_TYPE_POINT_OBSTACLE) {
-            stationary_object_created_ms = AP_HAL::millis64();
+            stationary_object_created_ms = AG_HAL::millis64();
             velocity_ef.zero();
         } else {
             stationary_object_created_ms = 0;
@@ -68,7 +68,7 @@ void ADSB_Vehicle::update(float delta_t)
                 velocity_ef.z = Aircraft::rand_normal(-3, 3);
             }
         }
-    } else if (stationary_object_created_ms > 0 && AP_HAL::millis64() - stationary_object_created_ms > AP_MSEC_PER_HOUR) {
+    } else if (stationary_object_created_ms > 0 && AG_HAL::millis64() - stationary_object_created_ms > AP_MSEC_PER_HOUR) {
         // regenerate stationary objects so we don't randomly fill up the screen with them over time
         initialised = false;
     }
@@ -102,7 +102,7 @@ void ADSB::update(const class Aircraft &aircraft)
     }
 
     // calculate delta time in seconds
-    uint32_t now_us = AP_HAL::micros();
+    uint32_t now_us = AG_HAL::micros();
 
     float delta_t = (now_us - last_update_us) * 1.0e-6f;
     last_update_us = now_us;
@@ -120,7 +120,7 @@ void ADSB::update(const class Aircraft &aircraft)
 */
 void ADSB::send_report(const class Aircraft &aircraft)
 {
-    if (AP_HAL::millis() < 10000) {
+    if (AG_HAL::millis() < 10000) {
         // simulated aircraft don't appear until 10s after startup. This avoids a windows
         // threading issue with non-blocking sockets and the initial wait on uartA
         return;
@@ -156,7 +156,7 @@ void ADSB::send_report(const class Aircraft &aircraft)
         return;
     }
 
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     mavlink_message_t msg;
     uint16_t len;
 
@@ -192,7 +192,7 @@ void ADSB::send_report(const class Aircraft &aircraft)
      */
     const Location &home = aircraft.get_home();
 
-    uint32_t now_us = AP_HAL::micros();
+    uint32_t now_us = AG_HAL::micros();
     if (now_us - last_report_us >= reporting_period_ms*1000UL) {
         for (uint8_t i=0; i<num_vehicles; i++) {
             ADSB_Vehicle &vehicle = vehicles[i];

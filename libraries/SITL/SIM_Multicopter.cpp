@@ -17,7 +17,7 @@
 */
 
 #include "SIM_Multicopter.h"
-#include <AP_Motors/AP_Motors.h>
+#include <AG_Motors/AG_Motors.h>
 
 #include <stdio.h>
 

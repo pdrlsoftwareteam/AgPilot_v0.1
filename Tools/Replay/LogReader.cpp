@@ -23,7 +23,7 @@
 extern struct user_parameter *user_parameters;
 
 LogReader::LogReader(struct LogStructure *log_structure, NavEKF2 &_ekf2, NavEKF3 &_ekf3) :
-    AP_LoggerFileReader(),
+    AG_LoggerFileReader(),
     _log_structure(log_structure),
     ekf2(_ekf2),
     ekf3(_ekf3)
@@ -165,7 +165,7 @@ bool LogReader::set_parameter(const char *name, float value, bool force)
         return false;
     }
     enum ap_var_type var_type;
-    AP_Param *vp = AP_Param::find(name, &var_type);
+    AG_Param *vp = AG_Param::find(name, &var_type);
     if (vp == NULL) {
         // a lot of parameters will not be found - e.g. FORMAT_VERSION
         // and all of the vehicle-specific parameters, ....
@@ -185,7 +185,7 @@ bool LogReader::set_parameter(const char *name, float value, bool force)
         old_value = ((AP_Int8 *)vp)->cast_to_float();
         ((AP_Int8 *)vp)->set(value);
     } else {
-        AP_HAL::panic("What manner of evil is var_type=%u", var_type);
+        AG_HAL::panic("What manner of evil is var_type=%u", var_type);
     }
     if (fabsf(old_value - value) > 1.0e-12) {
         ::printf("Changed %s to %.8f from %.8f\n", name, value, old_value);

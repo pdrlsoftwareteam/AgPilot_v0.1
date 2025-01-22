@@ -67,7 +67,7 @@ bool ModeSmartRTL::is_landing() const
 void ModeSmartRTL::wait_cleanup_run()
 {
     // hover at current target position
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     wp_nav->update_wpnav();
     pos_control->update_z_controller();
     attitude_control->input_thrust_vector_heading(pos_control->get_thrust_vector(), auto_yaw.get_heading());
@@ -107,27 +107,27 @@ void ModeSmartRTL::path_follow_run()
                     // this can only happen if peek failed to take the semaphore
                     // send next point anyway which will cause the vehicle to slow at the next point
                     wp_nav->set_wp_destination_NED(dest_NED);
-                    INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+                    INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
                 }
             }
         } else if (g2.smart_rtl.get_num_points() == 0) {
             // We should never get here; should always have at least
             // two points and the "zero points left" is handled above.
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+            INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
             smart_rtl_state = SubMode::PRELAND_POSITION;
         } else if (path_follow_last_pop_fail_ms == 0) {
             // first time we've failed to pop off (ever, or after a success)
-            path_follow_last_pop_fail_ms = AP_HAL::millis();
-        } else if (AP_HAL::millis() - path_follow_last_pop_fail_ms > 10000) {
+            path_follow_last_pop_fail_ms = AG_HAL::millis();
+        } else if (AG_HAL::millis() - path_follow_last_pop_fail_ms > 10000) {
             // we failed to pop a point off for 10 seconds.  This is
             // almost certainly a bug.
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+            INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
             smart_rtl_state = SubMode::PRELAND_POSITION;
         }
     }
 
     // update controllers
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     wp_nav->update_wpnav();
     pos_control->update_z_controller();
 
@@ -151,7 +151,7 @@ void ModeSmartRTL::pre_land_position_run()
     }
 
     // update controllers
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     wp_nav->update_wpnav();
     pos_control->update_z_controller();
     attitude_control->input_thrust_vector_heading(pos_control->get_thrust_vector(), auto_yaw.get_heading());

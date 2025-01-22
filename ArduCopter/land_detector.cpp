@@ -47,10 +47,10 @@ void Copter::update_land_detector()
         set_land_complete(true);
     } else if (ap.land_complete) {
         // if throttle output is high then clear landing flag
-        if (!flightmode->is_taking_off() && motors->get_throttle_out() > get_non_takeoff_throttle() && motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
+        if (!flightmode->is_taking_off() && motors->get_throttle_out() > get_non_takeoff_throttle() && motors->get_spool_state() == AG_Motors::SpoolState::THROTTLE_UNLIMITED) {
             // this should never happen because take-off should be detected at the flight mode level
             // this here to highlight there is a bug or missing take-off detection
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+            INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
             set_land_complete(false);
         }
     } else if (standby_active) {
@@ -70,7 +70,7 @@ void Copter::update_land_detector()
 
         uint8_t land_detector_scalar = 1;
 #if AP_LANDINGGEAR_ENABLED
-        if (landinggear.get_wow_state() != AP_LandingGear::LG_WOW_UNKNOWN) {
+        if (landinggear.get_wow_state() != AG_LandingGear::LG_WOW_UNKNOWN) {
             // we have a WoW sensor so lets loosen the strictness of the landing detector
             land_detector_scalar = 2;
         }
@@ -87,7 +87,7 @@ void Copter::update_land_detector()
 
         // if we have weight on wheels (WoW) or ambiguous unknown. never no WoW
 #if AP_LANDINGGEAR_ENABLED
-        const bool WoW_check = (landinggear.get_wow_state() == AP_LandingGear::LG_WOW || landinggear.get_wow_state() == AP_LandingGear::LG_WOW_UNKNOWN);
+        const bool WoW_check = (landinggear.get_wow_state() == AG_LandingGear::LG_WOW || landinggear.get_wow_state() == AG_LandingGear::LG_WOW_UNKNOWN);
 #else
         const bool WoW_check = true;
 #endif
@@ -133,10 +133,10 @@ void Copter::set_land_complete(bool b)
     
     // trigger disarm-on-land if configured
     bool disarm_on_land_configured = (g.throttle_behavior & THR_BEHAVE_DISARM_ON_LAND_DETECT) != 0;
-    const bool mode_disarms_on_land = flightmode->allows_arming(AP_Arming::Method::LANDING) && !flightmode->has_manual_throttle();
+    const bool mode_disarms_on_land = flightmode->allows_arming(AG_Arming::Method::LANDING) && !flightmode->has_manual_throttle();
 
     if (ap.land_complete && motors->armed() && disarm_on_land_configured && mode_disarms_on_land) {
-        arming.disarm(AP_Arming::Method::LANDED);
+        arming.disarm(AG_Arming::Method::LANDED);
     }
 }
 

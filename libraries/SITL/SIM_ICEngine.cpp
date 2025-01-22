@@ -38,7 +38,7 @@ float ICEngine::update(const struct sitl_input &input)
     state.choke = have_choke?input.servos[choke_servo]>1700:false;
     state.starter = have_starter?input.servos[starter_servo]>1700:false;
 
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     float dt = (now - last_update_us) * 1.0e-6f;
     float max_change = slew_rate * 0.01f * dt;
     
@@ -111,7 +111,7 @@ engine_off:
     if (start_time_us != 0) {
         printf("Engine stopped\n");
     }
-    last_update_us = AP_HAL::micros64();
+    last_update_us = AG_HAL::micros64();
     start_time_us = 0;
     last_output = 0;
     last_state = state;

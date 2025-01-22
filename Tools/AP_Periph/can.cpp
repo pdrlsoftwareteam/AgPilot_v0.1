@@ -16,26 +16,26 @@
   AP_Periph can support
  */
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 #include <canard.h>
-#include <AP_GPS/RTCM3_Parser.h>
+#include <AG_GPS/RTCM3_Parser.h>
 #include <stdio.h>
 #include <drivers/stm32/canard_stm32.h>
-#include <AP_HAL/I2CDevice.h>
-#include <AP_HAL/utility/RingBuffer.h>
-#include <AP_Common/AP_FWVersion.h>
+#include <AG_HAL/I2CDevice.h>
+#include <AG_HAL/utility/RingBuffer.h>
+#include <AG_Common/AG_FWVersion.h>
 #include <dronecan_msgs.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <hal.h>
-#include <AP_HAL_ChibiOS/CANIface.h>
-#include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
-#include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
+#include <AG_HAL_ChibiOS/CANIface.h>
+#include <AG_HAL_ChibiOS/hwdef/common/stm32_util.h>
+#include <AG_HAL_ChibiOS/hwdef/common/watchdog.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
-#include <AP_HAL_SITL/CANSocketIface.h>
+#include <AG_HAL_SITL/CANSocketIface.h>
 #endif
 
 #define IFACE_ALL ((1U<<(HAL_NUM_CAN_IFACES+1U))-1U)
@@ -44,14 +44,14 @@
 #include <utility>
 
 #if HAL_NUM_CAN_IFACES >= 2
-#include <AP_CANManager/AP_CANSensor.h>
+#include <AG_CANManager/AG_CANSensor.h>
 #endif
 
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 extern const HAL_SITL &hal;
 #else
-extern const AP_HAL::HAL &hal;
+extern const AG_HAL::HAL &hal;
 #endif
 
 extern AP_Periph_FW periph;
@@ -98,7 +98,7 @@ static struct instance_t {
     uint8_t index;
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
-    AP_HAL::CANIface* iface;
+    AG_HAL::CANIface* iface;
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
     HALSITL::CANIface* iface;
 #endif
@@ -210,7 +210,7 @@ static void handle_get_node_info(CanardInstance* ins,
     uint8_t buffer[UAVCAN_PROTOCOL_GETNODEINFO_RESPONSE_MAX_SIZE] {};
     uavcan_protocol_GetNodeInfoResponse pkt {};
 
-    node_status.uptime_sec = AP_HAL::native_millis() / 1000U;
+    node_status.uptime_sec = AG_HAL::native_millis() / 1000U;
 
     pkt.status = node_status;
     pkt.software_version.major = AP::fwversion().major;
@@ -273,17 +273,17 @@ static void handle_param_getset(CanardInstance* ins, CanardRxTransfer* transfer)
 
     uavcan_protocol_param_GetSetResponse pkt {};
 
-    AP_Param *vp;
+    AG_Param *vp;
     enum ap_var_type ptype;
 
     if (req.name.len != 0 && req.name.len > AP_MAX_NAME_SIZE) {
         vp = nullptr;
     } else if (req.name.len != 0 && req.name.len <= AP_MAX_NAME_SIZE) {
         memcpy((char *)pkt.name.data, (char *)req.name.data, req.name.len);
-        vp = AP_Param::find((char *)pkt.name.data, &ptype);
+        vp = AG_Param::find((char *)pkt.name.data, &ptype);
     } else {
-        AP_Param::ParamToken token {};
-        vp = AP_Param::find_by_index(req.index, &ptype, &token);
+        AG_Param::ParamToken token {};
+        vp = AG_Param::find_by_index(req.index, &ptype, &token);
         if (vp != nullptr) {
             vp->copy_name_token(token, (char *)pkt.name.data, AP_MAX_NAME_SIZE+1, true);
         }
@@ -376,26 +376,26 @@ static void handle_param_executeopcode(CanardInstance* ins, CanardRxTransfer* tr
     }
     if (req.opcode == UAVCAN_PROTOCOL_PARAM_EXECUTEOPCODE_REQUEST_OPCODE_ERASE) {
         StorageManager::erase();
-        AP_Param::erase_all();
-        AP_Param::load_all();
-        AP_Param::setup_sketch_defaults();
+        AG_Param::erase_all();
+        AG_Param::load_all();
+        AG_Param::setup_sketch_defaults();
 #ifdef HAL_PERIPH_ENABLE_GPS
-        AP_Param::setup_object_defaults(&periph.gps, periph.gps.var_info);
+        AG_Param::setup_object_defaults(&periph.gps, periph.gps.var_info);
 #endif
 #ifdef HAL_PERIPH_ENABLE_BATTERY
-        AP_Param::setup_object_defaults(&periph.battery, periph.battery.lib.var_info);
+        AG_Param::setup_object_defaults(&periph.battery, periph.battery.lib.var_info);
 #endif
 #ifdef HAL_PERIPH_ENABLE_MAG
-        AP_Param::setup_object_defaults(&periph.compass, periph.compass.var_info);
+        AG_Param::setup_object_defaults(&periph.compass, periph.compass.var_info);
 #endif
 #ifdef HAL_PERIPH_ENABLE_BARO
-        AP_Param::setup_object_defaults(&periph.baro, periph.baro.var_info);
+        AG_Param::setup_object_defaults(&periph.baro, periph.baro.var_info);
 #endif
 #ifdef HAL_PERIPH_ENABLE_AIRSPEED
-        AP_Param::setup_object_defaults(&periph.airspeed, periph.airspeed.var_info);
+        AG_Param::setup_object_defaults(&periph.airspeed, periph.airspeed.var_info);
 #endif
 #ifdef HAL_PERIPH_ENABLE_RANGEFINDER
-        AP_Param::setup_object_defaults(&periph.rangefinder, periph.rangefinder.var_info);
+        AG_Param::setup_object_defaults(&periph.rangefinder, periph.rangefinder.var_info);
 #endif
     }
 
@@ -497,7 +497,7 @@ static void handle_allocation_response(CanardInstance* ins, CanardRxTransfer* tr
 {
     // Rule C - updating the randomized time interval
     dronecan.send_next_node_id_allocation_request_at_ms =
-        AP_HAL::native_millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
+        AG_HAL::native_millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
         get_random_range(UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MAX_FOLLOWUP_DELAY_MS);
 
     if (transfer->source_node_id == CANARD_BROADCAST_NODE_ID)
@@ -567,9 +567,9 @@ static void handle_beep_command(CanardInstance* ins, CanardRxTransfer* transfer)
     if (!initialised) {
         initialised = true;
         hal.rcout->init();
-        hal.util->toneAlarm_init(AP_Notify::Notify_Buzz_Builtin);
+        hal.util->toneAlarm_init(AG_Notify::Notify_Buzz_Builtin);
     }
-    buzzer_start_ms = AP_HAL::native_millis();
+    buzzer_start_ms = AG_HAL::native_millis();
     buzzer_len_ms = req.duration*1000;
 #ifdef HAL_PERIPH_ENABLE_BUZZER_WITHOUT_NOTIFY
     float volume = constrain_float(periph.g.buzz_volume/100.0f, 0, 1);
@@ -585,7 +585,7 @@ static void handle_beep_command(CanardInstance* ins, CanardRxTransfer* transfer)
 static void can_buzzer_update(void)
 {
     if (buzzer_start_ms != 0) {
-        uint32_t now = AP_HAL::native_millis();
+        uint32_t now = AG_HAL::native_millis();
         if (now - buzzer_start_ms > buzzer_len_ms) {
             hal.util->toneAlarm_set_buzzer_tone(0, 0, 0);
             buzzer_start_ms = 0;
@@ -674,7 +674,7 @@ static void set_rgb_led(uint8_t red, uint8_t green, uint8_t blue)
 #ifdef HAL_PERIPH_ENABLE_NCP5623_LED_WITHOUT_NOTIFY
     {
         const uint8_t i2c_address = 0x38;
-        static AP_HAL::OwnPtr<AP_HAL::I2CDevice> dev;
+        static AG_HAL::OwnPtr<AG_HAL::I2CDevice> dev;
         if (!dev) {
             dev = std::move(hal.i2c_mgr->get_device(0, i2c_address));
         }
@@ -694,7 +694,7 @@ static void set_rgb_led(uint8_t red, uint8_t green, uint8_t blue)
 #ifdef HAL_PERIPH_ENABLE_NCP5623_BGR_LED_WITHOUT_NOTIFY
     {
         const uint8_t i2c_address = 0x38;
-        static AP_HAL::OwnPtr<AP_HAL::I2CDevice> dev;
+        static AG_HAL::OwnPtr<AG_HAL::I2CDevice> dev;
         if (!dev) {
             dev = std::move(hal.i2c_mgr->get_device(0, i2c_address));
         }
@@ -716,7 +716,7 @@ static void set_rgb_led(uint8_t red, uint8_t green, uint8_t blue)
 #define TOSHIBA_LED_ENABLE  0x04    // enable register
 #define TOSHIBA_LED_I2C_ADDR 0x55   // default I2C bus address
 
-        static AP_HAL::OwnPtr<AP_HAL::I2CDevice> dev_toshiba;
+        static AG_HAL::OwnPtr<AG_HAL::I2CDevice> dev_toshiba;
         if (!dev_toshiba) {
             dev_toshiba = std::move(hal.i2c_mgr->get_device(0, TOSHIBA_LED_I2C_ADDR));
         }
@@ -781,7 +781,7 @@ static void handle_esc_rawcommand(CanardInstance* ins, CanardRxTransfer* transfe
 
     // Update internal copy for disabling output to ESC when CAN packets are lost
     periph.last_esc_num_channels = cmd.cmd.len;
-    periph.last_esc_raw_command_ms = AP_HAL::millis();
+    periph.last_esc_raw_command_ms = AG_HAL::millis();
 }
 
 static void handle_act_command(CanardInstance* ins, CanardRxTransfer* transfer)
@@ -841,7 +841,7 @@ static void handle_notify_state(CanardInstance* ins, CanardRxTransfer* transfer)
         periph.yaw_earth = radians((float)tmp * 0.01f);
     }
     periph.vehicle_state = msg.vehicle_state;
-    periph.last_vehicle_state = AP_HAL::millis();
+    periph.last_vehicle_state = AG_HAL::millis();
 }
 #endif // HAL_PERIPH_ENABLE_NOTIFY
 
@@ -857,7 +857,7 @@ static void can_safety_LED_update(void)
         palWriteLine(HAL_GPIO_PIN_SAFE_LED, SAFE_LED_ON);
         break;
     case ARDUPILOT_INDICATION_SAFETYSTATE_STATUS_SAFETY_ON: {
-        uint32_t now = AP_HAL::native_millis();
+        uint32_t now = AG_HAL::native_millis();
         if (now - last_update_ms > 100) {
             last_update_ms = now;
             static uint8_t led_counter;
@@ -886,7 +886,7 @@ static void can_safety_button_update(void)
 {
     static uint32_t last_update_ms;
     static uint8_t counter;
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     // send at 10Hz when pressed
     if (palReadLine(HAL_GPIO_PIN_SAFE_BUTTON) != HAL_SAFE_BUTTON_ON) {
         counter = 0;
@@ -1198,16 +1198,16 @@ static void canard_broadcast(uint64_t data_type_signature,
 static void processTx(void)
 {
     for (const CanardCANFrame* txf = NULL; (txf = canardPeekTxQueue(&dronecan.canard)) != NULL;) {
-        AP_HAL::CANFrame txmsg {};
-        txmsg.dlc = AP_HAL::CANFrame::dataLengthToDlc(txf->data_len);
+        AG_HAL::CANFrame txmsg {};
+        txmsg.dlc = AG_HAL::CANFrame::dataLengthToDlc(txf->data_len);
         memcpy(txmsg.data, txf->data, txf->data_len);
-        txmsg.id = (txf->id | AP_HAL::CANFrame::FlagEFF);
+        txmsg.id = (txf->id | AG_HAL::CANFrame::FlagEFF);
 #if HAL_CANFD_SUPPORTED
         txmsg.canfd = txf->canfd;
 #endif
         // push message with 1s timeout
         bool sent = true;
-        const uint64_t deadline = AP_HAL::native_micros64() + 1000000;
+        const uint64_t deadline = AG_HAL::native_micros64() + 1000000;
         // try sending to all interfaces
         for (auto &ins : instances) {
             if (ins.iface == NULL) {
@@ -1219,7 +1219,7 @@ static void processTx(void)
             }
     #endif
     #if HAL_NUM_CAN_IFACES >= 2
-            if (periph.can_protocol_cached[ins.index] != AP_CANManager::Driver_Type_UAVCAN) {
+            if (periph.can_protocol_cached[ins.index] != AG_CANManager::Driver_Type_UAVCAN) {
                 continue;
             }
     #endif
@@ -1245,13 +1245,13 @@ static void processTx(void)
 
 static void processRx(void)
 {
-    AP_HAL::CANFrame rxmsg;
+    AG_HAL::CANFrame rxmsg;
     for (auto &ins : instances) {
         if (ins.iface == NULL) {
             continue;
         }
 #if HAL_NUM_CAN_IFACES >= 2
-        if (periph.can_protocol_cached[ins.index] != AP_CANManager::Driver_Type_UAVCAN) {
+        if (periph.can_protocol_cached[ins.index] != AG_CANManager::Driver_Type_UAVCAN) {
             continue;
         }
 #endif
@@ -1266,11 +1266,11 @@ static void processRx(void)
 
             //palToggleLine(HAL_GPIO_PIN_LED);
             uint64_t timestamp;
-            AP_HAL::CANIface::CanIOFlags flags;
+            AG_HAL::CANIface::CanIOFlags flags;
             if (ins.iface->receive(rxmsg, timestamp, flags) <= 0) {
                 break;
             }
-            rx_frame.data_len = AP_HAL::CANFrame::dlcToDataLength(rxmsg.dlc);
+            rx_frame.data_len = AG_HAL::CANFrame::dlcToDataLength(rxmsg.dlc);
             memcpy(rx_frame.data, rxmsg.data, rx_frame.data_len);
 #if HAL_CANFD_SUPPORTED
             rx_frame.canfd = rxmsg.canfd;
@@ -1309,7 +1309,7 @@ static uint16_t pool_peak_percent()
 static void node_status_send(void)
 {
     uint8_t buffer[UAVCAN_PROTOCOL_NODESTATUS_MAX_SIZE];
-    node_status.uptime_sec = AP_HAL::millis() / 1000U;
+    node_status.uptime_sec = AG_HAL::millis() / 1000U;
 
     node_status.vendor_specific_status_code = hal.util->available_memory();
 
@@ -1373,16 +1373,16 @@ static void process1HzTasks(uint64_t timestamp_usec)
         }
         EXPECT_DELAY_MS(2000);
         hal.scheduler->delay(1000);
-        AP_HAL::Util::FlashBootloader res = hal.util->flash_bootloader();
+        AG_HAL::Util::FlashBootloader res = hal.util->flash_bootloader();
         switch (res) {
-        case AP_HAL::Util::FlashBootloader::OK:
+        case AG_HAL::Util::FlashBootloader::OK:
             can_printf("Flash bootloader OK\n");
             break;
-        case AP_HAL::Util::FlashBootloader::NO_CHANGE:
+        case AG_HAL::Util::FlashBootloader::NO_CHANGE:
             can_printf("Bootloader unchanged\n");
             break;
 #if AP_SIGNED_FIRMWARE
-        case AP_HAL::Util::FlashBootloader::NOT_SIGNED:
+        case AG_HAL::Util::FlashBootloader::NOT_SIGNED:
             can_printf("Bootloader not signed\n");
             break;
 #endif
@@ -1404,12 +1404,12 @@ static void process1HzTasks(uint64_t timestamp_usec)
 
 #if 0
     // test code for watchdog reset
-    if (AP_HAL::native_millis() > 15000) {
+    if (AG_HAL::native_millis() > 15000) {
         while (true) ;
     }
 #endif
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
-    if (AP_HAL::native_millis() > 30000) {
+    if (AG_HAL::native_millis() > 30000) {
         // use RTC to mark that we have been running fine for
         // 30s. This is used along with watchdog resets to ensure the
         // user has a chance to load a fixed firmware
@@ -1429,7 +1429,7 @@ static bool can_do_dna()
         return true;
     }
 
-    const uint32_t now = AP_HAL::native_millis();
+    const uint32_t now = AG_HAL::native_millis();
 
     static uint8_t node_id_allocation_transfer_id = 0;
 
@@ -1493,7 +1493,7 @@ void AP_Periph_FW::can_start()
 {
     node_status.health = UAVCAN_PROTOCOL_NODESTATUS_HEALTH_OK;
     node_status.mode = UAVCAN_PROTOCOL_NODESTATUS_MODE_INITIALIZATION;
-    node_status.uptime_sec = AP_HAL::native_millis() / 1000U;
+    node_status.uptime_sec = AG_HAL::native_millis() / 1000U;
 
     if (g.can_node >= 0 && g.can_node < 128) {
         PreferredNodeID = g.can_node;
@@ -1506,12 +1506,12 @@ void AP_Periph_FW::can_start()
 #if AP_PERIPH_ENFORCE_AT_LEAST_ONE_PORT_IS_UAVCAN_1MHz && HAL_NUM_CAN_IFACES >= 2
     bool has_uavcan_at_1MHz = false;
     for (uint8_t i=0; i<HAL_NUM_CAN_IFACES; i++) {
-        if (g.can_protocol[i] == AP_CANManager::Driver_Type_UAVCAN && g.can_baudrate[i] == 1000000) {
+        if (g.can_protocol[i] == AG_CANManager::Driver_Type_UAVCAN && g.can_baudrate[i] == 1000000) {
             has_uavcan_at_1MHz = true;
         }
     }
     if (!has_uavcan_at_1MHz) {
-        g.can_protocol[0].set_and_save(AP_CANManager::Driver_Type_UAVCAN);
+        g.can_protocol[0].set_and_save(AG_CANManager::Driver_Type_UAVCAN);
         g.can_baudrate[0].set_and_save(1000000);
     }
 #endif // HAL_PERIPH_ENFORCE_AT_LEAST_ONE_PORT_IS_UAVCAN_1MHz
@@ -1530,9 +1530,9 @@ void AP_Periph_FW::can_start()
 #endif
         if (can_iface_periph[i] != nullptr) {
 #if HAL_CANFD_SUPPORTED
-            can_iface_periph[i]->init(g.can_baudrate[i], g.can_fdbaudrate[i]*1000000U, AP_HAL::CANIface::NormalMode);
+            can_iface_periph[i]->init(g.can_baudrate[i], g.can_fdbaudrate[i]*1000000U, AG_HAL::CANIface::NormalMode);
 #else
-            can_iface_periph[i]->init(g.can_baudrate[i], AP_HAL::CANIface::NormalMode);
+            can_iface_periph[i]->init(g.can_baudrate[i], AG_HAL::CANIface::NormalMode);
 #endif
         }
     }
@@ -1541,11 +1541,11 @@ void AP_Periph_FW::can_start()
     const uint8_t slcan_selected_index = g.can_slcan_cport - 1;
     if (slcan_selected_index < HAL_NUM_CAN_IFACES) {
         slcan_interface.set_can_iface(can_iface_periph[slcan_selected_index]);
-        instances[slcan_selected_index].iface = (AP_HAL::CANIface*)&slcan_interface;
+        instances[slcan_selected_index].iface = (AG_HAL::CANIface*)&slcan_interface;
 
         // ensure there's a serial port mapped to SLCAN
-        if (!periph.serial_manager.have_serial(AP_SerialManager::SerialProtocol_SLCAN, 0)) {
-            periph.serial_manager.set_protocol_and_baud(SERIALMANAGER_NUM_PORTS-1, AP_SerialManager::SerialProtocol_SLCAN, 1500000);
+        if (!periph.serial_manager.have_serial(AG_SerialManager::SerialProtocol_SLCAN, 0)) {
+            periph.serial_manager.set_protocol_and_baud(SERIALMANAGER_NUM_PORTS-1, AG_SerialManager::SerialProtocol_SLCAN, 1500000);
         }
     }
 #endif
@@ -1563,7 +1563,7 @@ void AP_Periph_FW::pwm_hardpoint_init()
 {
     hal.gpio->attach_interrupt(
         PWM_HARDPOINT_PIN,
-        FUNCTOR_BIND_MEMBER(&AP_Periph_FW::pwm_irq_handler, void, uint8_t, bool, uint32_t), AP_HAL::GPIO::INTERRUPT_BOTH);
+        FUNCTOR_BIND_MEMBER(&AP_Periph_FW::pwm_irq_handler, void, uint8_t, bool, uint32_t), AG_HAL::GPIO::INTERRUPT_BOTH);
 
 }
 
@@ -1587,7 +1587,7 @@ void AP_Periph_FW::pwm_irq_handler(uint8_t pin, bool pin_state, uint32_t timesta
 
 void AP_Periph_FW::pwm_hardpoint_update()
 {
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     // send at 10Hz
     void *save = hal.scheduler->disable_interrupts_save();
     uint16_t value = pwm_hardpoint.highest_pwm;
@@ -1642,7 +1642,7 @@ void AP_Periph_FW::hwesc_telem_update()
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
 #if HAL_WITH_ESC_TELEM
 /*
-  send ESC status packets based on AP_ESC_Telem
+  send ESC status packets based on AG_ESC_Telem
  */
 void AP_Periph_FW::esc_telem_update()
 {
@@ -1697,7 +1697,7 @@ void AP_Periph_FW::esc_telem_update()
 
 void AP_Periph_FW::can_update()
 {
-    const uint32_t now = AP_HAL::native_millis();
+    const uint32_t now = AG_HAL::native_millis();
     const uint32_t led_pattern = 0xAAAA;
     const uint32_t led_change_period = 50;
     static uint8_t led_idx = 0;
@@ -1718,14 +1718,14 @@ void AP_Periph_FW::can_update()
         last_led_change = now;
     }
 
-    if (AP_HAL::millis() > dronecan.send_next_node_id_allocation_request_at_ms) {
+    if (AG_HAL::millis() > dronecan.send_next_node_id_allocation_request_at_ms) {
         can_do_dna();
     }
     
     static uint32_t last_1Hz_ms;
     if (now - last_1Hz_ms >= 1000) {
         last_1Hz_ms = now;
-        process1HzTasks(AP_HAL::native_micros64());
+        process1HzTasks(AG_HAL::native_micros64());
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -1764,8 +1764,8 @@ void AP_Periph_FW::can_update()
         can_efi_update();
     #endif
     }
-    const uint32_t now_us = AP_HAL::micros();
-    while ((AP_HAL::micros() - now_us) < 1000) {
+    const uint32_t now_us = AG_HAL::micros();
+    while ((AG_HAL::micros() - now_us) < 1000) {
         hal.scheduler->delay_microseconds(HAL_PERIPH_LOOP_DELAY_US);
         processTx();
         processRx();
@@ -1784,7 +1784,7 @@ void AP_Periph_FW::can_mag_update(void)
 
 #if AP_PERIPH_MAG_MAX_RATE > 0
     // don't flood the bus with very high rate magnetometers
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
     if (now_ms - last_mag_update_ms < (1000U / AP_PERIPH_MAG_MAX_RATE)) {
         return;
     }
@@ -1794,7 +1794,7 @@ void AP_Periph_FW::can_mag_update(void)
 #if AP_PERIPH_PROBE_CONTINUOUS
     if (compass.get_count() == 0) {
         static uint32_t last_probe_ms;
-        uint32_t now = AP_HAL::native_millis();
+        uint32_t now = AG_HAL::native_millis();
         if (now - last_probe_ms >= 1000) {
             last_probe_ms = now;
             compass.init();
@@ -1835,7 +1835,7 @@ void AP_Periph_FW::can_mag_update(void)
 void AP_Periph_FW::can_battery_update(void)
 {
 #ifdef HAL_PERIPH_ENABLE_BATTERY
-    const uint32_t now_ms = AP_HAL::native_millis();
+    const uint32_t now_ms = AG_HAL::native_millis();
     if (now_ms - battery.last_can_send_ms < 100) {
         return;
     }
@@ -1912,7 +1912,7 @@ static void check_float16_range(float *v, uint8_t len)
 void AP_Periph_FW::can_gps_update(void)
 {
 #ifdef HAL_PERIPH_ENABLE_GPS
-    if (gps.get_type(0) == AP_GPS::GPS_Type::GPS_TYPE_NONE) {
+    if (gps.get_type(0) == AG_GPS::GPS_Type::GPS_TYPE_NONE) {
         return;
     }
     gps.update();
@@ -1930,8 +1930,8 @@ void AP_Periph_FW::can_gps_update(void)
         uavcan_equipment_gnss_Fix2 pkt {};
         const Location &loc = gps.location();
         const Vector3f &vel = gps.velocity();
-        if (gps.status() < AP_GPS::GPS_OK_FIX_2D && !saw_gps_lock_once) {
-            pkt.timestamp.usec = AP_HAL::micros64();
+        if (gps.status() < AG_GPS::GPS_OK_FIX_2D && !saw_gps_lock_once) {
+            pkt.timestamp.usec = AG_HAL::micros64();
             pkt.gnss_timestamp.usec = 0;
         } else {
             saw_gps_lock_once = true;
@@ -1956,33 +1956,33 @@ void AP_Periph_FW::can_gps_update(void)
         }
         pkt.sats_used = gps.num_sats();
         switch (gps.status()) {
-        case AP_GPS::GPS_Status::NO_GPS:
-        case AP_GPS::GPS_Status::NO_FIX:
+        case AG_GPS::GPS_Status::NO_GPS:
+        case AG_GPS::GPS_Status::NO_FIX:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_NO_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_SINGLE;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_DGPS_OTHER;
             break;
-        case AP_GPS::GPS_Status::GPS_OK_FIX_2D:
+        case AG_GPS::GPS_Status::GPS_OK_FIX_2D:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_2D_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_SINGLE;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_DGPS_OTHER;
             break;
-        case AP_GPS::GPS_Status::GPS_OK_FIX_3D:
+        case AG_GPS::GPS_Status::GPS_OK_FIX_3D:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_3D_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_SINGLE;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_DGPS_OTHER;
             break;
-        case AP_GPS::GPS_Status::GPS_OK_FIX_3D_DGPS:
+        case AG_GPS::GPS_Status::GPS_OK_FIX_3D_DGPS:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_3D_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_DGPS;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_DGPS_SBAS;
             break;
-        case AP_GPS::GPS_Status::GPS_OK_FIX_3D_RTK_FLOAT:
+        case AG_GPS::GPS_Status::GPS_OK_FIX_3D_RTK_FLOAT:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_3D_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_RTK;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_RTK_FLOAT;
             break;
-        case AP_GPS::GPS_Status::GPS_OK_FIX_3D_RTK_FIXED:
+        case AG_GPS::GPS_Status::GPS_OK_FIX_3D_RTK_FIXED:
             pkt.status = UAVCAN_EQUIPMENT_GNSS_FIX2_STATUS_3D_FIX;
             pkt.mode = UAVCAN_EQUIPMENT_GNSS_FIX2_MODE_RTK;
             pkt.sub_mode = UAVCAN_EQUIPMENT_GNSS_FIX2_SUB_MODE_RTK_FIXED;
@@ -2234,7 +2234,7 @@ void AP_Periph_FW::can_airspeed_update(void)
     }
 #if AP_PERIPH_PROBE_CONTINUOUS
     if (!airspeed.healthy()) {
-        uint32_t now = AP_HAL::native_millis();
+        uint32_t now = AG_HAL::native_millis();
         static uint32_t last_probe_ms;
         if (now - last_probe_ms >= 1000) {
             last_probe_ms = now;
@@ -2242,7 +2242,7 @@ void AP_Periph_FW::can_airspeed_update(void)
         }
     }
 #endif
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     if (now - last_airspeed_update_ms < 50) {
         // max 20Hz data
         return;
@@ -2294,7 +2294,7 @@ void AP_Periph_FW::can_rangefinder_update(void)
     }
 #if AP_PERIPH_PROBE_CONTINUOUS
     if (rangefinder.num_sensors() == 0) {
-        uint32_t now = AP_HAL::native_millis();
+        uint32_t now = AG_HAL::native_millis();
         static uint32_t last_probe_ms;
         if (now - last_probe_ms >= 1000) {
             last_probe_ms = now;
@@ -2302,7 +2302,7 @@ void AP_Periph_FW::can_rangefinder_update(void)
         }
     }
 #endif
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     static uint32_t last_update_ms;
     if (g.rangefinder_max_rate > 0 &&
         now - last_update_ms < 1000/g.rangefinder_max_rate) {
@@ -2371,11 +2371,11 @@ void AP_Periph_FW::can_rangefinder_update(void)
 void AP_Periph_FW::can_proximity_update()
 {
 #ifdef HAL_PERIPH_ENABLE_PRX
-    if (proximity.get_type(0) == AP_Proximity::Type::None) {
+    if (proximity.get_type(0) == AG_Proximity::Type::None) {
         return;
     }
 
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     static uint32_t last_update_ms;
     if (g.proximity_max_rate > 0 &&
         now - last_update_ms < 1000/g.proximity_max_rate) {
@@ -2384,8 +2384,8 @@ void AP_Periph_FW::can_proximity_update()
     }
     last_update_ms = now;
     proximity.update();
-    AP_Proximity::Status status = proximity.get_status();
-    if (status <= AP_Proximity::Status::NoData) {
+    AG_Proximity::Status status = proximity.get_status();
+    if (status <= AG_Proximity::Status::NoData) {
         // don't send any data
         return;
     }
@@ -2409,13 +2409,13 @@ void AP_Periph_FW::can_proximity_update()
         pkt.sensor_id = proximity.get_address(0);
 
         switch (status) {
-        case AP_Proximity::Status::NotConnected:
+        case AG_Proximity::Status::NotConnected:
             pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_NOT_CONNECTED;
             break;
-        case AP_Proximity::Status::Good:
+        case AG_Proximity::Status::Good:
             pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_GOOD;
             break;
-        case AP_Proximity::Status::NoData:
+        case AG_Proximity::Status::NoData:
         default:
             pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_NO_DATA;
             break;

@@ -54,7 +54,7 @@ void PS_RPLidarA2::update_input()
     if (n < 0) {
         // TODO: do better here
         if (errno != EAGAIN && errno != EWOULDBLOCK && errno != 0) {
-            AP_HAL::panic("Failed to read from autopilot");
+            AG_HAL::panic("Failed to read from autopilot");
         }
     } else {
         _buflen += n;
@@ -114,7 +114,7 @@ void PS_RPLidarA2::update_input()
             set_inputstate(InputState::RESETTING_START);
             return;
         default:
-            AP_HAL::panic("Bad command received (%02x)", (uint8_t)_buffer[0]);
+            AG_HAL::panic("Bad command received (%02x)", (uint8_t)_buffer[0]);
         }
     case InputState::RESETTING_START:
         _firmware_info_offset = 0;
@@ -123,7 +123,7 @@ void PS_RPLidarA2::update_input()
     case InputState::RESETTING_SEND_FIRMWARE_INFO: {
         const ssize_t written = write_to_autopilot(&FIRMWARE_INFO[_firmware_info_offset], strlen(FIRMWARE_INFO) - _firmware_info_offset);
         if (written <= 0) {
-            AP_HAL::panic("Failed to write to autopilot");
+            AG_HAL::panic("Failed to write to autopilot");
         }
         _firmware_info_offset += written;
         if (_firmware_info_offset < strlen(FIRMWARE_INFO)) {
@@ -137,7 +137,7 @@ void PS_RPLidarA2::update_input()
 
 void PS_RPLidarA2::update_output_scan(const Location &location)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (last_scan_output_time_ms == 0) {
         last_scan_output_time_ms = now;
         return;

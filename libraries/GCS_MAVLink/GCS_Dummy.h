@@ -1,5 +1,5 @@
 #include "GCS.h"
-#include <AP_Common/AP_FWVersion.h>
+#include <AG_Common/AG_FWVersion.h>
 
 #define THISFIRMWARE "GCSDummy V3.1.4-dev"
 
@@ -22,7 +22,7 @@ private:
     uint32_t telem_delay() const override { return 0; }
     void handleMessage(const mavlink_message_t &msg) override {}
     bool try_send_message(enum ap_message id) override { return true; }
-    bool handle_guided_request(AP_Mission::Mission_Command &cmd) override { return true; }
+    bool handle_guided_request(AG_Mission::Mission_Command &cmd) override { return true; }
     uint8_t sysid_my_gcs() const override { return 1; }
 
 protected:
@@ -42,7 +42,7 @@ protected:
  * a GCS singleton used for many example sketches and tools
  */
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 class GCS_Dummy : public GCS
 {
@@ -55,7 +55,7 @@ protected:
     uint8_t sysid_this_mav() const override { return 1; }
 
     GCS_MAVLINK_Dummy *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
-                                               AP_HAL::UARTDriver &uart) override {
+                                               AG_HAL::UARTDriver &uart) override {
         return new GCS_MAVLINK_Dummy(params, uart);
     }
 

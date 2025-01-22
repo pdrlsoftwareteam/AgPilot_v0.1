@@ -97,10 +97,10 @@ void ModeGuided::run()
     }
  }
 
-bool ModeGuided::allows_arming(AP_Arming::Method method) const
+bool ModeGuided::allows_arming(AG_Arming::Method method) const
 {
     // always allow arming from the ground station or scripting
-    if (method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) {
+    if (method == AG_Arming::Method::MAVLINK || method == AG_Arming::Method::SCRIPTING) {
         return true;
     }
 
@@ -116,7 +116,7 @@ bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
     int32_t alt_target_cm;
     bool alt_target_terrain = false;
     if (wp_nav->rangefinder_used_and_healthy() &&
-        wp_nav->get_terrain_source() == AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER &&
+        wp_nav->get_terrain_source() == AG_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER &&
         takeoff_alt_cm < copter.rangefinder.max_distance_cm_orient(ROTATION_PITCH_270)) {
         // can't takeoff downwards
         if (takeoff_alt_cm <= copter.rangefinder_state.alt_cm) {
@@ -168,7 +168,7 @@ void ModeGuided::wp_control_start()
     wp_nav->get_wp_stopping_point(stopping_point);
     if (!wp_nav->set_wp_destination(stopping_point, false)) {
         // this should never happen because terrain data is not used
-        INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+        INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
     }
 
     // initialise yaw
@@ -184,7 +184,7 @@ void ModeGuided::wp_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run waypoint controller
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
@@ -675,7 +675,7 @@ void ModeGuided::pos_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // send position and velocity targets to position controller
     guided_accel_target_cmss.zero();
@@ -712,7 +712,7 @@ void ModeGuided::accel_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // set velocity to zero and stop rotating if no updates received for 3 seconds
     uint32_t tnow = millis();
@@ -755,7 +755,7 @@ void ModeGuided::velaccel_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // set velocity to zero and stop rotating if no updates received for 3 seconds
     uint32_t tnow = millis();
@@ -809,7 +809,7 @@ void ModeGuided::pause_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // set the horizontal velocity and acceleration targets to zero
     Vector2f vel_xy, accel_xy;
@@ -837,7 +837,7 @@ void ModeGuided::posvelaccel_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // set velocity to zero and stop rotating if no updates received for 3 seconds
     uint32_t tnow = millis();
@@ -872,7 +872,7 @@ void ModeGuided::posvelaccel_control_run()
 
     // guided_pos_target z-axis should never be a terrain altitude
     if (guided_pos_terrain_alt) {
-        INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+        INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
     }
 
     float pz = guided_pos_target_cm.z;
@@ -928,8 +928,8 @@ void ModeGuided::angle_control_run()
     // landed with positive desired climb rate, takeoff
     if (copter.ap.land_complete && (guided_angle_state.climb_rate_cms > 0.0f)) {
         zero_throttle_and_relax_ac();
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
-        if (motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        if (motors->get_spool_state() == AG_Motors::SpoolState::THROTTLE_UNLIMITED) {
             set_land_complete(false);
             pos_control->init_z_controller();
         }
@@ -937,7 +937,7 @@ void ModeGuided::angle_control_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // call attitude controller
     if (guided_angle_state.attitude_quat.is_zero()) {
@@ -1002,7 +1002,7 @@ void ModeGuided::limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_
 void ModeGuided::limit_init_time_and_pos()
 {
     // initialise start time
-    guided_limit.start_time = AP_HAL::millis();
+    guided_limit.start_time = AG_HAL::millis();
 
     // initialise start position from current position
     guided_limit.start_pos = inertial_nav.get_position_neu_cm();

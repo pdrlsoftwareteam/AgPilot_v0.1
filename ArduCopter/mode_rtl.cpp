@@ -170,7 +170,7 @@ void ModeRTL::climb_return_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run waypoint controller
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
@@ -212,7 +212,7 @@ void ModeRTL::loiterathome_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run waypoint controller
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
@@ -301,7 +301,7 @@ void ModeRTL::descent_run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     Vector2f accel;
     pos_control->input_vel_accel_xy(vel_correction, accel);
@@ -366,8 +366,8 @@ void ModeRTL::land_run(bool disarm_on_land)
     _state_complete = copter.ap.land_complete;
 
     // disarm when the landing detector says we've landed
-    if (disarm_on_land && copter.ap.land_complete && motors->get_spool_state() == AP_Motors::SpoolState::GROUND_IDLE) {
-        copter.arming.disarm(AP_Arming::Method::LANDED);
+    if (disarm_on_land && copter.ap.land_complete && motors->get_spool_state() == AG_Motors::SpoolState::GROUND_IDLE) {
+        copter.arming.disarm(AG_Arming::Method::LANDED);
     }
 
     // if not armed set throttle to zero and exit immediately
@@ -377,7 +377,7 @@ void ModeRTL::land_run(bool disarm_on_land)
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run normal landing or precision landing (if enabled)
     land_run_normal_or_precland();
@@ -424,15 +424,15 @@ void ModeRTL::compute_return_target()
     if (terrain_following_allowed && (get_alt_type() == RTLAltType::RTL_ALTTYPE_TERRAIN)) {
         // convert RTL_ALT_TYPE and WPNAV_RFNG_USE parameters to ReturnTargetAltType
         switch (wp_nav->get_terrain_source()) {
-        case AC_WPNav::TerrainSource::TERRAIN_UNAVAILABLE:
+        case AG_WPNav::TerrainSource::TERRAIN_UNAVAILABLE:
             alt_type = ReturnTargetAltType::RELATIVE;
             AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::RTL_MISSING_RNGFND);
             gcs().send_text(MAV_SEVERITY_CRITICAL, "RTL: no terrain data, using alt-above-home");
             break;
-        case AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER:
+        case AG_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER:
             alt_type = ReturnTargetAltType::RANGEFINDER;
             break;
-        case AC_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE:
+        case AG_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE:
             alt_type = ReturnTargetAltType::TERRAINDATABASE;
             break;
         }

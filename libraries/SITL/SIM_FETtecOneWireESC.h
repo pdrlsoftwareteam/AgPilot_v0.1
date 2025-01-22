@@ -33,7 +33,7 @@ param fetch
 
 #pragma once
 
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 
 #include "SITL_Input.h"
 
@@ -59,7 +59,7 @@ public:
     // update state
     void update(const class Aircraft &aircraft);
 
-    static const AP_Param::GroupInfo var_info[];
+    static const AG_Param::GroupInfo var_info[];
 
     bool enabled() const { return _enabled.get(); }
 

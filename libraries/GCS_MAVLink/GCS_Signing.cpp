@@ -17,7 +17,7 @@
 
 #include "GCS.h"
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 // storage object
 StorageAccess GCS_MAVLINK::_signing_storage(StorageManager::StorageKeys);
@@ -199,7 +199,7 @@ void GCS_MAVLINK::update_signing_timestamp(uint64_t timestamp_usec)
  */
 void GCS_MAVLINK::save_signing_timestamp(bool force_save_now)
 {
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     // we save the timestamp every 30s, unless forced by a GPS update
     if (!force_save_now &&  now - last_signing_save_ms < 30*1000UL) {
         return;
@@ -251,7 +251,7 @@ uint8_t GCS_MAVLINK::packet_overhead_chan(mavlink_channel_t chan)
      */
     uint8_t reserved_space = 0;
     if (reserve_param_space_start_ms != 0 &&
-        AP_HAL::millis() - reserve_param_space_start_ms < 2000) {
+        AG_HAL::millis() - reserve_param_space_start_ms < 2000) {
         reserved_space = 100;
     } else {
         reserve_param_space_start_ms = 0;

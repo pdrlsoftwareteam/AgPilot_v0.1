@@ -110,7 +110,7 @@ else:
 compatible_IDs = {33: (9, 'AUAVX2.1')}
 
 
-# CRC equivalent to crc_crc32() in AP_Math/crc.cpp
+# CRC equivalent to crc_crc32() in AG_Math/crc.cpp
 crctab = array.array('I', [
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
     0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -853,7 +853,7 @@ class uploader(object):
             ret = []
 
             hwdef_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                     "..", "..", "libraries", "AP_HAL_ChibiOS", "hwdef")
+                                     "..", "..", "libraries", "AG_HAL_ChibiOS", "hwdef")
             # uploader.py is swiped into other places, so if the dir
             # doesn't exist then fail silently
             if os.path.exists(hwdef_dir):

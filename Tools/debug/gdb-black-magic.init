@@ -12,7 +12,7 @@ attach 1
 set mem inaccessible-by-default off
 set print pretty
 
-b AP_HAL::panic
+b AG_HAL::panic
 b HardFault_Handler
 b chSysHalt
 set confirm off

@@ -17,7 +17,7 @@ Changes from 4.4.3
 ------------------------------------------------------------------
 Copter 4.4.3 14-Nov-2023
 Changes from 4.4.3-beta1
-1) AP_GPS: correct uBlox M10 configuration on low flash boards
+1) AG_GPS: correct uBlox M10 configuration on low flash boards
 ------------------------------------------------------------------
 Copter 4.4.3-beta1 07-Nov-2023
 Changes from 4.4.2
@@ -1787,7 +1787,7 @@ Changes from 3.6.6-rc1
 ------------------------------------------------------------------
 Copter 3.6.6-rc1 02-Feb-2019
 Changes from 3.6.5
-1) AP_RSSI fixes and minor enhancements
+1) AG_RSSI fixes and minor enhancements
     a) RSSI pwm input driver for ChibiOS
     b) add V5 Nano to RSSI_ANA_PIN parameter description
 2) Bug fixes and minor enhancements
@@ -2455,7 +2455,7 @@ Changes from 3.4.0-rc1
     d) SingleCopter, CoaxCopter flag gains 
 10) Small enhancements:
     a) Rally points outside fence are ignored
-    b) AP_Button support added to allow ground station to see if user has pushed a button on the flight controller
+    b) AG_Button support added to allow ground station to see if user has pushed a button on the flight controller
     c) support for PLAY_TUNE and LED_CONTROL mavlink messages to cause vehicle to play tune or change colour of LED
     d) support for GPS_INPUT mavlink message to allow supplying vehicle position data from other sources
     e) NAV_DELAY mission command to delay start of mission (or individual command) until a specified absolute time
@@ -3304,7 +3304,7 @@ Improvements over 2.8.1:
 2) landing improvements [Leonard/Randy]
     LAND_SPEED - allows you to set the landing speed in cm/s
 3) camera related improvements:
-    a) AP_Relay enabled for APM2 and integrated with AP_Camera [Sandro Benigno]
+    a) AG_Relay enabled for APM2 and integrated with AG_Camera [Sandro Benigno]
     b) camera trigger with channel 7 switch or DO_DIGICAM_CONTROL mission command [Randy]
     c) allow yaw override by pilot or with CONDITIONAL_YAW command during missions [Randy]
         YAW_OVR_BEHAVE - Controls when autopilot takes back normal control of yaw after pilot overrides (0=after next wp, 1=never)

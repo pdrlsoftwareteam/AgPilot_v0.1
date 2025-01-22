@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_JSON_MASTER_ENABLED
 #define HAL_SIM_JSON_MASTER_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
@@ -27,8 +27,8 @@
 #if HAL_SIM_JSON_MASTER_ENABLED
 
 #include "SITL_Input.h"
-#include <AP_HAL/utility/Socket.h>
-#include <AP_Math/AP_Math.h>
+#include <AG_HAL/utility/Socket.h>
+#include <AG_Math/AG_Math.h>
 
 namespace SITL {
 

@@ -19,7 +19,7 @@ bootloader for a Pixhawk1, use:
  ./Tools/scripts/build_bootloaders.py Pixhawk1
 
 The config files for the builds of these bootloaders are in
-libraries/AP_HAL_ChibiOS/hwdef, in the files called hwdef-bl.dat
+libraries/AG_HAL_ChibiOS/hwdef, in the files called hwdef-bl.dat
 
 ## Old Bootloader details
 

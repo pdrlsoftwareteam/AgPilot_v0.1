@@ -99,10 +99,10 @@ void MS5611::check_conversion_accuracy(float P_Pa, float Temp_C, uint32_t D1, ui
     convert_forward(D1, D2, f_P_Pa, f_Temp_C);
 
     if (fabs(f_P_Pa - P_Pa) > 0.2) {
-        AP_HAL::panic("Invalid pressure conversion");
+        AG_HAL::panic("Invalid pressure conversion");
     }
     if (fabs(f_Temp_C - Temp_C) > 0.02) {
-        AP_HAL::panic("Invalid temperature conversion");
+        AG_HAL::panic("Invalid temperature conversion");
     }
 }
 
@@ -113,14 +113,14 @@ void MS5611::get_pressure_temperature_readings(float &P_Pa, float &Temp_C)
     float sim_alt = AP::sitl()->state.altitude;
     sim_alt += 2 * rand_float();
 
-    AP_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
     P_Pa = SSL_AIR_PRESSURE * delta;
 
     Temp_C = KELVIN_TO_C(SSL_AIR_TEMPERATURE * theta) + AP::sitl()->temp_board_offset;
 
-    // TO DO add in temperature adjustment by inheritting from AP_Baro_SITL_Generic?
-    // AP_Baro_SITL::temperature_adjustment(P_Pa, Temp_C);
+    // TO DO add in temperature adjustment by inheritting from AG_Baro_SITL_Generic?
+    // AG_Baro_SITL::temperature_adjustment(P_Pa, Temp_C);
 
-    // TO DO add in wind correction by inheritting from AP_Baro_SITL_Generic?
-    // P_Pa += AP_Baro_SITL::wind_pressure_correction(instance);
+    // TO DO add in wind correction by inheritting from AG_Baro_SITL_Generic?
+    // P_Pa += AG_Baro_SITL::wind_pressure_correction(instance);
 }

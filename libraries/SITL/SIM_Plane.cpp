@@ -86,8 +86,8 @@ Plane::Plane(const char *frame_str) :
         aerobatic = true;
         thrust_scale *= 1.5;
         // setup parameters for plane-3d
-        AP_Param::load_defaults_file("@ROMFS/models/plane.parm", false);
-        AP_Param::load_defaults_file("@ROMFS/models/plane-3d.parm", false);
+        AG_Param::load_defaults_file("@ROMFS/models/plane.parm", false);
+        AG_Param::load_defaults_file("@ROMFS/models/plane-3d.parm", false);
     }
     
     if (strstr(frame_str, "-ice")) {
@@ -346,7 +346,7 @@ void Plane::calculate_forces(const struct sitl_input &input, Vector3f &rot_accel
           simple simulation of a launcher
          */
         if (launch_triggered) {
-            uint64_t now = AP_HAL::millis64();
+            uint64_t now = AG_HAL::millis64();
             if (launch_start_ms == 0) {
                 launch_start_ms = now;
             }

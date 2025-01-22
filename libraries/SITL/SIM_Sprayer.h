@@ -19,7 +19,7 @@
 #pragma once
 
 #include "stdint.h"
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 #include "SITL_Input.h"
 
 namespace SITL {
@@ -27,7 +27,7 @@ namespace SITL {
 class Sprayer {
 public:
     Sprayer() {
-        AP_Param::setup_object_defaults(this, var_info);
+        AG_Param::setup_object_defaults(this, var_info);
     };
 
     // update sprayer state
@@ -35,7 +35,7 @@ public:
 
     float payload_mass() const { return static_cast<float>(capacity); }; // kg; water, so kg=l
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
     bool is_enabled() const {return static_cast<bool>(sprayer_enable);}
 
  private:

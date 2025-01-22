@@ -5,7 +5,7 @@
 #include "LR_MsgHandler.h"
 #include "Parameters.h"
 
-class LogReader : public AP_LoggerFileReader
+class LogReader : public AG_LoggerFileReader
 {
 public:
     LogReader(struct LogStructure *log_structure, NavEKF2 &_ekf, NavEKF3 &_ekf3);

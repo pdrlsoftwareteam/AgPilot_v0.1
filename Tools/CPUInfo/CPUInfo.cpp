@@ -7,10 +7,10 @@
 
 #include <cmath>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Common/AP_Common.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Common/AG_Common.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_ESC_Telem/AG_ESC_Telem.h>
 #include "EKF_Maths.h"
 
 #if HAL_WITH_DSP && CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
@@ -20,7 +20,7 @@
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 #if CONFIG_HAL_BOARD != HAL_BOARD_LINUX
 
@@ -40,7 +40,7 @@ static uint32_t sysclk = 0;
 static EKF_Maths ekf;
 
 HAL_Semaphore sem;
-AP_ESC_Telem telem;
+AG_ESC_Telem telem;
 
 void setup() {
 #ifdef DISABLE_CACHES
@@ -73,11 +73,11 @@ static void show_sizes(void)
 
 #define TIMEIT(name, op, count) do { \
     uint16_t us_end, us_start; \
-    us_start = AP_HAL::micros16(); \
+    us_start = AG_HAL::micros16(); \
     for (uint8_t i = 0; i < count; i++) { \
         FIFTYTIMES(op); \
     } \
-    us_end = AP_HAL::micros16(); \
+    us_end = AG_HAL::micros16(); \
     uint16_t dt_us = us_end - us_start; \
     hal.console->printf("%-10s %7.4f usec/call\n", name, double(dt_us) / double(count * 50.0)); \
     hal.scheduler->delay(10); \
@@ -100,18 +100,18 @@ volatile uint64_t v_out_64 = 1;
 static void show_timings(void)
 {
 
-    v_f = 1+(AP_HAL::micros() % 5);
-    v_out = 1+(AP_HAL::micros() % 3);
+    v_f = 1+(AG_HAL::micros() % 5);
+    v_out = 1+(AG_HAL::micros() % 3);
 
-    v_32 = AP_HAL::millis();
-    v_32 = 1+(AP_HAL::micros() % 5);
-    v_out_32 = 1+(AP_HAL::micros() % 3);
+    v_32 = AG_HAL::millis();
+    v_32 = 1+(AG_HAL::micros() % 5);
+    v_out_32 = 1+(AG_HAL::micros() % 3);
 
-    v_16 = 1+(AP_HAL::micros() % 5);
-    v_out_16 = 1+(AP_HAL::micros() % 3);
+    v_16 = 1+(AG_HAL::micros() % 5);
+    v_out_16 = 1+(AG_HAL::micros() % 3);
 
-    v_8 = 1+(AP_HAL::micros() % 5);
-    v_out_8 = 1+(AP_HAL::micros() % 3);
+    v_8 = 1+(AG_HAL::micros() % 5);
+    v_out_8 = 1+(AG_HAL::micros() % 3);
 
 
     hal.console->printf("Operation timings:\n");
@@ -119,11 +119,11 @@ static void show_timings(void)
 
     TIMEIT("nop", asm volatile("nop"::), 255);
 
-    TIMEIT("micros()", AP_HAL::micros(), 200);
-    TIMEIT("micros16()", AP_HAL::micros16(), 200);
-    TIMEIT("millis()", AP_HAL::millis(), 200);
-    TIMEIT("millis16()", AP_HAL::millis16(), 200);
-    TIMEIT("micros64()", AP_HAL::micros64(), 200);
+    TIMEIT("micros()", AG_HAL::micros(), 200);
+    TIMEIT("micros16()", AG_HAL::micros16(), 200);
+    TIMEIT("millis()", AG_HAL::millis(), 200);
+    TIMEIT("millis16()", AG_HAL::millis16(), 200);
+    TIMEIT("micros64()", AG_HAL::micros64(), 200);
 
     TIMEIT("fadd", v_out += v_f, 100);
     TIMEIT("fsub", v_out -= v_f, 100);
@@ -204,4 +204,4 @@ void loop() {}
 void setup() {}
 #endif
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

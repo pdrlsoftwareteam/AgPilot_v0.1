@@ -27,16 +27,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include "picojson.h"
-#include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
 
 // ignore cast errors in this case to keep complexity down
 #pragma GCC diagnostic ignored "-Wcast-align"
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #if APM_BUILD_TYPE(APM_BUILD_Heli)
 #define XPLANE_JSON "xplane_heli.json"
@@ -105,19 +105,19 @@ XPlane::XPlane(const char *frame_str) :
            (unsigned)bind_port, (unsigned)xplane_port);
 
     // XPlane sensor data is not good enough for EKF. Use fake EKF by default
-    AP_Param::set_default_by_name("AHRS_EKF_TYPE", 10);
-    AP_Param::set_default_by_name("GPS_TYPE", 100);
-    AP_Param::set_default_by_name("INS_GYR_CAL", 0);
+    AG_Param::set_default_by_name("AHRS_EKF_TYPE", 10);
+    AG_Param::set_default_by_name("GPS_TYPE", 100);
+    AG_Param::set_default_by_name("INS_GYR_CAL", 0);
 
 #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
     // default flaps to channel 5
-    AP_Param::set_default_by_name("SERVO5_FUNCTION", 3);
-    AP_Param::set_default_by_name("SERVO5_MIN", 1000);
-    AP_Param::set_default_by_name("SERVO5_MAX", 2000);
+    AG_Param::set_default_by_name("SERVO5_FUNCTION", 3);
+    AG_Param::set_default_by_name("SERVO5_MIN", 1000);
+    AG_Param::set_default_by_name("SERVO5_MAX", 2000);
 #endif
 
     if (!load_dref_map(XPLANE_JSON)) {
-        AP_HAL::panic("%s failed to load\n", XPLANE_JSON);
+        AG_HAL::panic("%s failed to load\n", XPLANE_JSON);
     }
 }
 
@@ -128,12 +128,12 @@ void XPlane::add_dref(const char *name, DRefType type, const picojson::value &dr
 {
     struct DRef *d = new struct DRef;
     if (d == nullptr) {
-        AP_HAL::panic("out of memory for DRef %s", name);
+        AG_HAL::panic("out of memory for DRef %s", name);
     }
     d->name = strdup(name);
     d->type = type;
     if (d->name == nullptr) {
-        AP_HAL::panic("out of memory for DRef %s", name);
+        AG_HAL::panic("out of memory for DRef %s", name);
     }
     if (d->type == DRefType::FIXED) {
         d->fixed_value = dref.get("value").get<double>();
@@ -154,7 +154,7 @@ void XPlane::add_joyinput(const char *label, JoyType type, const picojson::value
     if (strncmp(label, "axis", 4) == 0) {
         struct JoyInput *j = new struct JoyInput;
         if (j == nullptr) {
-            AP_HAL::panic("out of memory for JoyInput %s", label);
+            AG_HAL::panic("out of memory for JoyInput %s", label);
         }
         j->axis = atoi(label+4);
         j->type = JoyType::AXIS;
@@ -167,7 +167,7 @@ void XPlane::add_joyinput(const char *label, JoyType type, const picojson::value
     if (strncmp(label, "button", 6) == 0) {
         struct JoyInput *j = new struct JoyInput;
         if (j == nullptr) {
-            AP_HAL::panic("out of memory for JoyInput %s", label);
+            AG_HAL::panic("out of memory for JoyInput %s", label);
         }
         j->type = JoyType::BUTTON;
         j->channel = d.get("channel").get<double>();
@@ -340,7 +340,7 @@ bool XPlane::receive_data(void)
     Location loc {};
     Vector3d pos;
     uint32_t wait_time_ms = 1;
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     bool ret = false;
 
     // if we are about to get another frame from X-Plane then wait longer
@@ -552,7 +552,7 @@ bool XPlane::receive_data(void)
     if (now > last_data_time_ms && now - last_data_time_ms < 100) {
         xplane_frame_time = now - last_data_time_ms;
     }
-    last_data_time_ms = AP_HAL::millis();
+    last_data_time_ms = AG_HAL::millis();
 
     if (ret) {
         report.data_count++;
@@ -562,7 +562,7 @@ bool XPlane::receive_data(void)
     return ret;
         
 failed:
-    if (AP_HAL::millis() - last_data_time_ms > 200) {
+    if (AG_HAL::millis() - last_data_time_ms > 200) {
         // don't extrapolate beyond 0.2s
         return false;
     }
@@ -684,7 +684,7 @@ void XPlane::update(const struct sitl_input &input)
         send_drefs(input);
     }
 
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (report.last_report_ms == 0) {
         report.last_report_ms = now;
         request_drefs();

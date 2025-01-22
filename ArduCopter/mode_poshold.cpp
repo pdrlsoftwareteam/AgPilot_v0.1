@@ -153,7 +153,7 @@ void ModePosHold::run()
         break;
 
     case AltHold_Flying:
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
         // get avoidance adjusted climb rate
         target_climb_rate = get_avoidance_adjusted_climbrate(target_climb_rate);
@@ -168,7 +168,7 @@ void ModePosHold::run()
 
     // poshold specific behaviour to calculate desired roll, pitch angles
     // convert inertial nav earth-frame velocities to body-frame
-    // To-Do: move this to AP_Math (or perhaps we already have a function to do this)
+    // To-Do: move this to AG_Math (or perhaps we already have a function to do this)
     float vel_fw = vel.x*ahrs.cos_yaw() + vel.y*ahrs.sin_yaw();
     float vel_right = -vel.x*ahrs.sin_yaw() + vel.y*ahrs.cos_yaw();
 

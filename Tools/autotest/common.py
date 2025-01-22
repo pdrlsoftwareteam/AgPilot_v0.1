@@ -2678,7 +2678,7 @@ class AutoTest(ABC):
             linestate_within = 46
             linestate = linestate_none
             debug = False
-            if f == "/home/pbarker/rc/ardupilot/libraries/AP_HAL_ChibiOS/LogStructure.h":
+            if f == "/home/pbarker/rc/ardupilot/libraries/AG_HAL_ChibiOS/LogStructure.h":
                 debug = True
             for line in open(f).readlines():
                 if debug:
@@ -2855,7 +2855,7 @@ class AutoTest(ABC):
                     if not re.search("[.]cpp$", f):
                         continue
                     filepath = os.path.join(root, f)
-                    if "AP_Logger/examples" in filepath:
+                    if "AG_Logger/examples" in filepath:
                         # this is the sample file which contains examples...
                         continue
                     count = 0
@@ -7588,13 +7588,13 @@ Also, ignores heartbeats not from our target system'''
 
     # routines helpful for testing LUA scripting:
     def script_example_source_path(self, scriptname):
-        return os.path.join(self.rootdir(), "libraries", "AP_Scripting", "examples", scriptname)
+        return os.path.join(self.rootdir(), "libraries", "AG_Scripting", "examples", scriptname)
 
     def script_test_source_path(self, scriptname):
-        return os.path.join(self.rootdir(), "libraries", "AP_Scripting", "tests", scriptname)
+        return os.path.join(self.rootdir(), "libraries", "AG_Scripting", "tests", scriptname)
 
     def script_applet_source_path(self, scriptname):
-        return os.path.join(self.rootdir(), "libraries", "AP_Scripting", "applets", scriptname)
+        return os.path.join(self.rootdir(), "libraries", "AG_Scripting", "applets", scriptname)
 
     def installed_script_path(self, scriptname):
         return os.path.join("scripts", os.path.basename(scriptname))
@@ -10042,7 +10042,7 @@ Also, ignores heartbeats not from our target system'''
     def clear_fence(self):
         self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
 
-    # Sub does not instantiate AP_Stats.  Also see https://github.com/ArduPilot/ardupilot/issues/10247  # noqa
+    # Sub does not instantiate AG_Stats.  Also see https://github.com/ArduPilot/ardupilot/issues/10247  # noqa
     def ConfigErrorLoop(self):
         '''test the sensor config error loop works and that parameter sets are persistent'''
         parameter_name = "SERVO8_MIN"
@@ -12928,7 +12928,7 @@ switch value'''
             (5, "NMEA", 5, "NMEA"),
             (6, "SBP", None, "SBP"),
             # (7, "SBP2", 9, "SBP2"),  # broken, "waiting for config data"
-            (8, "NOVA", 15, "NOVA"),  # no attempt to auto-detect this in AP_GPS
+            (8, "NOVA", 15, "NOVA"),  # no attempt to auto-detect this in AG_GPS
             # (9, "FILE"),
         ]
         self.context_collect("STATUSTEXT")
@@ -12957,7 +12957,7 @@ switch value'''
         self.assert_message_rate_hz('GPS2_RAW', 0)
 
         # we start sending GPS_TYPE2 - but it will never actually be
-        # filled in as _port[1] is only filled in in AP_GPS::init()
+        # filled in as _port[1] is only filled in in AG_GPS::init()
         self.start_subtest("Get GPS2_RAW as soon as we're configured for a second GPS")
         self.set_parameter("GPS_TYPE2", 1)
         self.assert_message_rate_hz('GPS2_RAW', 5)
@@ -12974,7 +12974,7 @@ switch value'''
         # a reboot is required after setting GPS_TYPE2.  We start
         # sending GPS2_RAW out, once the parameter is set, but a
         # reboot is required because _port[1] is only set in
-        # AP_GPS::init() at boot time, so it will never be detected.
+        # AG_GPS::init() at boot time, so it will never be detected.
         self.context_collect("STATUSTEXT")
         self.reboot_sitl()
         self.wait_statustext("GPS 1: detected as u-blox", check_context=True)

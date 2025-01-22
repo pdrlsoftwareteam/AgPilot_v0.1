@@ -22,7 +22,7 @@
 
 #define DEFAULT_FRAME_CLASS 0
 
-const AP_Param::Info Copter::var_info[] = {
+const AG_Param::Info Copter::var_info[] = {
     // @Param: FORMAT_VERSION
     // @DisplayName: Eeprom format version number
     // @Description: This value is incremented when changes are made to the eeprom format
@@ -71,8 +71,8 @@ const AP_Param::Info Copter::var_info[] = {
     GSCALAR(throttle_behavior, "PILOT_THR_BHV", 0),
 
     // @Group: SERIAL
-    // @Path: ../libraries/AP_SerialManager/AP_SerialManager.cpp
-    GOBJECT(serial_manager, "SERIAL",   AP_SerialManager),
+    // @Path: ../libraries/AG_SerialManager/AG_SerialManager.cpp
+    GOBJECT(serial_manager, "SERIAL",   AG_SerialManager),
 
     // @Param: TELEM_DELAY
     // @DisplayName: Telemetry startup delay
@@ -331,8 +331,8 @@ const AP_Param::Info Copter::var_info[] = {
     GSCALAR(frame_type, "FRAME_TYPE", 1),
 
     // @Group: ARMING_
-    // @Path: ../libraries/AP_Arming/AP_Arming.cpp
-    GOBJECT(arming,                 "ARMING_", AP_Arming_Copter),
+    // @Path: ../libraries/AG_Arming/AG_Arming.cpp
+    GOBJECT(arming,                 "ARMING_", AG_Arming_Copter),
 
     // @Param: DISARM_DELAY
     // @DisplayName: Disarm delay
@@ -412,56 +412,56 @@ const AP_Param::Info Copter::var_info[] = {
 
 #if AP_CAMERA_ENABLED
     // @Group: CAM
-    // @Path: ../libraries/AP_Camera/AP_Camera.cpp
-    GOBJECT(camera, "CAM", AP_Camera),
+    // @Path: ../libraries/AG_Camera/AG_Camera.cpp
+    GOBJECT(camera, "CAM", AG_Camera),
 #endif
 
     // @Group: RELAY_
-    // @Path: ../libraries/AP_Relay/AP_Relay.cpp
-    GOBJECT(relay,                  "RELAY_", AP_Relay),
+    // @Path: ../libraries/AG_Relay/AG_Relay.cpp
+    GOBJECT(relay,                  "RELAY_", AG_Relay),
 
 #if PARACHUTE == ENABLED
     // @Group: CHUTE_
-    // @Path: ../libraries/AP_Parachute/AP_Parachute.cpp
-    GOBJECT(parachute, "CHUTE_", AP_Parachute),
+    // @Path: ../libraries/AG_Parachute/AG_Parachute.cpp
+    GOBJECT(parachute, "CHUTE_", AG_Parachute),
 #endif
 
 #if AP_LANDINGGEAR_ENABLED
     // @Group: LGR_
-    // @Path: ../libraries/AP_LandingGear/AP_LandingGear.cpp
-    GOBJECT(landinggear,    "LGR_", AP_LandingGear),
+    // @Path: ../libraries/AG_LandingGear/AG_LandingGear.cpp
+    GOBJECT(landinggear,    "LGR_", AG_LandingGear),
 #endif
 
     // @Group: COMPASS_
-    // @Path: ../libraries/AP_Compass/AP_Compass.cpp
+    // @Path: ../libraries/AG_Compass/AG_Compass.cpp
     GOBJECT(compass,        "COMPASS_", Compass),
 
     // @Group: INS
-    // @Path: ../libraries/AP_InertialSensor/AP_InertialSensor.cpp
-    GOBJECT(ins,            "INS", AP_InertialSensor),
+    // @Path: ../libraries/AG_InertialSensor/AG_InertialSensor.cpp
+    GOBJECT(ins,            "INS", AG_InertialSensor),
 
     // @Group: WPNAV_
-    // @Path: ../libraries/AC_WPNav/AC_WPNav.cpp
-    GOBJECTPTR(wp_nav, "WPNAV_",       AC_WPNav),
+    // @Path: ../libraries/AG_WPNav/AG_WPNav.cpp
+    GOBJECTPTR(wp_nav, "WPNAV_",       AG_WPNav),
 
     // @Group: LOIT_
-    // @Path: ../libraries/AC_WPNav/AC_Loiter.cpp
-    GOBJECTPTR(loiter_nav, "LOIT_", AC_Loiter),
+    // @Path: ../libraries/AG_WPNav/AG_Loiter.cpp
+    GOBJECTPTR(loiter_nav, "LOIT_", AG_Loiter),
 
 #if MODE_CIRCLE_ENABLED == ENABLED
     // @Group: CIRCLE_
-    // @Path: ../libraries/AC_WPNav/AC_Circle.cpp
-    GOBJECTPTR(circle_nav, "CIRCLE_",  AC_Circle),
+    // @Path: ../libraries/AG_WPNav/AG_Circle.cpp
+    GOBJECTPTR(circle_nav, "CIRCLE_",  AG_Circle),
 #endif
 
     // @Group: ATC_
-    // @Path: ../libraries/AC_AttitudeControl/AC_AttitudeControl.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
+    // @Path: ../libraries/AG_AttitudeControl/AG_AttitudeControl.cpp,../libraries/AG_AttitudeControl/AG_AttitudeControl_Multi.cpp,../libraries/AG_AttitudeControl/AG_AttitudeControl_Heli.cpp
 
-    GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_Multi),
+    GOBJECTPTR(attitude_control, "ATC_", AG_AttitudeControl_Multi),
 
     // @Group: PSC
-    // @Path: ../libraries/AC_AttitudeControl/AC_PosControl.cpp
-    GOBJECTPTR(pos_control, "PSC", AC_PosControl),
+    // @Path: ../libraries/AG_AttitudeControl/AG_PosControl.cpp
+    GOBJECTPTR(pos_control, "PSC", AG_PosControl),
 
     // @Group: SR0_
     // @Path: GCS_Mavlink.cpp
@@ -504,37 +504,37 @@ const AP_Param::Info Copter::var_info[] = {
 #endif
 
     // @Group: AHRS_
-    // @Path: ../libraries/AP_AHRS/AP_AHRS.cpp
-    GOBJECT(ahrs,                   "AHRS_",    AP_AHRS),
+    // @Path: ../libraries/AG_AHRS/AG_AHRS.cpp
+    GOBJECT(ahrs,                   "AHRS_",    AG_AHRS),
 
 #if HAL_MOUNT_ENABLED
     // @Group: MNT
-    // @Path: ../libraries/AP_Mount/AP_Mount.cpp
-    GOBJECT(camera_mount,           "MNT",  AP_Mount),
+    // @Path: ../libraries/AG_Mount/AG_Mount.cpp
+    GOBJECT(camera_mount,           "MNT",  AG_Mount),
 #endif
 
     // @Group: LOG
-    // @Path: ../libraries/AP_Logger/AP_Logger.cpp
-    GOBJECT(logger,           "LOG",  AP_Logger),
+    // @Path: ../libraries/AG_Logger/AG_Logger.cpp
+    GOBJECT(logger,           "LOG",  AG_Logger),
 
     // @Group: BATT
-    // @Path: ../libraries/AP_BattMonitor/AP_BattMonitor.cpp
-    GOBJECT(battery,                "BATT",         AP_BattMonitor),
+    // @Path: ../libraries/AG_BattMonitor/AG_BattMonitor.cpp
+    GOBJECT(battery,                "BATT",         AG_BattMonitor),
 
     // @Group: BRD_
-    // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
-    GOBJECT(BoardConfig,            "BRD_",       AP_BoardConfig),
+    // @Path: ../libraries/AG_BoardConfig/AG_BoardConfig.cpp
+    GOBJECT(BoardConfig,            "BRD_",       AG_BoardConfig),
 
 #if HAL_MAX_CAN_PROTOCOL_DRIVERS
     // @Group: CAN_
-    // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
-    GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
+    // @Path: ../libraries/AG_CANManager/AG_CANManager.cpp
+    GOBJECT(can_mgr,        "CAN_",       AG_CANManager),
 #endif
 
 #if HAL_SPRAYER_ENABLED
     // @Group: SPRAY_
-    // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
-    GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
+    // @Path: ../libraries/AG_Sprayer/AG_Sprayer.cpp
+    GOBJECT(sprayer,                "SPRAY_",       AG_Sprayer),
 #endif
 
 #if AP_SIM_ENABLED
@@ -544,114 +544,114 @@ const AP_Param::Info Copter::var_info[] = {
 #endif
 
     // @Group: BARO
-    // @Path: ../libraries/AP_Baro/AP_Baro.cpp
-    GOBJECT(barometer, "BARO", AP_Baro),
+    // @Path: ../libraries/AG_Baro/AG_Baro.cpp
+    GOBJECT(barometer, "BARO", AG_Baro),
 
     // GPS driver
     // @Group: GPS
-    // @Path: ../libraries/AP_GPS/AP_GPS.cpp
-    GOBJECT(gps, "GPS", AP_GPS),
+    // @Path: ../libraries/AG_GPS/AG_GPS.cpp
+    GOBJECT(gps, "GPS", AG_GPS),
 
     // @Group: SCHED_
-    // @Path: ../libraries/AP_Scheduler/AP_Scheduler.cpp
-    GOBJECT(scheduler, "SCHED_", AP_Scheduler),
+    // @Path: ../libraries/AG_Scheduler/AG_Scheduler.cpp
+    GOBJECT(scheduler, "SCHED_", AG_Scheduler),
 
     // @Group: AVOID_
-    // @Path: ../libraries/AC_Avoidance/AC_Avoid.cpp
+    // @Path: ../libraries/AG_Avoidance/AG_Avoid.cpp
 #if AC_AVOID_ENABLED == ENABLED
-    GOBJECT(avoid,      "AVOID_",   AC_Avoid),
+    GOBJECT(avoid,      "AVOID_",   AG_Avoid),
 #endif
 
 #if HAL_RALLY_ENABLED
     // @Group: RALLY_
-    // @Path: AP_Rally.cpp,../libraries/AP_Rally/AP_Rally.cpp
-    GOBJECT(rally,      "RALLY_",   AP_Rally_Copter),
+    // @Path: AG_Rally.cpp,../libraries/AG_Rally/AG_Rally.cpp
+    GOBJECT(rally,      "RALLY_",   AG_Rally_Copter),
 #endif
 
     // @Group: MOT_
-    // @Path: ../libraries/AP_Motors/AP_MotorsMulticopter.cpp
+    // @Path: ../libraries/AG_Motors/AG_MotorsMulticopter.cpp
     GOBJECTVARPTR(motors, "MOT_",      &copter.motors_var_info),
 
     // @Group: RCMAP_
-    // @Path: ../libraries/AP_RCMapper/AP_RCMapper.cpp
+    // @Path: ../libraries/AG_RCMapper/AG_RCMapper.cpp
     GOBJECT(rcmap, "RCMAP_",        RCMapper),
 
 #if HAL_NAVEKF2_AVAILABLE
     // @Group: EK2_
-    // @Path: ../libraries/AP_NavEKF2/AP_NavEKF2.cpp
+    // @Path: ../libraries/AG_NavEKF2/AG_NavEKF2.cpp
     GOBJECTN(ahrs.EKF2, NavEKF2, "EK2_", NavEKF2),
 #endif
 
 #if HAL_NAVEKF3_AVAILABLE
     // @Group: EK3_
-    // @Path: ../libraries/AP_NavEKF3/AP_NavEKF3.cpp
+    // @Path: ../libraries/AG_NavEKF3/AG_NavEKF3.cpp
     GOBJECTN(ahrs.EKF3, NavEKF3, "EK3_", NavEKF3),
 #endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     // @Group: MIS_
-    // @Path: ../libraries/AP_Mission/AP_Mission.cpp
-    GOBJECTN(mode_auto.mission, mission, "MIS_", AP_Mission),
+    // @Path: ../libraries/AG_Mission/AG_Mission.cpp
+    GOBJECTN(mode_auto.mission, mission, "MIS_", AG_Mission),
 #endif
 
     // @Group: RSSI_
-    // @Path: ../libraries/AP_RSSI/AP_RSSI.cpp
-    GOBJECT(rssi, "RSSI_",  AP_RSSI),
+    // @Path: ../libraries/AG_RSSI/AG_RSSI.cpp
+    GOBJECT(rssi, "RSSI_",  AG_RSSI),
     
 #if RANGEFINDER_ENABLED == ENABLED
     // @Group: RNGFND
-    // @Path: ../libraries/AP_RangeFinder/AP_RangeFinder.cpp
+    // @Path: ../libraries/AG_RangeFinder/AG_RangeFinder.cpp
     GOBJECT(rangefinder,   "RNGFND", RangeFinder),
 #endif
 
 #if AP_TERRAIN_AVAILABLE
     // @Group: TERRAIN_
-    // @Path: ../libraries/AP_Terrain/AP_Terrain.cpp
-    GOBJECT(terrain,                "TERRAIN_", AP_Terrain),
+    // @Path: ../libraries/AG_Terrain/AG_Terrain.cpp
+    GOBJECT(terrain,                "TERRAIN_", AG_Terrain),
 #endif
 
 #if AP_OPTICALFLOW_ENABLED
     // @Group: FLOW
-    // @Path: ../libraries/AP_OpticalFlow/AP_OpticalFlow.cpp
-    GOBJECT(optflow,   "FLOW", AP_OpticalFlow),
+    // @Path: ../libraries/AG_OpticalFlow/AG_OpticalFlow.cpp
+    GOBJECT(optflow,   "FLOW", AG_OpticalFlow),
 #endif
 
 #if PRECISION_LANDING == ENABLED
     // @Group: PLND_
-    // @Path: ../libraries/AC_PrecLand/AC_PrecLand.cpp
-    GOBJECT(precland, "PLND_", AC_PrecLand),
+    // @Path: ../libraries/AG_PrecLand/AG_PrecLand.cpp
+    GOBJECT(precland, "PLND_", AG_PrecLand),
 #endif
 
-#if AP_RPM_ENABLED
+#if AG_RPM_ENABLED
     // @Group: RPM
-    // @Path: ../libraries/AP_RPM/AP_RPM.cpp
-    GOBJECT(rpm_sensor, "RPM", AP_RPM),
+    // @Path: ../libraries/AG_RPM/AG_RPM.cpp
+    GOBJECT(rpm_sensor, "RPM", AG_RPM),
 #endif
 
 #if HAL_ADSB_ENABLED
     // @Group: ADSB_
-    // @Path: ../libraries/AP_ADSB/AP_ADSB.cpp
-    GOBJECT(adsb,                "ADSB_", AP_ADSB),
+    // @Path: ../libraries/AG_ADSB/AG_ADSB.cpp
+    GOBJECT(adsb,                "ADSB_", AG_ADSB),
 
     // @Group: AVD_
-    // @Path: ../libraries/AP_Avoidance/AP_Avoidance.cpp
-    GOBJECT(avoidance_adsb, "AVD_", AP_Avoidance_Copter),
+    // @Path: ../libraries/AGP_Avoidance/AGP_Avoidance.cpp
+    GOBJECT(avoidance_adsb, "AVD_", AGP_Avoidance_Copter),
 #endif
 
     // @Group: NTF_
-    // @Path: ../libraries/AP_Notify/AP_Notify.cpp
-    GOBJECT(notify, "NTF_",  AP_Notify),
+    // @Path: ../libraries/AG_Notify/AG_Notify.cpp
+    GOBJECT(notify, "NTF_",  AG_Notify),
 
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     // @Group: OSD
-    // @Path: ../libraries/AP_OSD/AP_OSD.cpp
-    GOBJECT(osd, "OSD", AP_OSD),
+    // @Path: ../libraries/AG_OSD/AG_OSD.cpp
+    GOBJECT(osd, "OSD", AG_OSD),
 #endif
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
     // @Group: CC
-    // @Path: ../libraries/AC_CustomControl/AC_CustomControl.cpp
-    GOBJECT(custom_control, "CC", AC_CustomControl),
+    // @Path: ../libraries/AG_CustomControl/AG_CustomControl.cpp
+    GOBJECT(custom_control, "CC", AG_CustomControl),
 #endif
 
     // @Group:
@@ -659,7 +659,7 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(g2, "",  ParametersG2),
 
     // @Group:
-    // @Path: ../libraries/AP_Vehicle/AP_Vehicle.cpp
+    // @Path: ../libraries/AG_Vehicle/AG_Vehicle.cpp
     PARAM_VEHICLE_INFO,
 
     AP_VAREND
@@ -668,7 +668,7 @@ const AP_Param::Info Copter::var_info[] = {
 /*
   2nd group of parameters
  */
-const AP_Param::GroupInfo ParametersG2::var_info[] = {
+const AG_Param::GroupInfo ParametersG2::var_info[] = {
 
     // @Param: WP_NAVALT_MIN
     // @DisplayName: Minimum navigation altitude
@@ -679,8 +679,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if HAL_BUTTON_ENABLED
     // @Group: BTN_
-    // @Path: ../libraries/AP_Button/AP_Button.cpp
-    AP_SUBGROUPPTR(button_ptr, "BTN_", 2, ParametersG2, AP_Button),
+    // @Path: ../libraries/AG_Button/AG_Button.cpp
+    AP_SUBGROUPPTR(button_ptr, "BTN_", 2, ParametersG2, AG_Button),
 #endif
 
     // @Param: GND_EFFECT_COMP
@@ -692,8 +692,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if ADVANCED_FAILSAFE == ENABLED
     // @Group: AFS_
-    // @Path: ../libraries/AP_AdvancedFailsafe/AP_AdvancedFailsafe.cpp
-    AP_SUBGROUPINFO(afs, "AFS_", 6, ParametersG2, AP_AdvancedFailsafe),
+    // @Path: ../libraries/AG_AdvancedFailsafe/AG_AdvancedFailsafe.cpp
+    AP_SUBGROUPINFO(afs, "AFS_", 6, ParametersG2, AG_AdvancedFailsafe),
 #endif
 
     // @Param: DEV_OPTIONS
@@ -705,14 +705,14 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if BEACON_ENABLED == ENABLED
     // @Group: BCN
-    // @Path: ../libraries/AP_Beacon/AP_Beacon.cpp
-    AP_SUBGROUPINFO(beacon, "BCN", 14, ParametersG2, AP_Beacon),
+    // @Path: ../libraries/AG_Beacon/AG_Beacon.cpp
+    AP_SUBGROUPINFO(beacon, "BCN", 14, ParametersG2, AG_Beacon),
 #endif
 
 #if HAL_PROXIMITY_ENABLED
     // @Group: PRX
-    // @Path: ../libraries/AP_Proximity/AP_Proximity.cpp
-    AP_SUBGROUPINFO(proximity, "PRX", 8, ParametersG2, AP_Proximity),
+    // @Path: ../libraries/AG_Proximity/AG_Proximity.cpp
+    AP_SUBGROUPINFO(proximity, "PRX", 8, ParametersG2, AG_Proximity),
 #endif
 
     // ACRO_Y_EXPO (9) moved to Command Model Class
@@ -726,14 +726,14 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if STATS_ENABLED == ENABLED
     // @Group: STAT
-    // @Path: ../libraries/AP_Stats/AP_Stats.cpp
-    AP_SUBGROUPINFO(stats, "STAT", 12, ParametersG2, AP_Stats),
+    // @Path: ../libraries/AG_Stats/AG_Stats.cpp
+    AP_SUBGROUPINFO(stats, "STAT", 12, ParametersG2, AG_Stats),
 #endif
 
 #if AP_GRIPPER_ENABLED
     // @Group: GRIP_
-    // @Path: ../libraries/AP_Gripper/AP_Gripper.cpp
-    AP_SUBGROUPINFO(gripper, "GRIP_", 13, ParametersG2, AP_Gripper),
+    // @Path: ../libraries/AG_Gripper/AG_Gripper.cpp
+    AP_SUBGROUPINFO(gripper, "GRIP_", 13, ParametersG2, AG_Gripper),
 #endif
 
     // @Param: FRAME_CLASS
@@ -752,11 +752,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: ../libraries/RC_Channel/RC_Channels_VarInfo.h
     AP_SUBGROUPINFO(rc_channels, "RC", 17, ParametersG2, RC_Channels_Copter),
 
-    // 18 was used by AP_VisualOdom
+    // 18 was used by AG_VisualOdom
 
     // @Group: TCAL
-    // @Path: ../libraries/AP_TempCalibration/AP_TempCalibration.cpp
-    AP_SUBGROUPINFO(temp_calibration, "TCAL", 19, ParametersG2, AP_TempCalibration),
+    // @Path: ../libraries/AG_TempCalibration/AG_TempCalibration.cpp
+    AP_SUBGROUPINFO(temp_calibration, "TCAL", 19, ParametersG2, AG_TempCalibration),
 
 #if TOY_MODE_ENABLED == ENABLED
     // @Group: TMODE
@@ -766,16 +766,16 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
     // @Group: SRTL_
-    // @Path: ../libraries/AP_SmartRTL/AP_SmartRTL.cpp
-    AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AP_SmartRTL),
+    // @Path: ../libraries/AG_SmartRTL/AG_SmartRTL.cpp
+    AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AG_SmartRTL),
 #endif
 
 #if AP_WINCH_ENABLED
-    // 22 was AP_WheelEncoder
+    // 22 was AG_WheelEncoder
 
     // @Group: WINCH
-    // @Path: ../libraries/AP_Winch/AP_Winch.cpp
-    AP_SUBGROUPINFO(winch, "WINCH", 23, ParametersG2, AP_Winch),
+    // @Path: ../libraries/AG_Winch/AG_Winch.cpp
+    AP_SUBGROUPINFO(winch, "WINCH", 23, ParametersG2, AG_Winch),
 #endif
 
     // @Param: PILOT_SPEED_DN
@@ -804,8 +804,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if AP_SCRIPTING_ENABLED
     // @Group: SCR_
-    // @Path: ../libraries/AP_Scripting/AP_Scripting.cpp
-    AP_SUBGROUPINFO(scripting, "SCR_", 30, ParametersG2, AP_Scripting),
+    // @Path: ../libraries/AG_Scripting/AG_Scripting.cpp
+    AP_SUBGROUPINFO(scripting, "SCR_", 30, ParametersG2, AG_Scripting),
 #endif
 
     // @Param: TUNE_MIN
@@ -822,8 +822,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
     // @Group: OA_
-    // @Path: ../libraries/AC_Avoidance/AP_OAPathPlanner.cpp
-    AP_SUBGROUPINFO(oa, "OA_", 33, ParametersG2, AP_OAPathPlanner),
+    // @Path: ../libraries/AG_Avoidance/AG_OAGathPlanner.cpp
+    AP_SUBGROUPINFO(oa, "OA_", 33, ParametersG2, AG_OAGathPlanner),
 #endif
 
 #if MODE_SYSTEMID_ENABLED == ENABLED
@@ -849,8 +849,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     // @Group: AROT_
-    // @Path: ../libraries/AC_Autorotation/AC_Autorotation.cpp
-    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
+    // @Path: ../libraries/AG_Autorotation/AG_Autorotation.cpp
+    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AG_Autorotation),
 #endif
 
 #if MODE_ZIGZAG_ENABLED == ENABLED
@@ -970,7 +970,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Increment: 0.01
     // @Values: 0.5:Very Soft, 0.2:Soft, 0.15:Medium, 0.1:Crisp, 0.05:Very Crisp
     // @User: Standard
-    AP_SUBGROUPINFO(command_model_pilot, "PILOT_Y_", 56, ParametersG2, AC_CommandModel),
+    AP_SUBGROUPINFO(command_model_pilot, "PILOT_Y_", 56, ParametersG2, AG_CommandModel),
 
     // @Param: TKOFF_SLEW_TIME
     // @DisplayName: Slew time of throttle during take-off
@@ -1015,7 +1015,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 /*
   extension to g2 parameters
  */
-const AP_Param::GroupInfo ParametersG2::var_info2[] = {
+const AG_Param::GroupInfo ParametersG2::var_info2[] = {
 
     // @Param: PLDP_THRESH
     // @DisplayName: Payload Place thrust ratio threshold
@@ -1093,8 +1093,8 @@ ParametersG2::ParametersG2(void)
 
     ,command_model_pilot(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
 {
-    AP_Param::setup_object_defaults(this, var_info);
-    AP_Param::setup_object_defaults(this, var_info2);
+    AG_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info2);
 }
 
 /*
@@ -1110,7 +1110,7 @@ ParametersG2::ParametersG2(void)
   The second column below is the index in the var_info[] table for the
   old object. This should be zero for top level parameters.
  */
-const AP_Param::ConversionInfo conversion_table[] = {
+const AG_Param::ConversionInfo conversion_table[] = {
     // PARAMETER_CONVERSION - Added: Oct-2014
     { Parameters::k_param_log_bitmask_old,    0,      AP_PARAM_INT16, "LOG_BITMASK" },
     // PARAMETER_CONVERSION - Added: Jan-2015
@@ -1148,7 +1148,7 @@ void Copter::load_parameters(void)
         // erase all parameters
         DEV_PRINTF("Firmware change: erasing EEPROM...\n");
         StorageManager::erase();
-        AP_Param::erase_all();
+        AG_Param::erase_all();
 
         // save the current format version
         g.format_version.set_and_save(Parameters::k_format_version);
@@ -1158,8 +1158,8 @@ void Copter::load_parameters(void)
 
     uint32_t before = micros();
     // Load all auto-loaded EEPROM variables
-    AP_Param::load_all();
-    AP_Param::convert_old_parameters(&conversion_table[0], ARRAY_SIZE(conversion_table));
+    AG_Param::load_all();
+    AG_Param::convert_old_parameters(&conversion_table[0], ARRAY_SIZE(conversion_table));
 
 #if AP_LANDINGGEAR_ENABLED
     // convert landing gear parameters
@@ -1174,13 +1174,13 @@ void Copter::load_parameters(void)
 
     // PARAMETER_CONVERSION - Added: Mar-2022
 #if AP_FENCE_ENABLED
-    AP_Param::convert_class(g.k_param_fence_old, &fence, fence.var_info, 0, 0, true);
+    AG_Param::convert_class(g.k_param_fence_old, &fence, fence.var_info, 0, 0, true);
 #endif
 
     hal.console->printf("load_all took %uus\n", (unsigned)(micros() - before));
 
-    // setup AP_Param frame type flags
-    AP_Param::set_frame_type_flags(AP_PARAM_FRAME_COPTER);
+    // setup AG_Param frame type flags
+    AG_Param::set_frame_type_flags(AP_PARAM_FRAME_COPTER);
 
 }
 
@@ -1188,7 +1188,7 @@ void Copter::load_parameters(void)
 void Copter::convert_pid_parameters(void)
 {
     // conversion info
-    const AP_Param::ConversionInfo pid_conversion_info[] = {
+    const AG_Param::ConversionInfo pid_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Apr-2016
         { Parameters::k_param_pid_rate_roll, 0, AP_PARAM_FLOAT, "ATC_RAT_RLL_P" },
         { Parameters::k_param_pid_rate_roll, 1, AP_PARAM_FLOAT, "ATC_RAT_RLL_I" },
@@ -1200,14 +1200,14 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_pid_rate_yaw, 1, AP_PARAM_FLOAT, "ATC_RAT_YAW_I" },
         { Parameters::k_param_pid_rate_yaw, 2, AP_PARAM_FLOAT, "ATC_RAT_YAW_D" },
     };
-    const AP_Param::ConversionInfo imax_conversion_info[] = {
+    const AG_Param::ConversionInfo imax_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Apr-2016
         { Parameters::k_param_pid_rate_roll,  5, AP_PARAM_FLOAT, "ATC_RAT_RLL_IMAX" },
         { Parameters::k_param_pid_rate_pitch, 5, AP_PARAM_FLOAT, "ATC_RAT_PIT_IMAX" },
         { Parameters::k_param_pid_rate_yaw,   5, AP_PARAM_FLOAT, "ATC_RAT_YAW_IMAX" },
     };
     // conversion from Copter-3.3 to Copter-3.4
-    const AP_Param::ConversionInfo angle_and_filt_conversion_info[] = {
+    const AG_Param::ConversionInfo angle_and_filt_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: May-2016
         { Parameters::k_param_p_stabilize_roll, 0, AP_PARAM_FLOAT, "ATC_ANG_RLL_P" },
         { Parameters::k_param_p_stabilize_pitch, 0, AP_PARAM_FLOAT, "ATC_ANG_PIT_P" },
@@ -1234,12 +1234,12 @@ void Copter::convert_pid_parameters(void)
         { Parameters::k_param_p_alt_hold, 0, AP_PARAM_FLOAT, "PSC_POSZ_P" },
         { Parameters::k_param_p_pos_xy, 0, AP_PARAM_FLOAT, "PSC_POSXY_P" },
     };
-    const AP_Param::ConversionInfo throttle_conversion_info[] = {
+    const AG_Param::ConversionInfo throttle_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Jun-2016
         { Parameters::k_param_throttle_min, 0, AP_PARAM_FLOAT, "MOT_SPIN_MIN" },
         { Parameters::k_param_throttle_mid, 0, AP_PARAM_FLOAT, "MOT_THST_HOVER" }
     };
-    const AP_Param::ConversionInfo loiter_conversion_info[] = {
+    const AG_Param::ConversionInfo loiter_conversion_info[] = {
         // PARAMETER_CONVERSION - Added: Apr-2018
         { Parameters::k_param_wp_nav, 4, AP_PARAM_FLOAT, "LOIT_SPEED" },
         { Parameters::k_param_wp_nav, 7, AP_PARAM_FLOAT, "LOIT_BRK_JERK" },
@@ -1253,42 +1253,42 @@ void Copter::convert_pid_parameters(void)
     float pid_scaler = 1.27f;
 
     // Multicopter x-frame gains are 40% lower because -1 or +1 input to motors now results in maximum rotation
-    if (g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_X || g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_V || g.frame_type == AP_Motors::MOTOR_FRAME_TYPE_H) {
+    if (g.frame_type == AG_Motors::MOTOR_FRAME_TYPE_X || g.frame_type == AG_Motors::MOTOR_FRAME_TYPE_V || g.frame_type == AG_Motors::MOTOR_FRAME_TYPE_H) {
         pid_scaler = 0.9f;
     }
 
     // scale PID gains
     for (const auto &info : pid_conversion_info) {
-        AP_Param::convert_old_parameter(&info, pid_scaler);
+        AG_Param::convert_old_parameter(&info, pid_scaler);
     }
     // reduce IMAX into -1 ~ +1 range
     for (const auto &info : imax_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0f/4500.0f);
+        AG_Param::convert_old_parameter(&info, 1.0f/4500.0f);
     }
     // convert angle controller gain and filter without scaling
     for (const auto &info : angle_and_filt_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0f);
+        AG_Param::convert_old_parameter(&info, 1.0f);
     }
     // convert throttle parameters (multicopter only)
     for (const auto &info : throttle_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 0.001f);
+        AG_Param::convert_old_parameter(&info, 0.001f);
     }
     // convert RC_FEEL_RP to ATC_INPUT_TC
     // PARAMETER_CONVERSION - Added: Mar-2018
-    const AP_Param::ConversionInfo rc_feel_rp_conversion_info = { Parameters::k_param_rc_feel_rp, 0, AP_PARAM_INT8, "ATC_INPUT_TC" };
+    const AG_Param::ConversionInfo rc_feel_rp_conversion_info = { Parameters::k_param_rc_feel_rp, 0, AP_PARAM_INT8, "ATC_INPUT_TC" };
     AP_Int8 rc_feel_rp_old;
-    if (AP_Param::find_old_parameter(&rc_feel_rp_conversion_info, &rc_feel_rp_old)) {
-        AP_Param::set_default_by_name(rc_feel_rp_conversion_info.new_name, (1.0f / (2.0f + rc_feel_rp_old.get() * 0.1f)));
+    if (AG_Param::find_old_parameter(&rc_feel_rp_conversion_info, &rc_feel_rp_old)) {
+        AG_Param::set_default_by_name(rc_feel_rp_conversion_info.new_name, (1.0f / (2.0f + rc_feel_rp_old.get() * 0.1f)));
     }
     // convert loiter parameters
     for (const auto &info : loiter_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0f);
+        AG_Param::convert_old_parameter(&info, 1.0f);
     }
 
 
     // attitude and position control filter parameter changes (from _FILT to FLTD, FLTE, FLTT) for Copter-4.0
     // magic numbers shown below are discovered by setting AP_PARAM_KEY_DUMP = 1
-    const AP_Param::ConversionInfo ff_and_filt_conversion_info[] = {
+    const AG_Param::ConversionInfo ff_and_filt_conversion_info[] = {
         // multicopters move ATC_RAT_RLL/PIT_FILT to FLTD & FLTT, ATC_RAT_YAW_FILT to FLTE
         { Parameters::k_param_attitude_control, 385, AP_PARAM_FLOAT, "ATC_RAT_RLL_FLTD" },
         // PARAMETER_CONVERSION - Added: Oct-2019
@@ -1305,21 +1305,21 @@ void Copter::convert_pid_parameters(void)
         // PARAMETER_CONVERSION - Added: Oct-2019
         { Parameters::k_param_pos_control, 388, AP_PARAM_FLOAT, "PSC_ACCZ_FLTE" },
     };
-    AP_Param::convert_old_parameters(&ff_and_filt_conversion_info[0], ARRAY_SIZE(ff_and_filt_conversion_info));
+    AG_Param::convert_old_parameters(&ff_and_filt_conversion_info[0], ARRAY_SIZE(ff_and_filt_conversion_info));
 
 #if HAL_INS_NUM_HARMONIC_NOTCH_FILTERS > 1
     if (!ins.harmonic_notches[1].params.enabled()) {
         // notch filter parameter conversions (moved to INS_HNTC2) for 4.2.x, converted from fixed notch
-        const AP_Param::ConversionInfo notchfilt_conversion_info[] {
+        const AG_Param::ConversionInfo notchfilt_conversion_info[] {
             // PARAMETER_CONVERSION - Added: Apr 2022
             { Parameters::k_param_ins, 101, AP_PARAM_INT8,  "INS_HNTC2_ENABLE" },
             { Parameters::k_param_ins, 293, AP_PARAM_FLOAT, "INS_HNTC2_ATT" },
             { Parameters::k_param_ins, 357, AP_PARAM_FLOAT, "INS_HNTC2_FREQ" },
             { Parameters::k_param_ins, 421, AP_PARAM_FLOAT, "INS_HNTC2_BW" },
         };
-        AP_Param::convert_old_parameters(&notchfilt_conversion_info[0], ARRAY_SIZE(notchfilt_conversion_info));
-        AP_Param::set_default_by_name("INS_HNTC2_MODE", 0);
-        AP_Param::set_default_by_name("INS_HNTC2_HMNCS", 1);
+        AG_Param::convert_old_parameters(&notchfilt_conversion_info[0], ARRAY_SIZE(notchfilt_conversion_info));
+        AG_Param::set_default_by_name("INS_HNTC2_MODE", 0);
+        AG_Param::set_default_by_name("INS_HNTC2_HMNCS", 1);
     }
 #endif
 
@@ -1333,7 +1333,7 @@ void Copter::convert_prx_parameters()
 {
     // convert PRX to PRX1_ parameters for Copter-4.3
     // PARAMETER_CONVERSION - Added: Aug-2022
-    const AP_Param::ConversionInfo prx_conversion_info[] = {
+    const AG_Param::ConversionInfo prx_conversion_info[] = {
         { Parameters::k_param_g2, 72, AP_PARAM_INT8, "PRX1_TYPE" },
         { Parameters::k_param_g2, 136, AP_PARAM_INT8, "PRX1_ORIENT" },
         { Parameters::k_param_g2, 200, AP_PARAM_INT16, "PRX1_YAW_CORR" },
@@ -1349,7 +1349,7 @@ void Copter::convert_prx_parameters()
         { Parameters::k_param_g2, 1288, AP_PARAM_FLOAT, "PRX1_MAX" },
     };
     for (const auto &info : prx_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0);
+        AG_Param::convert_old_parameter(&info, 1.0);
     }
 }
 #endif
@@ -1377,16 +1377,16 @@ void Copter::convert_lgr_parameters(void)
     enum ap_var_type ptype;
     // get pointers to the servo min, max and trim parameters
     snprintf(pname, sizeof(pname), "SERVO%u_MIN", chan);
-    servo_min = (AP_Int16 *)AP_Param::find(pname, &ptype);
+    servo_min = (AP_Int16 *)AG_Param::find(pname, &ptype);
 
     snprintf(pname, sizeof(pname), "SERVO%u_MAX", chan);
-    servo_max = (AP_Int16 *)AP_Param::find(pname, &ptype);
+    servo_max = (AP_Int16 *)AG_Param::find(pname, &ptype);
 
     snprintf(pname, sizeof(pname), "SERVO%u_TRIM", chan);
-    servo_trim = (AP_Int16 *)AP_Param::find(pname, &ptype);
+    servo_trim = (AP_Int16 *)AG_Param::find(pname, &ptype);
 
     snprintf(pname, sizeof(pname), "SERVO%u_REVERSED", chan & 0x3F); // Only use the 6 LSBs, avoids a cpp warning
-    servo_reversed = (AP_Int16 *)AP_Param::find(pname, &ptype);
+    servo_reversed = (AP_Int16 *)AG_Param::find(pname, &ptype);
 
     if (!servo_min || !servo_max || !servo_trim || !servo_reversed) {
         // this shouldn't happen
@@ -1403,12 +1403,12 @@ void Copter::convert_lgr_parameters(void)
     // get the old PWM values
     AP_Int16 old_pwm;
     uint16_t old_retract=0, old_deploy=0;
-    const AP_Param::ConversionInfo cinfo_ret { Parameters::k_param_landinggear, 0, AP_PARAM_INT16, nullptr };
-    const AP_Param::ConversionInfo cinfo_dep { Parameters::k_param_landinggear, 1, AP_PARAM_INT16, nullptr };
-    if (AP_Param::find_old_parameter(&cinfo_ret, &old_pwm)) {
+    const AG_Param::ConversionInfo cinfo_ret { Parameters::k_param_landinggear, 0, AP_PARAM_INT16, nullptr };
+    const AG_Param::ConversionInfo cinfo_dep { Parameters::k_param_landinggear, 1, AP_PARAM_INT16, nullptr };
+    if (AG_Param::find_old_parameter(&cinfo_ret, &old_pwm)) {
         old_retract = (uint16_t)old_pwm.get();
     }
-    if (AP_Param::find_old_parameter(&cinfo_dep, &old_pwm)) {
+    if (AG_Param::find_old_parameter(&cinfo_dep, &old_pwm)) {
         old_deploy = (uint16_t)old_pwm.get();
     }
 

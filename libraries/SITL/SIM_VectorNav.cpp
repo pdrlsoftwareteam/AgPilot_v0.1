@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <AP_Common/NMEA.h>
+#include <AG_Common/NMEA.h>
 
 using namespace SITL;
 
@@ -66,7 +66,7 @@ struct PACKED VN_packet2 {
  */
 static void simulation_timeval(struct timeval *tv)
 {
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     static uint64_t first_usec;
     static struct timeval first_tv;
     if (first_usec == 0) {
@@ -95,7 +95,7 @@ void VectorNav::send_packet1(void)
     pkt.uncompAngRate[2] = radians(fdm.yawRate + gyro_noise * rand_float());
 
     float sigma, delta, theta;
-    AP_Baro::SimpleAtmosphere(fdm.altitude * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(fdm.altitude * 0.001f, sigma, delta, theta);
     pkt.pressure = SSL_AIR_PRESSURE * delta * 0.001 + rand_float() * 0.01;
 
     pkt.mag[0] = fdm.bodyMagField.x*0.001;
@@ -202,7 +202,7 @@ void VectorNav::update(void)
         return;
     }
 
-    uint32_t now = AP_HAL::micros();
+    uint32_t now = AG_HAL::micros();
     if (now - last_pkt1_us >= 20000) {
         last_pkt1_us = now;
         send_packet1();

@@ -3,8 +3,8 @@
 /*
   data structure for measuring speed of EKF mag fusion code
  */
-#include <AP_Math/AP_Math.h>
-#include <AP_Math/ftype.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Math/ftype.h>
 #include <stdint.h>
 
 class EKF_Maths {

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_WEBOTSPYTHON_ENABLED
 #define HAL_SIM_WEBOTSPYTHON_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
@@ -27,7 +27,7 @@
 #if HAL_SIM_WEBOTSPYTHON_ENABLED
 
 #include "SIM_Aircraft.h"
-#include <AP_HAL/utility/Socket.h>
+#include <AG_HAL/utility/Socket.h>
 
 namespace SITL {
 

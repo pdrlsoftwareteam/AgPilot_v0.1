@@ -1,5 +1,5 @@
 #include "DataFlashFileReader.h"
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 
 #include <fcntl.h>
 #include <string.h>
@@ -13,15 +13,15 @@
 #define PRIu64 "llu"
 #endif
 
-AP_LoggerFileReader::AP_LoggerFileReader()
+AG_LoggerFileReader::AG_LoggerFileReader()
 {}
 
-AP_LoggerFileReader::~AP_LoggerFileReader()
+AG_LoggerFileReader::~AG_LoggerFileReader()
 {
     ::printf("Replay counts: %" PRIu64 " bytes  %u entries\n", bytes_read, message_count);
 }
 
-bool AP_LoggerFileReader::open_log(const char *logfile)
+bool AG_LoggerFileReader::open_log(const char *logfile)
 {
     fd = AP::FS().open(logfile, O_RDONLY);
     if (fd == -1) {
@@ -30,14 +30,14 @@ bool AP_LoggerFileReader::open_log(const char *logfile)
     return true;
 }
 
-ssize_t AP_LoggerFileReader::read_input(void *buffer, const size_t count)
+ssize_t AG_LoggerFileReader::read_input(void *buffer, const size_t count)
 {
     uint64_t ret = AP::FS().read(fd, buffer, count);
     bytes_read += ret;
     return ret;
 }
 
-void AP_LoggerFileReader::format_type(uint16_t type, char dest[5])
+void AG_LoggerFileReader::format_type(uint16_t type, char dest[5])
 {
     const struct log_Format &f = formats[type];
     memset(dest,0,5);
@@ -46,12 +46,12 @@ void AP_LoggerFileReader::format_type(uint16_t type, char dest[5])
     }
     strncpy(dest, f.name, 4);
 }
-void AP_LoggerFileReader::get_packet_counts(uint64_t dest[])
+void AG_LoggerFileReader::get_packet_counts(uint64_t dest[])
 {
     memcpy(dest, packet_counts, sizeof(packet_counts));
 }
 
-bool AP_LoggerFileReader::update()
+bool AG_LoggerFileReader::update()
 {
     uint8_t hdr[3];
     if (read_input(hdr, 3) != 3) {
@@ -65,7 +65,7 @@ bool AP_LoggerFileReader::update()
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
     // running on stm32 is slow enough it is nice to see progress
     if (message_count % 500 == 0) {
-        ::printf("line %u pkt 0x%02x t=%u\n", message_count, hdr[2], AP_HAL::millis());
+        ::printf("line %u pkt 0x%02x t=%u\n", message_count, hdr[2], AG_HAL::millis());
     }
 #endif
     packet_counts[hdr[2]]++;

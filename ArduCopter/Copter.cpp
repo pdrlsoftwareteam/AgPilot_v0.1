@@ -80,10 +80,10 @@
 #include "version.h"
 #undef FORCE_VERSION_H_INCLUDE
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
-AP_KEYSTORE *keyStore = AP_KEYSTORE::getInstance();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
+AG_KEYSTORE *keyStore = AG_KEYSTORE::getInstance();
 AP_PDRL_Logger *pdrl_logger = AP_PDRL_Logger::getInstance();
-AP_LIBNPNT *libnpnt = AP_LIBNPNT::getInstance();
+AG_LIBNPNT *libnpnt = AG_LIBNPNT::getInstance();
 
 #define SCHED_TASK(func, _interval_ticks, _max_time_micros, _prio) SCHED_TASK_CLASS(Copter, &copter, func, _interval_ticks, _max_time_micros, _prio)
 #define FAST_TASK(func) FAST_TASK_CLASS(Copter, &copter, func)
@@ -93,7 +93,7 @@ AP_LIBNPNT *libnpnt = AP_LIBNPNT::getInstance();
 
   All entries in this table must be ordered by priority.
 
-  This table is interleaved with the table in AP_Vehicle to determine
+  This table is interleaved with the table in AG_Vehicle to determine
   the order in which tasks are run.  Convenience methods SCHED_TASK
   and SCHED_TASK_CLASS are provided to build entries in this structure:
 
@@ -112,9 +112,9 @@ SCHED_TASK_CLASS arguments:
  - priority (0 through 255, lower number meaning higher priority)
 
  */
-const AP_Scheduler::Task Copter::scheduler_tasks[] = {
+const AG_Scheduler::Task Copter::scheduler_tasks[] = {
     // update INS immediately to get current gyro data populated
-    FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update),
+    FAST_TASK_CLASS(AG_InertialSensor, &copter.ins, update),
     // run low level rate controllers that only require IMU data
     FAST_TASK(run_rate_controller),
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
@@ -138,15 +138,15 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     FAST_TASK(update_rangefinder_terrain_offset),
 #if HAL_MOUNT_ENABLED
     // camera mount's fast update
-    FAST_TASK_CLASS(AP_Mount, &copter.camera_mount, update_fast),
+    FAST_TASK_CLASS(AG_Mount, &copter.camera_mount, update_fast),
 #endif
     FAST_TASK(Log_Video_Stabilisation),
 
     SCHED_TASK(rc_loop,              250,    130,  3),
     SCHED_TASK(throttle_loop,         50,     75,  6),
-    SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
+    SCHED_TASK_CLASS(AG_GPS,               &copter.gps,                 update,          50, 200,   9),
 #if AP_OPTICALFLOW_ENABLED
-    SCHED_TASK_CLASS(AP_OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
+    SCHED_TASK_CLASS(AG_OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
     SCHED_TASK(update_batt_compass,   10,    120, 15),
     SCHED_TASK_CLASS(RC_Channels, (RC_Channels*)&copter.g2.rc_channels, read_aux_all,    10,  50,  18),
@@ -160,10 +160,10 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(read_rangefinder,      20,    100,  33),
 #endif
 #if HAL_PROXIMITY_ENABLED
-    SCHED_TASK_CLASS(AP_Proximity,         &copter.g2.proximity,        update,         200,  50,  36),
+    SCHED_TASK_CLASS(AG_Proximity,         &copter.g2.proximity,        update,         200,  50,  36),
 #endif
 #if BEACON_ENABLED == ENABLED
-    SCHED_TASK_CLASS(AP_Beacon,            &copter.g2.beacon,           update,         400,  50,  39),
+    SCHED_TASK_CLASS(AG_Beacon,            &copter.g2.beacon,           update,         400,  50,  39),
 #endif
     SCHED_TASK(update_altitude,       10,    100,  42),
     SCHED_TASK(run_nav_updates,       50,    100,  45),
@@ -172,18 +172,18 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(ModeSmartRTL,         &copter.mode_smartrtl,       save_position,    3, 100,  51),
 #endif
 #if HAL_SPRAYER_ENABLED
-    SCHED_TASK_CLASS(AC_Sprayer,           &copter.sprayer,               update,         3,  90,  54),
+    SCHED_TASK_CLASS(AG_Sprayer,           &copter.sprayer,               update,         3,  90,  54),
 #endif
     SCHED_TASK(three_hz_loop,          3,     75, 57),
-    SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,  75,  60),
-    SCHED_TASK_CLASS(AP_Baro,              &copter.barometer,             accumulate,    50,  90,  63),
+    SCHED_TASK_CLASS(AG_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,  75,  60),
+    SCHED_TASK_CLASS(AG_Baro,              &copter.barometer,             accumulate,    50,  90,  63),
 #if PRECISION_LANDING == ENABLED
     SCHED_TASK(update_precland,      400,     50,  69),
 #endif
 #if LOGGING_ENABLED == ENABLED
     SCHED_TASK(loop_rate_logging, LOOP_RATE,    50,  75),
 #endif
-    SCHED_TASK_CLASS(AP_Notify,            &copter.notify,              update,          50,  90,  78),
+    SCHED_TASK_CLASS(AG_Notify,            &copter.notify,              update,          50,  90,  78),
     SCHED_TASK(one_hz_loop,            1,    100,  81),
     SCHED_TASK(ekf_check,             10,     75,  84),
     SCHED_TASK(check_vibration,       10,     50,  87),
@@ -197,23 +197,23 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_receive, 400, 180, 102),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_send,    400, 550, 105),
 #if HAL_MOUNT_ENABLED
-    SCHED_TASK_CLASS(AP_Mount,             &copter.camera_mount,        update,          50,  75, 108),
+    SCHED_TASK_CLASS(AG_Mount,             &copter.camera_mount,        update,          50,  75, 108),
 #endif
 #if AP_CAMERA_ENABLED
-    SCHED_TASK_CLASS(AP_Camera,            &copter.camera,              update,          50,  75, 111),
+    SCHED_TASK_CLASS(AG_Camera,            &copter.camera,              update,          50,  75, 111),
 #endif
 #if LOGGING_ENABLED == ENABLED
     SCHED_TASK(ten_hz_logging_loop,   10,    350, 114),
     SCHED_TASK(twentyfive_hz_logging, 25,    110, 117),
-    SCHED_TASK_CLASS(AP_Logger,            &copter.logger,              periodic_tasks, 400, 300, 120),
+    SCHED_TASK_CLASS(AG_Logger,            &copter.logger,              periodic_tasks, 400, 300, 120),
 #endif
-    SCHED_TASK_CLASS(AP_InertialSensor,    &copter.ins,                 periodic,       400,  50, 123),
+    SCHED_TASK_CLASS(AG_InertialSensor,    &copter.ins,                 periodic,       400,  50, 123),
 
-    SCHED_TASK_CLASS(AP_Scheduler,         &copter.scheduler,           update_logging, 0.1,  75, 126),
-#if AP_RPM_ENABLED
-    SCHED_TASK_CLASS(AP_RPM,               &copter.rpm_sensor,          update,          40, 200, 129),
+    SCHED_TASK_CLASS(AG_Scheduler,         &copter.scheduler,           update_logging, 0.1,  75, 126),
+#if AG_RPM_ENABLED
+    SCHED_TASK_CLASS(AG_RPM,               &copter.rpm_sensor,          update,          40, 200, 129),
 #endif
-    SCHED_TASK_CLASS(AP_TempCalibration,   &copter.g2.temp_calibration, update,          10, 100, 135),
+    SCHED_TASK_CLASS(AG_TempCalibration,   &copter.g2.temp_calibration, update,          10, 100, 135),
 #if HAL_ADSB_ENABLED
     SCHED_TASK(avoidance_adsb_update, 10,    100, 138),
 #endif
@@ -224,10 +224,10 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(terrain_update,        10,    100, 144),
 #endif
 #if AP_GRIPPER_ENABLED
-    SCHED_TASK_CLASS(AP_Gripper,           &copter.g2.gripper,          update,          10,  75, 147),
+    SCHED_TASK_CLASS(AG_Gripper,           &copter.g2.gripper,          update,          10,  75, 147),
 #endif
 #if AP_WINCH_ENABLED
-    SCHED_TASK_CLASS(AP_Winch,             &copter.g2.winch,            update,          50,  50, 150),
+    SCHED_TASK_CLASS(AG_Winch,             &copter.g2.winch,            update,          50,  50, 150),
 #endif
 #ifdef USERHOOK_FASTLOOP
     SCHED_TASK(userhook_FastLoop,    100,     75, 153),
@@ -245,14 +245,14 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(userhook_SuperSlowLoop, 1,     75, 165),
 #endif
 #if HAL_BUTTON_ENABLED
-    SCHED_TASK_CLASS(AP_Button,            &copter.button,              update,           5, 100, 168),
+    SCHED_TASK_CLASS(AG_Button,            &copter.button,              update,           5, 100, 168),
 #endif
 #if STATS_ENABLED == ENABLED
-    SCHED_TASK_CLASS(AP_Stats,             &copter.g2.stats,            update,           1, 100, 171),
+    SCHED_TASK_CLASS(AG_Stats,             &copter.g2.stats,            update,           1, 100, 171),
 #endif
 };
 
-void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
+void Copter::get_scheduler_tasks(const AG_Scheduler::Task *&tasks,
                                  uint8_t &task_count,
                                  uint32_t &log_bit)
 {
@@ -608,7 +608,7 @@ void Copter::one_hz_loop()
         update_using_interlock();
 
         // check the user hasn't updated the frame class or type
-        motors->set_frame_class_and_type((AP_Motors::motor_frame_class)g2.frame_class.get(), (AP_Motors::motor_frame_type)g.frame_type.get());
+        motors->set_frame_class_and_type((AG_Motors::motor_frame_class)g2.frame_class.get(), (AG_Motors::motor_frame_type)g.frame_type.get());
 
         // set all throttle channel settings
         motors->update_throttle_range();
@@ -624,7 +624,7 @@ void Copter::one_hz_loop()
     adsb.set_is_flying(!ap.land_complete);
 #endif
 
-    AP_Notify::flags.flying = !ap.land_complete;
+    AG_Notify::flags.flying = !ap.land_complete;
 }
 
 void Copter::init_simple_bearing()
@@ -774,6 +774,6 @@ Copter::Copter(void)
 }
 
 Copter copter;
-AP_Vehicle& vehicle = copter;
+AG_Vehicle& vehicle = copter;
 
-AP_HAL_MAIN_CALLBACKS(&copter);
+AG_HAL_MAIN_CALLBACKS(&copter);

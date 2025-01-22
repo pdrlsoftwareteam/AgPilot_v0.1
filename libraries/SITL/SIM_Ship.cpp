@@ -25,8 +25,8 @@
 #include <stdio.h>
 
 #include "SIM_Aircraft.h"
-#include <AP_HAL_SITL/SITL_State.h>
-#include <AP_Terrain/AP_Terrain.h>
+#include <AG_HAL_SITL/SITL_State.h>
+#include <AG_Terrain/AG_Terrain.h>
 
 // use a spare channel for send. This is static to avoid mavlink
 // header import in SIM_Ship.h
@@ -35,7 +35,7 @@ static const mavlink_channel_t mavlink_ch = (mavlink_channel_t)(MAVLINK_COMM_0+6
 using namespace SITL;
 
 // SITL Ship parameters
-const AP_Param::GroupInfo ShipSim::var_info[] = {
+const AG_Param::GroupInfo ShipSim::var_info[] = {
     AP_GROUPINFO("ENABLE",    1, ShipSim,  enable, 0),
     AP_GROUPINFO("SPEED",     2, ShipSim,  speed, 3),
     AP_GROUPINFO("PSIZE",     3, ShipSim,  path_size, 1000),
@@ -75,9 +75,9 @@ void Ship::update(float delta_t)
 ShipSim::ShipSim()
 {
     if (!valid_channel(mavlink_ch)) {
-        AP_HAL::panic("Invalid mavlink channel for ShipSim");
+        AG_HAL::panic("Invalid mavlink channel for ShipSim");
     }
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 /*
@@ -127,7 +127,7 @@ void ShipSim::update(void)
     }
 
     auto *sitl = AP::sitl();
-    uint32_t now_us = AP_HAL::micros();
+    uint32_t now_us = AG_HAL::micros();
 
     if (!initialised) {
         home = sitl->state.home;
@@ -142,7 +142,7 @@ void ShipSim::update(void)
         ::printf("ShipSim home %f %f\n", home.lat*1.0e-7, home.lng*1.0e-7);
         ship.sim = this;
         last_update_us = now_us;
-        last_report_ms = AP_HAL::millis();
+        last_report_ms = AG_HAL::millis();
     }
 
     float dt = (now_us - last_update_us)*1.0e-6;
@@ -150,7 +150,7 @@ void ShipSim::update(void)
 
     ship.update(dt);
 
-    uint32_t now_ms = AP_HAL::millis();
+    uint32_t now_ms = AG_HAL::millis();
     if (now_ms - last_report_ms >= reporting_period_ms) {
         last_report_ms = now_ms;
         send_report();
@@ -170,7 +170,7 @@ void ShipSim::send_report(void)
         return;
     }
 
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     mavlink_message_t msg;
     uint16_t len;
     uint8_t buf[300];

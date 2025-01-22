@@ -1,4 +1,4 @@
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 #include <SITL/SIM_Motor.h>
 #include <SITL/SIM_Frame.h>
@@ -15,7 +15,7 @@
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 // helper to give access to protected functions
 class Frame_helper : public SITL::Frame {
@@ -117,4 +117,4 @@ void loop(void)
     exit(0);
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

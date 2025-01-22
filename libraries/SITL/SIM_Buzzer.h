@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 #include "SITL_Input.h"
 
 #include "stdint.h"
@@ -32,7 +32,7 @@ public:
     // update buzzer state
     void update(const struct sitl_input &input);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     bool is_enabled() const {return static_cast<bool>(_enable);}
 

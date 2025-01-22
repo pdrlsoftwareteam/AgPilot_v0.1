@@ -15,7 +15,7 @@ build/BOARDNAME/AP_Bootloader for loading with gdb.
 
 The --bootloader option tells waf to get the hardware config from
 the hwdef-bl.dat file for the board. It will look in
-libraries/AP_HAL_CHibiOS/hwdef/BOARDNAME/hwdef-bl.dat
+libraries/AG_HAL_CHibiOS/hwdef/BOARDNAME/hwdef-bl.dat
 
 The bootloader protocol is compatible with that used by the PX4
 project for boards like the Pixhawk. For compatibility purposes we

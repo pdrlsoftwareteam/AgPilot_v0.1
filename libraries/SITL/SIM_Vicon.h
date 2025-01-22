@@ -22,7 +22,7 @@
 
 #include <SITL/SITL.h>
 
-#include <AP_HAL/utility/RingBuffer.h>
+#include <AG_HAL/utility/RingBuffer.h>
 
 #include "SIM_SerialDevice.h"
 

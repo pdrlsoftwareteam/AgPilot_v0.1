@@ -25,110 +25,110 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 // Common dependencies
-#include <AP_Common/AP_Common.h>            // Common definitions and utility routines for the ArduPilot libraries
-#include <AP_Common/Location.h>             // Library having the implementation of location class         
-#include <AP_Param/AP_Param.h>              // A system for managing and storing variables that are of general interest to the system.
+#include <AG_Common/AG_Common.h>            // Common definitions and utility routines for the ArduPilot libraries
+#include <AG_Common/Location.h>             // Library having the implementation of location class         
+#include <AG_Param/AG_Param.h>              // A system for managing and storing variables that are of general interest to the system.
 #include <StorageManager/StorageManager.h>  // library for Management for hal.storage to allow for backwards compatible mapping of storage offsets to available storage
 
 // Application dependencies
-#include <AP_KEYSTORE/AP_KEYSTORE.h>
-#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
-#include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
-#include <AP_LIBNPNT/AP_LIBNPNT.h>
-#include <AP_Logger/AP_Logger.h>            // ArduPilot Mega Flash Memory Library
-#include <AP_Math/AP_Math.h>                // ArduPilot Mega Vector/Matrix math Library
-#include <AP_AccelCal/AP_AccelCal.h>        // interface and maths for accelerometer calibration
-#include <AP_InertialSensor/AP_InertialSensor.h>                // ArduPilot Mega Inertial Sensor (accel & gyro) Library
-#include <AP_AHRS/AP_AHRS.h>                                    // AHRS (Attitude Heading Reference System) interface library for ArduPilot
-#include <AP_Mission/AP_Mission.h>                              // Mission command library
-#include <AP_Mission/AP_Mission_ChangeDetector.h>               // Mission command change detection library
-#include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>        // Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
-#include <AC_AttitudeControl/AC_PosControl.h>                   // Position control library
-#include <AC_AttitudeControl/AC_CommandModel.h>                 // Command model library
-#include <AP_Motors/AP_Motors.h>            // AP Motors library
-#include <AP_Stats/AP_Stats.h>              // statistics library
+#include <AG_KEYSTORE/AG_KEYSTORE.h>
+#include <AG_PDRL_Commander/AG_PDRL_Commander.h>
+#include <AG_PDRL_Commander/AG_PDRL_Commander_Logger.h>
+#include <AG_LIBNPNT/AG_LIBNPNT.h>
+#include <AG_Logger/AG_Logger.h>            // ArduPilot Mega Flash Memory Library
+#include <AG_Math/AG_Math.h>                // ArduPilot Mega Vector/Matrix math Library
+#include <AG_AccelCal/AG_AccelCal.h>        // interface and maths for accelerometer calibration
+#include <AG_InertialSensor/AG_InertialSensor.h>                // ArduPilot Mega Inertial Sensor (accel & gyro) Library
+#include <AG_AHRS/AG_AHRS.h>                                    // AHRS (Attitude Heading Reference System) interface library for ArduPilot
+#include <AG_Mission/AG_Mission.h>                              // Mission command library
+#include <AG_Mission/AG_Mission_ChangeDetector.h>               // Mission command change detection library
+#include <AG_AttitudeControl/AG_AttitudeControl_Multi.h>        // Attitude control library
+#include <AG_AttitudeControl/AG_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
+#include <AG_AttitudeControl/AG_PosControl.h>                   // Position control library
+#include <AG_AttitudeControl/AG_CommandModel.h>                 // Command model library
+#include <AG_Motors/AG_Motors.h>            // AP Motors library
+#include <AG_Stats/AG_Stats.h>              // statistics library
 #include <Filter/Filter.h>                  // Filter library
-#include <AP_Vehicle/AP_Vehicle.h>          // needed for AHRS build
-#include <AP_InertialNav/AP_InertialNav.h>  // inertial navigation library
-#include <AC_WPNav/AC_WPNav.h>              // ArduCopter waypoint navigation library
-#include <AC_WPNav/AC_Loiter.h>             // ArduCopter Loiter Mode Library
-#include <AC_WPNav/AC_Circle.h>             // circle navigation library
-#include <AP_Declination/AP_Declination.h>  // ArduPilot Mega Declination Helper Library
-#include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
-#include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
-#include <AP_LandingGear/AP_LandingGear.h>  // Landing Gear library
-#include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-#include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
-#include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
-#include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
-#include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
-#include <AP_Parachute/AP_Parachute.h>      // ArduPilot parachute release library
-#include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
-#include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
-#include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_Winch/AP_Winch_config.h>
+#include <AG_Vehicle/AG_Vehicle.h>          // needed for AHRS build
+#include <AG_InertialNav/AG_InertialNav.h>  // inertial navigation library
+#include <AG_WPNav/AG_WPNav.h>              // ArduCopter waypoint navigation library
+#include <AG_WPNav/AG_Loiter.h>             // ArduCopter Loiter Mode Library
+#include <AG_WPNav/AG_Circle.h>             // circle navigation library
+#include <AG_Declination/AG_Declination.h>  // ArduPilot Mega Declination Helper Library
+#include <AG_RCMapper/AG_RCMapper.h>        // RC input mapping library
+#include <AG_BattMonitor/AG_BattMonitor.h>  // Battery monitor library
+#include <AG_LandingGear/AG_LandingGear.h>  // Landing Gear library
+#include <AG_InputManager/AG_InputManager.h>        // Pilot input handling library
+#include <AG_Arming/AG_Arming.h>            // ArduPilot motor arming library
+#include <AG_SmartRTL/AG_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
+#include <AG_TempCalibration/AG_TempCalibration.h>  // temperature calibration library
+#include <AG_AutoTune/AG_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
+#include <AG_Parachute/AG_Parachute.h>      // ArduPilot parachute release library
+#include <AG_Sprayer/AG_Sprayer.h>          // Crop sprayer library
+#include <AG_ADSB/AG_ADSB.h>                // ADS-B RF based collision avoidance module library
+#include <AG_Proximity/AG_Proximity.h>      // ArduPilot proximity sensor library
+#include <AG_OpticalFlow/AG_OpticalFlow.h>
+#include <AG_Winch/AG_Winch_config.h>
 
 // Configuration
 #include "defines.h"
 #include "config.h"
 
-    #define AC_AttitudeControl_t AC_AttitudeControl_Multi
+    #define AG_AttitudeControl_t AG_AttitudeControl_Multi
 
- #define MOTOR_CLASS AP_MotorsMulticopter
+ #define MOTOR_CLASS AG_MotorsMulticopter
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
- #include <AC_Autorotation/AC_Autorotation.h> // Autorotation controllers
+ #include <AG_Autorotation/AG_Autorotation.h> // Autorotation controllers
 #endif
 
 #include "RC_Channel.h"         // RC Channel Library
 
 #include "GCS_Mavlink.h"
 #include "GCS_Copter.h"
-#include "AP_Rally.h"           // Rally point library
-#include "AP_Arming.h"
+#include "AG_Rally.h"           // Rally point library
+#include "AG_Arming.h"
 
 // libraries which are dependent on #defines in defines.h and/or config.h
 #if BEACON_ENABLED == ENABLED
- #include <AP_Beacon/AP_Beacon.h>
+ #include <AG_Beacon/AG_Beacon.h>
 #endif
 
 #if AC_AVOID_ENABLED == ENABLED
- #include <AC_Avoidance/AC_Avoid.h>
+ #include <AG_Avoidance/AG_Avoid.h>
 #endif
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
- #include <AC_WPNav/AC_WPNav_OA.h>
- #include <AC_Avoidance/AP_OAPathPlanner.h>
+ #include <AG_WPNav/AG_WPNav_OA.h>
+ #include <AG_Avoidance/AG_OAGathPlanner.h>
 #endif
-#include <AP_Gripper/AP_Gripper_config.h>
+#include <AG_Gripper/AG_Gripper_config.h>
 #if AP_GRIPPER_ENABLED
- # include <AP_Gripper/AP_Gripper.h>
+ # include <AG_Gripper/AG_Gripper.h>
 #endif
 #if PRECISION_LANDING == ENABLED
- # include <AC_PrecLand/AC_PrecLand.h>
- # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
+ # include <AG_PrecLand/AG_PrecLand.h>
+ # include <AG_PrecLand/AG_PrecLand_StateMachine.h>
 #endif
 #if AP_TERRAIN_AVAILABLE
- # include <AP_Terrain/AP_Terrain.h>
+ # include <AG_Terrain/AG_Terrain.h>
 #endif
 #if RANGEFINDER_ENABLED == ENABLED
- # include <AP_RangeFinder/AP_RangeFinder.h>
+ # include <AG_RangeFinder/AG_RangeFinder.h>
 #endif
 
-#include <AP_Mount/AP_Mount.h>
+#include <AG_Mount/AG_Mount.h>
 
-#include <AP_Camera/AP_Camera.h>
+#include <AG_Camera/AG_Camera.h>
 
 #if HAL_BUTTON_ENABLED
- # include <AP_Button/AP_Button.h>
+ # include <AG_Button/AG_Button.h>
 #endif
 
 #if OSD_ENABLED || OSD_PARAM_ENABLED
- #include <AP_OSD/AP_OSD.h>
+ #include <AG_OSD/AG_OSD.h>
 #endif
 
 #if ADVANCED_FAILSAFE == ENABLED
@@ -138,24 +138,24 @@
  # include "toy_mode.h"
 #endif
 #if AP_WINCH_ENABLED
- # include <AP_Winch/AP_Winch.h>
+ # include <AG_Winch/AG_Winch.h>
 #endif
-#include <AP_RPM/AP_RPM.h>
+#include <AG_RPM/AG_RPM.h>
 
 #if AP_SCRIPTING_ENABLED
-#include <AP_Scripting/AP_Scripting.h>
+#include <AG_Scripting/AG_Scripting.h>
 #endif
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
-#include <AC_CustomControl/AC_CustomControl.h>                  // Custom control library
+#include <AG_CustomControl/AG_CustomControl.h>                  // Custom control library
 #endif
 
 #if AC_AVOID_ENABLED && !AP_FENCE_ENABLED
-  #error AC_Avoidance relies on AP_FENCE_ENABLED which is disabled
+  #error AG_Avoidance relies on AP_FENCE_ENABLED which is disabled
 #endif
 
 #if AC_OAPATHPLANNER_ENABLED && !AP_FENCE_ENABLED
-  #error AP_OAPathPlanner relies on AP_FENCE_ENABLED which is disabled
+  #error AG_OAGathPlanner relies on AP_FENCE_ENABLED which is disabled
 #endif
 
 // Local modules
@@ -169,19 +169,19 @@
 
 #include "mode.h"
 
-class Copter : public AP_Vehicle {
+class Copter : public AG_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;
     friend class GCS_Copter;
-    friend class AP_Rally_Copter;
+    friend class AG_Rally_Copter;
     friend class Parameters;
     friend class ParametersG2;
-    friend class AP_Avoidance_Copter;
+    friend class AGP_Avoidance_Copter;
 
 #if ADVANCED_FAILSAFE == ENABLED
-    friend class AP_AdvancedFailsafe_Copter;
+    friend class AG_AdvancedFailsafe_Copter;
 #endif
-    friend class AP_Arming_Copter;
+    friend class AG_Arming_Copter;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
@@ -209,7 +209,7 @@ public:
 private:
 
     // key aircraft parameters passed to multiple libraries
-    AP_MultiCopter aparm;
+    AG_MultiCopter aparm;
 
     // Global parameters are all contained within the 'g' class.
     Parameters g;
@@ -224,7 +224,7 @@ private:
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
 
-    AP_Logger logger;
+    AG_Logger logger;
 
     // flight modes convenience array
     AP_Int8 *flight_modes;
@@ -281,19 +281,19 @@ private:
         bool reset_target;          // true if target should be reset because of change in surface being tracked
     } surface_tracking;
 
-#if AP_RPM_ENABLED
-    AP_RPM rpm_sensor;
+#if AG_RPM_ENABLED
+    AG_RPM rpm_sensor;
 #endif
 
     // Inertial Navigation EKF - different viewpoint
-    AP_AHRS_View *ahrs_view;
+    AG_AHRS_View *ahrs_view;
 
     // Arming/Disarming management class
-    AP_Arming_Copter arming;
+    AG_Arming_Copter arming;
 
     // Optical flow sensor
 #if AP_OPTICALFLOW_ENABLED
-    AP_OpticalFlow optflow;
+    AG_OpticalFlow optflow;
 #endif
 
     // system time in milliseconds of last recorded yaw reset from ekf
@@ -397,7 +397,7 @@ private:
 
     // Motor Output
     MOTOR_CLASS *motors;
-    const struct AP_Param::GroupInfo *motors_var_info;
+    const struct AG_Param::GroupInfo *motors_var_info;
 
     int32_t _home_bearing;
     uint32_t _home_distance;
@@ -421,12 +421,12 @@ private:
     int32_t initial_armed_bearing;
 
     // Battery Sensors
-    AP_BattMonitor battery{MASK_LOG_CURRENT,
+    AG_BattMonitor battery{MASK_LOG_CURRENT,
                            FUNCTOR_BIND_MEMBER(&Copter::handle_battery_failsafe, void, const char*, const int8_t),
                            _failsafe_priorities};
 
 #if OSD_ENABLED || OSD_PARAM_ENABLED
-    AP_OSD osd;
+    AG_OSD osd;
 #endif
 
     // Altitude
@@ -441,21 +441,21 @@ private:
     Location current_loc;
 
     // Inertial Navigation
-    AP_InertialNav inertial_nav;
+    AG_InertialNav inertial_nav;
 
     // Attitude, Position and Waypoint navigation objects
     // To-Do: move inertial nav up or other navigation variables down here
-    AC_AttitudeControl_t *attitude_control;
-    AC_PosControl *pos_control;
-    AC_WPNav *wp_nav;
-    AC_Loiter *loiter_nav;
+    AG_AttitudeControl_t *attitude_control;
+    AG_PosControl *pos_control;
+    AG_WPNav *wp_nav;
+    AG_Loiter *loiter_nav;
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
-    AC_CustomControl custom_control{ahrs_view, attitude_control, motors, scheduler.get_loop_period_s()};
+    AG_CustomControl custom_control{ahrs_view, attitude_control, motors, scheduler.get_loop_period_s()};
 #endif
 
 #if MODE_CIRCLE_ENABLED == ENABLED
-    AC_Circle *circle_nav;
+    AG_Circle *circle_nav;
 #endif
 
     // System Timers
@@ -469,56 +469,56 @@ private:
 
     // Camera
 #if AP_CAMERA_ENABLED
-    AP_Camera camera{MASK_LOG_CAMERA};
+    AG_Camera camera{MASK_LOG_CAMERA};
 #endif
 
     // Camera/Antenna mount tracking and stabilisation stuff
 #if HAL_MOUNT_ENABLED
-    AP_Mount camera_mount;
+    AG_Mount camera_mount;
 #endif
 
 #if AC_AVOID_ENABLED == ENABLED
-    AC_Avoid avoid;
+    AG_Avoid avoid;
 #endif
 
     // Rally library
 #if HAL_RALLY_ENABLED
-    AP_Rally_Copter rally;
+    AG_Rally_Copter rally;
 #endif
 
     // Crop Sprayer
 #if HAL_SPRAYER_ENABLED
-    AC_Sprayer sprayer;
+    AG_Sprayer sprayer;
 #endif
 
     // Parachute release
 #if PARACHUTE == ENABLED
-    AP_Parachute parachute;
+    AG_Parachute parachute;
 #endif
 
     // Landing Gear Controller
 #if AP_LANDINGGEAR_ENABLED
-    AP_LandingGear landinggear;
+    AG_LandingGear landinggear;
 #endif
 
     // terrain handling
 #if AP_TERRAIN_AVAILABLE
-    AP_Terrain terrain;
+    AG_Terrain terrain;
 #endif
 
     // Precision Landing
 #if PRECISION_LANDING == ENABLED
-    AC_PrecLand precland;
-    AC_PrecLand_StateMachine precland_statemachine;
+    AG_PrecLand precland;
+    AG_PrecLand_StateMachine precland_statemachine;
 #endif
 
     // Pilot Input Management Library
 
 #if HAL_ADSB_ENABLED
-    AP_ADSB adsb;
+    AG_ADSB adsb;
 
     // avoidance of adsb enabled vehicles (normally manned vehicles)
-    AP_Avoidance_Copter avoidance_adsb{adsb};
+    AGP_Avoidance_Copter avoidance_adsb{adsb};
 #endif
 
     // last valid RC input time
@@ -529,7 +529,7 @@ private:
 
     // Top-level logic
     // setup the var_info table
-    AP_Param param_loader;
+    AG_Param param_loader;
 
     // ground effect detector
     struct {
@@ -541,8 +541,8 @@ private:
 
     bool standby_active;
 
-    static const AP_Scheduler::Task scheduler_tasks[];
-    static const AP_Param::Info var_info[];
+    static const AG_Scheduler::Task scheduler_tasks[];
+    static const AG_Param::Info var_info[];
     static const struct LogStructure log_structure[];
 
     // enum for ESC CALIBRATION
@@ -607,7 +607,7 @@ private:
     void update_using_interlock();
 
     // Copter.cpp
-    void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
+    void get_scheduler_tasks(const AG_Scheduler::Task *&tasks,
                              uint8_t &task_count,
                              uint32_t &log_bit) override;
 #if AP_SCRIPTING_ENABLED
@@ -936,5 +936,5 @@ public:
 
 extern Copter copter;
 
-using AP_HAL::millis;
-using AP_HAL::micros;
+using AG_HAL::millis;
+using AG_HAL::micros;

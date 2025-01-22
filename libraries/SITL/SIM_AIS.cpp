@@ -26,7 +26,7 @@
 
 #include <SITL/SITL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -39,7 +39,7 @@ AIS::AIS() : SerialDevice::SerialDevice()
     file = fopen(file_path,"r");
 
     if (file == nullptr) {
-        AP_HAL::panic("AIS could not open data file");
+        AG_HAL::panic("AIS could not open data file");
     }
 
     // seek past the header line
@@ -50,11 +50,11 @@ AIS::AIS() : SerialDevice::SerialDevice()
 void AIS::update()
 {
     if (file == nullptr) {
-        AP_HAL::panic("AIS lost data file");
+        AG_HAL::panic("AIS lost data file");
     }
 
     // just send a line of data at 1Hz:
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_sent_ms < 1000) {
         return;
     }
@@ -66,7 +66,7 @@ void AIS::update()
         // got to the end of the file, circle back
         fseek(file,0,SEEK_SET);
         if (!fgets(line, sizeof(line), file)) {
-            AP_HAL::panic("AIS lost data file");
+            AG_HAL::panic("AIS lost data file");
         }
         return;
     }

@@ -18,17 +18,17 @@
 #include "LogReader.h"
 
 #include <stdio.h>
-#include <AP_HAL/utility/getopt_cpp.h>
+#include <AG_HAL/utility/getopt_cpp.h>
 
-#include <AP_Vehicle/AP_Vehicle.h>
+#include <AG_Vehicle/AG_Vehicle.h>
 
 #include <GCS_MAVLink/GCS_Dummy.h>
-#include <AP_Filesystem/AP_Filesystem.h>
-#include <AP_Filesystem/posix_compat.h>
-#include <AP_AdvancedFailsafe/AP_AdvancedFailsafe.h>
+#include <AG_Filesystem/AG_Filesystem.h>
+#include <AG_Filesystem/posix_compat.h>
+#include <AG_AdvancedFailsafe/AG_AdvancedFailsafe.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_LINUX
-#include <AP_HAL_Linux/Scheduler.h>
+#include <AG_HAL_Linux/Scheduler.h>
 #endif
 
 #define streq(x, y) (!strcmp(x, y))
@@ -40,75 +40,75 @@ user_parameter *user_parameters;
 bool replay_force_ekf2;
 bool replay_force_ekf3;
 
-const AP_Param::Info ReplayVehicle::var_info[] = {
+const AG_Param::Info ReplayVehicle::var_info[] = {
     GSCALAR(dummy,         "_DUMMY", 0),
 
     // @Group: BARO
-    // @Path: ../libraries/AP_Baro/AP_Baro.cpp
-    GOBJECT(barometer, "BARO", AP_Baro),
+    // @Path: ../libraries/AG_Baro/AG_Baro.cpp
+    GOBJECT(barometer, "BARO", AG_Baro),
 
     // @Group: INS
-    // @Path: ../libraries/AP_InertialSensor/AP_InertialSensor.cpp
-    GOBJECT(ins,                    "INS", AP_InertialSensor),
+    // @Path: ../libraries/AG_InertialSensor/AG_InertialSensor.cpp
+    GOBJECT(ins,                    "INS", AG_InertialSensor),
 
     // @Group: AHRS_
-    // @Path: ../libraries/AP_AHRS/AP_AHRS.cpp
-    GOBJECT(ahrs,                   "AHRS_",    AP_AHRS),
+    // @Path: ../libraries/AG_AHRS/AG_AHRS.cpp
+    GOBJECT(ahrs,                   "AHRS_",    AG_AHRS),
 
 #if AP_AIRSPEED_ENABLED
     // @Group: ARSPD_
-    // @Path: ../libraries/AP_Airspeed/AP_Airspeed.cpp
-    GOBJECT(airspeed,                               "ARSP_",   AP_Airspeed),
+    // @Path: ../libraries/AG_Airspeed/AG_Airspeed.cpp
+    GOBJECT(airspeed,                               "ARSP_",   AG_Airspeed),
 #endif
 
     // @Group: EK2_
-    // @Path: ../libraries/AP_NavEKF2/AP_NavEKF2.cpp
+    // @Path: ../libraries/AG_NavEKF2/AG_NavEKF2.cpp
     GOBJECTN(ekf2, NavEKF2, "EK2_", NavEKF2),
     
     // @Group: COMPASS_
-    // @Path: ../libraries/AP_Compass/AP_Compass.cpp
+    // @Path: ../libraries/AG_Compass/AG_Compass.cpp
     GOBJECT(compass, "COMPASS_", Compass),
 
     // @Group: LOG
-    // @Path: ../libraries/AP_Logger/AP_Logger.cpp
-    GOBJECT(logger, "LOG", AP_Logger),
+    // @Path: ../libraries/AG_Logger/AG_Logger.cpp
+    GOBJECT(logger, "LOG", AG_Logger),
     
     // @Group: EK3_
-    // @Path: ../libraries/AP_NavEKF3/AP_NavEKF3.cpp
+    // @Path: ../libraries/AG_NavEKF3/AG_NavEKF3.cpp
     GOBJECTN(ekf3, NavEKF3, "EK3_", NavEKF3),
 
     // @Group: GPS
-    // @Path: ../libraries/AP_GPS/AP_GPS.cpp
-    GOBJECT(gps, "GPS", AP_GPS),
+    // @Path: ../libraries/AG_GPS/AG_GPS.cpp
+    GOBJECT(gps, "GPS", AG_GPS),
     
     AP_VAREND
 };
 
 void ReplayVehicle::load_parameters(void)
 {
-    AP_Param::check_var_info();
+    AG_Param::check_var_info();
 
     StorageManager::erase();
-    AP_Param::erase_all();
+    AG_Param::erase_all();
     // Load all auto-loaded EEPROM variables - also registers thread
     // which saves parameters, which Compass now does in its init() routine
-    AP_Param::load_all();
+    AG_Param::load_all();
 }
 
-const struct AP_Param::GroupInfo        GCS_MAVLINK_Parameters::var_info[] = {
+const struct AG_Param::GroupInfo        GCS_MAVLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 GCS_Dummy _gcs;
 
-AP_AdvancedFailsafe *AP::advancedfailsafe() { return nullptr; }
-bool AP_AdvancedFailsafe::gcs_terminate(bool should_terminate, const char *reason) { return false; }
+AG_AdvancedFailsafe *AP::advancedfailsafe() { return nullptr; }
+bool AG_AdvancedFailsafe::gcs_terminate(bool should_terminate, const char *reason) { return false; }
 
-// dummy method to avoid linking AP_Avoidance
-// AP_Avoidance *AP::ap_avoidance() { return nullptr; }
+// dummy method to avoid linking AGP_Avoidance
+// AGP_Avoidance *AP::ap_avoidance() { return nullptr; }
 
 #if AP_LTM_TELEM_ENABLED
 // avoid building/linking LTM:
-void AP_LTM_Telem::init() {};
+void AG_LTM_Telem::init() {};
 #endif
 #if AP_DEVO_TELEM_ENABLED
 // avoid building/linking Devo:
@@ -323,8 +323,8 @@ void Replay::load_param_file(const char *pfilename)
 }
 
 Replay replay(replayvehicle);
-AP_Vehicle& vehicle = replayvehicle;
+AG_Vehicle& vehicle = replayvehicle;
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
-AP_HAL_MAIN_CALLBACKS(&replay);
+AG_HAL_MAIN_CALLBACKS(&replay);

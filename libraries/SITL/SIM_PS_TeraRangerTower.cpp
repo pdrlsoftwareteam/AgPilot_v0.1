@@ -21,7 +21,7 @@
 #if HAL_SIM_PS_TERARANGERTOWER_ENABLED
 
 #include <GCS_MAVLink/GCS.h>
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 #include <stdio.h>
 #include <errno.h>
 
@@ -36,7 +36,7 @@ uint32_t PS_TeraRangerTower::packet_for_location(const Location &location,
 
 void PS_TeraRangerTower::update_output(const Location &location)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (last_output_time_ms == 0) {
         last_output_time_ms = now;
         return;

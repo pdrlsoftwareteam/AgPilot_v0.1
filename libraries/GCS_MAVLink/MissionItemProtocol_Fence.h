@@ -2,11 +2,11 @@
 
 #include "MissionItemProtocol.h"
 
-class AC_PolyFence_loader;
+class AG_PolyFence_loader;
 
 class MissionItemProtocol_Fence : public MissionItemProtocol {
 public:
-    MissionItemProtocol_Fence(class AC_Fence &fence) :
+    MissionItemProtocol_Fence(class AG_Fence &fence) :
         _fence(fence) {}
 
     MAV_MISSION_TYPE mission_type() const override {
@@ -30,7 +30,7 @@ protected:
     bool clear_all_items() override WARN_IF_UNUSED;
 
 private:
-    class AC_Fence &_fence;
+    class AG_Fence &_fence;
 
     uint16_t item_count() const override;
     uint16_t max_items() const override;
@@ -47,7 +47,7 @@ private:
     MAV_MISSION_RESULT allocate_receive_resources(const uint16_t count) override WARN_IF_UNUSED;
     MAV_MISSION_RESULT allocate_update_resources() override WARN_IF_UNUSED;
 
-    class AC_PolyFenceItem *_new_items;
+    class AG_PolyFenceItem *_new_items;
     uint16_t _new_items_count;
     uint8_t *_updated_mask;
 };

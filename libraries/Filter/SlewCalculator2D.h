@@ -5,7 +5,7 @@
  * slew rate
 */
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include <stdint.h>
 #include "SlewLimiter.h"
 

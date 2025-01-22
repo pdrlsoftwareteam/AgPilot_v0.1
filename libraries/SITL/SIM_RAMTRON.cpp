@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <AP_HAL_SITL/AP_HAL_SITL.h>
+#include <AG_HAL_SITL/AG_HAL_SITL.h>
 
 using namespace SITL;
 
@@ -14,7 +14,7 @@ extern const HAL_SITL& hal_sitl;
 void RAMTRON::open_storage_fd()
 {
     if (storage_fd != -1) {
-        AP_HAL::panic("Should not have been called");
+        AG_HAL::panic("Should not have been called");
     }
     const char *filepath = filename();
     uint32_t flags = O_RDWR|O_CREAT;
@@ -23,10 +23,10 @@ void RAMTRON::open_storage_fd()
     }
     storage_fd = open(filepath, flags, 0644);
     if (storage_fd == -1) {
-        AP_HAL::panic("open(%s): %s", filepath, strerror(errno));
+        AG_HAL::panic("open(%s): %s", filepath, strerror(errno));
     }
     if (ftruncate(storage_fd, storage_size()) != 0) {
-        AP_HAL::panic("truncate(%s): %s", filepath, strerror(errno));
+        AG_HAL::panic("truncate(%s): %s", filepath, strerror(errno));
     }
 }
 
@@ -80,28 +80,28 @@ int RAMTRON::rdwr(uint8_t count, SPI::spi_ioc_transfer *&tfrs)
                 abort();
             }
             if (lseek(storage_fd, xfr_addr, SEEK_SET) == -1) {
-                AP_HAL::panic("lseek(): %s", strerror(errno));
+                AG_HAL::panic("lseek(): %s", strerror(errno));
             }
             const size_t read_ret = read(storage_fd, rx_buf, tfr.len);
             if (read_ret != tfr.len) {
-                AP_HAL::panic("read(): %s (%d/%u)", strerror(errno), (signed)read_ret, (unsigned)tfr.len);
+                AG_HAL::panic("read(): %s (%d/%u)", strerror(errno), (signed)read_ret, (unsigned)tfr.len);
             }
             state = State::WAITING;
             break;
         }
         case State::WRITING: {
             if (!write_enabled) {
-                AP_HAL::panic("Writes not enabled");
+                AG_HAL::panic("Writes not enabled");
             }
             if (xfr_addr + tfr.len > storage_size()) {
                 abort();
             }
             if (lseek(storage_fd, xfr_addr, SEEK_SET) == -1) {
-                AP_HAL::panic("lseek(): %s", strerror(errno));
+                AG_HAL::panic("lseek(): %s", strerror(errno));
             }
             const size_t write_ret = write(storage_fd, tx_buf, tfr.len);
             if (write_ret != tfr.len) {
-                AP_HAL::panic("write(): %s (%d/%u)", strerror(errno), (signed)write_ret, (unsigned)tfr.len);
+                AG_HAL::panic("write(): %s (%d/%u)", strerror(errno), (signed)write_ret, (unsigned)tfr.len);
             }
             state = State::WAITING;
             write_enabled = false;

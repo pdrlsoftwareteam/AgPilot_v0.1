@@ -4,4 +4,4 @@
 cd "$(dirname "$0")"
 cd ../..
 
-luacheck */ --config libraries/AP_Scripting/tests/luacheck.lua
+luacheck */ --config libraries/AG_Scripting/tests/luacheck.lua

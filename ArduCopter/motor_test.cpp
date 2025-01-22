@@ -26,7 +26,7 @@ void Copter::motor_test_output()
     EXPECT_DELAY_MS(2000);
 
     // check for test timeout
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if ((now - motor_test_start_ms) >= motor_test_timeout_ms) {
         if (motor_test_count > 1) {
             if (now - motor_test_start_ms < motor_test_timeout_ms*1.5) {
@@ -112,7 +112,7 @@ bool Copter::mavlink_motor_control_check(const GCS_MAVLINK &gcs_chan, bool check
     }
 
     // check if safety switch has been pushed
-    if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
+    if (hal.util->safety_switch_state() == AG_HAL::Util::SAFETY_DISARMED) {
         gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: Safety switch", mode);
         return false;
     }
@@ -162,12 +162,12 @@ MAV_RESULT Copter::mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t
             g.fs_ekf_action.set(0);
 
             // turn on notify leds
-            AP_Notify::flags.esc_calibration = true;
+            AG_Notify::flags.esc_calibration = true;
         }
     }
 
     // set timeout
-    motor_test_start_ms = AP_HAL::millis();
+    motor_test_start_ms = AG_HAL::millis();
     motor_test_timeout_ms = MIN(timeout_sec, MOTOR_TEST_TIMEOUT_SEC) * 1000;
 
     // store required output
@@ -215,5 +215,5 @@ void Copter::motor_test_stop()
     }
 
     // turn off notify leds
-    AP_Notify::flags.esc_calibration = false;
+    AG_Notify::flags.esc_calibration = false;
 }

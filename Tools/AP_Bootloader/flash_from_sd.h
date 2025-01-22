@@ -4,7 +4,7 @@
 
 #if AP_BOOTLOADER_FLASH_FROM_SD_ENABLED
 
-#include <AP_HAL_ChibiOS/sdcard.h>
+#include <AG_HAL_ChibiOS/sdcard.h>
 #include <stdbool.h>
 
 bool flash_from_sd();

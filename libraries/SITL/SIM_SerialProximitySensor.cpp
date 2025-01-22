@@ -20,7 +20,7 @@
 
 #if HAL_SIM_SERIALPROXIMITYSENSOR_ENABLED
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include <stdio.h>
 
@@ -29,7 +29,7 @@ using namespace SITL;
 void SerialProximitySensor::update(const Location &location)
 {
     // just send a chunk of data at 5Hz:
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_sent_ms < reading_interval_ms()) {
         return;
     }

@@ -2,10 +2,10 @@
 /// @brief	RC_Channel manager, with EEPROM-backed storage of constants.
 #pragma once
 
-#include <AP_Common/AP_Common.h>
-#include <AP_Param/AP_Param.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Common/Bitmask.h>
+#include <AG_Common/AG_Common.h>
+#include <AG_Param/AG_Param.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Common/Bitmask.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 #ifndef AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
@@ -63,7 +63,7 @@ public:
 
     uint8_t     percent_input() const;
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     // return true if input is within deadzone of trim
     bool       in_trim_dz() const;
@@ -141,7 +141,7 @@ public:
         RELAY3 =              35, // Relay3 pin on/off
         RELAY4 =              36, // Relay4 pin on/off
         THROW =               37, // change to THROW flight mode
-        AVOID_ADSB =          38, // enable AP_Avoidance library
+        AVOID_ADSB =          38, // enable AGP_Avoidance library
         PRECISION_LOITER =    39, // enable precision loiter
         AVOID_PROXIMITY =     40, // enable object avoidance using proximity sensors (ie. horizontal lidar)
         ARMDISARM_UNUSED =    41, // UNUSED
@@ -438,7 +438,7 @@ public:
         return _singleton;
     }
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     // compatability functions for Plane:
     static uint16_t get_radio_in(const uint8_t chan) {
@@ -649,7 +649,7 @@ protected:
 
 private:
     static RC_Channels *_singleton;
-    // this static arrangement is to avoid static pointers in AP_Param tables
+    // this static arrangement is to avoid static pointers in AG_Param tables
     static RC_Channel *channels;
 
     uint32_t last_update_ms;

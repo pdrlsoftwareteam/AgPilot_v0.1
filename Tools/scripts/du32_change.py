@@ -73,7 +73,7 @@ class DU32Change(object):
             if m is None:
                 break
             if m.Id != 7:
-                # 7 is LOG_DATA_ID from AP_Logger.h
+                # 7 is LOG_DATA_ID from AG_Logger.h
                 continue
             if old_m is not None and m.Value == old_m.Value:
                 continue

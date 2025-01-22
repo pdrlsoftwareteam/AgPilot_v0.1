@@ -33,7 +33,7 @@
 // need to namespace this or we end up with multiple definitions of
 // things from Synth.hpp
 namespace BuzzerSynth {
-#include <AP_HAL_SITL/Synth.hpp>
+#include <AG_HAL_SITL/Synth.hpp>
 };
 
 #endif
@@ -43,7 +43,7 @@ using namespace SITL;
 #ifdef WITH_SITL_TONEALARM
 
 // table of user settable parameters
-const AP_Param::GroupInfo Buzzer::var_info[] = {
+const AG_Param::GroupInfo Buzzer::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Buzzer enable/disable
@@ -68,7 +68,7 @@ static sf::Sound xdemoSound;
 static uint32_t duration_ms = 10000;
 
 Buzzer::Buzzer() {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 };
 
 void Buzzer::update(const struct sitl_input &input)
@@ -99,7 +99,7 @@ void Buzzer::update(const struct sitl_input &input)
     }
 
     const bool on = _pin >= 1 && (AP::sitl()->pin_mask.get() & (1<<_pin));
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (on) {
         if (!was_on) {
             gcs().send_text(MAV_SEVERITY_WARNING, "%u: Buzzer on", now);
@@ -126,7 +126,7 @@ void Buzzer::update(const struct sitl_input &input)
 
 using namespace SITL;
 
-const AP_Param::GroupInfo Buzzer::var_info[] = { AP_GROUPEND };
+const AG_Param::GroupInfo Buzzer::var_info[] = { AP_GROUPEND };
 
 Buzzer::Buzzer() { };
 

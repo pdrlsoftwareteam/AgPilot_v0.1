@@ -19,16 +19,16 @@
  */
 
 #if ADVANCED_FAILSAFE == ENABLED
-#include <AP_AdvancedFailsafe/AP_AdvancedFailsafe.h>
+#include <AG_AdvancedFailsafe/AG_AdvancedFailsafe.h>
 
 /*
-  a plane specific AP_AdvancedFailsafe class
+  a plane specific AG_AdvancedFailsafe class
  */
-class AP_AdvancedFailsafe_Copter : public AP_AdvancedFailsafe
+class AG_AdvancedFailsafe_Copter : public AG_AdvancedFailsafe
 {
 public:
 
-    using AP_AdvancedFailsafe::AP_AdvancedFailsafe;
+    using AG_AdvancedFailsafe::AG_AdvancedFailsafe;
 
     // called to set all outputs to termination state
     void terminate_vehicle(void) override;

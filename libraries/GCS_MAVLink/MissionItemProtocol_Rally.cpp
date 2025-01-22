@@ -18,8 +18,8 @@
 
 #include "MissionItemProtocol_Rally.h"
 
-#include <AP_Logger/AP_Logger.h>
-#include <AP_Rally/AP_Rally.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_Rally/AG_Rally.h>
 #include <GCS_MAVLink/GCS.h>
 
 #if HAL_RALLY_ENABLED

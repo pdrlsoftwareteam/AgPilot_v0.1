@@ -47,7 +47,7 @@ void Copter::failsafe_radio_on_event()
     if (should_disarm_on_failsafe()) {
         // should immediately disarm when we're on the ground
         announce_failsafe("Radio", "Disarming");
-        arming.disarm(AP_Arming::Method::RADIOFAILSAFE);
+        arming.disarm(AG_Arming::Method::RADIOFAILSAFE);
         desired_action = FailsafeAction::NONE;
 
     } else if (flightmode->is_landing() && ((battery.has_failsafed() && battery.get_highest_failsafe_priority() <= FAILSAFE_LAND_PRIORITY))) {
@@ -105,7 +105,7 @@ void Copter::handle_battery_failsafe(const char *type_str, const int8_t action)
     // Conditions to deviate from BATT_FS_XXX_ACT parameter setting
     if (should_disarm_on_failsafe()) {
         // should immediately disarm when we're on the ground
-        arming.disarm(AP_Arming::Method::BATTERYFAILSAFE);
+        arming.disarm(AG_Arming::Method::BATTERYFAILSAFE);
         desired_action = FailsafeAction::NONE;
         announce_failsafe("Battery", "Disarming");
 
@@ -198,7 +198,7 @@ void Copter::failsafe_gcs_on_event(void)
 
     } else if (should_disarm_on_failsafe()) {
         // should immediately disarm when we're on the ground
-        arming.disarm(AP_Arming::Method::GCSFAILSAFE);
+        arming.disarm(AG_Arming::Method::GCSFAILSAFE);
         desired_action = FailsafeAction::NONE;
         announce_failsafe("GCS", "Disarming");
 
@@ -282,7 +282,7 @@ void Copter::failsafe_terrain_on_event()
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_TERRAIN, LogErrorCode::FAILSAFE_OCCURRED);
 
     if (should_disarm_on_failsafe()) {
-        arming.disarm(AP_Arming::Method::TERRAINFAILSAFE);
+        arming.disarm(AG_Arming::Method::TERRAINFAILSAFE);
 #if MODE_RTL_ENABLED == ENABLED
     } else if (flightmode->mode_number() == Mode::Number::RTL) {
         mode_rtl.restart_without_terrain();
@@ -313,7 +313,7 @@ void Copter::gpsglitch_check()
     nav_filter_status filt_status = inertial_nav.get_filter_status();
     bool gps_glitching = filt_status.flags.gps_glitching;
 
-    // log start or stop of gps glitch.  AP_Notify update is handled from within AP_AHRS
+    // log start or stop of gps glitch.  AG_Notify update is handled from within AG_AHRS
     if (ap.gps_glitching != gps_glitching) {
         ap.gps_glitching = gps_glitching;
         if (gps_glitching) {
@@ -336,7 +336,7 @@ void Copter::failsafe_deadreckon_check()
     bool ekf_dead_reckoning = inertial_nav.get_filter_status().flags.dead_reckoning;
 
     // alert user to start or stop of dead reckoning
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
     if (dead_reckoning.active != ekf_dead_reckoning) {
         dead_reckoning.active = ekf_dead_reckoning;
         if (dead_reckoning.active) {
@@ -376,7 +376,7 @@ void Copter::failsafe_deadreckon_check()
 
             // immediately disarm while landed
             if (should_disarm_on_failsafe()) {
-                arming.disarm(AP_Arming::Method::DEADRECKON_FAILSAFE);
+                arming.disarm(AG_Arming::Method::DEADRECKON_FAILSAFE);
                 return;
             }
 
@@ -396,7 +396,7 @@ void Copter::set_mode_RTL_or_land_with_pause(ModeReason reason)
         set_mode_land_with_pause(reason);
     } else {
         // alert pilot to mode change
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
     }
 }
 
@@ -409,7 +409,7 @@ void Copter::set_mode_SmartRTL_or_land_with_pause(ModeReason reason)
         gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Using Land Mode");
         set_mode_land_with_pause(reason);
     } else {
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
     }
 }
 
@@ -423,7 +423,7 @@ void Copter::set_mode_SmartRTL_or_RTL(ModeReason reason)
         gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Trying RTL Mode");
         set_mode_RTL_or_land_with_pause(reason);
     } else {
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
     }
 }
 
@@ -433,7 +433,7 @@ void Copter::set_mode_auto_do_land_start_or_RTL(ModeReason reason)
 {
 #if MODE_AUTO_ENABLED == ENABLED
     if (set_mode(Mode::Number::AUTO_RTL, reason)) {
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
         return;
     }
 #endif
@@ -448,7 +448,7 @@ void Copter::set_mode_brake_or_land_with_pause(ModeReason reason)
 {
 #if MODE_BRAKE_ENABLED == ENABLED
     if (set_mode(Mode::Number::BRAKE, reason)) {
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
         return;
     }
 #endif
@@ -463,7 +463,7 @@ void Copter::set_mode_loiter_or_RTL(ModeReason reason)
 {
 #if MODE_AUTO_ENABLED == ENABLED
     if (set_mode(Mode::Number::LOITER, reason)) {
-        AP_Notify::events.failsafe_mode_change = 1;
+        AG_Notify::events.failsafe_mode_change = 1;
         return;
     }
 #endif
@@ -514,7 +514,7 @@ void Copter::do_failsafe_action(FailsafeAction action, ModeReason reason){
 #if ADVANCED_FAILSAFE == ENABLED
             g2.afs.gcs_terminate(true, "Failsafe");
 #else
-            arming.disarm(AP_Arming::Method::FAILSAFE_ACTION_TERMINATE);
+            arming.disarm(AG_Arming::Method::FAILSAFE_ACTION_TERMINATE);
 #endif
             break;
         }

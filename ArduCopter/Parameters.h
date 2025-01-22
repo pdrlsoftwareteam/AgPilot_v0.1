@@ -2,17 +2,17 @@
 
 #define AP_PARAM_VEHICLE_NAME copter
 
-#include <AP_Common/AP_Common.h>
+#include <AG_Common/AG_Common.h>
 #include "RC_Channel.h"
-#include <AP_Proximity/AP_Proximity.h>
+#include <AG_Proximity/AG_Proximity.h>
 
-#include <AP_Gripper/AP_Gripper_config.h>
+#include <AG_Gripper/AG_Gripper_config.h>
 #if AP_GRIPPER_ENABLED
- # include <AP_Gripper/AP_Gripper.h>
+ # include <AG_Gripper/AG_Gripper.h>
 #endif
 
 #if WEATHERVANE_ENABLED == ENABLED
- #include <AC_AttitudeControl/AC_WeatherVane.h>
+ #include <AG_AttitudeControl/AG_WeatherVane.h>
 #endif
 
 // Global parameter class.
@@ -33,7 +33,7 @@ public:
     //
     // The enumeration defined here is used to ensure that every parameter
     // or parameter group has a unique ID number.  This number is used by
-    // AP_Param to store and locate parameters in EEPROM.
+    // AG_Param to store and locate parameters in EEPROM.
     //
     // Note that entries without a number are assigned the next number after
     // the entry preceding them. When adding new entries, ensure that they
@@ -44,7 +44,7 @@ public:
     // at the end of the enumeration.
     //
     // WARNING: Care should be taken when editing this enumeration as the
-    //          AP_Param load/save code depends on the values here to identify
+    //          AG_Param load/save code depends on the values here to identify
     //          variables saved in EEPROM.
     //
     //
@@ -54,7 +54,7 @@ public:
         k_param_format_version = 0,
         k_param_software_type, // deprecated
         k_param_ins_old,                        // *** Deprecated, remove with next eeprom number change
-        k_param_ins,                            // libraries/AP_InertialSensor variables
+        k_param_ins,                            // libraries/AG_InertialSensor variables
         k_param_NavEKF2_old, // deprecated - remove
         k_param_NavEKF2,
         k_param_g2, // 2nd block of parameters
@@ -113,7 +113,7 @@ public:
         k_param_angle_max,
         k_param_gps_hdop_good,
         k_param_battery,
-        k_param_fs_batt_mah,            // unused - moved to AP_BattMonitor
+        k_param_fs_batt_mah,            // unused - moved to AG_BattMonitor
         k_param_angle_rate_max,         // remove
         k_param_rssi_range,             // unused, replaced by rssi_ library parameters
         k_param_rc_feel_rp,             // deprecated
@@ -151,7 +151,7 @@ public:
         k_param_gps_glitch,             // deprecated
         k_param_baro_glitch,            // 71 - deprecated
 
-        // AP_ADSB Library
+        // AG_ADSB Library
         k_param_adsb,                   // 72
         k_param_notify,                 // 73
 
@@ -235,7 +235,7 @@ public:
         k_param_rangefinder_enabled_old, // deprecated
         k_param_frame_type,
         k_param_optflow_enabled,    // deprecated
-        k_param_fs_batt_voltage,    // unused - moved to AP_BattMonitor
+        k_param_fs_batt_voltage,    // unused - moved to AG_BattMonitor
         k_param_ch7_option_old,
         k_param_auto_slew_rate,     // deprecated - can be deleted
         k_param_rangefinder_type_old,     // deprecated
@@ -291,7 +291,7 @@ public:
         k_param_radio_tuning_high_old,   // unused
         k_param_radio_tuning_low_old,    // unused
         k_param_rc_speed = 192,
-        k_param_failsafe_battery_enabled, // unused - moved to AP_BattMonitor
+        k_param_failsafe_battery_enabled, // unused - moved to AG_BattMonitor
         k_param_throttle_mid,           // remove
         k_param_failsafe_gps_enabled,   // remove
         k_param_rc_9_old,
@@ -361,7 +361,7 @@ public:
         k_param_rtl_climb_min,
         k_param_rpm_sensor,
         k_param_autotune_min_d, // remove
-        k_param_arming, // 252  - AP_Arming
+        k_param_arming, // 252  - AG_Arming
         k_param_logger = 253, // 253 - Logging Group
 
         // 254,255: reserved
@@ -463,24 +463,24 @@ public:
     ParametersG2(void);
 
     // var_info for holding Parameter information
-    static const struct AP_Param::GroupInfo var_info[];
-    static const struct AP_Param::GroupInfo var_info2[];
+    static const struct AG_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info2[];
 
     // altitude at which nav control can start in takeoff
     AP_Float wp_navalt_min;
 
     // button checking
 #if HAL_BUTTON_ENABLED
-    AP_Button *button_ptr;
+    AG_Button *button_ptr;
 #endif
 
 #if STATS_ENABLED == ENABLED
     // vehicle statistics
-    AP_Stats stats;
+    AG_Stats stats;
 #endif
 
 #if AP_GRIPPER_ENABLED
-    AP_Gripper gripper;
+    AG_Gripper gripper;
 #endif
 
 
@@ -488,16 +488,16 @@ public:
     AP_Int8 gndeffect_comp_enabled;
 
     // temperature calibration handling
-    AP_TempCalibration temp_calibration;
+    AG_TempCalibration temp_calibration;
 
 #if BEACON_ENABLED == ENABLED
     // beacon (non-GPS positioning) library
-    AP_Beacon beacon;
+    AG_Beacon beacon;
 #endif
 
 #if HAL_PROXIMITY_ENABLED
     // proximity (aka object avoidance) library
-    AP_Proximity proximity;
+    AG_Proximity proximity;
 #endif
 
     // whether to enforce acceptance of packets only from sysid_my_gcs
@@ -505,7 +505,7 @@ public:
     
 #if ADVANCED_FAILSAFE == ENABLED
     // advanced failsafe library
-    AP_AdvancedFailsafe_Copter afs;
+    AG_AdvancedFailsafe_Copter afs;
 #endif
 
     // developer options
@@ -522,12 +522,12 @@ public:
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
     // Safe RTL library
-    AP_SmartRTL smart_rtl;
+    AG_SmartRTL smart_rtl;
 #endif
 
     // wheel encoder and winch
 #if AP_WINCH_ENABLED
-    AP_Winch winch;
+    AG_Winch winch;
 #endif
 
     // Additional pilot velocity items
@@ -546,7 +546,7 @@ public:
 #endif
 
 #if AP_SCRIPTING_ENABLED
-    AP_Scripting scripting;
+    AG_Scripting scripting;
 #endif // AP_SCRIPTING_ENABLED
 
     AP_Float tuning_min;
@@ -554,7 +554,7 @@ public:
 
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
     // object avoidance path planning
-    AP_OAPathPlanner oa;
+    AG_OAGathPlanner oa;
 #endif
 
 #if MODE_SYSTEMID_ENABLED == ENABLED
@@ -570,7 +570,7 @@ public:
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     // Autonmous autorotation
-    AC_Autorotation arot;
+    AG_Autorotation arot;
 #endif
 
 #if MODE_ZIGZAG_ENABLED == ENABLED
@@ -578,7 +578,7 @@ public:
     void *mode_zigzag_ptr;
 #endif
 
-    AC_CommandModel command_model_pilot;
+    AG_CommandModel command_model_pilot;
 
 #if MODE_AUTO_ENABLED == ENABLED
     AP_Int32 auto_options;
@@ -627,4 +627,4 @@ public:
     bool _spray_enabled;
 };
 
-extern const AP_Param::Info        var_info[];
+extern const AG_Param::Info        var_info[];

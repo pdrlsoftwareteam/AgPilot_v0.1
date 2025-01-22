@@ -11,7 +11,7 @@ exclude: |
   ^build/ |
   ^cmake-build-debug/ |
   \.m |
-  ^libraries/AP_HAL_ChibiOS/hwdef/scripts/
+  ^libraries/AG_HAL_ChibiOS/hwdef/scripts/
   )
 
 repos:

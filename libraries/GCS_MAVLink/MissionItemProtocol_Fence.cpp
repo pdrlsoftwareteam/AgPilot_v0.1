@@ -1,7 +1,7 @@
 #include "MissionItemProtocol_Fence.h"
 
-#include <AC_Fence/AC_Fence.h>
-#include <AP_InternalError/AP_InternalError.h>
+#include <AG_Fence/AG_Fence.h>
+#include <AG_InternalError/AG_InternalError.h>
 #include <GCS_MAVLink/GCS.h>
 
 #if AP_FENCE_ENABLED
@@ -12,7 +12,7 @@
 bool MissionItemProtocol_Fence::get_item_as_mission_item(uint16_t seq,
                                                          mavlink_mission_item_int_t &ret_packet)
 {
-    AC_Fence *fence = AP::fence();
+    AG_Fence *fence = AP::fence();
     if (fence == nullptr) {
         return false;
     }
@@ -21,7 +21,7 @@ bool MissionItemProtocol_Fence::get_item_as_mission_item(uint16_t seq,
         return false;
     }
 
-    AC_PolyFenceItem fenceitem;
+    AG_PolyFenceItem fenceitem;
 
     if (!fence->polyfence().get_item(seq, fenceitem)) {
         return false;
@@ -30,31 +30,31 @@ bool MissionItemProtocol_Fence::get_item_as_mission_item(uint16_t seq,
     MAV_CMD ret_cmd = MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION; // initialised to avoid compiler warning
     float p1 = 0;
     switch (fenceitem.type) {
-    case AC_PolyFenceType::POLYGON_INCLUSION:
+    case AG_PolyFenceType::POLYGON_INCLUSION:
         ret_cmd = MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION;
         p1 = fenceitem.vertex_count;
         break;
-    case AC_PolyFenceType::POLYGON_EXCLUSION:
+    case AG_PolyFenceType::POLYGON_EXCLUSION:
         ret_cmd = MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION;
         p1 = fenceitem.vertex_count;
         break;
-    case AC_PolyFenceType::RETURN_POINT:
+    case AG_PolyFenceType::RETURN_POINT:
         ret_cmd = MAV_CMD_NAV_FENCE_RETURN_POINT;
         break;
-    case AC_PolyFenceType::CIRCLE_EXCLUSION:
+    case AG_PolyFenceType::CIRCLE_EXCLUSION:
         ret_cmd = MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION;
         p1 = fenceitem.radius;
         break;
-    case AC_PolyFenceType::CIRCLE_INCLUSION:
+    case AG_PolyFenceType::CIRCLE_INCLUSION:
         ret_cmd = MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION;
         p1 = fenceitem.radius;
         break;
-    case AC_PolyFenceType::CIRCLE_EXCLUSION_INT:
-    case AC_PolyFenceType::CIRCLE_INCLUSION_INT:
-        // should never have an AC_PolyFenceItem with these types
-        INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+    case AG_PolyFenceType::CIRCLE_EXCLUSION_INT:
+    case AG_PolyFenceType::CIRCLE_INCLUSION_INT:
+        // should never have an AG_PolyFenceItem with these types
+        INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
         FALLTHROUGH;
-    case AC_PolyFenceType::END_OF_STORAGE:
+    case AG_PolyFenceType::END_OF_STORAGE:
         return false;
     }
 
@@ -92,7 +92,7 @@ uint16_t MissionItemProtocol_Fence::item_count() const
     return _fence.polyfence().num_stored_items();
 }
 
-static MAV_MISSION_RESULT convert_MISSION_ITEM_INT_to_AC_PolyFenceItem(const mavlink_mission_item_int_t &mission_item_int, AC_PolyFenceItem &ret)
+static MAV_MISSION_RESULT convert_MISSION_ITEM_INT_to_AG_PolyFenceItem(const mavlink_mission_item_int_t &mission_item_int, AG_PolyFenceItem &ret)
 {
     if (mission_item_int.frame != MAV_FRAME_GLOBAL &&
         mission_item_int.frame != MAV_FRAME_GLOBAL_INT &&
@@ -105,22 +105,22 @@ static MAV_MISSION_RESULT convert_MISSION_ITEM_INT_to_AC_PolyFenceItem(const mav
 
     switch (mission_item_int.command) {
     case MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION:
-        ret.type = AC_PolyFenceType::POLYGON_INCLUSION;
+        ret.type = AG_PolyFenceType::POLYGON_INCLUSION;
         ret.vertex_count = mission_item_int.param1;
         break;
     case MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION:
-        ret.type = AC_PolyFenceType::POLYGON_EXCLUSION;
+        ret.type = AG_PolyFenceType::POLYGON_EXCLUSION;
         ret.vertex_count = mission_item_int.param1;
         break;
     case MAV_CMD_NAV_FENCE_RETURN_POINT:
-        ret.type = AC_PolyFenceType::RETURN_POINT;
+        ret.type = AG_PolyFenceType::RETURN_POINT;
         break;
     case MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION:
-        ret.type = AC_PolyFenceType::CIRCLE_EXCLUSION;
+        ret.type = AG_PolyFenceType::CIRCLE_EXCLUSION;
         ret.radius = mission_item_int.param1;
         break;
     case MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION:
-        ret.type = AC_PolyFenceType::CIRCLE_INCLUSION;
+        ret.type = AG_PolyFenceType::CIRCLE_INCLUSION;
         ret.radius = mission_item_int.param1;
         break;
     default:
@@ -134,14 +134,14 @@ static MAV_MISSION_RESULT convert_MISSION_ITEM_INT_to_AC_PolyFenceItem(const mav
 MAV_MISSION_RESULT MissionItemProtocol_Fence::replace_item(const mavlink_mission_item_int_t &mission_item_int)
 {
     if (_new_items == nullptr) {
-        INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+        INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
         return MAV_MISSION_ERROR;
     }
     if (mission_item_int.seq >= _new_items_count) {
         return MAV_MISSION_INVALID_SEQUENCE;
     }
 
-    const MAV_MISSION_RESULT ret = convert_MISSION_ITEM_INT_to_AC_PolyFenceItem(mission_item_int, _new_items[mission_item_int.seq]);
+    const MAV_MISSION_RESULT ret = convert_MISSION_ITEM_INT_to_AG_PolyFenceItem(mission_item_int, _new_items[mission_item_int.seq]);
     if (ret != MAV_MISSION_ACCEPTED) {
         return ret;
     }
@@ -211,13 +211,13 @@ MAV_MISSION_RESULT MissionItemProtocol_Fence::allocate_receive_resources(const u
     if (_new_items != nullptr) {
         // this is an error - the base class should have called
         // free_upload_resources first
-        INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+        INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
         return MAV_MISSION_ERROR;
     }
 
-    const uint16_t allocation_size = count * sizeof(AC_PolyFenceItem);
+    const uint16_t allocation_size = count * sizeof(AG_PolyFenceItem);
     if (allocation_size != 0) {
-        _new_items = (AC_PolyFenceItem*)malloc(allocation_size);
+        _new_items = (AG_PolyFenceItem*)malloc(allocation_size);
         if (_new_items == nullptr) {
             gcs().send_text(MAV_SEVERITY_WARNING, "Out of memory for upload");
             return MAV_MISSION_ERROR;

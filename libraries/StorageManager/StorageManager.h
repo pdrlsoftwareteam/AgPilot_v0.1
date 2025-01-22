@@ -20,8 +20,8 @@
  */
 #pragma once
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_BoardConfig/AP_BoardConfig_config.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_BoardConfig/AG_BoardConfig_config.h>
 
 /*
   use just one area per storage type for boards with 4k of

@@ -2,14 +2,14 @@
   bootloader support functions
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include "ch.h"
 #include "hal.h"
 #include "hwdef.h"
-#include <AP_HAL_ChibiOS/hwdef/common/usbcfg.h>
-#include <AP_HAL_ChibiOS/hwdef/common/flash.h>
-#include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
-#include <AP_Math/AP_Math.h>
+#include <AG_HAL_ChibiOS/hwdef/common/usbcfg.h>
+#include <AG_HAL_ChibiOS/hwdef/common/flash.h>
+#include <AG_HAL_ChibiOS/hwdef/common/stm32_util.h>
+#include <AG_Math/AG_Math.h>
 #include "support.h"
 #include "mcu_f1.h"
 #include "mcu_f3.h"

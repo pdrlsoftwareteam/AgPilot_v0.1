@@ -1,5 +1,5 @@
 #include "Copter.h"
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
+#include <AG_ESC_Telem/AG_ESC_Telem.h>
 
 /*****************************************************************************
 *   The init_ardupilot function processes everything we need for an in - air restart
@@ -156,8 +156,8 @@ void Copter::init_ardupilot()
     g2.beacon.init();
 #endif
 
-#if AP_RPM_ENABLED
-    // initialise AP_RPM library
+#if AG_RPM_ENABLED
+    // initialise AG_RPM library
     rpm_sensor.init();
 #endif
 
@@ -171,7 +171,7 @@ void Copter::init_ardupilot()
     g2.smart_rtl.init();
 #endif
 
-    // initialise AP_Logger library
+    // initialise AG_Logger library
     logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&copter, &Copter::Log_Write_Vehicle_Startup_Messages, void));
 
     startup_INS_ground();
@@ -209,7 +209,7 @@ void Copter::init_ardupilot()
         set_mode(Mode::Number::STABILIZE, ModeReason::UNAVAILABLE);
     }
 
-    AP_Param::verifySha256Checksum();
+    AG_Param::verifySha256Checksum();
 
     // flag that initialisation has completed
     ap.initialised = true;
@@ -223,7 +223,7 @@ void Copter::startup_INS_ground()
 {
     // initialise ahrs (may push imu calibration into the mpu6000 if using that device).
     ahrs.init();
-    ahrs.set_vehicle_class(AP_AHRS::VehicleClass::COPTER);
+    ahrs.set_vehicle_class(AG_AHRS::VehicleClass::COPTER);
 
     // Warm up and calibrate gyro offsets
     ins.init(scheduler.get_loop_rate_hz());
@@ -337,7 +337,7 @@ void Copter::update_auto_armed()
         
         // for tradheli if motors are armed and throttle is above zero and the motor is started, auto_armed should be true
         if(motors->armed() && ap.using_interlock) {
-            if(!ap.throttle_zero && motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
+            if(!ap.throttle_zero && motors->get_spool_state() == AG_Motors::SpoolState::THROTTLE_UNLIMITED) {
                 set_auto_armed(true);
             }
         // if motors are armed and throttle is above zero auto_armed should be true
@@ -368,111 +368,111 @@ bool Copter::should_log(uint32_t mask)
  */
 void Copter::allocate_motors(void)
 {
-    switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
-        case AP_Motors::MOTOR_FRAME_QUAD:
-        case AP_Motors::MOTOR_FRAME_HEXA:
-        case AP_Motors::MOTOR_FRAME_Y6:
-        case AP_Motors::MOTOR_FRAME_OCTA:
-        case AP_Motors::MOTOR_FRAME_OCTAQUAD:
-        case AP_Motors::MOTOR_FRAME_DODECAHEXA:
-        case AP_Motors::MOTOR_FRAME_DECA:
-        case AP_Motors::MOTOR_FRAME_SCRIPTING_MATRIX:
+    switch ((AG_Motors::motor_frame_class)g2.frame_class.get()) {
+        case AG_Motors::MOTOR_FRAME_QUAD:
+        case AG_Motors::MOTOR_FRAME_HEXA:
+        case AG_Motors::MOTOR_FRAME_Y6:
+        case AG_Motors::MOTOR_FRAME_OCTA:
+        case AG_Motors::MOTOR_FRAME_OCTAQUAD:
+        case AG_Motors::MOTOR_FRAME_DODECAHEXA:
+        case AG_Motors::MOTOR_FRAME_DECA:
+        case AG_Motors::MOTOR_FRAME_SCRIPTING_MATRIX:
         default:
-            motors = new AP_MotorsMatrix(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix::var_info;
+            motors = new AG_MotorsMatrix(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsMatrix::var_info;
             break;
-        case AP_Motors::MOTOR_FRAME_TRI:
-            motors = new AP_MotorsTri(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsTri::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_TRICOPTER);
+        case AG_Motors::MOTOR_FRAME_TRI:
+            motors = new AG_MotorsTri(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsTri::var_info;
+            AG_Param::set_frame_type_flags(AP_PARAM_FRAME_TRICOPTER);
             break;
-        case AP_Motors::MOTOR_FRAME_SINGLE:
-            motors = new AP_MotorsSingle(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsSingle::var_info;
+        case AG_Motors::MOTOR_FRAME_SINGLE:
+            motors = new AG_MotorsSingle(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsSingle::var_info;
             break;
-        case AP_Motors::MOTOR_FRAME_COAX:
-            motors = new AP_MotorsCoax(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsCoax::var_info;
+        case AG_Motors::MOTOR_FRAME_COAX:
+            motors = new AG_MotorsCoax(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsCoax::var_info;
             break;
-        case AP_Motors::MOTOR_FRAME_TAILSITTER:
-            motors = new AP_MotorsTailsitter(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsTailsitter::var_info;
+        case AG_Motors::MOTOR_FRAME_TAILSITTER:
+            motors = new AG_MotorsTailsitter(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsTailsitter::var_info;
             break;
-        case AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING:
+        case AG_Motors::MOTOR_FRAME_6DOF_SCRIPTING:
 #if AP_SCRIPTING_ENABLED
-            motors = new AP_MotorsMatrix_6DoF_Scripting(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix_6DoF_Scripting::var_info;
+            motors = new AG_MotorsMatrix_6DoF_Scripting(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsMatrix_6DoF_Scripting::var_info;
 #endif // AP_SCRIPTING_ENABLED
             break;
-        case AP_Motors::MOTOR_FRAME_DYNAMIC_SCRIPTING_MATRIX:
+        case AG_Motors::MOTOR_FRAME_DYNAMIC_SCRIPTING_MATRIX:
 #if AP_SCRIPTING_ENABLED
-            motors = new AP_MotorsMatrix_Scripting_Dynamic(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix_Scripting_Dynamic::var_info;
+            motors = new AG_MotorsMatrix_Scripting_Dynamic(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AG_MotorsMatrix_Scripting_Dynamic::var_info;
 #endif // AP_SCRIPTING_ENABLED
             break;
     }
     if (motors == nullptr) {
-        AP_BoardConfig::allocation_error("FRAME_CLASS=%u", (unsigned)g2.frame_class.get());
+        AG_BoardConfig::allocation_error("FRAME_CLASS=%u", (unsigned)g2.frame_class.get());
     }
-    AP_Param::load_object_from_eeprom(motors, motors_var_info);
+    AG_Param::load_object_from_eeprom(motors, motors_var_info);
 
     ahrs_view = ahrs.create_view(ROTATION_NONE);
     if (ahrs_view == nullptr) {
-        AP_BoardConfig::allocation_error("AP_AHRS_View");
+        AG_BoardConfig::allocation_error("AG_AHRS_View");
     }
 
-    const struct AP_Param::GroupInfo *ac_var_info;
+    const struct AG_Param::GroupInfo *ac_var_info;
 
-    if ((AP_Motors::motor_frame_class)g2.frame_class.get() == AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING) {
+    if ((AG_Motors::motor_frame_class)g2.frame_class.get() == AG_Motors::MOTOR_FRAME_6DOF_SCRIPTING) {
 #if AP_SCRIPTING_ENABLED
-        attitude_control = new AC_AttitudeControl_Multi_6DoF(*ahrs_view, aparm, *motors);
-        ac_var_info = AC_AttitudeControl_Multi_6DoF::var_info;
+        attitude_control = new AG_AttitudeControl_Multi_6DoF(*ahrs_view, aparm, *motors);
+        ac_var_info = AG_AttitudeControl_Multi_6DoF::var_info;
 #endif // AP_SCRIPTING_ENABLED
     } else {
-        attitude_control = new AC_AttitudeControl_Multi(*ahrs_view, aparm, *motors);
-        ac_var_info = AC_AttitudeControl_Multi::var_info;
+        attitude_control = new AG_AttitudeControl_Multi(*ahrs_view, aparm, *motors);
+        ac_var_info = AG_AttitudeControl_Multi::var_info;
     }
     if (attitude_control == nullptr) {
-        AP_BoardConfig::allocation_error("AttitudeControl");
+        AG_BoardConfig::allocation_error("AttitudeControl");
     }
-    AP_Param::load_object_from_eeprom(attitude_control, ac_var_info);
+    AG_Param::load_object_from_eeprom(attitude_control, ac_var_info);
         
-    pos_control = new AC_PosControl(*ahrs_view, inertial_nav, *motors, *attitude_control);
+    pos_control = new AG_PosControl(*ahrs_view, inertial_nav, *motors, *attitude_control);
     if (pos_control == nullptr) {
-        AP_BoardConfig::allocation_error("PosControl");
+        AG_BoardConfig::allocation_error("PosControl");
     }
-    AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
+    AG_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
 
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
-    wp_nav = new AC_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+    wp_nav = new AG_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
 #else
-    wp_nav = new AC_WPNav(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+    wp_nav = new AG_WPNav(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
 #endif
     if (wp_nav == nullptr) {
-        AP_BoardConfig::allocation_error("WPNav");
+        AG_BoardConfig::allocation_error("WPNav");
     }
-    AP_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
+    AG_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
 
-    loiter_nav = new AC_Loiter(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+    loiter_nav = new AG_Loiter(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
     if (loiter_nav == nullptr) {
-        AP_BoardConfig::allocation_error("LoiterNav");
+        AG_BoardConfig::allocation_error("LoiterNav");
     }
-    AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
+    AG_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
 
 #if MODE_CIRCLE_ENABLED == ENABLED
-    circle_nav = new AC_Circle(inertial_nav, *ahrs_view, *pos_control);
+    circle_nav = new AG_Circle(inertial_nav, *ahrs_view, *pos_control);
     if (circle_nav == nullptr) {
-        AP_BoardConfig::allocation_error("CircleNav");
+        AG_BoardConfig::allocation_error("CircleNav");
     }
-    AP_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
+    AG_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
 #endif
 
     // reload lines from the defaults file that may now be accessible
-    AP_Param::reload_defaults_file(true);
+    AG_Param::reload_defaults_file(true);
     
     // now setup some frame-class specific defaults
-    switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
-    case AP_Motors::MOTOR_FRAME_Y6:
+    switch ((AG_Motors::motor_frame_class)g2.frame_class.get()) {
+    case AG_Motors::MOTOR_FRAME_Y6:
         attitude_control->get_rate_roll_pid().kP().set_default(0.1);
         attitude_control->get_rate_roll_pid().kD().set_default(0.006);
         attitude_control->get_rate_pitch_pid().kP().set_default(0.1);
@@ -480,7 +480,7 @@ void Copter::allocate_motors(void)
         attitude_control->get_rate_yaw_pid().kP().set_default(0.15);
         attitude_control->get_rate_yaw_pid().kI().set_default(0.015);
         break;
-    case AP_Motors::MOTOR_FRAME_TRI:
+    case AG_Motors::MOTOR_FRAME_TRI:
         attitude_control->get_rate_yaw_pid().filt_D_hz().set_default(100);
         break;
     default:
@@ -501,5 +501,5 @@ void Copter::allocate_motors(void)
 #endif
 
     // param count could have changed
-    AP_Param::invalidate_count();
+    AG_Param::invalidate_count();
 }

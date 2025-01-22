@@ -3,8 +3,8 @@
 #include "SIM_I2C.h"
 
 #include <SITL/SIM_Aircraft.h>
-#include <AP_HAL/utility/sparse-endian.h>
-#include <AP_Common/Bitmask.h>
+#include <AG_HAL/utility/sparse-endian.h>
+#include <AG_Common/Bitmask.h>
 
 namespace SITL {
 

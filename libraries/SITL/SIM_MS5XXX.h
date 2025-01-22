@@ -2,7 +2,7 @@
 
 #include "SIM_I2CDevice.h"
 
-#include <AP_Common/Bitmask.h>
+#include <AG_Common/Bitmask.h>
 
 namespace SITL {
 

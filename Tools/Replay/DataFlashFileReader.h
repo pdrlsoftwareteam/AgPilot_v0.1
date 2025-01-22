@@ -1,15 +1,15 @@
 #pragma once
 
-#include <AP_Logger/AP_Logger.h>
+#include <AG_Logger/AG_Logger.h>
 
 #define LOGREADER_MAX_FORMATS 255 // must be >= highest MESSAGE
 
-class AP_LoggerFileReader
+class AG_LoggerFileReader
 {
 public:
 
-    AP_LoggerFileReader();
-    ~AP_LoggerFileReader();
+    AG_LoggerFileReader();
+    ~AG_LoggerFileReader();
 
     bool open_log(const char *logfile);
     bool update();

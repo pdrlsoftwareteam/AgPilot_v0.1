@@ -440,7 +440,7 @@ def setup_canmgr_build(cfg):
     the build based on the presence of CAN pins in hwdef.dat except for AP_Periph builds'''
     env = cfg.env
     env.AP_LIBRARIES += [
-        'AP_UAVCAN',
+        'AG_UAVCAN',
         'modules/uavcan/libuavcan/src/**/*.cpp',
         ]
 
@@ -528,14 +528,14 @@ def configure(cfg):
 
     env.CH_ROOT = srcpath('modules/ChibiOS')
     env.CC_ROOT = srcpath('modules/CrashDebug/CrashCatcher')
-    env.AP_HAL_ROOT = srcpath('libraries/AP_HAL_ChibiOS')
+    env.AG_HAL_ROOT = srcpath('libraries/AG_HAL_ChibiOS')
     env.BUILDDIR = bldpath('modules/ChibiOS')
     env.BUILDROOT = bldpath('')
     env.SRCROOT = srcpath('')
     env.PT_DIR = srcpath('Tools/ardupilotwaf/chibios/image')
     env.MKFW_TOOLS = srcpath('Tools/ardupilotwaf')
     env.UPLOAD_TOOLS = srcpath('Tools/scripts')
-    env.CHIBIOS_SCRIPTS = srcpath('libraries/AP_HAL_ChibiOS/hwdef/scripts')
+    env.CHIBIOS_SCRIPTS = srcpath('libraries/AG_HAL_ChibiOS/hwdef/scripts')
     env.TOOLS_SCRIPTS = srcpath('Tools/scripts')
     env.APJ_TOOL = srcpath('Tools/scripts/apj_tool.py')
     env.SERIAL_PORT = srcpath('/dev/serial/by-id/*_STLink*')
@@ -543,11 +543,11 @@ def configure(cfg):
     # relative paths to pass to make, relative to directory that make is run from
     env.CH_ROOT_REL = os.path.relpath(env.CH_ROOT, env.BUILDROOT)
     env.CC_ROOT_REL = os.path.relpath(env.CC_ROOT, env.BUILDROOT)
-    env.AP_HAL_REL = os.path.relpath(env.AP_HAL_ROOT, env.BUILDROOT)
+    env.AG_HAL_REL = os.path.relpath(env.AG_HAL_ROOT, env.BUILDROOT)
     env.BUILDDIR_REL = os.path.relpath(env.BUILDDIR, env.BUILDROOT)
 
-    mk_custom = srcpath('libraries/AP_HAL_ChibiOS/hwdef/%s/chibios_board.mk' % env.BOARD)
-    mk_common = srcpath('libraries/AP_HAL_ChibiOS/hwdef/common/chibios_board.mk')
+    mk_custom = srcpath('libraries/AG_HAL_ChibiOS/hwdef/%s/chibios_board.mk' % env.BOARD)
+    mk_common = srcpath('libraries/AG_HAL_ChibiOS/hwdef/common/chibios_board.mk')
     # see if there is a board specific make file
     if os.path.exists(mk_custom):
         env.BOARD_MK = mk_custom
@@ -574,21 +574,21 @@ def generate_hwdef_h(env):
     import subprocess
     if env.BOOTLOADER:
         if len(env.HWDEF) == 0:
-            env.HWDEF = os.path.join(env.SRCROOT, 'libraries/AP_HAL_ChibiOS/hwdef/%s/hwdef-bl.dat' % env.BOARD)
+            env.HWDEF = os.path.join(env.SRCROOT, 'libraries/AG_HAL_ChibiOS/hwdef/%s/hwdef-bl.dat' % env.BOARD)
         else:
             # update to using hwdef-bl.dat
             env.HWDEF = env.HWDEF.replace('hwdef.dat', 'hwdef-bl.dat')
         env.BOOTLOADER_OPTION="--bootloader"
     else:
         if len(env.HWDEF) == 0:
-            env.HWDEF = os.path.join(env.SRCROOT, 'libraries/AP_HAL_ChibiOS/hwdef/%s/hwdef.dat' % env.BOARD)
+            env.HWDEF = os.path.join(env.SRCROOT, 'libraries/AG_HAL_ChibiOS/hwdef/%s/hwdef.dat' % env.BOARD)
         env.BOOTLOADER_OPTION=""
 
     if env.AP_SIGNED_FIRMWARE:
         print(env.BOOTLOADER_OPTION)
         env.BOOTLOADER_OPTION += " --signed-fw"
         print(env.BOOTLOADER_OPTION)
-    hwdef_script = os.path.join(env.SRCROOT, 'libraries/AP_HAL_ChibiOS/hwdef/scripts/chibios_hwdef.py')
+    hwdef_script = os.path.join(env.SRCROOT, 'libraries/AG_HAL_ChibiOS/hwdef/scripts/chibios_hwdef.py')
     hwdef_out = env.BUILDROOT
     if not os.path.exists(hwdef_out):
         os.mkdir(hwdef_out)
@@ -621,7 +621,7 @@ def build(bld):
 
     hwdef_rule="%s '%s/hwdef/scripts/chibios_hwdef.py' -D '%s' --params '%s' '%s'" % (
             bld.env.get_flat('PYTHON'),
-            bld.env.AP_HAL_ROOT,
+            bld.env.AG_HAL_ROOT,
             bld.env.BUILDROOT,
             bld.env.default_parameters,
             bld.env.HWDEF)
@@ -641,7 +641,7 @@ def build(bld):
     
     bld(
         # create the file modules/ChibiOS/include_dirs
-        rule="touch Makefile && BUILDDIR=${BUILDDIR_REL} CRASHCATCHER=${CC_ROOT_REL} CHIBIOS=${CH_ROOT_REL} AP_HAL=${AP_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${MAKE} pass -f '${BOARD_MK}'",
+        rule="touch Makefile && BUILDDIR=${BUILDDIR_REL} CRASHCATCHER=${CC_ROOT_REL} CHIBIOS=${CH_ROOT_REL} AG_HAL=${AG_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${MAKE} pass -f '${BOARD_MK}'",
         group='dynamic_sources',
         target=bld.bldnode.find_or_declare('modules/ChibiOS/include_dirs')
     )
@@ -649,8 +649,8 @@ def build(bld):
     common_src = [bld.bldnode.find_or_declare('hwdef.h'),
                   bld.bldnode.find_or_declare('hw.dat'),
                   bld.bldnode.find_or_declare('modules/ChibiOS/include_dirs')]
-    common_src += bld.path.ant_glob('libraries/AP_HAL_ChibiOS/hwdef/common/*.[ch]')
-    common_src += bld.path.ant_glob('libraries/AP_HAL_ChibiOS/hwdef/common/*.mk')
+    common_src += bld.path.ant_glob('libraries/AG_HAL_ChibiOS/hwdef/common/*.[ch]')
+    common_src += bld.path.ant_glob('libraries/AG_HAL_ChibiOS/hwdef/common/*.mk')
     common_src += bld.path.ant_glob('modules/ChibiOS/os/hal/**/*.[ch]')
     common_src += bld.path.ant_glob('modules/ChibiOS/os/hal/**/*.mk')
     if bld.env.ROMFS_FILES:
@@ -659,7 +659,7 @@ def build(bld):
     if bld.env.ENABLE_CRASHDUMP:
         ch_task = bld(
             # build libch.a from ChibiOS sources and hwdef.h
-            rule="BUILDDIR='${BUILDDIR_REL}' CRASHCATCHER='${CC_ROOT_REL}' CHIBIOS='${CH_ROOT_REL}' AP_HAL=${AP_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${HAL_MAX_STACK_FRAME_SIZE} '${MAKE}' -j%u lib -f '${BOARD_MK}'" % bld.options.jobs,
+            rule="BUILDDIR='${BUILDDIR_REL}' CRASHCATCHER='${CC_ROOT_REL}' CHIBIOS='${CH_ROOT_REL}' AG_HAL=${AG_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${HAL_MAX_STACK_FRAME_SIZE} '${MAKE}' -j%u lib -f '${BOARD_MK}'" % bld.options.jobs,
             group='dynamic_sources',
             source=common_src,
             target=[bld.bldnode.find_or_declare('modules/ChibiOS/libch.a'), bld.bldnode.find_or_declare('modules/ChibiOS/libcc.a')]
@@ -667,7 +667,7 @@ def build(bld):
     else:
         ch_task = bld(
             # build libch.a from ChibiOS sources and hwdef.h
-            rule="BUILDDIR='${BUILDDIR_REL}' CHIBIOS='${CH_ROOT_REL}' AP_HAL=${AP_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${HAL_MAX_STACK_FRAME_SIZE} '${MAKE}' -j%u lib -f '${BOARD_MK}'" % bld.options.jobs,
+            rule="BUILDDIR='${BUILDDIR_REL}' CHIBIOS='${CH_ROOT_REL}' AG_HAL=${AG_HAL_REL} ${CHIBIOS_BUILD_FLAGS} ${CHIBIOS_BOARD_NAME} ${HAL_MAX_STACK_FRAME_SIZE} '${MAKE}' -j%u lib -f '${BOARD_MK}'" % bld.options.jobs,
             group='dynamic_sources',
             source=common_src,
             target=bld.bldnode.find_or_declare('modules/ChibiOS/libch.a')
@@ -680,7 +680,7 @@ def build(bld):
     if bld.env.CORTEX in DSP_LIBS:
         libname = DSP_LIBS[bld.env.CORTEX]
         # we need to copy the library on cygwin as it doesn't handle linking outside build tree
-        shutil.copyfile(os.path.join(bld.env.SRCROOT,'libraries/AP_GyroFFT/CMSIS_5/lib',libname),
+        shutil.copyfile(os.path.join(bld.env.SRCROOT,'libraries/AG_GyroFFT/CMSIS_5/lib',libname),
                         os.path.join(bld.env.BUILDROOT,'modules/ChibiOS/libDSP.a'))
         bld.env.LIB += ['DSP']
     bld.env.LIB += ['ch']

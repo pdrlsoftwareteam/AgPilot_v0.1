@@ -18,7 +18,7 @@
 
 #include "SIM_Aircraft.h"
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 namespace SITL {
 

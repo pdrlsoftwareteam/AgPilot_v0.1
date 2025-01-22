@@ -45,7 +45,7 @@ def topdir():
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."),
             "",
             ]:
-        if os.path.exists(os.path.join(path, "libraries", "AP_HAL_ChibiOS")):
+        if os.path.exists(os.path.join(path, "libraries", "AG_HAL_ChibiOS")):
             return path
     raise Exception("Unable to find ardupilot checkout dir")
 
@@ -53,7 +53,7 @@ def topdir():
 def is_chibios_build(board):
     '''see if a board is using HAL_ChibiOS'''
     # cope with both running from Tools/scripts or running from cwd
-    hwdef_dir = os.path.join(topdir(), "libraries", "AP_HAL_ChibiOS", "hwdef")
+    hwdef_dir = os.path.join(topdir(), "libraries", "AG_HAL_ChibiOS", "hwdef")
 
     return os.path.exists(os.path.join(hwdef_dir, board, "hwdef.dat"))
 

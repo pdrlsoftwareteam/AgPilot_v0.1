@@ -17,7 +17,7 @@
 */
 
 #include "SIM_Motor.h"
-#include <AP_Motors/AP_Motors.h>
+#include <AG_Motors/AG_Motors.h>
 
 using namespace SITL;
 
@@ -46,7 +46,7 @@ void Motor::calculate_forces(const struct sitl_input &input,
     }
 
     // apply slew limiter to command
-    uint64_t now_us = AP_HAL::micros64();
+    uint64_t now_us = AG_HAL::micros64();
     if (last_calc_us != 0 && slew_max > 0) {
         float dt = (now_us - last_calc_us)*1.0e-6;
         float slew_max_change = slew_max * dt;
@@ -77,7 +77,7 @@ void Motor::calculate_forces(const struct sitl_input &input,
     // work out roll and pitch of motor relative to it pointing straight up
     float roll = 0, pitch = 0;
 
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     
     // possibly roll and/or pitch the motor
     if (roll_servo >= 0) {

@@ -125,7 +125,7 @@ void Copter::mode_change_failed(const Mode *mode, const char *reason)
     AP::logger().Write_Error(LogErrorSubsystem::FLIGHT_MODE, LogErrorCode(mode->mode_number()));
     // make sad noise
     if (copter.ap.initialised) {
-        AP_Notify::events.user_mode_change_failed = 1;
+        AG_Notify::events.user_mode_change_failed = 1;
     }
 }
 
@@ -148,7 +148,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         }
         // make happy noise
         if (copter.ap.initialised && (reason != last_reason)) {
-            AP_Notify::events.user_mode_change = 1;
+            AG_Notify::events.user_mode_change = 1;
         }
         return true;
     }
@@ -224,7 +224,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 
     // make happy noise
     if (copter.ap.initialised) {
-        AP_Notify::events.user_mode_change = 1;
+        AG_Notify::events.user_mode_change = 1;
     }
 
     // return success
@@ -271,8 +271,8 @@ void Copter::exit_mode(Mode *&old_flightmode,
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
 void Copter::notify_flight_mode() {
-    AP_Notify::flags.autopilot_mode = flightmode->is_autopilot();
-    AP_Notify::flags.flight_mode = (uint8_t)flightmode->mode_number();
+    AG_Notify::flags.autopilot_mode = flightmode->is_autopilot();
+    AG_Notify::flags.flight_mode = (uint8_t)flightmode->mode_number();
     notify.set_flight_mode_str(flightmode->name4());
 }
 
@@ -341,7 +341,7 @@ bool Mode::_TakeOff::triggered(const float target_climb_rate) const
         return false;
     }
 
-    if (copter.motors->get_spool_state() != AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
+    if (copter.motors->get_spool_state() != AG_Motors::SpoolState::THROTTLE_UNLIMITED) {
         // hold aircraft on the ground until rotor speed runup has finished
         return false;
     }
@@ -360,9 +360,9 @@ bool Mode::is_disarmed_or_landed() const
 void Mode::zero_throttle_and_relax_ac(bool spool_up)
 {
     if (spool_up) {
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     } else {
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::GROUND_IDLE);
     }
     attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(0.0f, 0.0f, 0.0f);
     attitude_control->set_throttle_out(0.0f, false, copter.g.throttle_filt);
@@ -385,24 +385,24 @@ void Mode::make_safe_ground_handling(bool force_throttle_unlimited)
 {
     if (force_throttle_unlimited) {
         // keep rotors turning 
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
     } else {
         // spool down to ground idle
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::GROUND_IDLE);
     }
 
     // aircraft is landed, integrator terms must be reset regardless of spool state
     attitude_control->reset_rate_controller_I_terms_smoothly();
  
     switch (motors->get_spool_state()) {
-    case AP_Motors::SpoolState::SHUT_DOWN:
-    case AP_Motors::SpoolState::GROUND_IDLE:
+    case AG_Motors::SpoolState::SHUT_DOWN:
+    case AG_Motors::SpoolState::GROUND_IDLE:
         // reset yaw targets and rates during idle states
         attitude_control->reset_yaw_target_and_rate();
         break;
-    case AP_Motors::SpoolState::SPOOLING_UP:
-    case AP_Motors::SpoolState::THROTTLE_UNLIMITED:
-    case AP_Motors::SpoolState::SPOOLING_DOWN:
+    case AG_Motors::SpoolState::SPOOLING_UP:
+    case AG_Motors::SpoolState::THROTTLE_UNLIMITED:
+    case AG_Motors::SpoolState::SPOOLING_DOWN:
         // while transitioning though active states continue to operate normally
         break;
     }
@@ -676,30 +676,30 @@ void Mode::precland_run()
         Vector3f retry_pos;
 
         switch (copter.precland_statemachine.update(retry_pos)) {
-        case AC_PrecLand_StateMachine::Status::RETRYING:
+        case AG_PrecLand_StateMachine::Status::RETRYING:
             // we want to retry landing by going to another position
             precland_retry_position(retry_pos);
             break;
 
-        case AC_PrecLand_StateMachine::Status::FAILSAFE: {
+        case AG_PrecLand_StateMachine::Status::FAILSAFE: {
             // we have hit a failsafe. Failsafe can only mean two things, we either want to stop permanently till user takes over or land
             switch (copter.precland_statemachine.get_failsafe_actions()) {
-            case AC_PrecLand_StateMachine::FailSafeAction::DESCEND:
+            case AG_PrecLand_StateMachine::FailSafeAction::DESCEND:
                 // descend normally, prec land target is definitely not in sight
                 land_run_horiz_and_vert_control();
                 break;
-            case AC_PrecLand_StateMachine::FailSafeAction::HOLD_POS:
+            case AG_PrecLand_StateMachine::FailSafeAction::HOLD_POS:
                 // sending "true" in this argument will stop the descend
                 land_run_horiz_and_vert_control(true);
                 break;
             }
             break;
         }
-        case AC_PrecLand_StateMachine::Status::ERROR:
+        case AG_PrecLand_StateMachine::Status::ERROR:
             // should never happen, is certainly a bug. Report then descend
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
+            INTERNAL_ERROR(AG_InternalError::error_t::flow_of_control);
             FALLTHROUGH;
-        case AC_PrecLand_StateMachine::Status::DESCEND:
+        case AG_PrecLand_StateMachine::Status::DESCEND:
             // run land controller. This will descend towards the target if prec land target is in sight
             // else it will just descend vertically
             land_run_horiz_and_vert_control();
@@ -770,15 +770,15 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
     // Alt Hold State Machine Determination
     if (!motors->armed()) {
         // the aircraft should moved to a shut down state
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::SHUT_DOWN);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::SHUT_DOWN);
 
         // transition through states as aircraft spools down
         switch (motors->get_spool_state()) {
 
-        case AP_Motors::SpoolState::SHUT_DOWN:
+        case AG_Motors::SpoolState::SHUT_DOWN:
             return AltHold_MotorStopped;
 
-        case AP_Motors::SpoolState::GROUND_IDLE:
+        case AG_Motors::SpoolState::GROUND_IDLE:
             return AltHold_Landed_Ground_Idle;
 
         default:
@@ -794,14 +794,14 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
         // the aircraft is armed and landed
         if (target_climb_rate_cms < 0.0f && !copter.ap.using_interlock) {
             // the aircraft should move to a ground idle state
-            motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+            motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::GROUND_IDLE);
 
         } else {
             // the aircraft should prepare for imminent take off
-            motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+            motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
         }
 
-        if (motors->get_spool_state() == AP_Motors::SpoolState::GROUND_IDLE) {
+        if (motors->get_spool_state() == AG_Motors::SpoolState::GROUND_IDLE) {
             // the aircraft is waiting in ground idle
             return AltHold_Landed_Ground_Idle;
 
@@ -812,7 +812,7 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
 
     } else {
         // the aircraft is in a flying state
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
         return AltHold_Flying;
     }
 }

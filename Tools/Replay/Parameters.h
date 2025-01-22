@@ -1,6 +1,6 @@
 #pragma once
 
-#include <AP_Common/AP_Common.h>
+#include <AG_Common/AG_Common.h>
 
 // Global parameter class.
 //
@@ -21,4 +21,4 @@ public:
     AP_Int8 dummy;
 };
 
-extern const AP_Param::Info var_info[];
+extern const AG_Param::Info var_info[];

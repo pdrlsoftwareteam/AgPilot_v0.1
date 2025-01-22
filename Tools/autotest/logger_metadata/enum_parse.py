@@ -191,7 +191,7 @@ class EnumDocco(object):
         _next = []
         for _dir in dirs_to_search:
             for entry in os.listdir(_dir):
-                if "AP_Scripting/lua" in _dir:
+                if "AG_Scripting/lua" in _dir:
                     continue
                 if "modules" in _dir:
                     continue
@@ -204,7 +204,7 @@ class EnumDocco(object):
                 (name, extension) = os.path.splitext(filepath)
                 if extension not in [".cpp", ".h"]:
                     continue
-                if filepath.endswith("libraries/AP_HAL/utility/getopt_cpp.h"):
+                if filepath.endswith("libraries/AG_HAL/utility/getopt_cpp.h"):
                     continue
                 self.files.append(filepath)
         if len(_next):

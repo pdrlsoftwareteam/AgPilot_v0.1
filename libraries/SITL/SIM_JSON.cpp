@@ -24,13 +24,13 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_HAL/utility/replace.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_HAL/utility/replace.h>
 
 #define UDP_TIMEOUT_MS 100
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -68,10 +68,10 @@ JSON::JSON(const char *frame_str) :
     }
 
     for (uint8_t i=0; i<ARRAY_SIZE(sim_defaults); i++) {
-    AP_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
+    AG_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
         if (sim_defaults[i].save) {
             enum ap_var_type ptype;
-            AP_Param *p = AP_Param::find(sim_defaults[i].name, &ptype);
+            AG_Param *p = AG_Param::find(sim_defaults[i].name, &ptype);
             if (!p->configured()) {
                 p->save();
             }
@@ -384,7 +384,7 @@ void JSON::recv_fdm(const struct sitl_input &input)
                        "ssrrrEEE",
                        "F???????",
                        "Qfffffff",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        state.timestamp_s,
                        roll,
                        pitch,
@@ -411,7 +411,7 @@ void JSON::recv_fdm(const struct sitl_input &input)
                        "snnnoooooo",
                        "F?????????",
                        "Qfffffffff",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        velocity_ef.x,
                        velocity_ef.y,
                        velocity_ef.z,

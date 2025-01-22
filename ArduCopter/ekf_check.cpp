@@ -42,7 +42,7 @@ void Copter::ekf_check()
     if (g.fs_ekf_thresh <= 0.0f) {
         ekf_check_state.fail_count = 0;
         ekf_check_state.bad_variance = false;
-        AP_Notify::flags.ekf_bad = ekf_check_state.bad_variance;
+        AG_Notify::flags.ekf_bad = ekf_check_state.bad_variance;
         failsafe_ekf_off_event();   // clear failsafe
         return;
     }
@@ -82,9 +82,9 @@ void Copter::ekf_check()
                 ekf_check_state.bad_variance = true;
                 AP::logger().Write_Error(LogErrorSubsystem::EKFCHECK, LogErrorCode::EKFCHECK_BAD_VARIANCE);
                 // send message to gcs
-                if ((AP_HAL::millis() - ekf_check_state.last_warn_time) > EKF_CHECK_WARNING_TIME) {
+                if ((AG_HAL::millis() - ekf_check_state.last_warn_time) > EKF_CHECK_WARNING_TIME) {
                     gcs().send_text(MAV_SEVERITY_CRITICAL,"EKF variance");
-                    ekf_check_state.last_warn_time = AP_HAL::millis();
+                    ekf_check_state.last_warn_time = AG_HAL::millis();
                 }
                 failsafe_ekf_event();
             }
@@ -104,8 +104,8 @@ void Copter::ekf_check()
         }
     }
 
-    // set AP_Notify flags
-    AP_Notify::flags.ekf_bad = ekf_check_state.bad_variance;
+    // set AG_Notify flags
+    AG_Notify::flags.ekf_bad = ekf_check_state.bad_variance;
 
     // To-Do: add ekf variances to extended status
 }
@@ -190,7 +190,7 @@ void Copter::failsafe_ekf_event()
     }
 
     // set true if ekf action is triggered
-    AP_Notify::flags.failsafe_ekf = true;
+    AG_Notify::flags.failsafe_ekf = true;
     gcs().send_text(MAV_SEVERITY_CRITICAL, "EKF Failsafe: changed to %s Mode", flightmode->name());
 }
 
@@ -203,8 +203,8 @@ void Copter::failsafe_ekf_off_event(void)
     }
 
     failsafe.ekf = false;
-    if (AP_Notify::flags.failsafe_ekf) {
-        AP_Notify::flags.failsafe_ekf = false;
+    if (AG_Notify::flags.failsafe_ekf) {
+        AG_Notify::flags.failsafe_ekf = false;
         gcs().send_text(MAV_SEVERITY_CRITICAL, "EKF Failsafe Cleared");
     }
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_EKFINAV, LogErrorCode::FAILSAFE_RESOLVED);
@@ -235,7 +235,7 @@ void Copter::check_ekf_reset()
         AP::logger().Write_Event(LogEvent::EKF_YAW_RESET);
     }
 
-    // check for change in primary EKF, reset attitude target and log.  AC_PosControl handles position target adjustment
+    // check for change in primary EKF, reset attitude target and log.  AG_PosControl handles position target adjustment
     if ((ahrs.get_primary_core_index() != ekf_primary_core) && (ahrs.get_primary_core_index() != -1)) {
         attitude_control->inertial_frame_reset();
         ekf_primary_core = ahrs.get_primary_core_index();
@@ -247,7 +247,7 @@ void Copter::check_ekf_reset()
 // check for high vibrations affecting altitude control
 void Copter::check_vibration()
 {
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
 
     // assume checks will succeed
     bool innovation_checks_valid = true;

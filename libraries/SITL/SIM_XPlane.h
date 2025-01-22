@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_XPLANE_ENABLED
 #define HAL_SIM_XPLANE_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
@@ -26,8 +26,8 @@
 
 #if HAL_SIM_XPLANE_ENABLED
 
-#include <AP_HAL/utility/Socket.h>
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_HAL/utility/Socket.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 
 #include "SIM_Aircraft.h"
 #include "picojson.h"

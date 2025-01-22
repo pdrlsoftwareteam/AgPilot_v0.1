@@ -23,13 +23,13 @@
 
 #if AP_SIM_ENABLED
 
-#include <AP_Common/AP_Common.h>
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AG_Common/AG_Common.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
 
 #include <GCS_MAVLink/GCS_MAVLink.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_InertialSensor/AP_InertialSensor.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_InertialSensor/AG_InertialSensor.h>
 
 #ifdef SFML_JOYSTICK
   #ifdef HAVE_SFML_GRAPHICS_HPP
@@ -39,7 +39,7 @@
   #endif
 #endif // SFML_JOYSTICK
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #ifndef SIM_RATE_HZ_DEFAULT
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -54,7 +54,7 @@ namespace SITL {
 SIM *SIM::_singleton = nullptr;
 
 // table of user settable parameters
-const AP_Param::GroupInfo SIM::var_info[] = {
+const AG_Param::GroupInfo SIM::var_info[] = {
     
     AP_GROUPINFO("DRIFT_SPEED",    5, SIM,  drift_speed, 0.05f),
     AP_GROUPINFO("DRIFT_TIME",     6, SIM,  drift_time,  5),
@@ -128,7 +128,7 @@ const AP_Param::GroupInfo SIM::var_info[] = {
 };
 
 // second table of user settable parameters for SITL. 
-const AP_Param::GroupInfo SIM::var_info2[] = {
+const AG_Param::GroupInfo SIM::var_info2[] = {
     AP_GROUPINFO("TEMP_START",   1, SIM,  temp_start,  25),
     AP_GROUPINFO("TEMP_BRD_OFF", 2, SIM,  temp_board_offset, 20),
     AP_GROUPINFO("TEMP_TCONST",  3, SIM,  temp_tconst, 30),
@@ -261,7 +261,7 @@ const AP_Param::GroupInfo SIM::var_info2[] = {
 };
 
 // third table of user settable parameters for SITL. 
-const AP_Param::GroupInfo SIM::var_info3[] = {
+const AG_Param::GroupInfo SIM::var_info3[] = {
     AP_GROUPINFO("ODOM_ENABLE",   1, SIM,  odom_enable, 0),
 
     AP_GROUPINFO("LED_LAYOUT",    11, SIM, led_layout, 0),
@@ -388,7 +388,7 @@ const AP_Param::GroupInfo SIM::var_info3[] = {
 };
 
 // user settable parameters for the barometers
-const AP_Param::GroupInfo SIM::BaroParm::var_info[] = {
+const AG_Param::GroupInfo SIM::BaroParm::var_info[] = {
     AP_GROUPINFO("RND",      1, SIM::BaroParm,  noise, 0.2f),
     AP_GROUPINFO("DRIFT",    2, SIM::BaroParm,  drift, 0),
     AP_GROUPINFO("DISABLE",  3, SIM::BaroParm,  disable, 0),
@@ -407,7 +407,7 @@ const AP_Param::GroupInfo SIM::BaroParm::var_info[] = {
 };
 
 // user settable parameters for airspeed sensors
-const AP_Param::GroupInfo SIM::AirspeedParm::var_info[] = {
+const AG_Param::GroupInfo SIM::AirspeedParm::var_info[] = {
         // user settable parameters for the 1st airspeed sensor
     AP_GROUPINFO("RND",     1, SIM::AirspeedParm,  noise, 2.0),
     AP_GROUPINFO("OFS",     2, SIM::AirspeedParm,  offset, 2013),
@@ -426,7 +426,7 @@ const AP_Param::GroupInfo SIM::AirspeedParm::var_info[] = {
 
 #if HAL_SIM_GPS_ENABLED
 // GPS SITL parameters
-const AP_Param::GroupInfo SIM::var_gps[] = {
+const AG_Param::GroupInfo SIM::var_gps[] = {
     // @Param: GPS_DISABLE
     // @DisplayName: GPS 1 disable
     // @Description: Disables GPS 1
@@ -479,7 +479,7 @@ const AP_Param::GroupInfo SIM::var_gps[] = {
 #endif  // HAL_SIM_GPS_ENABLED
 
 // Mag SITL parameters
-const AP_Param::GroupInfo SIM::var_mag[] = {
+const AG_Param::GroupInfo SIM::var_mag[] = {
     AP_GROUPINFO("MAG_RND",        1, SIM,  mag_noise,   0),
     AP_GROUPINFO("MAG_MOT",        2, SIM,  mag_mot, 0),
     AP_GROUPINFO("MAG_DELAY",      3, SIM,  mag_delay, 0),
@@ -546,7 +546,7 @@ const AP_Param::GroupInfo SIM::var_mag[] = {
 };
 
 #ifdef SFML_JOYSTICK
-const AP_Param::GroupInfo SIM::var_sfml_joystick[] = {
+const AG_Param::GroupInfo SIM::var_sfml_joystick[] = {
     AP_GROUPINFO("SF_JS_STICK",    1, SIM,  sfml_joystick_id,   0),
     AP_GROUPINFO("SF_JS_AXIS1",    2, SIM,  sfml_joystick_axis[0], sf::Joystick::Axis::X),
     AP_GROUPINFO("SF_JS_AXIS2",    3, SIM,  sfml_joystick_axis[1], sf::Joystick::Axis::Y),
@@ -561,7 +561,7 @@ const AP_Param::GroupInfo SIM::var_sfml_joystick[] = {
 #endif //SFML_JOYSTICK
 
 // INS SITL parameters
-const AP_Param::GroupInfo SIM::var_ins[] = {
+const AG_Param::GroupInfo SIM::var_ins[] = {
 #if HAL_INS_TEMPERATURE_CAL_ENABLE
     AP_GROUPINFO("IMUT_START",    1, SIM, imu_temp_start,  25),
     AP_GROUPINFO("IMUT_END",      2, SIM, imu_temp_end, 45),
@@ -793,18 +793,18 @@ const AP_Param::GroupInfo SIM::var_ins[] = {
 
     // the IMUT parameters must be last due to the enable parameters
 #if HAL_INS_TEMPERATURE_CAL_ENABLE
-    AP_SUBGROUPINFO(imu_tcal[0], "IMUT1_", 61, SIM, AP_InertialSensor_TCal),
+    AP_SUBGROUPINFO(imu_tcal[0], "IMUT1_", 61, SIM, AG_InertialSensor_TCal),
 #if INS_MAX_INSTANCES > 1
-    AP_SUBGROUPINFO(imu_tcal[1], "IMUT2_", 62, SIM, AP_InertialSensor_TCal),
+    AP_SUBGROUPINFO(imu_tcal[1], "IMUT2_", 62, SIM, AG_InertialSensor_TCal),
 #endif
 #if INS_MAX_INSTANCES > 2
-    AP_SUBGROUPINFO(imu_tcal[2], "IMUT3_", 63, SIM, AP_InertialSensor_TCal),
+    AP_SUBGROUPINFO(imu_tcal[2], "IMUT3_", 63, SIM, AG_InertialSensor_TCal),
 #endif
 #if INS_MAX_INSTANCES > 3
-    AP_SUBGROUPINFO(imu_tcal[3], "IMUT4_", 60, SIM, AP_InertialSensor_TCal),
+    AP_SUBGROUPINFO(imu_tcal[3], "IMUT4_", 60, SIM, AG_InertialSensor_TCal),
 #endif
 #if INS_MAX_INSTANCES > 4
-    AP_SUBGROUPINFO(imu_tcal[4], "IMUT5_", 59, SIM, AP_InertialSensor_TCal),
+    AP_SUBGROUPINFO(imu_tcal[4], "IMUT5_", 59, SIM, AG_InertialSensor_TCal),
 #endif
 #endif  // HAL_INS_TEMPERATURE_CAL_ENABLE
     AP_GROUPEND
@@ -875,7 +875,7 @@ void SIM::sim_state_send(mavlink_channel_t chan) const
             state.speedD);
 }
 
-/* report SITL state to AP_Logger */
+/* report SITL state to AG_Logger */
 void SIM::Log_Write_SIMSTATE()
 {
     float yaw;
@@ -888,7 +888,7 @@ void SIM::Log_Write_SIMSTATE()
 
     struct log_AHRS pkt = {
         LOG_PACKET_HEADER_INIT(LOG_SIMSTATE_MSG),
-        time_us : AP_HAL::micros64(),
+        time_us : AG_HAL::micros64(),
         roll    : (int16_t)(state.rollDeg*100),
         pitch   : (int16_t)(state.pitchDeg*100),
         yaw     : (uint16_t)(wrap_360_cd(yaw*100)),

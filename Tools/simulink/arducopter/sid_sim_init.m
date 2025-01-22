@@ -114,7 +114,7 @@ simIn.param.INS.GYRO_RATE = 400; % Gyro sampling rate. Actually define by INS_GY
 %% AHRS
 trim_x = getParamVal(sid, 'AHRS_TRIM_X');
 trim_y = getParamVal(sid, 'AHRS_TRIM_Y');
-simIn.param.AHRS.FC2BF = single(dcmFromEuler(trim_x, trim_y, 0)); % Rotation matrix from FC to Body Frame based on AP_AHRS constructor
+simIn.param.AHRS.FC2BF = single(dcmFromEuler(trim_x, trim_y, 0)); % Rotation matrix from FC to Body Frame based on AG_AHRS constructor
 simIn.param.AHRS.BF2FC = simIn.param.AHRS.FC2BF';
 
 clear trim_x trim_y
@@ -187,7 +187,7 @@ simIn.signals.ATT.DesYaw = single(demodYawAngle(sid.ATT.DesYaw(iVec)));
 
 % The actual yaw angle is calculated from the DCM with
 % Matrix3<T>::to_euler() with the four-quadrant arcus tangens atan2(), for 
-% example in AP_AHRS_View::update(), so the controller can only handle 
+% example in AG_AHRS_View::update(), so the controller can only handle 
 % values in the range [-pi, pi]. 
 simIn.signals.ATT.Yaw = simIn.signals.ATT.Yaw - 360 * (simIn.signals.ATT.Yaw > 180);
 simIn.signals.ATT.DesYaw = simIn.signals.ATT.DesYaw - 360 * (simIn.signals.ATT.DesYaw > 180);
@@ -209,7 +209,7 @@ simIn.init.ATT.Yaw = yawAngInit;
 simIn.init.ATT.DCM = dcmFromEuler(rollAngInit, pitchAngInit, yawAngInit);
 
 % Initialize attitudeTarget according to
-% AC_AttitudeControl::reset_yaw_target_and_rate(), which is called in
+% AG_AttitudeControl::reset_yaw_target_and_rate(), which is called in
 % ModeStabilize::run() when copter is landed
 attitudeTargetUpdate = fromAxisAngle([0;0;yawAngInit]);
 simIn.init.ATT.attitudeTarget = quatMult(attitudeTargetUpdate, [1;0;0;0]);
@@ -238,14 +238,14 @@ clear rollAngInit pitchAngInit yawAngInit attitudeTargetUpdate iInit
 %% Attitude Controller General
 simIn.param.ATC.RATE_FF_ENAB = getParamVal(sid, 'ATC_RATE_FF_ENAB');
 simIn.param.ATC.INPUT_TC = getParamVal(sid, 'ATC_INPUT_TC'); % Attitude control input time constant
-simIn.param.ATC.ANGLE_LIMIT_MIN = single(10); % Min lean angle so that vehicle can maintain limited control, defined in AC_AttitudeControl.cpp as AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN
-simIn.param.ATC.ANGLE_LIMIT_THROTTLE_MAX = single(0.8); % Max throttle used to limit lean angle so that vehicle does not lose altitude, defined in AC_AttitudeControl.h as AC_ATTITUDE_CONTROL_ANGLE_LIMIT_THROTTLE_MAX
+simIn.param.ATC.ANGLE_LIMIT_MIN = single(10); % Min lean angle so that vehicle can maintain limited control, defined in AG_AttitudeControl.cpp as AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN
+simIn.param.ATC.ANGLE_LIMIT_THROTTLE_MAX = single(0.8); % Max throttle used to limit lean angle so that vehicle does not lose altitude, defined in AG_AttitudeControl.h as AC_ATTITUDE_CONTROL_ANGLE_LIMIT_THROTTLE_MAX
 simIn.param.ATC.ANG_LIM_TC = getParamVal(sid, 'ATC_ANG_LIM_TC'); % Angle Limit (to maintain altitude) Time Constant
 % Roll Angle Controller
 simIn.param.ATC.ANG_RLL_P = getParamVal(sid, 'ATC_ANG_RLL_P');
 simIn.param.ATC.ACCEL_R_MAX = getParamVal(sid, 'ATC_ACCEL_R_MAX');
 simIn.param.ATC.RATE_R_MAX = getParamVal(sid, 'ATC_RATE_R_MAX');
-simIn.param.ATC.ACCEL_RP_CONTROLLER_MIN_RADSS = 40*pi/180; % Maximum body-frame acceleration limit for the stability controller, defined in AC_AttitudeControl.h
+simIn.param.ATC.ACCEL_RP_CONTROLLER_MIN_RADSS = 40*pi/180; % Maximum body-frame acceleration limit for the stability controller, defined in AG_AttitudeControl.h
 simIn.param.ATC.ACCEL_RP_CONTROLLER_MAX_RADSS = 720*pi/180;
 % Pitch Angle Controller
 simIn.param.ATC.ANG_PIT_P = getParamVal(sid, 'ATC_ANG_PIT_P');
@@ -255,22 +255,22 @@ simIn.param.ATC.RATE_P_MAX = getParamVal(sid, 'ATC_RATE_P_MAX');
 simIn.param.ATC.ANG_YAW_P = getParamVal(sid, 'ATC_ANG_YAW_P');
 simIn.param.ATC.ACCEL_Y_MAX = getParamVal(sid, 'ATC_ACCEL_Y_MAX');
 simIn.param.ATC.RATE_Y_MAX = getParamVal(sid, 'ATC_RATE_Y_MAX');
-simIn.param.ATC.ACCEL_Y_CONTROLLER_MAX_RADSS = single(120*pi/180); % Maximum body-frame acceleration limit for the stability controller, defined in AC_AttitudeControl.h
+simIn.param.ATC.ACCEL_Y_CONTROLLER_MAX_RADSS = single(120*pi/180); % Maximum body-frame acceleration limit for the stability controller, defined in AG_AttitudeControl.h
 simIn.param.ATC.ACCEL_Y_CONTROLLER_MIN_RADSS = single(10*pi/180);
-simIn.param.ATC.THRUST_ERROR_ANGLE = single(30*pi/180); % Thrust angle error above which yaw corrections are limited. Defined in AC_AttitudeControl.h
+simIn.param.ATC.THRUST_ERROR_ANGLE = single(30*pi/180); % Thrust angle error above which yaw corrections are limited. Defined in AG_AttitudeControl.h
 
 % Thrust and throttle calculation parameters
 simIn.param.MODE.THR_MAN_FLG = thr_man;    % Flag for manual throttle, which depends on the current mode. 
 if thr_man
-    simIn.param.ATC.THR_FILT_CUTOFF = getParamVal(sid, 'PILOT_THR_FILT'); % Cutoff frequency of throttle filter for modes with manual throttle. parameter is given to function call of AC_AttitudeControl_Multi::set_throttle_out().
+    simIn.param.ATC.THR_FILT_CUTOFF = getParamVal(sid, 'PILOT_THR_FILT'); % Cutoff frequency of throttle filter for modes with manual throttle. parameter is given to function call of AG_AttitudeControl_Multi::set_throttle_out().
 else
-    simIn.param.ATC.THR_FILT_CUTOFF = 2.0; % Cutoff frequency of throttle filter for modes with z position control (Defined in AC_PosControl.h, line 33)
+    simIn.param.ATC.THR_FILT_CUTOFF = 2.0; % Cutoff frequency of throttle filter for modes with z position control (Defined in AG_PosControl.h, line 33)
 end
 simIn.param.ATC.ANGLE_BOOST = getParamVal(sid, 'ATC_ANGLE_BOOST');   % Enabling of angle boost to increase output throttle. Used in AC_AttitudeConrtol_Multi::get_throttle_boosted()
 simIn.param.ATC.THR_MIX_MAN = getParamVal(sid, 'ATC_THR_MIX_MAN');   % Throttle vs. attitude priorisation during manual flight
 simIn.param.ATC.THR_MIX_MIN = getParamVal(sid, 'ATC_THR_MIX_MIN');   % Throttle vs. attitude priorisation used when landing
 simIn.param.ATC.THR_MIX_MAX = getParamVal(sid, 'ATC_THR_MIX_MAX');   % Throttle vs. attitude priorisation during active flights
-simIn.param.ATC.THR_MIX_DFLT = single(0.5); % Default value for the priorization of throttle use between attitude control and throttle demand by pilot (or autopilot). Defined in AC_AttitudeControl.h, line 44 
+simIn.param.ATC.THR_MIX_DFLT = single(0.5); % Default value for the priorization of throttle use between attitude control and throttle demand by pilot (or autopilot). Defined in AG_AttitudeControl.h, line 44 
 if thr_man
     simIn.init.ATC.THR_MIX = simIn.param.ATC.THR_MIX_MAN;
 else
@@ -279,9 +279,9 @@ end
 simIn.param.MOT.HOVER_LEARN = getParamVal(sid, 'MOT_HOVER_LEARN');     % Enable/Disable automatic learning of hover throttle (0=Disabled, 1=Learn, 2=Learn and Save
 simIn.param.MOT.THST_HOVER = getParamVal(sid, 'MOT_THST_HOVER');    % Motor thrust needed to hover. Default value of _throttle_hover.
 simIn.param.MOT.THST_HOVER = simIn.param.MOT.THST_HOVER(1); % Assign first value of array to default value which is the correct value in the case, that the parameter is defined twice in the param file.
-simIn.param.MOT.THST_HOVER_TC = single(10.0);                                         % Time constant used to update estimated hover throttle, found as AP_MOTORS_THST_HOVER_TC in AP_MotorsMulticopter.h
-simIn.param.MOT.THST_HOVER_MIN = single(0.125);                                       % Minimum possible hover throttle, found as AP_MOTORS_THST_HOVER_MIN in AP_MotorsMulticopter.h
-simIn.param.MOT.THST_HOVER_MAX = single(0.6875);                                      % Maximum possible hover throttle, found as AP_MOTORS_THST_HOVER_MAX in AP_MotorsMulticopter.h
+simIn.param.MOT.THST_HOVER_TC = single(10.0);                                         % Time constant used to update estimated hover throttle, found as AP_MOTORS_THST_HOVER_TC in AG_MotorsMulticopter.h
+simIn.param.MOT.THST_HOVER_MIN = single(0.125);                                       % Minimum possible hover throttle, found as AP_MOTORS_THST_HOVER_MIN in AG_MotorsMulticopter.h
+simIn.param.MOT.THST_HOVER_MAX = single(0.6875);                                      % Maximum possible hover throttle, found as AP_MOTORS_THST_HOVER_MAX in AG_MotorsMulticopter.h
 simIn.param.MOT.BAT_VOLT_MAX = getParamVal(sid, 'MOT_BAT_VOLT_MAX');   % Maximum voltage above which no additional scaling on thrust is performed
 simIn.param.MOT.BAT_VOLT_MIN = getParamVal(sid, 'MOT_BAT_VOLT_MIN');   % Minimum voltage below which no additional scaling on thrust is performed
 simIn.param.MOT.BAT_CURR_MAX = getParamVal(sid, 'MOT_BAT_CURR_MAX');   % Maximum current over which maximum throttle is limited (and no further scaling is performed)
@@ -294,8 +294,8 @@ iVec = (sid.CTUN.TimeS >= tStart & sid.CTUN.TimeS <= tEnd);
 simIn.signals.CTUN.Time = single(sid.CTUN.TimeS(iVec)--tStart);
 simIn.signals.CTUN.ThrIn = single(sid.CTUN.ThI(iVec)); % Throttle In, pilots input to Attitude Control (attitude_control->get_throttle_in())
 simIn.signals.CTUN.ThrOut = single(sid.CTUN.ThO(iVec)); % Throttle Out, throttle given to motor mixer after filtering (motors->get_throttle())
-simIn.signals.CTUN.AngBst = single(sid.CTUN.ABst(iVec)); % Extra amount of throttle, added to throttle_in in AC_AttitudeControl_Multi::get_throttle_boosted()
-simIn.signals.CTUN.ThrHov = single(sid.CTUN.ThH(iVec)); % Estimated throttle required to hover throttle in range 0-1 (AP_MotorsMulticopter::get_throttle_hover())
+simIn.signals.CTUN.AngBst = single(sid.CTUN.ABst(iVec)); % Extra amount of throttle, added to throttle_in in AG_AttitudeControl_Multi::get_throttle_boosted()
+simIn.signals.CTUN.ThrHov = single(sid.CTUN.ThH(iVec)); % Estimated throttle required to hover throttle in range 0-1 (AG_MotorsMulticopter::get_throttle_hover())
 
 % Throttle inital values
 if simIn.param.rateCtrlVal || simIn.param.attCtrlVal || simIn.param.mdlVal || simIn.param.altCtrlVal
@@ -366,8 +366,8 @@ simIn.signals.BARO.GndTemp = single(sid.BARO.GndTemp(iVec)); % Temperature on gr
 % Attitude controller outputs
 iVec = (sid.MOTB.TimeS >= tStart & sid.MOTB.TimeS <= tEnd);
 simIn.signals.MOTB.Time = single(sid.MOTB.TimeS(iVec)-tStart);
-simIn.signals.MOTB.LiftMax = single(sid.MOTB.LiftMax(iVec)); % Maximum motor compensation gain, calculated in AP_MotorsMulticopter::update_lift_max_from_batt_voltage()
-simIn.signals.MOTB.ThrLimit = single(sid.MOTB.ThLimit(iVec)); % Throttle limit set due to battery current limitations, calculated in AP_MotorsMulticopter::get_current_limit_max_throttle()
+simIn.signals.MOTB.LiftMax = single(sid.MOTB.LiftMax(iVec)); % Maximum motor compensation gain, calculated in AG_MotorsMulticopter::update_lift_max_from_batt_voltage()
+simIn.signals.MOTB.ThrLimit = single(sid.MOTB.ThLimit(iVec)); % Throttle limit set due to battery current limitations, calculated in AG_MotorsMulticopter::get_current_limit_max_throttle()
 simIn.signals.MOTB.ThrAvMx = single(sid.MOTB.ThrAvMx(iVec)); % Throttle average max
 
 % SID Inputs
@@ -424,7 +424,7 @@ simIn.signals.PIDR.I = single(sid.PIDR.I(iVec));
 simIn.signals.PIDR.D = single(sid.PIDR.D(iVec));
 simIn.signals.PIDR.DMod = single(sid.PIDR.Dmod(iVec));
 simIn.signals.PIDR.ILimit = single(sid.PIDR.Limit(iVec));
-simIn.signals.PIDR.SRate = single(sid.PIDR.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AC_PID.cpp, line 161
+simIn.signals.PIDR.SRate = single(sid.PIDR.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AG_PID.cpp, line 161
 
 % parameters - Read from PARM.Value cell array with logical indexing
 simIn.param.PIDR.TC = getParamVal(sid, 'ATC_INPUT_TC');
@@ -437,7 +437,7 @@ simIn.param.PIDR.D = getParamVal(sid, 'ATC_RAT_RLL_D');
 simIn.param.PIDR.IMAX = getParamVal(sid, 'ATC_RAT_RLL_IMAX');
 simIn.param.PIDR.FF = getParamVal(sid, 'ATC_RAT_RLL_FF'); %0.05;
 simIn.param.PIDR.SR_MAX = getParamVal(sid, 'ATC_RAT_RLL_SMAX'); %5.0;
-simIn.param.PIDR.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AC_PID.h, line 24).
+simIn.param.PIDR.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AG_PID.h, line 24).
 simIn.param.PIDR.SR_FLT_f = single(25.0);  % Slew Rate lowpass filter cutoff frequency. Defined in SlewLimiter.h, line 14.
 
 % Inital inputs
@@ -445,7 +445,7 @@ if simIn.param.rateCtrlVal || simIn.param.attCtrlVal || simIn.param.mdlVal
     simIn.init.PIDR.P = single(sid.PIDR.P(1));
     simIn.init.PIDR.I = single(sid.PIDR.I(1));
     simIn.init.PIDR.D = single(sid.PIDR.D(1));
-    simIn.init.PIDR.Tar = single(sid.RATE.RDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AP_AHRS_View::Write_Rate)
+    simIn.init.PIDR.Tar = single(sid.RATE.RDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AG_AHRS_View::Write_Rate)
     simIn.init.PIDR.TarFilt = single(sid.PIDR.Tar(1));
     simIn.init.PIDR.ErrFilt = single(sid.PIDR.Err(1));
     simIn.init.PIDR.SROut = single(sid.PIDR.SRate(1)); % Initial value of the slew rate determined by the slew limiter. Used for both modifier_slew_rate and output_slew_rate.
@@ -487,7 +487,7 @@ simIn.signals.PIDP.I = single(sid.PIDP.I(iVec));
 simIn.signals.PIDP.D = single(sid.PIDP.D(iVec));
 simIn.signals.PIDP.DMod = single(sid.PIDP.Dmod(iVec));
 simIn.signals.PIDP.ILimit = single(sid.PIDP.Limit(iVec));
-simIn.signals.PIDP.SRate = single(sid.PIDP.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AC_PID.cpp, line 161
+simIn.signals.PIDP.SRate = single(sid.PIDP.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AG_PID.cpp, line 161
 
 % Parameters - Read from PARM.Value cell array with logical indexing
 simIn.param.PIDP.TC = getParamVal(sid, 'ATC_INPUT_TC');
@@ -500,7 +500,7 @@ simIn.param.PIDP.D = getParamVal(sid, 'ATC_RAT_PIT_D');
 simIn.param.PIDP.IMAX = getParamVal(sid, 'ATC_RAT_PIT_IMAX');
 simIn.param.PIDP.FF = getParamVal(sid, 'ATC_RAT_PIT_FF');
 simIn.param.PIDP.SR_MAX = getParamVal(sid, 'ATC_RAT_PIT_SMAX');
-simIn.param.PIDP.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AC_PID.h, line 24).
+simIn.param.PIDP.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AG_PID.h, line 24).
 simIn.param.PIDP.SR_FLT_f = single(25.0);  % Slew Rate lowpass filter cutoff frequency. Defined in SlewLimiter.h, line 14.
 
 % Inital inputs
@@ -508,7 +508,7 @@ if simIn.param.rateCtrlVal || simIn.param.attCtrlVal || simIn.param.mdlVal
     simIn.init.PIDP.P = single(sid.PIDP.P(1));
     simIn.init.PIDP.I = single(sid.PIDP.I(1));
     simIn.init.PIDP.D = single(sid.PIDP.D(1));
-    simIn.init.PIDP.Tar = single(sid.RATE.PDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AP_AHRS_View::Write_Rate)
+    simIn.init.PIDP.Tar = single(sid.RATE.PDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AG_AHRS_View::Write_Rate)
     simIn.init.PIDP.TarFilt = single(sid.PIDP.Tar(1));
     simIn.init.PIDP.ErrFilt = single(sid.PIDP.Err(1));
     simIn.init.PIDP.SrOut = single(sid.PIDP.SRate(1)); % Initial value of the slew rate determined by the slew limiter. Used for both modifier_slew_rate and output_slew_rate.
@@ -550,7 +550,7 @@ simIn.signals.PIDY.I = single(sid.PIDY.I(iVec));
 simIn.signals.PIDY.D = single(sid.PIDY.D(iVec));
 simIn.signals.PIDY.DMod = single(sid.PIDY.Dmod(iVec));
 simIn.signals.PIDY.ILimit = single(sid.PIDY.Limit(iVec));
-simIn.signals.PIDY.SRate = single(sid.PIDY.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AC_PID.cpp, line 161
+simIn.signals.PIDY.SRate = single(sid.PIDY.SRate(iVec)); % Output slew rate of the slew limiter, stored in _output_slew_rate in AG_PID.cpp, line 161
 
 % Parameters - Read from PARM.Value cell array with logical indexing
 simIn.param.PIDY.TC = getParamVal(sid, 'ATC_INPUT_TC');
@@ -563,7 +563,7 @@ simIn.param.PIDY.D = getParamVal(sid, 'ATC_RAT_YAW_D');
 simIn.param.PIDY.IMAX = getParamVal(sid, 'ATC_RAT_YAW_IMAX');
 simIn.param.PIDY.FF = getParamVal(sid, 'ATC_RAT_YAW_FF');
 simIn.param.PIDY.SR_MAX = getParamVal(sid, 'ATC_RAT_YAW_SMAX');
-simIn.param.PIDY.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AC_PID.h, line 24).
+simIn.param.PIDY.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AG_PID.h, line 24).
 simIn.param.PIDY.SR_FLT_f = single(25.0);  % Slew Rate lowpass filter cutoff frequency. Defined in SlewLimiter.h, line 14.
 
 % Inital inputs
@@ -571,7 +571,7 @@ if simIn.param.rateCtrlVal || simIn.param.attCtrlVal || simIn.param.mdlVal
     simIn.init.PIDY.P = single(sid.PIDY.P(1));
     simIn.init.PIDY.I = single(sid.PIDY.I(1));
     simIn.init.PIDY.D = single(sid.PIDY.D(1));
-    simIn.init.PIDY.Tar = single(sid.RATE.PDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AP_AHRS_View::Write_Rate)
+    simIn.init.PIDY.Tar = single(sid.RATE.PDes(1)*pi/180); % Convert to radian due to conversion to degree for logging (AG_AHRS_View::Write_Rate)
     simIn.init.PIDY.TarFilt = single(sid.PIDY.Tar(1));
     simIn.init.PIDY.ErrFilt = single(sid.PIDY.Err(1));
     simIn.init.PIDY.SrOut = single(sid.PIDY.SRate(1)); % Initial value of the slew rate determined by the slew limiter. Used for both modifier_slew_rate and output_slew_rate.
@@ -635,16 +635,16 @@ simIn.signals.RATE.A = single(sid.RATE.A(iVec)); % Vertical acceleration in eart
 %% Position Controller
 % Default definitions
 simIn.param.PSCD.THR_DZ = getParamVal(sid, 'THR_DZ'); % Deadzone above and below mid throttle in PWM microseconds. Used in Althold, Loiter, PosHold. Defined in Parameters.cpp
-simIn.param.PSCD.VEL_MAX_DOWN_DFLT = single(-150); % Default descent rate in cm/s, defined in AC_PosControl.h, line 27
-simIn.param.PSCD.VEL_MAX_UP_DFLT = single(250); % Default climb rate in cm/s, defined in AC_PosControl.h, line 28
-simIn.param.PSCD.ACC_MAX_Z_DFLT = single(250); % Default vertical acceleration cm/s/s, defined in AC_PosControl.h, line 30
-simIn.param.PSCD.JERK_MAX_Z_DFLT = single(500); % Default vertical jerk, defined as m/s/s/s in AC_PosControl.h, line 31. Converted to cm/s/s/s in AC_PosControl.cpp, line 318.
+simIn.param.PSCD.VEL_MAX_DOWN_DFLT = single(-150); % Default descent rate in cm/s, defined in AG_PosControl.h, line 27
+simIn.param.PSCD.VEL_MAX_UP_DFLT = single(250); % Default climb rate in cm/s, defined in AG_PosControl.h, line 28
+simIn.param.PSCD.ACC_MAX_Z_DFLT = single(250); % Default vertical acceleration cm/s/s, defined in AG_PosControl.h, line 30
+simIn.param.PSCD.JERK_MAX_Z_DFLT = single(500); % Default vertical jerk, defined as m/s/s/s in AG_PosControl.h, line 31. Converted to cm/s/s/s in AG_PosControl.cpp, line 318.
 
 simIn.param.PSCD.VEL_MAX_DN = getParamVal(sid, 'PILOT_SPEED_DN'); % Maximum vertical descending velocity in cm/s, defined in parameters.cpp, line 906
 simIn.param.PSCD.VEL_MAX_UP = getParamVal(sid, 'PILOT_SPEED_UP'); % Maximum vertical ascending velocity in cm/s, defined in parameters.cpp, line 223
 simIn.param.PSCD.ACC_MAX_Z = getParamVal(sid, 'PILOT_ACCEL_Z'); % Maximum vertical acceleration used when pilot is controlling the altitude, parameters.cpp, line 232
 simIn.param.PSCD.JERK_MAX_Z = getParamVal(sid, 'PSC_JERK_Z'); % Jerk limit of vertical kinematic path generation in m/s^3. Determines how quickly aircraft changes acceleration target
-simIn.param.PSCD.OVERSPEED_GAIN_Z = single(2); % gain controlling rate at which z-axis speed is brought back within SPEED_UP and SPEED_DOWN range, defined in AC_PosControl.h 
+simIn.param.PSCD.OVERSPEED_GAIN_Z = single(2); % gain controlling rate at which z-axis speed is brought back within SPEED_UP and SPEED_DOWN range, defined in AG_PosControl.h 
 %% Position Controller z
 
 % Parameters z position controller
@@ -670,7 +670,7 @@ simIn.param.PIDA.FLTE_f = getParamVal(sid, 'PSC_ACCZ_FLTE'); % Cutoff frequency 
 simIn.param.PIDA.FLTD_f = getParamVal(sid, 'PSC_ACCZ_FLTD'); % Cutoff frequency of the D term filter (in Hz)
 simIn.param.PIDA.FLTT_f = getParamVal(sid, 'PSC_ACCZ_FLTT'); % Cutoff frequency of the target filter (in Hz)
 simIn.param.PIDA.SR_MAX = getParamVal(sid, 'PSC_ACCZ_SMAX'); % Upper limit of the slew rate produced by combined P and D gains
-simIn.param.PIDA.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AC_PID.h, line 24).
+simIn.param.PIDA.SR_TAU = single(1.0); % Slew Rate Tau - not yet available as a parameter of the copter. Set to 1.0 by default (AG_PID.h, line 24).
 simIn.param.PIDA.SR_FLT_f = single(25.0);  % Slew Rate lowpass filter cutoff frequency. Defined in SlewLimiter.h, line 14.
 
 % Read signals for z position controller if PSCD message was logged
@@ -720,7 +720,7 @@ if isfield(sid, 'PSCD')
         simIn.init.PSCD.accAct = single(-sid.PSCD.AD(1));
         
         % Init the position controller to the current position, velocity
-        % and acceleration (from AC_PosControl::init_z()) in cm
+        % and acceleration (from AG_PosControl::init_z()) in cm
         simIn.init.PIDA.posTar = single(-sid.PSCD.TPD(1)*100);
         simIn.init.PIDA.velDes = single(-sid.PSCD.DVD(1)*100);
         simIn.init.PIDA.accDes = single(min(max(-sid.PSCD.DAD(1)*100, -simIn.param.PSCD.ACC_MAX_Z_DFLT) ,simIn.param.PSCD.ACC_MAX_Z_DFLT));
@@ -728,7 +728,7 @@ if isfield(sid, 'PSCD')
         simIn.init.PIDA.P = single(sid.PIDA.P(1));
         simIn.init.PIDA.I = single(simIn.signals.CTUN.ThrIn(1) - simIn.signals.CTUN.ThrHov(1)) * 1000 ...
             - simIn.param.PIDA.P * (-sid.PSCD.TAD(1)*100 - (-sid.PSCD.AD(1))*100) ...
-            - simIn.param.PIDA.FF * sid.PIDA.Tar(1); % Integrator init. according to AC_PosControl::init_z_controller()
+            - simIn.param.PIDA.FF * sid.PIDA.Tar(1); % Integrator init. according to AG_PosControl::init_z_controller()
         simIn.init.PIDA.D = single(sid.PIDA.D(1));
         simIn.init.PIDA.TarFilt = single(sid.PIDA.Tar(1));
         simIn.init.PIDA.ErrFilt = single(sid.PIDA.Err(1));

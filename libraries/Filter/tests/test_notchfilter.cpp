@@ -4,7 +4,7 @@
 #include <Filter/NotchFilter.h>
 #include <Filter/HarmonicNotchFilter.h>
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 /*
   test if a reset of a notch filter results in no glitch in the following samples

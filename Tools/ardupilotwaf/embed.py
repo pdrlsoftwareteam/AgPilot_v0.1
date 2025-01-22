@@ -63,7 +63,7 @@ def embed_file(out, f, idx, embedded_name, uncompressed):
     return crc
 
 def crc32(bytes, crc=0):
-    '''crc32 equivalent to crc32_small() from AP_Math/crc.cpp'''
+    '''crc32 equivalent to crc32_small() from AG_Math/crc.cpp'''
     for byte in bytes:
         crc ^= byte
         for i in range(8):
@@ -76,7 +76,7 @@ def create_embedded_h(filename, files, uncompressed=False):
     '''create a ap_romfs_embedded.h file'''
 
     out = open(filename, "wb")
-    write_encode(out, '''// generated embedded files for AP_ROMFS\n\n''')
+    write_encode(out, '''// generated embedded files for AG_ROMFS\n\n''')
 
     # remove duplicates and sort
     files = sorted(list(set(files)))
@@ -89,7 +89,7 @@ def create_embedded_h(filename, files, uncompressed=False):
             print(e)
             return False
 
-    write_encode(out, '''const AP_ROMFS::embedded_file AP_ROMFS::files[] = {\n''')
+    write_encode(out, '''const AG_ROMFS::embedded_file AG_ROMFS::files[] = {\n''')
 
     for i in range(len(files)):
         (name, filename) = files[i]

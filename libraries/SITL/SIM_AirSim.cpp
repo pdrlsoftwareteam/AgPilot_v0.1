@@ -24,13 +24,13 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_HAL/utility/replace.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_HAL/utility/replace.h>
 
 #define UDP_TIMEOUT_MS 100
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -352,7 +352,7 @@ void AirSim::recv_fdm(const sitl_input& input)
 // @Field: GZ: Simulated gyroscope, Z-axis
     AP::logger().WriteStreaming("ASM1", "TimeUS,TUS,R,P,Y,GX,GY,GZ",
                        "QQffffff",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        state.timestamp,
                        degrees(state.pose.roll),
                        degrees(state.pose.pitch),
@@ -379,7 +379,7 @@ void AirSim::recv_fdm(const sitl_input& input)
 // @Field: SD: simulation's earth-frame speed-down
     AP::logger().WriteStreaming("ASM2", "TimeUS,AX,AY,AZ,VX,VY,VZ,PX,PY,PZ,Alt,SD",
                        "Qfffffffffff",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        accel_body.x,
                        accel_body.y,
                        accel_body.z,

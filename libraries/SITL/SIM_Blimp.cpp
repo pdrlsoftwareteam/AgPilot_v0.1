@@ -24,7 +24,7 @@
 
 using namespace SITL;
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 Blimp::Blimp(const char *frame_str) :
     Aircraft(frame_str)

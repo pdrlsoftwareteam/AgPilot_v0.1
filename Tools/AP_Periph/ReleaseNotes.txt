@@ -10,7 +10,7 @@ Release 1.4.0 4th Sep 2022
 
 This is a major release with a significant number of changes:
 
- - use new AP_CheckFirmware system
+ - use new AG_CheckFirmware system
  - fixed passing of WGS84 height from GPS
  - support CANFD on STM32H7
  - fixes for moving baseline yaw with DroneCAN GPS

@@ -17,104 +17,104 @@ SOURCE_EXTS = [
 ]
 
 COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
-    'AP_Airspeed',
-    'AP_AccelCal',
-    'AP_ADC',
-    'AP_AHRS',
-    'AP_Airspeed',
-    'AP_Baro',
-    'AP_BattMonitor',
-    'AP_BoardConfig',
-    'AP_Camera',
-    'AP_CANManager',
-    'AP_Common',
-    'AP_Compass',
-    'AP_Declination',
-    'AP_GPS',
-    'AP_HAL',
-    'AP_HAL_Empty',
-    'AP_InertialSensor',
-    'AP_Math',
-    'AP_Mission',
-    'AP_DAL',
-    'AP_NavEKF',
-    'AP_NavEKF2',
-    'AP_NavEKF3',
-    'AP_Notify',
-    'AP_OpticalFlow',
-    'AP_Param',
-    'AP_Rally',
-    'AP_RangeFinder',
-    'AP_Scheduler',
-    'AP_SerialManager',
-    'AP_Terrain',
-    'AP_Vehicle',
-    'AP_InternalError',
-    'AP_Logger',
+    'AG_Airspeed',
+    'AG_AccelCal',
+    'AG_ADC',
+    'AG_AHRS',
+    'AG_Airspeed',
+    'AG_Baro',
+    'AG_BattMonitor',
+    'AG_BoardConfig',
+    'AG_Camera',
+    'AG_CANManager',
+    'AG_Common',
+    'AG_Compass',
+    'AG_Declination',
+    'AG_GPS',
+    'AG_HAL',
+    'AG_HAL_Empty',
+    'AG_InertialSensor',
+    'AG_Math',
+    'AG_Mission',
+    'AG_DAL',
+    'AG_NavEKF',
+    'AG_NavEKF2',
+    'AG_NavEKF3',
+    'AG_Notify',
+    'AG_OpticalFlow',
+    'AG_Param',
+    'AG_Rally',
+    'AG_RangeFinder',
+    'AG_Scheduler',
+    'AG_SerialManager',
+    'AG_Terrain',
+    'AG_Vehicle',
+    'AG_InternalError',
+    'AG_Logger',
     'Filter',
     'GCS_MAVLink',
     'RC_Channel',
     'SRV_Channel',
     'StorageManager',
-    'AP_Tuning',
-    'AP_RPM',
-    'AP_RSSI',
-    'AP_Mount',
-    'AP_Module',
-    'AP_Button',
-    'AP_ICEngine',
-    'AP_Frsky_Telem',
-    'AP_FlashStorage',
-    'AP_Relay',
-    'AP_ServoRelayEvents',
-    'AP_Volz_Protocol',
-    'AP_SBusOut',
-    'AP_IOMCU',
-    'AP_Parachute',
-    'AP_PiccoloCAN',
-    'AP_PiccoloCAN/piccolo_protocol',
-    'AP_RAMTRON',
-    'AP_RCProtocol',
-    'AP_Radio',
-    'AP_TempCalibration',
-    'AP_VisualOdom',
-    'AP_ROMFS',
-    'AP_Proximity',
-    'AP_Gripper',
-    'AP_RTC',
-    'AC_Sprayer',
-    'AC_Fence',
-    'AC_Avoidance',
-    'AP_LandingGear',
-    'AP_RobotisServo',
-    'AP_NMEA_Output',
-    'AP_Filesystem',
-    'AP_ADSB',
-    'AP_ADSB/sagetech-sdk',
-    'AC_PID',
-    'AP_SerialLED',
-    'AP_EFI',
-    'AP_Hott_Telem',
-    'AP_ESC_Telem',
-    'AP_Stats',
-    'AP_GyroFFT',
-    'AP_RCTelemetry',
-    'AP_Generator',
-    'AP_MSP',
-    'AP_OLC',
-    'AP_WheelEncoder',
-    'AP_ExternalAHRS',
-    'AP_VideoTX',
-    'AP_FETtecOneWire',
-    'AP_TemperatureSensor',
-    'AP_Torqeedo',
-    'AP_CustomRotations',
-    'AP_AIS',
-    'AP_OpenDroneID',
-    'AP_CheckFirmware',
-    'AP_KEYSTORE',
-    'AP_LIBNPNT',
-    'AP_PDRL_Commander',
+    'AG_Tuning',
+    'AG_RPM',
+    'AG_RSSI',
+    'AG_Mount',
+    'AG_Module',
+    'AG_Button',
+    'AG_ICEngine',
+    'AG_Frsky_Telem',
+    'AG_FlashStorage',
+    'AG_Relay',
+    'AG_ServoRelayEvents',
+    'AG_Volz_Protocol',
+    'AG_SBusOut',
+    'AG_IOMCU',
+    'AG_Parachute',
+    'AG_PiccoloCAN',
+    'AG_PiccoloCAN/piccolo_protocol',
+    'AG_RAMTRON',
+    'AG_RCProtocol',
+    'AG_Radio',
+    'AG_TempCalibration',
+    'AG_VisualOdom',
+    'AG_ROMFS',
+    'AG_Proximity',
+    'AG_Gripper',
+    'AG_RTC',
+    'AG_Sprayer',
+    'AG_Fence',
+    'AG_Avoidance',
+    'AG_LandingGear',
+    'AG_RobotisServo',
+    'AG_NMEA_Output',
+    'AG_Filesystem',
+    'AG_ADSB',
+    'AG_ADSB/sagetech-sdk',
+    'AG_PID',
+    'AG_SerialLED',
+    'AG_EFI',
+    'AG_Hott_Telem',
+    'AG_ESC_Telem',
+    'AG_Stats',
+    'AG_GyroFFT',
+    'AG_RCTelemetry',
+    'AG_Generator',
+    'AG_MSP',
+    'AG_OLC',
+    'AG_WheelEncoder',
+    'AG_ExternalAHRS',
+    'AG_VideoTX',
+    'AG_FETtecOneWire',
+    'AG_TemperatureSensor',
+    'AG_Torqeedo',
+    'AG_CustomRotations',
+    'AG_AIS',
+    'AG_OpenDroneID',
+    'AG_CheckFirmware',
+    'AG_KEYSTORE',
+    'AG_LIBNPNT',
+    'AG_PDRL_Commander',
 ]
 
 def get_legacy_defines(sketch_name, bld):
@@ -135,7 +135,7 @@ def get_legacy_defines(sketch_name, bld):
 
 IGNORED_AP_LIBRARIES = [
     'doc',
-    'AP_Scripting', # this gets explicitly included when it is needed and should otherwise never be globbed in
+    'AG_Scripting', # this gets explicitly included when it is needed and should otherwise never be globbed in
 ]
 
 
@@ -224,18 +224,18 @@ def ap_configure_post_recurse():
 def ap_get_all_libraries(bld):
     if bld.env.BOOTLOADER:
         # we don't need the full set of libraries for the bootloader build
-        return ['AP_HAL']
+        return ['AG_HAL']
     libraries = []
     for lib_node in bld.srcnode.ant_glob('libraries/*', dir=True, src=False):
         name = lib_node.name
         if name in IGNORED_AP_LIBRARIES:
             continue
-        if name.startswith('AP_HAL'):
+        if name.startswith('AG_HAL'):
             continue
         if name == 'SITL':
             continue
         libraries.append(name)
-    libraries.extend(['AP_HAL', 'AP_HAL_Empty'])
+    libraries.extend(['AG_HAL', 'AG_HAL_Empty'])
     return libraries
 
 @conf
@@ -244,8 +244,8 @@ def ap_common_vehicle_libraries(bld):
 
     if bld.env.DEST_BINFMT == 'pe':
         libraries += [
-            'AC_Fence',
-            'AC_AttitudeControl',
+            'AG_Fence',
+            'AG_AttitudeControl',
         ]
 
     return libraries
@@ -396,7 +396,7 @@ def write_version_header(ctx, tgt):
 #pragma once
 
 #ifndef FORCE_VERSION_H_INCLUDE
-#error ap_version.h should never be included directly. You probably want to include AP_Common/AP_FWVersion.h
+#error ap_version.h should never be included directly. You probably want to include AG_Common/AG_FWVersion.h
 #endif
 ''', file=f)
 

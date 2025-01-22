@@ -9,5 +9,5 @@ format apo
 format ArduRover
 format ArduBoat
 format libraries/APO
-format libraries/AP_Common
-format libraries/AP_GPS
+format libraries/AG_Common
+format libraries/AG_GPS

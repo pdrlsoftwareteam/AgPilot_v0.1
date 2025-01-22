@@ -30,7 +30,7 @@ void Copter::takeoff_check()
     // check ESCs are sending RPM at expected level
     uint32_t motor_mask = motors->get_motor_mask();
 #if HAL_WITH_IO_MCU
-    if (AP_BoardConfig::io_enabled()) {
+    if (AG_BoardConfig::io_enabled()) {
         // In 4.4 and earlier ESC telemetry is always indexed from 1 for servo channels 9+
         motor_mask >>= 8;
     }
@@ -45,7 +45,7 @@ void Copter::takeoff_check()
     }
 
     // warn user telem inactive or rpm is inadequate every 5 seconds
-    uint32_t now_ms = AP_HAL::millis();
+    uint32_t now_ms = AG_HAL::millis();
     if (takeoff_check_warning_ms == 0) {
         takeoff_check_warning_ms = now_ms;
     }

@@ -13,10 +13,10 @@ int SITL::SMBusDevice::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
     if (data->nmsgs == 2) {
         // data read request
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
         if (data->msgs[1].flags != I2C_M_RD) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
 
         data->msgs[1].buf[0] = value_lengths[addr];
@@ -29,9 +29,9 @@ int SITL::SMBusDevice::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
     if (data->nmsgs == 1) {
         // data write request
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
-        AP_HAL::panic("block writes not implemented");
+        AG_HAL::panic("block writes not implemented");
     }
 
     return -1;
@@ -54,11 +54,11 @@ void SITL::SMBusDevice::add_block(const char *name, uint8_t reg, I2CRegisters::R
 void SITL::SMBusDevice::set_block(uint8_t block, uint8_t *value, uint8_t valuelen)
 {
     if (blockname[block] == nullptr) {
-        AP_HAL::panic("Setting un-named block %u", block);
+        AG_HAL::panic("Setting un-named block %u", block);
     }
     // ::fprintf(stderr, "Setting %u (0x%02x) (%s) to 0x%02x (%c)\n", (unsigned)reg, (unsigned)reg, regname[reg], (unsigned)value, value);
     if (valuelen == 0) {
-        AP_HAL::panic("Zero-length values not permitted by spec");
+        AG_HAL::panic("Zero-length values not permitted by spec");
     }
     if (values[block] != nullptr) {
         free(values[block]);

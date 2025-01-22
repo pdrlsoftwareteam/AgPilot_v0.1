@@ -17,16 +17,16 @@
 */
 
 #include "SIM_Gripper_Servo.h"
-#include "AP_HAL/AP_HAL.h"
-#include "AP_Math/AP_Math.h"
+#include "AG_HAL/AG_HAL.h"
+#include "AG_Math/AG_Math.h"
 #include <stdio.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo Gripper_Servo::var_info[] = {
+const AG_Param::GroupInfo Gripper_Servo::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Gripper servo Sim enable/disable
@@ -75,7 +75,7 @@ void Gripper_Servo::update(const struct sitl_input &input)
 {
     const int16_t gripper_pwm = gripper_servo_pin >= 1 ? input.servos[gripper_servo_pin-1] : -1;
 
-    const uint64_t now = AP_HAL::micros64();
+    const uint64_t now = AG_HAL::micros64();
     const float dt = (now - last_update_us) * 1.0e-6f;
 
     // update gripper position
@@ -118,7 +118,7 @@ void Gripper_Servo::update(const struct sitl_input &input)
 
 bool Gripper_Servo::should_report() const
 {
-    if (AP_HAL::micros64() - last_report_us < report_interval) {
+    if (AG_HAL::micros64() - last_report_us < report_interval) {
         return false;
     }
 

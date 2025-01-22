@@ -20,7 +20,7 @@ void MCP9600::init()
 
 void MCP9600::update(const class Aircraft &aircraft)
 {
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
     if (now_ms - last_temperature_update_ms < 100) {  // 10Hz
         return;
     }
@@ -33,10 +33,10 @@ void MCP9600::update(const class Aircraft &aircraft)
         return;
     }
     if ((config & 0b111) != 1) {  // FIXME: this is just the default config
-        AP_HAL::panic("Unexpected filter configuration");
+        AG_HAL::panic("Unexpected filter configuration");
     }
     if ((config >> 4) != 0) {  // this is a K-type thermocouple, the default in the driver
-        AP_HAL::panic("Unexpected thermocouple configuration");
+        AG_HAL::panic("Unexpected thermocouple configuration");
     }
     static constexpr uint16_t factor = (1/0.0625);
     set_register(MCP9600DevReg::HOT_JUNC, uint16_t(htobe16(some_temperature + degrees(sinf(now_ms)) * factor)));

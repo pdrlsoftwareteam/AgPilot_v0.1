@@ -13,16 +13,16 @@
 #include <fcntl.h>
 #include "stm32_util.h"
 
-#include <AP_HAL_ChibiOS/hwdef/common/flash.h>
-#include <AP_Math/AP_Math.h>
+#include <AG_HAL_ChibiOS/hwdef/common/flash.h>
+#include <AG_Math/AG_Math.h>
 #include "support.h"
 
 // swiped from support.cpp:
 static const uint8_t *flash_base = (const uint8_t *)(0x08000000 + (FLASH_BOOTLOADER_LOAD_KB + APP_START_OFFSET_KB)*1024U);
 
 
-// taken from AP_Common.cpp as we don't want to compile the AP_Common
-// directory.  This function is defined in AP_Common.h - so we can't
+// taken from AG_Common.cpp as we don't want to compile the AG_Common
+// directory.  This function is defined in AG_Common.h - so we can't
 // use "static" here.
 /**
  * return the numeric value of an ascii hex character

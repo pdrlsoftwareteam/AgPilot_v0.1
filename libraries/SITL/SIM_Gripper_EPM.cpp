@@ -17,16 +17,16 @@
 */
 
 #include "SIM_Gripper_EPM.h"
-#include "AP_HAL/AP_HAL.h"
+#include "AG_HAL/AG_HAL.h"
 #include <stdio.h>
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo Gripper_EPM::var_info[] = {
+const AG_Param::GroupInfo Gripper_EPM::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Gripper servo Sim enable/disable
@@ -64,7 +64,7 @@ void Gripper_EPM::update_servobased(int16_t gripper_pwm)
 
 void Gripper_EPM::update_from_demand()
 {
-    const uint64_t now = AP_HAL::micros64();
+    const uint64_t now = AG_HAL::micros64();
     const float dt = (now - last_update_us) * 1.0e-6f;
 
     // decay the field
@@ -105,7 +105,7 @@ void Gripper_EPM::update(const struct sitl_input &input)
 
 bool Gripper_EPM::should_report() const
 {
-    if (AP_HAL::micros64() - last_report_us < report_interval) {
+    if (AG_HAL::micros64() - last_report_us < report_interval) {
         return false;
     }
 

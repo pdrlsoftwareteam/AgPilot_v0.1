@@ -19,7 +19,7 @@
 #pragma once
 
 #include <unistd.h>
-#include <AP_HAL/utility/RingBuffer.h>
+#include <AG_HAL/utility/RingBuffer.h>
 
 namespace SITL {
 

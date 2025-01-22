@@ -28,12 +28,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Logger/AP_Logger.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Logger/AG_Logger.h>
 #include "pthread.h"
-#include <AP_HAL/utility/replace.h>
+#include <AG_HAL/utility/replace.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -120,10 +120,10 @@ Morse::Morse(const char *frame_str) :
     }
 
     for (uint8_t i=0; i<ARRAY_SIZE(sim_defaults); i++) {
-        AP_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
+        AG_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
         if (sim_defaults[i].save) {
             enum ap_var_type ptype;
-            AP_Param *p = AP_Param::find(sim_defaults[i].name, &ptype);
+            AG_Param *p = AG_Param::find(sim_defaults[i].name, &ptype);
             if (!p->configured()) {
                 p->save();
             }
@@ -263,7 +263,7 @@ bool Morse::connect_sockets(void)
     if (!sensors_sock) {
         sensors_sock = new SocketAPM(false);
         if (!sensors_sock) {
-            AP_HAL::panic("Out of memory for sensors socket");
+            AG_HAL::panic("Out of memory for sensors socket");
         }
         if (!sensors_sock->connect(morse_ip, morse_sensors_port)) {
             usleep(100000);
@@ -282,7 +282,7 @@ bool Morse::connect_sockets(void)
     if (!control_sock) {
         control_sock = new SocketAPM(false);
         if (!control_sock) {
-            AP_HAL::panic("Out of memory for control socket");
+            AG_HAL::panic("Out of memory for control socket");
         }
         if (!control_sock->connect(morse_ip, morse_control_port)) {
             usleep(100000);
@@ -597,7 +597,7 @@ void Morse::report_FPS(void)
 */
 void Morse::send_report(void)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
 #if defined(__CYGWIN__) || defined(__CYGWIN64__)
     if (now < 10000) {
         // don't send lidar reports until 10s after startup. This
@@ -621,7 +621,7 @@ void Morse::send_report(void)
         send_report_last_ms = now;
 
         mavlink_obstacle_distance_t packet {};
-        packet.time_usec = AP_HAL::micros64();
+        packet.time_usec = AG_HAL::micros64();
         packet.min_distance = 1;
         // the simulated rangefinder has an imposed 18m limit in
         // e.g. rover_scanner.py

@@ -3,7 +3,7 @@
  *       Code by Randy Mackay and Jason Short. DIYDrones.com
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <Filter/Filter.h>                     // Filter library
 #include <Filter/ModeFilter.h>         // ModeFilter class (inherits from Filter class)
 #include <Filter/AverageFilter.h>      // AverageFilter class (inherits from Filter class)
@@ -12,7 +12,7 @@ void setup();
 void loop();
 void readTemp();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 int16_t rangevalue[] = {31000, 31000, 50, 55, 60, 55, 10, 0, 31000};
 
@@ -67,4 +67,4 @@ void loop()
     hal.scheduler->delay(10000);
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

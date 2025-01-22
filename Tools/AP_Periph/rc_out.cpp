@@ -12,7 +12,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
 #include "AP_Periph.h"
 
@@ -24,7 +24,7 @@
 #define SERVO_OUT_RCIN_MAX      32  // note that we allow for more than is in the enum
 #define SERVO_OUT_MOTOR_MAX     12  // SRV_Channel::k_motor1 ... SRV_Channel::k_motor8, SRV_Channel::k_motor9 ... SRV_Channel::k_motor12
 
-extern const AP_HAL::HAL &hal;
+extern const AG_HAL::HAL &hal;
 
 void AP_Periph_FW::rcout_init()
 {
@@ -33,7 +33,7 @@ void AP_Periph_FW::rcout_init()
 
 #if HAL_WITH_ESC_TELEM && !HAL_GCS_ENABLED
     if (g.esc_telem_port >= 0) {
-        serial_manager.set_protocol_and_baud(g.esc_telem_port, AP_SerialManager::SerialProtocol_ESCTelemetry, 115200);
+        serial_manager.set_protocol_and_baud(g.esc_telem_port, AG_SerialManager::SerialProtocol_ESCTelemetry, 115200);
     }
 #endif
 
@@ -60,7 +60,7 @@ void AP_Periph_FW::rcout_init()
     rcout_init_1Hz();
 
     // setup ESCs with the desired PWM type, allowing for DShot
-    SRV_Channels::init(esc_mask, (AP_HAL::RCOutput::output_mode)g.esc_pwm_type.get());
+    SRV_Channels::init(esc_mask, (AG_HAL::RCOutput::output_mode)g.esc_pwm_type.get());
 
     // run DShot at 1kHz
     hal.rcout->set_dshot_rate(SRV_Channels::get_dshot_rate(), 400);
@@ -126,7 +126,7 @@ void AP_Periph_FW::rcout_handle_safety_state(uint8_t safety_state)
 
 void AP_Periph_FW::rcout_update()
 {
-    uint32_t now_ms = AP_HAL::millis();
+    uint32_t now_ms = AG_HAL::millis();
 
     const uint16_t esc_timeout_ms = g.esc_command_timeout_ms >= 0 ? g.esc_command_timeout_ms : 0; // Don't allow negative timeouts!
     const bool has_esc_rawcommand_timed_out = esc_timeout_ms != 0 && ((now_ms - last_esc_raw_command_ms) >= esc_timeout_ms);

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 
 #include "stdint.h"
 
@@ -36,7 +36,7 @@ public:
 
     int ioctl(uint8_t ioctl_type, void *data);
 
-    // the following must be identical to AP_HAL_SITL/I2CDevice.h
+    // the following must be identical to AG_HAL_SITL/I2CDevice.h
 #define I2C_M_RD 1
 #define I2C_RDWR 0
     struct i2c_msg {

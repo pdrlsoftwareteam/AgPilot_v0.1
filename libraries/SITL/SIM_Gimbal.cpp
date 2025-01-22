@@ -24,9 +24,9 @@
 
 #include "SIM_Aircraft.h"
 
-#include <AP_InertialSensor/AP_InertialSensor.h>
+#include <AG_InertialSensor/AG_InertialSensor.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #define GIMBAL_DEBUG 0
 
@@ -61,7 +61,7 @@ Gimbal::Gimbal(const struct sitl_fdm &_fdm) :
 void Gimbal::update(void)
 {
     // calculate delta time in seconds
-    uint32_t now_us = AP_HAL::micros();
+    uint32_t now_us = AG_HAL::micros();
 
     float delta_t = (now_us - last_update_us) * 1.0e-6f;
     last_update_us = now_us;
@@ -257,7 +257,7 @@ void Gimbal::param_send(const struct gimbal_param *p)
 */
 void Gimbal::send_report(void)
 {
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (now < 10000) {
         // don't send gimbal reports until 10s after startup. This
         // avoids a windows threading issue with non-blocking sockets
@@ -338,7 +338,7 @@ void Gimbal::send_report(void)
                     if (pkt.target_system == 0 && pkt.target_component == MAV_COMP_ID_GIMBAL) {
                         // start param send
                         param_send_idx = 0;
-                        param_send_last_ms = AP_HAL::millis();
+                        param_send_last_ms = AG_HAL::millis();
                     }
                     printf("Gimbal sending %u parameters\n", (unsigned)ARRAY_SIZE(gimbal_params));
                     break;
@@ -385,7 +385,7 @@ void Gimbal::send_report(void)
     /*
       send a GIMBAL_REPORT message
      */
-    uint32_t now_us = AP_HAL::micros();
+    uint32_t now_us = AG_HAL::micros();
     if (now_us - last_report_us > reporting_period_ms*1000UL) {
         mavlink_gimbal_report_t gimbal_report;
         float delta_time = (now_us - last_report_us) * 1.0e-6f;

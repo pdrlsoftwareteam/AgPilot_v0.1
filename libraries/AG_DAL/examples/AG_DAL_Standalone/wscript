@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+    bld.ap_stlib(
+        name='AG_DAL' + '_libs',
+        ap_vehicle='AG_DAL_Standalone',
+        ap_libraries=[
+            'AG_NavEKF2',
+            'AG_NavEKF3',
+            'AG_NavEKF',
+            'AG_Common',
+            'AG_Math',
+            'AG_DAL',
+            'AG_InternalError',
+            'AG_Declination',
+            'AG_RTC',
+        ],
+    )
+
+    # only valid to build with no GCS and no scripting
+    if '-DHAL_GCS_ENABLED=0' in bld.env.CXXFLAGS and 'AP_SCRIPTING_ENABLED=1' not in bld.env.DEFINES:
+        bld.ap_program(
+            program_groups=['tool'],
+            use='AG_DAL_libs',
+        )

@@ -18,11 +18,11 @@
  */
 
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include "GCS.h"
-#include <AP_GPS/AP_GPS.h>
+#include <AG_GPS/AG_GPS.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 /**
    handle a SERIAL_CONTROL message
@@ -32,8 +32,8 @@ void GCS_MAVLINK::handle_serial_control(const mavlink_message_t &msg)
     mavlink_serial_control_t packet;
     mavlink_msg_serial_control_decode(&msg, &packet);
 
-    AP_HAL::UARTDriver *port = nullptr;
-    AP_HAL::BetterStream *stream = nullptr;
+    AG_HAL::UARTDriver *port = nullptr;
+    AG_HAL::BetterStream *stream = nullptr;
 
     if (packet.flags & SERIAL_CONTROL_FLAG_REPLY) {
         // how did this packet get to us?
@@ -98,7 +98,7 @@ void GCS_MAVLINK::handle_serial_control(const mavlink_message_t &msg)
     if (stream == nullptr) {
         // this is probably very bad
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        AP_HAL::panic("stream is nullptr");
+        AG_HAL::panic("stream is nullptr");
 #endif
         return;
     }
@@ -107,7 +107,7 @@ void GCS_MAVLINK::handle_serial_control(const mavlink_message_t &msg)
         // force flow control off for exclusive access. This protocol
         // is used to talk to bootloaders which may not have flow
         // control support
-        port->set_flow_control(AP_HAL::UARTDriver::FLOW_CONTROL_DISABLE);
+        port->set_flow_control(AG_HAL::UARTDriver::FLOW_CONTROL_DISABLE);
     }
 
     // optionally change the baudrate

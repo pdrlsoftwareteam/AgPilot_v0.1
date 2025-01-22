@@ -55,7 +55,7 @@ void SITL::SIM_BattMonitor_SMBus_Generic::init()
         add_register("Cell1", SMBusBattGenericDevReg::CELL1, SITL::I2CRegisters::RegMode::RDONLY);
         return;
     default:
-        AP_HAL::panic("Bad cellcount %u", cellcount());
+        AG_HAL::panic("Bad cellcount %u", cellcount());
     }
 }
 
@@ -117,6 +117,6 @@ void SITL::SIM_BattMonitor_SMBus_Generic::update(const class Aircraft &aircraft)
         set_register(SMBusBattGenericDevReg::CELL1, value_odd);
         return;
     default:
-        AP_HAL::panic("Bad connected_cellcount %u", _connected_cells);
+        AG_HAL::panic("Bad connected_cellcount %u", _connected_cells);
     }
 }

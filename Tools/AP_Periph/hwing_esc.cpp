@@ -7,11 +7,11 @@
   CAN node per ESC works well.
  */
 #include "hwing_esc.h"
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 
 #ifdef HAL_PERIPH_ENABLE_HWESC
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #define TELEM_HEADER 0x9B
 #define TELEM_LEN    0x16
@@ -21,11 +21,11 @@ HWESC_Telem::HWESC_Telem(void)
 {
 }
 
-void HWESC_Telem::init(AP_HAL::UARTDriver *_uart)
+void HWESC_Telem::init(AG_HAL::UARTDriver *_uart)
 {
     uart = _uart;
     uart->begin(19200);
-    uart->set_options(AP_HAL::UARTDriver::OPTION_PULLDOWN_RX);
+    uart->set_options(AG_HAL::UARTDriver::OPTION_PULLDOWN_RX);
 }
 
 /*
@@ -39,7 +39,7 @@ bool HWESC_Telem::update()
     }
 
     // we expect at least 50ms idle between frames
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     bool frame_gap = (now - last_read_ms) > 10;
 
     last_read_ms = now;

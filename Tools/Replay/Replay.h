@@ -13,8 +13,8 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_Vehicle/AP_FixedWing.h>
+#include <AG_Vehicle/AG_Vehicle.h>
+#include <AG_Vehicle/AG_FixedWing.h>
 
 #include "LogReader.h"
 
@@ -30,14 +30,14 @@ extern user_parameter *user_parameters;
 extern bool replay_force_ekf2;
 extern bool replay_force_ekf3;
 
-class ReplayVehicle : public AP_Vehicle {
+class ReplayVehicle : public AG_Vehicle {
 public:
     friend class Replay;
 
     ReplayVehicle() { unused.set(-1); }
     // HAL::Callbacks implementation.
     void load_parameters(void) override;
-    void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
+    void get_scheduler_tasks(const AG_Scheduler::Task *&tasks,
                              uint8_t &task_count,
                              uint32_t &log_bit) override {
         tasks = nullptr;
@@ -48,12 +48,12 @@ public:
     virtual bool set_mode(const uint8_t new_mode, const ModeReason reason) override { return true; }
     virtual uint8_t get_mode() const override { return 0; }
 
-    AP_FixedWing aparm;
+    AG_FixedWing aparm;
 
     AP_Int32 unused; // logging is magic for Replay; this is unused
     struct LogStructure log_structure[256] = {
     };
-    AP_Logger logger{unused};
+    AG_Logger logger{unused};
 
     NavEKF2 ekf2;
     NavEKF3 ekf3;
@@ -66,12 +66,12 @@ private:
     Parameters g;
 
     // setup the var_info table
-    AP_Param param_loader{var_info};
+    AG_Param param_loader{var_info};
 
-    static const AP_Param::Info var_info[];
+    static const AG_Param::Info var_info[];
 };
 
-class Replay : public AP_HAL::HAL::Callbacks {
+class Replay : public AG_HAL::HAL::Callbacks {
 
 public:
     Replay(ReplayVehicle &vehicle) :

@@ -295,7 +295,7 @@ float Mode::AutoYaw::rate_cds() const
     return 0.0f;
 }
 
-AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
+AG_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
 {
     // process pilot's yaw input
     _pilot_yaw_rate_cds = 0.0;
@@ -311,7 +311,7 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
     }
 
 
-    AC_AttitudeControl::HeadingCommand heading;
+    AG_AttitudeControl::HeadingCommand heading;
     heading.yaw_angle_cd = yaw();
     heading.yaw_rate_cds = auto_yaw.rate_cds();
 
@@ -320,7 +320,7 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
         case Mode::RATE:
         case Mode::PILOT_RATE:
         case Mode::WEATHERVANE:
-            heading.heading_mode = AC_AttitudeControl::HeadingMode::Rate_Only;
+            heading.heading_mode = AG_AttitudeControl::HeadingMode::Rate_Only;
             break;
         case Mode::LOOK_AT_NEXT_WP:
         case Mode::ROI:
@@ -329,7 +329,7 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
         case Mode::RESETTOARMEDYAW:
         case Mode::ANGLE_RATE:
         case Mode::CIRCLE:
-            heading.heading_mode = AC_AttitudeControl::HeadingMode::Angle_And_Rate;
+            heading.heading_mode = AG_AttitudeControl::HeadingMode::Angle_And_Rate;
             break;
     }
 

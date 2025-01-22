@@ -28,12 +28,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Logger/AP_Logger.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Logger/AG_Logger.h>
 #include "pthread.h"
-#include <AP_HAL/utility/replace.h>
+#include <AG_HAL/utility/replace.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -120,10 +120,10 @@ Webots::Webots(const char *frame_str) :
     }
 
     for (uint8_t i=0; i<ARRAY_SIZE(sim_defaults); i++) {
-        AP_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
+        AG_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
         if (sim_defaults[i].save) {
             enum ap_var_type ptype;
-            AP_Param *p = AP_Param::find(sim_defaults[i].name, &ptype);
+            AG_Param *p = AG_Param::find(sim_defaults[i].name, &ptype);
             if (!p->configured()) {
                 p->save();
             }
@@ -293,7 +293,7 @@ bool Webots::connect_sockets(void)
     if (!sim_sock) {
         sim_sock = new SocketAPM(false);
         if (!sim_sock) {
-            AP_HAL::panic("Out of memory for sensors socket");
+            AG_HAL::panic("Out of memory for sensors socket");
         }
         if (!sim_sock->connect(webots_ip, webots_sensors_port)) {
             usleep(100000);

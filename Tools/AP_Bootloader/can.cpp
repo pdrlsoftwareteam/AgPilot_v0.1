@@ -15,11 +15,11 @@
 /*
   CAN bootloader support
  */
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <hal.h>
 #if HAL_USE_CAN == TRUE || HAL_NUM_CAN_IFACES
-#include <AP_Math/AP_Math.h>
-#include <AP_Math/crc.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Math/crc.h>
 #include <canard.h>
 #include "support.h"
 #include <dronecan_msgs.h>
@@ -27,10 +27,10 @@
 #include "bl_protocol.h"
 #include <drivers/stm32/canard_stm32.h>
 #include "app_comms.h"
-#include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
+#include <AG_HAL_ChibiOS/hwdef/common/watchdog.h>
 #include <stdio.h>
-#include <AP_HAL_ChibiOS/CANIface.h>
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
+#include <AG_HAL_ChibiOS/CANIface.h>
+#include <AG_CheckFirmware/AG_CheckFirmware.h>
 
 static CanardInstance canard;
 static uint32_t canard_memory_pool[4096/4];
@@ -116,7 +116,7 @@ static void handle_get_node_info(CanardInstance* ins,
     uint8_t buffer[UAVCAN_PROTOCOL_GETNODEINFO_RESPONSE_MAX_SIZE] {};
     uavcan_protocol_GetNodeInfoResponse pkt {};
 
-    node_status.uptime_sec = AP_HAL::millis() / 1000U;
+    node_status.uptime_sec = AG_HAL::millis() / 1000U;
 
     pkt.status = node_status;
     pkt.software_version.major = CAN_APP_VERSION_MAJOR;
@@ -152,7 +152,7 @@ static void handle_get_node_info(CanardInstance* ins,
  */
 static void send_fw_read(void)
 {
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (now - fw_update.last_ms < 750) {
         // the server may still be responding
         return;
@@ -282,7 +282,7 @@ static void handle_allocation_response(CanardInstance* ins, CanardRxTransfer* tr
 {
     // Rule C - updating the randomized time interval
     send_next_node_id_allocation_request_at_ms =
-        AP_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
+        AG_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
         get_random_range(UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MAX_FOLLOWUP_DELAY_MS);
 
     if (transfer->source_node_id == CANARD_BROADCAST_NODE_ID)
@@ -445,7 +445,7 @@ static void processRx(void)
 #ifdef HAL_GPIO_PIN_LED_BOOTLOADER
         palToggleLine(HAL_GPIO_PIN_LED_BOOTLOADER);
 #endif
-        const uint64_t timestamp = AP_HAL::micros64();
+        const uint64_t timestamp = AG_HAL::micros64();
         memcpy(rx_frame.data, rxmsg.data8, 8);
         rx_frame.data_len = rxmsg.DLC;
         if(rxmsg.IDE) {
@@ -462,14 +462,14 @@ static void processTx(void)
 {
     static uint8_t fail_count;
     for (const CanardCANFrame* txf = NULL; (txf = canardPeekTxQueue(&canard)) != NULL;) {
-        AP_HAL::CANFrame txmsg {};
+        AG_HAL::CANFrame txmsg {};
         txmsg.dlc = txf->data_len;
         memcpy(txmsg.data, txf->data, 8);
-        txmsg.id = (txf->id | AP_HAL::CANFrame::FlagEFF);
+        txmsg.id = (txf->id | AG_HAL::CANFrame::FlagEFF);
         // push message with 1s timeout
         bool send_ok = false;
         for (uint8_t i=0; i<HAL_NUM_CAN_IFACES; i++) {
-            send_ok |= (can_iface[i].send(txmsg, AP_HAL::micros64() + 1000000, 0) > 0);
+            send_ok |= (can_iface[i].send(txmsg, AG_HAL::micros64() + 1000000, 0) > 0);
         }
         if (send_ok) {
             canardPopTxQueue(&canard);
@@ -489,7 +489,7 @@ static void processTx(void)
 
 static void processRx(void)
 {
-    AP_HAL::CANFrame rxmsg;
+    AG_HAL::CANFrame rxmsg;
     while (true) {
         bool got_pkt = false;
         for (uint8_t i=0; i<HAL_NUM_CAN_IFACES; i++) {
@@ -506,7 +506,7 @@ static void processRx(void)
 
             //palToggleLine(HAL_GPIO_PIN_LED);
             uint64_t timestamp;
-            AP_HAL::CANIface::CanIOFlags flags;
+            AG_HAL::CANIface::CanIOFlags flags;
             can_iface[i].receive(rxmsg, timestamp, flags);
             memcpy(rx_frame.data, rxmsg.data, 8);
             rx_frame.data_len = rxmsg.dlc;
@@ -530,12 +530,12 @@ static void can_handle_DNA(void)
         return;
     }
 
-    if (AP_HAL::millis() < send_next_node_id_allocation_request_at_ms) {
+    if (AG_HAL::millis() < send_next_node_id_allocation_request_at_ms) {
         return;
     }
 
     send_next_node_id_allocation_request_at_ms =
-        AP_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
+        AG_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
         get_random_range(UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MAX_FOLLOWUP_DELAY_MS);
     
     // Structure of the request is documented in the DSDL definition
@@ -574,7 +574,7 @@ static void can_handle_DNA(void)
 static void send_node_status(void)
 {
     uint8_t buffer[UAVCAN_PROTOCOL_NODESTATUS_MAX_SIZE];
-    node_status.uptime_sec = AP_HAL::millis() / 1000U;
+    node_status.uptime_sec = AG_HAL::millis() / 1000U;
 
     uint32_t len = uavcan_protocol_NodeStatus_encode(&node_status, buffer, true);
 
@@ -682,7 +682,7 @@ void can_start()
     canStart(&CAND1, &cancfg);
 #else
     for (uint8_t i=0; i<HAL_NUM_CAN_IFACES; i++) {
-        can_iface[i].init(baudrate, AP_HAL::CANIface::NormalMode);
+        can_iface[i].init(baudrate, AG_HAL::CANIface::NormalMode);
     }
 #endif
     canardInit(&canard, (uint8_t *)canard_memory_pool, sizeof(canard_memory_pool),
@@ -693,7 +693,7 @@ void can_start()
     }
 
     send_next_node_id_allocation_request_at_ms =
-        AP_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
+        AG_HAL::millis() + UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MIN_REQUEST_PERIOD_MS +
         get_random_range(UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MAX_FOLLOWUP_DELAY_MS);
 
     if (stm32_was_watchdog_reset()) {
@@ -711,10 +711,10 @@ void can_update()
         processRx();
         can_handle_DNA();
         static uint32_t last_1Hz_ms;
-        uint32_t now = AP_HAL::millis();
+        uint32_t now = AG_HAL::millis();
         if (now - last_1Hz_ms >= 1000) {
             last_1Hz_ms = now;
-            process1HzTasks(AP_HAL::micros64());
+            process1HzTasks(AG_HAL::micros64());
         }
         if (fw_update.node_id != 0) {
             send_fw_read();

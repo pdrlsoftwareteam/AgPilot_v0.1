@@ -21,7 +21,7 @@
 #include "SIM_BalanceBot.h"
 #include <stdio.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 namespace SITL {
 

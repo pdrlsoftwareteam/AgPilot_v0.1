@@ -20,29 +20,29 @@
      st-flash write build/f103-periph/bin/AP_Periph.bin 0x8006000
 
  */
-#include <AP_HAL/AP_HAL.h>
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 #include <stdio.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
-#include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
-#include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
-#include <AP_HAL_ChibiOS/I2CDevice.h>
+#include <AG_HAL_ChibiOS/hwdef/common/stm32_util.h>
+#include <AG_HAL_ChibiOS/hwdef/common/watchdog.h>
+#include <AG_HAL_ChibiOS/I2CDevice.h>
 #endif
 
 #ifndef HAL_PERIPH_HWESC_SERIAL_PORT
 #define HAL_PERIPH_HWESC_SERIAL_PORT 3
 #endif
 
-extern const AP_HAL::HAL &hal;
+extern const AG_HAL::HAL &hal;
 
 AP_Periph_FW periph;
 
 void setup();
 void loop();
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 void stm32_watchdog_init() {}
@@ -67,7 +67,7 @@ AP_Periph_FW::AP_Periph_FW()
 #endif
 {
     if (_singleton != nullptr) {
-        AP_HAL::panic("AP_Periph_FW must be singleton");
+        AG_HAL::panic("AP_Periph_FW must be singleton");
     }
     _singleton = this;
 }
@@ -137,8 +137,8 @@ void AP_Periph_FW::init()
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_GPS
-    if (gps.get_type(0) != AP_GPS::GPS_Type::GPS_TYPE_NONE && g.gps_port >= 0) {
-        serial_manager.set_protocol_and_baud(g.gps_port, AP_SerialManager::SerialProtocol_GPS, AP_SERIALMANAGER_GPS_BAUD);
+    if (gps.get_type(0) != AG_GPS::GPS_Type::GPS_TYPE_NONE && g.gps_port >= 0) {
+        serial_manager.set_protocol_and_baud(g.gps_port, AG_SerialManager::SerialProtocol_GPS, AP_SERIALMANAGER_GPS_BAUD);
 #if HAL_LOGGING_ENABLED
         #define MASK_LOG_GPS (1<<2)
         gps.set_log_gps_bit(MASK_LOG_GPS);
@@ -164,7 +164,7 @@ void AP_Periph_FW::init()
 #endif
 
 #ifdef HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY
-    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY, AP_HAL::RCOutput::MODE_NEOPIXEL);
+    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY, AG_HAL::RCOutput::MODE_NEOPIXEL);
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
@@ -180,7 +180,7 @@ void AP_Periph_FW::init()
         auto *uart = hal.serial(g.efi_port);
         if (uart != nullptr) {
             uart->begin(g.efi_baudrate);
-            serial_manager.set_protocol_and_baud(g.efi_port, AP_SerialManager::SerialProtocol_EFI, g.efi_baudrate);
+            serial_manager.set_protocol_and_baud(g.efi_port, AG_SerialManager::SerialProtocol_EFI, g.efi_baudrate);
             efi.init();
         }
     }
@@ -212,7 +212,7 @@ void AP_Periph_FW::init()
             auto *uart = hal.serial(g.rangefinder_port);
             if (uart != nullptr) {
                 uart->begin(g.rangefinder_baud);
-                serial_manager.set_protocol_and_baud(g.rangefinder_port, AP_SerialManager::SerialProtocol_Rangefinder, g.rangefinder_baud);
+                serial_manager.set_protocol_and_baud(g.rangefinder_port, AG_SerialManager::SerialProtocol_Rangefinder, g.rangefinder_baud);
             }
         }
         rangefinder.init(ROTATION_NONE);
@@ -220,11 +220,11 @@ void AP_Periph_FW::init()
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PRX
-    if (proximity.get_type(0) != AP_Proximity::Type::None && g.proximity_port >= 0) {
+    if (proximity.get_type(0) != AG_Proximity::Type::None && g.proximity_port >= 0) {
         auto *uart = hal.serial(g.proximity_port);
         if (uart != nullptr) {
             uart->begin(g.proximity_baud);
-            serial_manager.set_protocol_and_baud(g.proximity_port, AP_SerialManager::SerialProtocol_Lidar360, g.proximity_baud);
+            serial_manager.set_protocol_and_baud(g.proximity_port, AG_SerialManager::SerialProtocol_Lidar360, g.proximity_baud);
             proximity.init();
         }
     }
@@ -259,7 +259,7 @@ void AP_Periph_FW::init()
 #if AP_SCRIPTING_ENABLED
     scripting.init();
 #endif
-    start_ms = AP_HAL::native_millis();
+    start_ms = AG_HAL::native_millis();
 }
 
 #if (defined(HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY) && HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY == 8) || defined(HAL_PERIPH_ENABLE_NOTIFY)
@@ -277,7 +277,7 @@ void AP_Periph_FW::update_rainbow()
     if (rainbow_done) {
         return;
     }
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     if (now - start_ms > 1500) {
         rainbow_done = true;
 #if defined (HAL_PERIPH_ENABLE_NOTIFY)
@@ -361,7 +361,7 @@ void AP_Periph_FW::update()
 #endif
 
     static uint32_t last_led_ms;
-    uint32_t now = AP_HAL::native_millis();
+    uint32_t now = AG_HAL::native_millis();
     if (now - last_led_ms > 1000) {
         last_led_ms = now;
 #ifdef HAL_GPIO_PIN_LED
@@ -386,7 +386,7 @@ void AP_Periph_FW::update()
         hal.scheduler->delay(1);
 #endif
 #ifdef HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY
-        hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY, AP_HAL::RCOutput::MODE_NEOPIXEL);
+        hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY, AG_HAL::RCOutput::MODE_NEOPIXEL);
 #endif
 
 #ifdef HAL_PERIPH_LISTEN_FOR_SERIAL_UART_REBOOT_CMD_PORT
@@ -419,7 +419,7 @@ void AP_Periph_FW::update()
     }
 #endif
 
-    if ((g.debug&(1<<DEBUG_AUTOREBOOT)) && AP_HAL::millis() > 15000) {
+    if ((g.debug&(1<<DEBUG_AUTOREBOOT)) && AG_HAL::millis() > 15000) {
         // attempt reboot with HOLD after 15s
         periph.prepare_reboot();
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
@@ -525,7 +525,7 @@ void AP_Periph_FW::check_for_serial_reboot_cmd(const int8_t serial_index)
 #endif // HAL_PERIPH_LISTEN_FOR_SERIAL_UART_REBOOT_CMD_PORT
 
 // prepare for a safe reboot where PWMs and params are gracefully disabled
-// This is copied from AP_Vehicle::reboot(bool hold_in_bootloader) minus the actual reboot
+// This is copied from AG_Vehicle::reboot(bool hold_in_bootloader) minus the actual reboot
 void AP_Periph_FW::prepare_reboot()
 {
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
@@ -534,7 +534,7 @@ void AP_Periph_FW::prepare_reboot()
 #endif
 
         // flush pending parameter writes
-        AP_Param::flush();
+        AG_Param::flush();
 
         // do not process incoming mavlink messages while we delay:
         hal.scheduler->register_delay_callback(nullptr, 5);
@@ -551,4 +551,4 @@ AP_Periph_FW& AP::periph()
     return *AP_Periph_FW::get_singleton();
 }
 
-AP_HAL_MAIN();
+AG_HAL_MAIN();

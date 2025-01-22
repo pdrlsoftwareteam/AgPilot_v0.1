@@ -17,9 +17,9 @@
 */
 
 #include "SIM_Frame.h"
-#include <AP_Motors/AP_Motors.h>
-#include <AP_Baro/AP_Baro.h>
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_Motors/AG_Motors.h>
+#include <AG_Baro/AG_Baro.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 #include "SIM_Aircraft.h"
 
 #include <stdio.h>
@@ -316,7 +316,7 @@ float Frame::get_air_density(float alt_amsl) const
 {
     float sigma, delta, theta;
 
-    AP_Baro::SimpleAtmosphere(alt_amsl * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(alt_amsl * 0.001f, sigma, delta, theta);
 
     const float air_pressure = SSL_AIR_PRESSURE * delta;
     return air_pressure / (ISA_GAS_CONSTANT * (C_TO_KELVIN(model.refTempC)));
@@ -335,15 +335,15 @@ void Frame::load_frame_params(const char *model_json)
     } else {
         IGNORE_RETURN(asprintf(&fname, "@ROMFS/models/%s", model_json));
         if (AP::FS().stat(model_json, &st) != 0) {
-            AP_HAL::panic("%s failed to load\n", model_json);
+            AG_HAL::panic("%s failed to load\n", model_json);
         }
     }
     if (fname == nullptr) {
-        AP_HAL::panic("%s failed to load\n", model_json);
+        AG_HAL::panic("%s failed to load\n", model_json);
     }
     picojson::value *obj = (picojson::value *)load_json(model_json);
     if (obj == nullptr) {
-        AP_HAL::panic("%s failed to load\n", model_json);
+        AG_HAL::panic("%s failed to load\n", model_json);
     }
 
     enum class VarType {
@@ -429,14 +429,14 @@ void Frame::load_frame_params(const char *model_json)
 
 void Frame::parse_float(picojson::value val, const char* label, float &param) {
     if (!val.is<double>()) {
-        AP_HAL::panic("Bad json type for %s: %s", label, val.to_str().c_str());
+        AG_HAL::panic("Bad json type for %s: %s", label, val.to_str().c_str());
     }
     param = val.get<double>();
 }
 
 void Frame::parse_vector3(picojson::value val, const char* label, Vector3f &param) {
     if (!val.is<picojson::array>() || !val.contains(2) || val.contains(3)) {
-        AP_HAL::panic("Bad json type for %s: %s", label, val.to_str().c_str());
+        AG_HAL::panic("Bad json type for %s: %s", label, val.to_str().c_str());
     }
     for (uint8_t j=0; j<3; j++) {
         parse_float(val.get(j), label, param[j]);
@@ -516,10 +516,10 @@ void Frame::init(const char *frame_str, Battery *_battery)
     }
 
     // setup reasonable defaults for battery
-    AP_Param::set_default_by_name("SIM_BATT_VOLTAGE", model.maxVoltage);
-    AP_Param::set_default_by_name("SIM_BATT_CAP_AH", model.battCapacityAh);
+    AG_Param::set_default_by_name("SIM_BATT_VOLTAGE", model.maxVoltage);
+    AG_Param::set_default_by_name("SIM_BATT_CAP_AH", model.battCapacityAh);
     if (model.battCapacityAh > 0) {
-        AP_Param::set_default_by_name("BATT_CAPACITY", model.battCapacityAh*1000);
+        AG_Param::set_default_by_name("BATT_CAPACITY", model.battCapacityAh*1000);
     }
 }
 

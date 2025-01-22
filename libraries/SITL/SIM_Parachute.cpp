@@ -17,14 +17,14 @@
 */
 
 #include "SIM_Parachute.h"
-#include "AP_HAL/AP_HAL.h"
-#include <AP_Math/AP_Math.h>
+#include "AG_HAL/AG_HAL.h"
+#include <AG_Math/AG_Math.h>
 #include <GCS_MAVLink/GCS.h>
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo Parachute::var_info[] = {
+const AG_Param::GroupInfo Parachute::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: Parachute Sim enable/disable
@@ -49,11 +49,11 @@ const AP_Param::GroupInfo Parachute::var_info[] = {
 void Parachute::update(const struct sitl_input &input)
 {
     const int16_t pwm = parachute_pin >= 1 ? input.servos[parachute_pin-1] : -1;
-    const uint64_t now = AP_HAL::micros64();
+    const uint64_t now = AG_HAL::micros64();
     // const float dt = (now - last_update_us) * 1.0e-6f;
     if (pwm >= 1250) {
         if (!deployed_ms) {
-            deployed_ms = AP_HAL::millis();
+            deployed_ms = AG_HAL::millis();
             GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "BANG!  Parachute deployed");
         }
     }
@@ -62,7 +62,7 @@ void Parachute::update(const struct sitl_input &input)
 
 bool Parachute::should_report() const
 {
-    if (AP_HAL::micros64() - last_report_us < report_interval) {
+    if (AG_HAL::micros64() - last_report_us < report_interval) {
         return false;
     }
 

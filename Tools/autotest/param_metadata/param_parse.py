@@ -91,7 +91,7 @@ def debug(str_to_print):
 def lua_applets():
     '''return list of Library objects for lua applets and drivers'''
     lua_lib = Library("", reference="Lua Script", not_rst=True, check_duplicates=True)
-    patterns = ["libraries/AP_Scripting/applets/*.lua", "libraries/AP_Scripting/drivers/*.lua"]
+    patterns = ["libraries/AG_Scripting/applets/*.lua", "libraries/AG_Scripting/drivers/*.lua"]
     paths = []
     for p in patterns:
         debug("Adding lua paths %s" % p)
@@ -107,10 +107,10 @@ def lua_applets():
 
 libraries = []
 
-# AP_Vehicle also has parameters rooted at "", but isn't referenced
+# AG_Vehicle also has parameters rooted at "", but isn't referenced
 # from the vehicle in any way:
 ap_vehicle_lib = Library("") # the "" is tacked onto the front of param name
-setattr(ap_vehicle_lib, "Path", os.path.join('..', 'libraries', 'AP_Vehicle', 'AP_Vehicle.cpp'))
+setattr(ap_vehicle_lib, "Path", os.path.join('..', 'libraries', 'AG_Vehicle', 'AG_Vehicle.cpp'))
 libraries.append(ap_vehicle_lib)
 
 libraries.append(lua_applets())

@@ -104,7 +104,7 @@ class embedded_defaults(object):
 
     def find(self):
         '''find defaults in firmware'''
-        # these are the magic headers from AP_Param.cpp
+        # these are the magic headers from AG_Param.cpp
         magic_str = "PARMDEF".encode('ascii')
         param_magic = [ 0x55, 0x37, 0xf4, 0xa0, 0x38, 0x5d, 0x48, 0x5b ]
         def u_ord(c):

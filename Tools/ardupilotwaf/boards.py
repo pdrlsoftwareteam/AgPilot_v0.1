@@ -64,29 +64,29 @@ class Board:
                 )
 
             env.AP_LIBRARIES += [
-                'AP_Scripting',
-                'AP_Scripting/lua/src',
+                'AG_Scripting',
+                'AG_Scripting/lua/src',
                 ]
 
         else:
             cfg.options.disable_scripting = True
 
-        # allow GCS disable for AP_DAL example
+        # allow GCS disable for AG_DAL example
         if cfg.options.no_gcs:
             env.CXXFLAGS += ['-DHAL_GCS_ENABLED=0']
 
         # setup for supporting onvif cam control
         if cfg.options.enable_onvif:
-            cfg.recurse('libraries/AP_ONVIF')
+            cfg.recurse('libraries/AG_ONVIF')
             env.ENABLE_ONVIF = True
             env.ROMFS_FILES += [('scripts/ONVIF_Camera_Control.lua',
-                                'libraries/AP_Scripting/applets/ONVIF_Camera_Control.lua')]
+                                'libraries/AG_Scripting/applets/ONVIF_Camera_Control.lua')]
             env.DEFINES.update(
                 ENABLE_ONVIF=1,
                 SCRIPTING_ENABLE_DEFAULT=1,
             )
             env.AP_LIBRARIES += [
-                'AP_ONVIF'
+                'AG_ONVIF'
             ]
         else:
             env.ENABLE_ONVIF = False
@@ -116,7 +116,7 @@ class Board:
 
         if cfg.options.enable_gps_logging:
             env.DEFINES.update(
-                AP_GPS_DEBUG_LOGGING_ENABLED=1,
+                AG_GPS_DEBUG_LOGGING_ENABLED=1,
             )
             cfg.msg("GPS Debug Logging", 'yes')
         else:
@@ -130,7 +130,7 @@ class Board:
                 AP_CUSTOMCONTROL_ENABLED=1,
             )
             env.AP_LIBRARIES += [
-                'AC_CustomControl'
+                'AG_CustomControl'
             ]
             cfg.msg("Enabled custom controller", 'yes')
         else:
@@ -159,7 +159,7 @@ class Board:
         cfg.ap_common_checks()
 
         cfg.env.prepend_value('INCLUDES', [
-            cfg.srcnode.find_dir('libraries/AP_Common/missing').abspath()
+            cfg.srcnode.find_dir('libraries/AG_Common/missing').abspath()
         ])
         if os.path.exists(os.path.join(env.SRCROOT, '.vscode/c_cpp_properties.json')):
             # change c_cpp_properties.json configure the VSCode Intellisense env
@@ -420,7 +420,7 @@ class Board:
 
         if self.with_can and not cfg.env.AP_PERIPH:
             env.AP_LIBRARIES += [
-                'AP_UAVCAN',
+                'AG_UAVCAN',
                 'modules/uavcan/libuavcan/src/**/*.cpp'
                 ]
 
@@ -450,9 +450,9 @@ class Board:
             env.CXXFLAGS += ['-DOSD_ENABLED=1', '-DHAL_MSP_ENABLED=1']
 
         if cfg.options.osd_fonts:
-            for f in os.listdir('libraries/AP_OSD/fonts'):
+            for f in os.listdir('libraries/AG_OSD/fonts'):
                 if fnmatch.fnmatch(f, "font*bin"):
-                    env.ROMFS_FILES += [(f,'libraries/AP_OSD/fonts/'+f)]
+                    env.ROMFS_FILES += [(f,'libraries/AG_OSD/fonts/'+f)]
 
         if cfg.options.ekf_double:
             env.CXXFLAGS += ['-DHAL_WITH_EKF_DOUBLE=1']
@@ -495,7 +495,7 @@ class Board:
             bld.ap_version_append_int('BUILD_DATE_DAY', ltime.tm_mday)
 
     def embed_ROMFS_files(self, ctx):
-        '''embed some files using AP_ROMFS'''
+        '''embed some files using AG_ROMFS'''
         import embed
         header = ctx.bldnode.make_node('ap_romfs_embedded.h').abspath()
         if not embed.create_embedded_h(header, ctx.env.ROMFS_FILES, ctx.env.ROMFS_UNCOMPRESSED):
@@ -505,7 +505,7 @@ Board = BoardMeta('Board', Board.__bases__, dict(Board.__dict__))
 
 def add_dynamic_boards_chibios():
     '''add boards based on existance of hwdef.dat in subdirectories for ChibiOS'''
-    dirname, dirlist, filenames = next(os.walk('libraries/AP_HAL_ChibiOS/hwdef'))
+    dirname, dirlist, filenames = next(os.walk('libraries/AG_HAL_ChibiOS/hwdef'))
     for d in dirlist:
         if d in _board_classes.keys():
             continue
@@ -524,7 +524,7 @@ def get_chibios_board_cls(ctx, name, hwdef):
 
 def add_dynamic_boards_esp32():
     '''add boards based on existance of hwdef.dat in subdirectories for ESP32'''
-    dirname, dirlist, filenames = next(os.walk('libraries/AP_HAL_ESP32/hwdef'))
+    dirname, dirlist, filenames = next(os.walk('libraries/AG_HAL_ESP32/hwdef'))
     for d in dirlist:
         if d in _board_classes.keys():
             continue
@@ -541,7 +541,7 @@ def get_boards_names():
 def get_ap_periph_boards():
     '''Add AP_Periph boards based on existance of periph keywork in hwdef.dat or board name'''
     list_ap = [s for s in list(_board_classes.keys()) if "periph" in s]
-    dirname, dirlist, filenames = next(os.walk('libraries/AP_HAL_ChibiOS/hwdef'))
+    dirname, dirlist, filenames = next(os.walk('libraries/AG_HAL_ChibiOS/hwdef'))
     for d in dirlist:
         if d in list_ap:
             continue
@@ -671,8 +671,8 @@ class sitl(Board):
              env.LINKFLAGS += ['-fsanitize=address']
 
         env.AP_LIBRARIES += [
-            'AP_HAL_SITL',
-            'AP_CSVReader',
+            'AG_HAL_SITL',
+            'AG_CSVReader',
         ]
 
         if not cfg.env.AP_PERIPH:
@@ -691,9 +691,9 @@ class sitl(Board):
 
         if cfg.options.sitl_osd:
             env.CXXFLAGS += ['-DWITH_SITL_OSD','-DOSD_ENABLED=1']
-            for f in os.listdir('libraries/AP_OSD/fonts'):
+            for f in os.listdir('libraries/AG_OSD/fonts'):
                 if fnmatch.fnmatch(f, "font*bin"):
-                    env.ROMFS_FILES += [(f,'libraries/AP_OSD/fonts/'+f)]
+                    env.ROMFS_FILES += [(f,'libraries/AG_OSD/fonts/'+f)]
 
         for f in os.listdir('Tools/autotest/models'):
             if fnmatch.fnmatch(f, "*.json") or fnmatch.fnmatch(f, "*.parm"):
@@ -709,7 +709,7 @@ class sitl(Board):
                     env.ROMFS_FILES += [('scripts/'+f,'ROMFS/scripts/'+f)]
 
         if len(env.ROMFS_FILES) > 0:
-            env.CXXFLAGS += ['-DHAL_HAVE_AP_ROMFS_EMBEDDED_H']
+            env.CXXFLAGS += ['-DHAL_HAVE_AG_ROMFS_EMBEDDED_H']
 
         if cfg.options.sitl_rgbled:
             env.CXXFLAGS += ['-DWITH_SITL_RGBLED']
@@ -824,7 +824,7 @@ class esp32(Board):
         )
 
         env.AP_LIBRARIES += [
-            'AP_HAL_ESP32',
+            'AG_HAL_ESP32',
         ]
 
         env.CFLAGS += [
@@ -851,7 +851,7 @@ class esp32(Board):
 
 
         env.INCLUDES += [
-                cfg.srcnode.find_dir('libraries/AP_HAL_ESP32/boards').abspath(),
+                cfg.srcnode.find_dir('libraries/AG_HAL_ESP32/boards').abspath(),
             ]
         env.AP_PROGRAM_AS_STLIB = True
         #if cfg.options.enable_profile:
@@ -894,7 +894,7 @@ class chibios(Board):
         )
 
         env.AP_LIBRARIES += [
-            'AP_HAL_ChibiOS',
+            'AG_HAL_ChibiOS',
         ]
 
         # make board name available for USB IDs
@@ -980,7 +980,7 @@ class chibios(Board):
             '--specs=nosys.specs',
             '-L%s' % env.BUILDROOT,
             '-L%s' % cfg.srcnode.make_node('modules/ChibiOS/os/common/startup/ARMCMx/compilers/GCC/ld/').abspath(),
-            '-L%s' % cfg.srcnode.make_node('libraries/AP_HAL_ChibiOS/hwdef/common/').abspath(),
+            '-L%s' % cfg.srcnode.make_node('libraries/AG_HAL_ChibiOS/hwdef/common/').abspath(),
             '-Wl,-Map,Linker.map,--cref,--gc-sections,--no-warn-mismatch,--library-path=/ld,--script=ldscript.ld,--defsym=__process_stack_size__=%s,--defsym=__main_stack_size__=%s' % (cfg.env.PROCESS_STACK, cfg.env.MAIN_STACK)
         ]
 
@@ -1045,7 +1045,7 @@ class chibios(Board):
         ]
 
         env.INCLUDES += [
-            cfg.srcnode.find_dir('libraries/AP_GyroFFT/CMSIS_5/include').abspath()
+            cfg.srcnode.find_dir('libraries/AG_GyroFFT/CMSIS_5/include').abspath()
         ]
 
         # whitelist of compilers which we should build with -Werror
@@ -1135,7 +1135,7 @@ class linux(Board):
 
         env.LINKFLAGS += ['-pthread',]
         env.AP_LIBRARIES += [
-            'AP_HAL_Linux',
+            'AG_HAL_Linux',
         ]
 
         if self.with_can:
@@ -1144,14 +1144,14 @@ class linux(Board):
         if cfg.options.apstatedir:
             cfg.define('AP_STATEDIR', cfg.options.apstatedir)
 
-        defaults_file = 'libraries/AP_HAL_Linux/boards/%s/defaults.parm' % self.get_name()
+        defaults_file = 'libraries/AG_HAL_Linux/boards/%s/defaults.parm' % self.get_name()
         if os.path.exists(defaults_file):
             env.ROMFS_FILES += [('defaults.parm', defaults_file)]
             env.DEFINES.update(
                 HAL_PARAM_DEFAULTS_PATH='"@ROMFS/defaults.parm"',
             )
         if len(env.ROMFS_FILES) > 0:
-            env.CXXFLAGS += ['-DHAL_HAVE_AP_ROMFS_EMBEDDED_H']
+            env.CXXFLAGS += ['-DHAL_HAVE_AG_ROMFS_EMBEDDED_H']
 
     def build(self, bld):
         super(linux, self).build(bld)

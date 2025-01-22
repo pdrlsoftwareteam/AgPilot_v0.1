@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_SCRIMMAGE_ENABLED
 #define HAL_SIM_SCRIMMAGE_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
@@ -28,7 +28,7 @@
 
 #include <string>
 
-#include <AP_HAL/utility/Socket.h>
+#include <AG_HAL/utility/Socket.h>
 
 #include "SIM_Aircraft.h"
 

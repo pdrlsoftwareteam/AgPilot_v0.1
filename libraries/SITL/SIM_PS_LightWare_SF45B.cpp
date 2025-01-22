@@ -81,7 +81,7 @@ void PS_LightWare_SF45B::handle_message()
         return;
     }
     }
-//    AP_HAL::panic("Unrecognised message (%u)", _msg.common.msgid);
+//    AG_HAL::panic("Unrecognised message (%u)", _msg.common.msgid);
     ::fprintf(stderr, "Unrecognised message (%u)\n", _msg.packed_msgstream.msg.msgid);
 }
 
@@ -91,7 +91,7 @@ void PS_LightWare_SF45B::update_input()
     if (n < 0) {
         // TODO: do better here
         if (errno != EAGAIN && errno != EWOULDBLOCK && errno != 0) {
-            AP_HAL::panic("Failed to read from autopilot");
+            AG_HAL::panic("Failed to read from autopilot");
         }
     } else {
         _buflen += n;
@@ -183,7 +183,7 @@ void PS_LightWare_SF45B::update_output_responses()
 
 void PS_LightWare_SF45B::update_output_scan(const Location &location)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (last_scan_output_time_ms == 0) {
         last_scan_output_time_ms = now;
         return;

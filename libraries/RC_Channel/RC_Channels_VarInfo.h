@@ -12,7 +12,7 @@
   This scheme reduces code duplicate between the Vehicles, and avoids the chance of things getting out of sync.
 */
 
-const AP_Param::GroupInfo RC_Channels::var_info[] = {
+const AG_Param::GroupInfo RC_Channels::var_info[] = {
     // @Group: 1_
     // @Path: RC_Channel.cpp
     AP_SUBGROUPINFO(obj_channels[0], "1_",  1, RC_CHANNELS_SUBCLASS, RC_CHANNEL_SUBCLASS),

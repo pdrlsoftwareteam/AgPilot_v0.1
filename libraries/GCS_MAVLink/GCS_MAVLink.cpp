@@ -22,10 +22,10 @@ This provides some support code and variables for MAVLink enabled sketches
 #include "GCS.h"
 #include "GCS_MAVLink.h"
 
-#include <AP_Common/AP_Common.h>
-#include <AP_HAL/AP_HAL.h>
+#include <AG_Common/AG_Common.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #ifdef MAVLINK_SEPARATE_HELPERS
 // Shut up warnings about missing declarations; TODO: should be fixed on
@@ -36,7 +36,7 @@ extern const AP_HAL::HAL& hal;
 #pragma GCC diagnostic pop
 #endif
 
-AP_HAL::UARTDriver	*mavlink_comm_port[MAVLINK_COMM_NUM_BUFFERS];
+AG_HAL::UARTDriver	*mavlink_comm_port[MAVLINK_COMM_NUM_BUFFERS];
 bool gcs_alternative_active[MAVLINK_COMM_NUM_BUFFERS];
 
 // per-channel lock
@@ -64,7 +64,7 @@ void GCS_MAVLINK::set_channel_private(mavlink_channel_t _chan)
     mavlink_private |= mask;
 }
 
-// return a MAVLink parameter type given a AP_Param type
+// return a MAVLink parameter type given a AG_Param type
 MAV_PARAM_TYPE GCS_MAVLINK::mav_param_type(enum ap_var_type t)
 {
     if (t == AP_PARAM_INT8) {
@@ -121,7 +121,7 @@ void comm_send_buffer(mavlink_channel_t chan, const uint8_t *buf, uint8_t len)
     const size_t written = mavlink_comm_port[chan]->write((const uint8_t*)tempBuf, len);
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     if (written < len) {
-        AP_HAL::panic("Short write on UART: %lu < %u", (unsigned long)written, len);
+        AG_HAL::panic("Short write on UART: %lu < %u", (unsigned long)written, len);
     }
 #else
     (void)written;

@@ -75,12 +75,12 @@ void Copter::read_rangefinder(void)
             // clear glitch and record time so consumers (i.e. surface tracking) can reset their target altitudes
             rf_state.glitch_count = 0;
             rf_state.alt_cm_glitch_protected = rf_state.alt_cm;
-            rf_state.glitch_cleared_ms = AP_HAL::millis();
+            rf_state.glitch_cleared_ms = AG_HAL::millis();
             reset_terrain_offset = true;
         }
 
         // filter rangefinder altitude
-        uint32_t now = AP_HAL::millis();
+        uint32_t now = AG_HAL::millis();
         const bool timed_out = now - rf_state.last_healthy_ms > RANGEFINDER_TIMEOUT_MS;
         if (rf_state.alt_healthy) {
             if (timed_out) {
@@ -150,7 +150,7 @@ void Copter::update_rangefinder_terrain_offset()
     terrain_offset_cm = rangefinder_up_state.inertial_alt_cm + rangefinder_up_state.alt_cm_glitch_protected;
     rangefinder_up_state.terrain_offset_cm += (terrain_offset_cm - rangefinder_up_state.terrain_offset_cm) * (copter.G_Dt / MAX(copter.g2.surftrak_tc, copter.G_Dt));
 
-    if (rangefinder_state.alt_healthy || (AP_HAL::millis() - rangefinder_state.last_healthy_ms > RANGEFINDER_TIMEOUT_MS)) {
+    if (rangefinder_state.alt_healthy || (AG_HAL::millis() - rangefinder_state.last_healthy_ms > RANGEFINDER_TIMEOUT_MS)) {
         wp_nav->set_rangefinder_terrain_offset(rangefinder_state.enabled, rangefinder_state.alt_healthy, rangefinder_state.terrain_offset_cm);
 #if MODE_CIRCLE_ENABLED
         circle_nav->set_rangefinder_terrain_offset(rangefinder_state.enabled && wp_nav->rangefinder_used(), rangefinder_state.alt_healthy, rangefinder_state.terrain_offset_cm);

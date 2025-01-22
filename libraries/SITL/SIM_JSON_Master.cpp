@@ -20,7 +20,7 @@
 
 #if HAL_SIM_JSON_MASTER_ENABLED
 
-#include <AP_Logger/AP_Logger.h>
+#include <AG_Logger/AG_Logger.h>
 #include <errno.h>
 
 using namespace SITL;
@@ -35,15 +35,15 @@ void JSON_Master::init(const int32_t num_slaves)
         uint16_t port = 9002 + 10 * i;
 
         if (!list->sock_in.reuseaddress()) {
-            AP_HAL::panic("JSON master: socket reuseaddress failed on port: %d - %s\n", port, strerror(errno));
+            AG_HAL::panic("JSON master: socket reuseaddress failed on port: %d - %s\n", port, strerror(errno));
         }
 
         if (!list->sock_in.bind("127.0.0.1", port)) {
-            AP_HAL::panic("JSON master: socket reuseaddress failed on port: %d - %s\n", port, strerror(errno));
+            AG_HAL::panic("JSON master: socket reuseaddress failed on port: %d - %s\n", port, strerror(errno));
         }
 
         if (!list->sock_in.set_blocking(false)) {
-            AP_HAL::panic( "JSON master: socket set_blocking(false) failed on port: %d - %s\n", port, strerror(errno));
+            AG_HAL::panic( "JSON master: socket set_blocking(false) failed on port: %d - %s\n", port, strerror(errno));
         }
 
         printf("Slave %u: listening on %u\n", list->instance, port);
@@ -111,7 +111,7 @@ void JSON_Master::receive(struct sitl_input &input)
                        "s#----",
                        "F?????",
                        "QBHHIB",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        list->instance,
                        buffer.magic,
                        buffer.frame_rate,
@@ -140,7 +140,7 @@ void JSON_Master::receive(struct sitl_input &input)
                        "s#YYYYYYYYYYYYYY",
                        "F?--------------",
                        "QBHHHHHHHHHHHHHH",
-                       AP_HAL::micros64(),
+                       AG_HAL::micros64(),
                        list->instance,
                        buffer.pwm[0],
                        buffer.pwm[1],

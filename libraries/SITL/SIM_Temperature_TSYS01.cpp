@@ -9,15 +9,15 @@ int SITL::TSYS01::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
     if (data->nmsgs == 2) {
         // something is expecting a response....
         if (data->msgs[0].flags != 0) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
         if (data->msgs[1].flags != I2C_M_RD) {
-            AP_HAL::panic("Unexpected flags");
+            AG_HAL::panic("Unexpected flags");
         }
         const uint8_t command = data->msgs[0].buf[0];
         switch ((Command)command) {
         case Command::RESET:
-            AP_HAL::panic("Bad RESET");
+            AG_HAL::panic("Bad RESET");
         case Command::READ_PROM0:
         case Command::READ_PROM1:
         case Command::READ_PROM2:
@@ -25,10 +25,10 @@ int SITL::TSYS01::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
         case Command::READ_PROM4:
         case Command::READ_PROM5: {
             if (state != State::RESET) {
-                AP_HAL::panic("reading prom outside RESET state");
+                AG_HAL::panic("reading prom outside RESET state");
             }
             if (data->msgs[1].len != 2) {
-                AP_HAL::panic("Unexpected prom read length");
+                AG_HAL::panic("Unexpected prom read length");
             }
             uint8_t offs = 5-((uint8_t(command) - uint8_t(Command::READ_PROM0))/2);
             const uint16_t k = _k[offs];
@@ -37,11 +37,11 @@ int SITL::TSYS01::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
             break;
         }
         case Command::CONVERT:
-            AP_HAL::panic("Bad CONVERT");
+            AG_HAL::panic("Bad CONVERT");
         case Command::READ_ADC: {
             uint8_t registers[3] {};
             if (data->msgs[1].len != sizeof(registers)) {
-                AP_HAL::panic("Unexpected prom read length");
+                AG_HAL::panic("Unexpected prom read length");
             }
             if (state == State::CONVERTING) {
                 // we've been asked for values while still converting.
@@ -55,7 +55,7 @@ int SITL::TSYS01::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
                 registers[0] = value & 0xff;
                 set_state(State::IDLE);
             } else {
-                // AP_HAL::panic("READ_ADC in bad state");
+                // AG_HAL::panic("READ_ADC in bad state");
                 // this happens at startup
                 return -1;
             }
@@ -83,18 +83,18 @@ int SITL::TSYS01::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
         case Command::READ_PROM3:
         case Command::READ_PROM4:
         case Command::READ_PROM5:
-            AP_HAL::panic("bad prom read");
+            AG_HAL::panic("bad prom read");
         case Command::CONVERT:
             if (state != State::RESET &&
                 state != State::CONVERTING &&
                 state != State::IDLE &&
                 state != State::READ_PROM) {
-                AP_HAL::panic("Convert outside reset/idle");
+                AG_HAL::panic("Convert outside reset/idle");
             }
             set_state(State::CONVERTING);
             break;
         case Command::READ_ADC:
-            AP_HAL::panic("bad READ_ADC");
+            AG_HAL::panic("bad READ_ADC");
         }
         return 0;
     }
@@ -194,7 +194,7 @@ float SITL::TSYS01::get_sim_temperature() const
     sim_alt += 2 * rand_float();
 
     float sigma, delta, theta;
-    AP_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(sim_alt * 0.001f, sigma, delta, theta);
 
     // To Do: Add a sensor board temperature offset parameter
     return (KELVIN_TO_C(SSL_AIR_TEMPERATURE * theta)) + 25.0;

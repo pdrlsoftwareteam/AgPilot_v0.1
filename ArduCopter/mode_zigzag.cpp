@@ -9,7 +9,7 @@
 #define ZIGZAG_WP_RADIUS_CM 300
 #define ZIGZAG_LINE_INFINITY -1
 
-const AP_Param::GroupInfo ModeZigZag::var_info[] = {
+const AG_Param::GroupInfo ModeZigZag::var_info[] = {
     // @Param: AUTO_ENABLE
     // @DisplayName: ZigZag auto enable/disable
     // @Description: Allows you to enable (1) or disable (0) ZigZag auto feature
@@ -61,7 +61,7 @@ const AP_Param::GroupInfo ModeZigZag::var_info[] = {
 
 ModeZigZag::ModeZigZag(void) : Mode()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 // initialise zigzag controller
@@ -128,7 +128,7 @@ void ModeZigZag::run()
             return_to_manual_control(false);
         } else if (reached_destination()) {
             // if vehicle has reached destination switch to manual control or moving to A or B
-            AP_Notify::events.waypoint_complete = 1;
+            AG_Notify::events.waypoint_complete = 1;
             if (is_auto) {
                 if (line_num == ZIGZAG_LINE_INFINITY || line_count < line_num) {
                     if (auto_stage == AutoState::SIDEWAYS) {
@@ -266,7 +266,7 @@ void ModeZigZag::auto_control()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run waypoint controller
     const bool wpnav_ok = wp_nav->update_wpnav();
@@ -366,7 +366,7 @@ void ModeZigZag::manual_control()
 
     case AltHold_Flying:
         // set motors to full range
-        motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+        motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
         // run loiter controller
         loiter_nav->update();
@@ -403,7 +403,7 @@ bool ModeZigZag::reached_destination()
     }
 
     // wait at time which is set in zigzag_wp_delay
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (reach_wp_time_ms == 0) {
         reach_wp_time_ms = now;
     }

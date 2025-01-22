@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 #include <GCS_MAVLink/GCS.h>
 
 using namespace SITL;
@@ -34,7 +34,7 @@ LORD::LORD() :SerialDevice::SerialDevice()
  */
 static void simulation_timeval(struct timeval *tv)
 {
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     static uint64_t first_usec;
     static struct timeval first_tv;
     if (first_usec == 0) {
@@ -97,7 +97,7 @@ void LORD::send_imu_packet(void)
     packet.payload[packet.payload_size++] = 0x06; // Ambient Pressure Field Size
     packet.payload[packet.payload_size++] = 0x17; // Descriptor
     float sigma, delta, theta;
-    AP_Baro::SimpleAtmosphere(fdm.altitude * 0.001f, sigma, delta, theta);
+    AG_Baro::SimpleAtmosphere(fdm.altitude * 0.001f, sigma, delta, theta);
     put_float(packet, SSL_AIR_PRESSURE * delta * 0.001 + rand_float() * 0.1);
 
     // Add scaled magnetometer field
@@ -266,7 +266,7 @@ void LORD::update(void)
     uint32_t us_between_gnss_packets = 250000;
     uint32_t us_between_filter_packets = 100000;
 
-    uint32_t now = AP_HAL::micros();
+    uint32_t now = AG_HAL::micros();
     if (now - last_imu_pkt_us >= us_between_imu_packets) {
         last_imu_pkt_us = now;
         send_imu_packet();

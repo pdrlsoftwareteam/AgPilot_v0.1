@@ -36,7 +36,7 @@ namespace SITL {
 class RF_Benewake_TFmini : public RF_Benewake {
 public:
 
-    // see AP_RangeFinder_Benewake.cpp for definitions
+    // see AG_RangeFinder_Benewake.cpp for definitions
     uint8_t byte4() const override { return 1; } // strength L
     uint8_t byte5() const override { return 1; } // strength H
     uint8_t byte6() const override { return 0x07; } // distance mode (0x02=mm 0x07=cm)

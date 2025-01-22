@@ -6,8 +6,8 @@
 
 using namespace SITL;
 
-#include <AP_HAL/AP_HAL.h>
-extern const AP_HAL::HAL& hal;
+#include <AG_HAL/AG_HAL.h>
+extern const AG_HAL::HAL& hal;
 
 MS5XXX::MS5XXX() :
     I2CDevice()
@@ -73,7 +73,7 @@ void MS5XXX::convert_D2()
 
 void MS5XXX::update(const class Aircraft &aircraft)
 {
-    const uint32_t now_us = AP_HAL::micros();
+    const uint32_t now_us = AG_HAL::micros();
     // static uint32_t then_us = 0;
     // ::fprintf(stderr, "update: s=%u now=%u delta=%u cmd-age=%u\n", (unsigned)state, (unsigned)now_us, (unsigned)(now_us - then_us), (unsigned)(now_us-command_start_us));
     // then_us = now_us;
@@ -150,15 +150,15 @@ int MS5XXX::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
 {
     struct I2C::i2c_msg &msg = data->msgs[0];
     // if (data->nmsgs != 1) {
-    //     AP_HAL::panic("nmsgs=%u", data->nmsgs);
+    //     AG_HAL::panic("nmsgs=%u", data->nmsgs);
     // }
     if (msg.flags == I2C_M_RD) {
-        AP_HAL::panic("Read (%u)",msg.len);
+        AG_HAL::panic("Read (%u)",msg.len);
         return 0;
     }
 
     if (msg.len != 1) {
-        AP_HAL::panic("bad command length");
+        AG_HAL::panic("bad command length");
     }
     const Command cmd = (Command)msg.buf[0];
     if (state != State::RUNNING) {
@@ -184,7 +184,7 @@ int MS5XXX::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
     case Command::READ_C6:
     case Command::READ_CRC: {
         if (data->msgs[1].len != 2) {
-            AP_HAL::panic("Unexpected length");
+            AG_HAL::panic("Unexpected length");
         }
         const uint8_t addr = ((unsigned)cmd - (unsigned)Command::READ_C0)/2;
         const uint16_t val = htobe16(loaded_prom[addr]);
@@ -206,14 +206,14 @@ int MS5XXX::rdwr(I2C::i2c_rdwr_ioctl_data *&data)
             return -1;
         }
         if (data->msgs[1].len != 3) {
-            AP_HAL::panic("Unexpected length=%u", data->msgs[1].len);
+            AG_HAL::panic("Unexpected length=%u", data->msgs[1].len);
         }
         data->msgs[1].buf[0] = convert_out[0];
         data->msgs[1].buf[1] = convert_out[1];
         data->msgs[1].buf[2] = convert_out[2];
         break;
     default:
-        AP_HAL::panic("Unknown command %u (0x%02x)", (unsigned)cmd, (unsigned)cmd);
+        AG_HAL::panic("Unknown command %u (0x%02x)", (unsigned)cmd, (unsigned)cmd);
     }
     return 0;
 }

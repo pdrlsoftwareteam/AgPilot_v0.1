@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 
 #include "stdint.h"
 
@@ -36,7 +36,7 @@ public:
 
     int ioctl(uint8_t bus, uint8_t cs_pin, uint8_t ioctl_type, void *data);
 
-    // the following must be identical to AP_HAL_SITL/SPIDevice.h
+    // the following must be identical to AG_HAL_SITL/SPIDevice.h
     struct spi_ioc_transfer {
         uint64_t tx_buf;
         uint64_t rx_buf;

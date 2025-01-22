@@ -1,5 +1,5 @@
 /*
-  copter specific AP_AdvancedFailsafe class
+  copter specific AG_AdvancedFailsafe class
  */
 
 #include "Copter.h"
@@ -9,17 +9,17 @@
 /*
   setup radio_out values for all channels to termination values
  */
-void AP_AdvancedFailsafe_Copter::terminate_vehicle(void)
+void AG_AdvancedFailsafe_Copter::terminate_vehicle(void)
 {
     if (_terminate_action == TERMINATE_ACTION_LAND) {
         copter.set_mode(Mode::Number::LAND, ModeReason::TERMINATE);
     } else {
         // stop motors
-        copter.motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::SHUT_DOWN);
+        copter.motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::SHUT_DOWN);
         copter.motors->output();
 
         // disarm as well
-        copter.arming.disarm(AP_Arming::Method::AFS);
+        copter.arming.disarm(AG_Arming::Method::AFS);
     
         // and set all aux channels
         SRV_Channels::set_output_limit(SRV_Channel::k_heli_rsc, SRV_Channel::Limit::TRIM);
@@ -33,7 +33,7 @@ void AP_AdvancedFailsafe_Copter::terminate_vehicle(void)
     SRV_Channels::output_ch_all();
 }
 
-void AP_AdvancedFailsafe_Copter::setup_IO_failsafe(void)
+void AG_AdvancedFailsafe_Copter::setup_IO_failsafe(void)
 {
     // setup failsafe for all aux channels
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_heli_rsc, SRV_Channel::Limit::TRIM);
@@ -43,7 +43,7 @@ void AP_AdvancedFailsafe_Copter::setup_IO_failsafe(void)
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_none, SRV_Channel::Limit::TRIM);
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_manual, SRV_Channel::Limit::TRIM);
 
-    // setup AP_Motors outputs for failsafe
+    // setup AG_Motors outputs for failsafe
     uint32_t mask = copter.motors->get_motor_mask();
     hal.rcout->set_failsafe_pwm(mask, copter.motors->get_pwm_output_min());
 }
@@ -51,7 +51,7 @@ void AP_AdvancedFailsafe_Copter::setup_IO_failsafe(void)
 /*
   return an AFS_MODE for current control mode
  */
-AP_AdvancedFailsafe::control_mode AP_AdvancedFailsafe_Copter::afs_mode(void)
+AG_AdvancedFailsafe::control_mode AG_AdvancedFailsafe_Copter::afs_mode(void)
 {
     switch (copter.flightmode->mode_number()) {
     case Mode::Number::AUTO:
@@ -59,11 +59,11 @@ AP_AdvancedFailsafe::control_mode AP_AdvancedFailsafe_Copter::afs_mode(void)
     case Mode::Number::GUIDED:
     case Mode::Number::RTL:
     case Mode::Number::LAND:
-        return AP_AdvancedFailsafe::AFS_AUTO;
+        return AG_AdvancedFailsafe::AFS_AUTO;
     default:
         break;
     }
-    return AP_AdvancedFailsafe::AFS_STABILIZED;
+    return AG_AdvancedFailsafe::AFS_STABILIZED;
 }
 
 #endif // ADVANCED_FAILSAFE

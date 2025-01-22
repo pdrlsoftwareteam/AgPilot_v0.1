@@ -27,9 +27,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 namespace SITL {
 
@@ -86,7 +86,7 @@ bool JSBSim::create_templates(void)
 
     FILE *f = fopen(jsbsim_script, "w");
     if (f == nullptr) {
-        AP_HAL::panic("Unable to create jsbsim script %s", jsbsim_script);
+        AG_HAL::panic("Unable to create jsbsim script %s", jsbsim_script);
     }
     fprintf(f,
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -132,7 +132,7 @@ bool JSBSim::create_templates(void)
 
     f = fopen(jsbsim_fgout, "w");
     if (f == nullptr) {
-        AP_HAL::panic("Unable to create jsbsim fgout script %s", jsbsim_fgout);
+        AG_HAL::panic("Unable to create jsbsim fgout script %s", jsbsim_fgout);
     }
     fprintf(f, "<?xml version=\"1.0\"?>\n"
             "<output name=\"127.0.0.1\" type=\"FLIGHTGEAR\" port=\"%u\" protocol=\"UDP\" rate=\"%f\">\n"
@@ -148,7 +148,7 @@ bool JSBSim::create_templates(void)
 
     f = fopen(jsbsim_reset, "w");
     if (f == nullptr) {
-        AP_HAL::panic("Unable to create jsbsim reset script %s", jsbsim_reset);
+        AG_HAL::panic("Unable to create jsbsim reset script %s", jsbsim_reset);
     }
     float r, p, y;
     dcm.to_euler(&r, &p, &y);
@@ -189,7 +189,7 @@ bool JSBSim::start_JSBSim(void)
     int p[2];
     int devnull = open("/dev/null", O_RDWR|O_CLOEXEC);
     if (pipe(p) != 0) {
-        AP_HAL::panic("Unable to create pipe");
+        AG_HAL::panic("Unable to create pipe");
     }
     pid_t child_pid = fork();
     if (child_pid == 0) {
@@ -235,14 +235,14 @@ bool JSBSim::start_JSBSim(void)
     // read startup to be sure it is running
     char c;
     if (read(jsbsim_stdout, &c, 1) != 1) {
-        AP_HAL::panic("Unable to start JSBSim");
+        AG_HAL::panic("Unable to start JSBSim");
     }
 
     if (!expect("JSBSim Execution beginning")) {
-        AP_HAL::panic("Failed to start JSBSim");
+        AG_HAL::panic("Failed to start JSBSim");
     }
     if (!open_control_socket()) {
-        AP_HAL::panic("Failed to open JSBSim control socket");
+        AG_HAL::panic("Failed to open JSBSim control socket");
     }
 
     fcntl(jsbsim_stdout, F_SETFL, fcntl(jsbsim_stdout, F_GETFL, 0) | O_NONBLOCK);

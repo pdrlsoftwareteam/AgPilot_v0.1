@@ -20,10 +20,10 @@
   Design by Leonard Hall
  */
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include <cmath>
 #include <inttypes.h>
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 
 
 template <class T>

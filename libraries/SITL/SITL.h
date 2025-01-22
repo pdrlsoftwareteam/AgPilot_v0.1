@@ -1,16 +1,16 @@
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #if AP_SIM_ENABLED
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
-#include <AP_Baro/AP_Baro.h>
-#include <AP_Airspeed/AP_Airspeed.h>
-#include <AP_Common/Location.h>
-#include <AP_Compass/AP_Compass.h>
-#include <AP_InertialSensor/AP_InertialSensor.h>
+#include <AG_Baro/AG_Baro.h>
+#include <AG_Airspeed/AG_Airspeed.h>
+#include <AG_Common/Location.h>
+#include <AG_Compass/AG_Compass.h>
+#include <AG_InertialSensor/AG_InertialSensor.h>
 #include "SIM_Buzzer.h"
 #include "SIM_Gripper_EPM.h"
 #include "SIM_Gripper_Servo.h"
@@ -99,29 +99,29 @@ class SIM {
 public:
 
     SIM() {
-        AP_Param::setup_object_defaults(this, var_info);
-        AP_Param::setup_object_defaults(this, var_info2);
-        AP_Param::setup_object_defaults(this, var_info3);
+        AG_Param::setup_object_defaults(this, var_info);
+        AG_Param::setup_object_defaults(this, var_info2);
+        AG_Param::setup_object_defaults(this, var_info3);
 #if HAL_SIM_GPS_ENABLED
-        AP_Param::setup_object_defaults(this, var_gps);
+        AG_Param::setup_object_defaults(this, var_gps);
 #endif
-        AP_Param::setup_object_defaults(this, var_mag);
-        AP_Param::setup_object_defaults(this, var_ins);
+        AG_Param::setup_object_defaults(this, var_mag);
+        AG_Param::setup_object_defaults(this, var_ins);
 #ifdef SFML_JOYSTICK
-        AP_Param::setup_object_defaults(this, var_sfml_joystick);
+        AG_Param::setup_object_defaults(this, var_sfml_joystick);
 #endif // SFML_JOYSTICK
         for (uint8_t i=0; i<BARO_MAX_INSTANCES; i++) {
-            AP_Param::setup_object_defaults(&baro[i], baro[i].var_info);
+            AG_Param::setup_object_defaults(&baro[i], baro[i].var_info);
         }
         for (uint8_t i=0; i<AIRSPEED_MAX_SENSORS; i++) {
-            AP_Param::setup_object_defaults(&airspeed[i], airspeed[i].var_info);
+            AG_Param::setup_object_defaults(&airspeed[i], airspeed[i].var_info);
         }
         // set compass offset
         for (uint8_t i = 0; i < HAL_COMPASS_MAX_SENSORS; i++) {
             mag_ofs[i].set(Vector3f(5, 13, -18));
         }
         if (_singleton != nullptr) {
-            AP_HAL::panic("Too many SITL instances");
+            AG_HAL::panic("Too many SITL instances");
         }
         _singleton = this;
     }
@@ -153,16 +153,16 @@ public:
     // height above ground
     float height_agl;
     
-    static const struct AP_Param::GroupInfo var_info[];
-    static const struct AP_Param::GroupInfo var_info2[];
-    static const struct AP_Param::GroupInfo var_info3[];
+    static const struct AG_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info2[];
+    static const struct AG_Param::GroupInfo var_info3[];
 #if HAL_SIM_GPS_ENABLED
-    static const struct AP_Param::GroupInfo var_gps[];
+    static const struct AG_Param::GroupInfo var_gps[];
 #endif
-    static const struct AP_Param::GroupInfo var_mag[];
-    static const struct AP_Param::GroupInfo var_ins[];
+    static const struct AG_Param::GroupInfo var_mag[];
+    static const struct AG_Param::GroupInfo var_ins[];
 #ifdef SFML_JOYSTICK
-    static const struct AP_Param::GroupInfo var_sfml_joystick[];
+    static const struct AG_Param::GroupInfo var_sfml_joystick[];
 #endif //SFML_JOYSTICK
 
     // Board Orientation (and inverse)
@@ -246,7 +246,7 @@ public:
     // baro parameters
     class BaroParm {
     public:
-        static const struct AP_Param::GroupInfo var_info[];
+        static const struct AG_Param::GroupInfo var_info[];
         AP_Float noise;  // in metres
         AP_Float drift;  // in metres per second
         AP_Float glitch; // glitch in meters
@@ -267,7 +267,7 @@ public:
     // airspeed parameters
     class AirspeedParm {
     public:
-        static const struct AP_Param::GroupInfo var_info[];
+        static const struct AG_Param::GroupInfo var_info[];
         AP_Float noise;  // pressure noise
         AP_Float fail;   // airspeed value in m/s to fail to
         AP_Float fail_pressure; // pitot tube failure pressure in Pa
@@ -393,14 +393,14 @@ public:
 
     AP_Int8 _safety_switch_state;
 
-    AP_HAL::Util::safety_state safety_switch_state() const {
-        return (AP_HAL::Util::safety_state)_safety_switch_state.get();
+    AG_HAL::Util::safety_state safety_switch_state() const {
+        return (AG_HAL::Util::safety_state)_safety_switch_state.get();
     }
     void force_safety_off() {
-        _safety_switch_state.set((uint8_t)AP_HAL::Util::SAFETY_ARMED);
+        _safety_switch_state.set((uint8_t)AG_HAL::Util::SAFETY_ARMED);
     }
     bool force_safety_on() {
-        _safety_switch_state.set((uint8_t)AP_HAL::Util::SAFETY_DISARMED);
+        _safety_switch_state.set((uint8_t)AG_HAL::Util::SAFETY_DISARMED);
         return true;
     }
 
@@ -488,7 +488,7 @@ public:
     AP_Float imu_temp_end;
     AP_Float imu_temp_tconst;
     AP_Float imu_temp_fixed;
-    AP_InertialSensor_TCal imu_tcal[INS_MAX_INSTANCES];
+    AG_InertialSensor_TCal imu_tcal[INS_MAX_INSTANCES];
 #endif
 
     // IMU control parameters

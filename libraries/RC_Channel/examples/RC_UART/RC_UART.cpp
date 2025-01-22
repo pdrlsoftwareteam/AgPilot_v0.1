@@ -2,17 +2,17 @@
   take RC channels in from UART and put out as PWM
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 #include <GCS_MAVLink/include/mavlink/v2.0/checksum.h>
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 #define NUM_CHANNELS 4
 #define ESC_MAGIC 0xF7
 #define RC_SPEED 490
 #define UART serial(4)
 
-class RC_UART : public AP_HAL::HAL::Callbacks {
+class RC_UART : public AG_HAL::HAL::Callbacks {
 public:
     // HAL::Callbacks implementation.
     void setup() override;
@@ -121,5 +121,5 @@ void RC_UART::loop()
 
 RC_UART rc_uart;
 
-AP_HAL_MAIN_CALLBACKS(&rc_uart);
+AG_HAL_MAIN_CALLBACKS(&rc_uart);
 

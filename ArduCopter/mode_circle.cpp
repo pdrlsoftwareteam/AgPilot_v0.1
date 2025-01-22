@@ -96,7 +96,7 @@ void ModeCircle::run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // update the vertical offset based on the surface measurement
     copter.surface_tracking.update_surface_offset();

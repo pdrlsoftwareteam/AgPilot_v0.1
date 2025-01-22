@@ -37,15 +37,15 @@ Protocol:
  - in the case that we don't have ESC telemetry, consider probing ESCs periodically with an "OK"-request while disarmed
 */
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SIM_FETtecOneWireESC.h"
 #include "SITL.h"
-#include <AP_HAL/utility/sparse-endian.h>
+#include <AG_HAL/utility/sparse-endian.h>
 
 #include "SIM_Aircraft.h"
 
@@ -55,7 +55,7 @@ extern const AP_HAL::HAL& hal;
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo FETtecOneWireESC::var_info[] = {
+const AG_Param::GroupInfo FETtecOneWireESC::var_info[] = {
 
     // @Param: ENA
     // @DisplayName: FETtec OneWire ESC simulator enable/disable
@@ -75,7 +75,7 @@ const AP_Param::GroupInfo FETtecOneWireESC::var_info[] = {
 
 FETtecOneWireESC::FETtecOneWireESC() : SerialDevice::SerialDevice()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 
     // initialise serial numbers and IDs
     for (uint8_t n=0; n<ARRAY_SIZE(escs); n++) {
@@ -155,7 +155,7 @@ void FETtecOneWireESC::handle_config_message()
     ESC &esc = escs[u.config_message_header.target_id-1];
     simfet_debug("Config message type=%u esc=%u", (unsigned)u.config_message_header.request_type, (unsigned)u.config_message_header.target_id);
     if ((ResponseFrameHeaderID)u.config_message_header.header != ResponseFrameHeaderID::MASTER) {
-        AP_HAL::panic("Unexpected header ID");
+        AG_HAL::panic("Unexpected header ID");
     }
     switch (esc.state) {
     case ESC::State::POWERED_OFF:
@@ -167,7 +167,7 @@ void FETtecOneWireESC::handle_config_message()
     case ESC::State::RUNNING:
         return running_handle_config_message(esc);
     }
-    AP_HAL::panic("Unknown state");
+    AG_HAL::panic("Unknown state");
 }
 
 template <typename T>
@@ -175,7 +175,7 @@ void FETtecOneWireESC::send_response(const T &r)
 {
     // simfet_debug("Sending response");
     if (write_to_autopilot((char*)&r, sizeof(r)) != sizeof(r)) {
-        AP_HAL::panic("short write");
+        AG_HAL::panic("short write");
     }
 }
 
@@ -213,7 +213,7 @@ void FETtecOneWireESC::bootloader_handle_config_message(FETtecOneWireESC::ESC &e
         break;
     }
     return;
-    AP_HAL::panic("Unhandled config message in bootloader (%u)",
+    AG_HAL::panic("Unhandled config message in bootloader (%u)",
                   (unsigned)u.config_message_header.request_type);
 }
 
@@ -232,7 +232,7 @@ void FETtecOneWireESC::running_handle_config_message(FETtecOneWireESC::ESC &esc)
         break;
     case ConfigMessageType::BL_START_FW:       // BL only
         hal.console->printf("received unexpected BL_START_FW message\n");
-        AP_HAL::panic("received unexpected BL_START_FW message");
+        AG_HAL::panic("received unexpected BL_START_FW message");
         return;
     case ConfigMessageType::BL_PAGES_TO_FLASH: // BL only
         break;
@@ -274,7 +274,7 @@ void FETtecOneWireESC::running_handle_config_message(FETtecOneWireESC::ESC &esc)
     case ConfigMessageType::SET_LED_TMP_COLOR:
         break;
     }
-    AP_HAL::panic("Unknown config message (%u)", (unsigned)u.config_message_header.request_type);
+    AG_HAL::panic("Unknown config message (%u)", (unsigned)u.config_message_header.request_type);
 }
 
 
@@ -291,7 +291,7 @@ void FETtecOneWireESC::handle_config_message_set_tlm_type(ESC &esc)
         });
         return;
     }
-    AP_HAL::panic("unknown telem type=%u", (unsigned)type);
+    AG_HAL::panic("unknown telem type=%u", (unsigned)type);
 }
 
 void FETtecOneWireESC::handle_fast_esc_data()
@@ -307,13 +307,13 @@ void FETtecOneWireESC::handle_fast_esc_data()
     uint16_t esc0_pwm;
     esc0_pwm = ((u.buffer[0] >> 3) & 0x1) << 10;
     if ((u.buffer[0] & 0b111) != 0x1) {
-        AP_HAL::panic("expected fast-throttle command");
+        AG_HAL::panic("expected fast-throttle command");
     }
 
     // decode second byte
     esc0_pwm |= (u.buffer[1] >> 5) << 7;
     if ((u.buffer[1] & 0b00011111) != 0x1f) {
-        AP_HAL::panic("Unexpected 5-bit target id");
+        AG_HAL::panic("Unexpected 5-bit target id");
     }
 
     // decode enough of third byte to complete pwm[0]
@@ -365,14 +365,14 @@ void FETtecOneWireESC::handle_fast_esc_data()
         if (esc.pwm >= 1000 && esc.pwm <= 2000) {
             continue;
         }
-        AP_HAL::panic("transmitted value out of range (%u)", esc.pwm);
+        AG_HAL::panic("transmitted value out of range (%u)", esc.pwm);
     }
 }
 
 void FETtecOneWireESC::consume_bytes(uint8_t count)
 {
     if (count > buflen) {
-        AP_HAL::panic("Consuming more bytes than in buffer?");
+        AG_HAL::panic("Consuming more bytes than in buffer?");
     }
     if (buflen == count) {
         buflen = 0;
@@ -388,7 +388,7 @@ void FETtecOneWireESC::update_input()
     if (n < 0) {
         // TODO: do better here
         if (errno != EAGAIN && errno != EWOULDBLOCK && errno != 0) {
-            AP_HAL::panic("Failed to read from autopilot");
+            AG_HAL::panic("Failed to read from autopilot");
         }
     } else {
         buflen += n;
@@ -443,7 +443,7 @@ void FETtecOneWireESC::update_input()
     if (buflen == bytes_required) {
         const uint8_t calculated_checksum = crc8_dvb_update(0, u.buffer, buflen-1);
         if (u.buffer[buflen-1] != calculated_checksum) {
-            AP_HAL::panic("checksum failure");
+            AG_HAL::panic("checksum failure");
         }
 
         handle_fast_esc_data();

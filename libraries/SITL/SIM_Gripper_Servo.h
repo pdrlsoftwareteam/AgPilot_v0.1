@@ -18,7 +18,7 @@
 
 #pragma once
 #include "stdint.h"
-#include <AP_Param/AP_Param.h>
+#include <AG_Param/AG_Param.h>
 #include "SITL_Input.h"
 
 namespace SITL {
@@ -26,7 +26,7 @@ namespace SITL {
 class Gripper_Servo {
 public:
     Gripper_Servo() {
-        AP_Param::setup_object_defaults(this, var_info);
+        AG_Param::setup_object_defaults(this, var_info);
     };
 
     // update Gripper state
@@ -35,7 +35,7 @@ public:
     float payload_mass() const; // kg
 
     void set_alt(float alt) {altitude = alt;};
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
     bool is_enabled() const {return static_cast<bool>(gripper_enable);}
     bool is_jaw_open() const {return jaw_open;}
 

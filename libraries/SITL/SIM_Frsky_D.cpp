@@ -18,9 +18,9 @@
 
 #include "SIM_Frsky_D.h"
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -54,7 +54,7 @@ void Frsky_D::update()
         switch (_state) {
         case State::WANT_START_STOP_D:
             if (_buffer[0] != START_STOP_D) {
-                AP_HAL::panic("Corrupt?");
+                AG_HAL::panic("Corrupt?");
                 // _lost_bytes++;
                 continue;
             }
@@ -80,7 +80,7 @@ void Frsky_D::update()
                 } else if (_buffer[1] == 0x3D) {
                     byte = BYTESTUFF_D;
                 } else {
-                    AP_HAL::panic("Unknown stuffed byte");
+                    AG_HAL::panic("Unknown stuffed byte");
                 }
                 consume = 2;
             } else {
@@ -93,7 +93,7 @@ void Frsky_D::update()
             switch (_state) {
             case State::WANT_ID:
             case State::WANT_START_STOP_D:
-                AP_HAL::panic("Should not get here");
+                AG_HAL::panic("Should not get here");
             case State::WANT_BYTE1:
                 _data = byte;
                 _state = State::WANT_BYTE2;

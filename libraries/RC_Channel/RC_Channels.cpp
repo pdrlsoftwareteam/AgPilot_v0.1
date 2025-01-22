@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include <AP_HAL/AP_HAL.h>
-extern const AP_HAL::HAL& hal;
+#include <AG_HAL/AG_HAL.h>
+extern const AG_HAL::HAL& hal;
 
-#include <AP_Math/AP_Math.h>
-#include <AP_Logger/AP_Logger.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Logger/AG_Logger.h>
 
 #include "RC_Channel.h"
 
@@ -35,10 +35,10 @@ extern const AP_HAL::HAL& hal;
 RC_Channels::RC_Channels(void)
 {
     // set defaults from the parameter table
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 
     if (_singleton != nullptr) {
-        AP_HAL::panic("RC_Channels must be singleton");
+        AG_HAL::panic("RC_Channels must be singleton");
     }
     _singleton = this;
 }
@@ -76,7 +76,7 @@ bool RC_Channels::read_input(void)
 
     has_new_overrides = false;
 
-    last_update_ms = AP_HAL::millis();
+    last_update_ms = AG_HAL::millis();
 
     bool success = false;
     for (uint8_t i=0; i<NUM_RC_CHANNELS; i++) {

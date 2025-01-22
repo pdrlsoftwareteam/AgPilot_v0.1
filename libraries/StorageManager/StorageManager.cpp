@@ -19,19 +19,19 @@
   of storage offsets to available storage
  */
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Math/AG_Math.h>
 
-#include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 #include <GCS_MAVLink/GCS.h>
 
 #include "StorageManager.h"
 
 #include <stdio.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 bool StorageManager::last_io_failed;
 
@@ -350,7 +350,7 @@ bool StorageAccess::attach_file(const char *filename, uint16_t size_kbyte)
     const uint32_t size = MIN(0xFFFFU, size_kbyte * 1024U);
     auto *newfile = new FileStorage;
     if (newfile == nullptr) {
-        AP_BoardConfig::allocation_error("StorageFile");
+        AG_BoardConfig::allocation_error("StorageFile");
     }
     ssize_t nread;
 
@@ -360,7 +360,7 @@ bool StorageAccess::attach_file(const char *filename, uint16_t size_kbyte)
     }
     newfile->buffer = new uint8_t[size];
     if (newfile->buffer == nullptr) {
-        AP_BoardConfig::allocation_error("StorageFile");
+        AG_BoardConfig::allocation_error("StorageFile");
     }
     newfile->bufsize = size;
     nread = AP::FS().read(newfile->fd, newfile->buffer, size);
@@ -407,7 +407,7 @@ void StorageAccess::flush_file(void)
     if (file == nullptr || file->dirty_mask == 0) {
         return;
     }
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
     if (now_ms - file->last_clean_ms < 1000U) {
         return;
     }

@@ -503,9 +503,9 @@ def configure(cfg):
         cfg.end_msg('disabled', color='YELLOW')
     else:
         cfg.end_msg('enabled')
-        cfg.recurse('libraries/AP_Scripting')
+        cfg.recurse('libraries/AG_Scripting')
 
-    cfg.recurse('libraries/AP_GPS')
+    cfg.recurse('libraries/AG_GPS')
 
     cfg.start_msg('Scripting runtime checks')
     if cfg.options.scripting_checks:
@@ -653,7 +653,7 @@ def _build_dynamic_sources(bld):
     if (bld.get_board().with_can or bld.env.HAL_NUM_CAN_IFACES) and not bld.env.AP_PERIPH:
         bld(
             features='uavcangen',
-            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/* libraries/AP_UAVCAN/dsdl/*', dir=True, src=False),
+            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/* libraries/AG_UAVCAN/dsdl/*', dir=True, src=False),
             output_dir='modules/uavcan/libuavcan/include/dsdlc_generated',
             name='uavcan',
             export_includes=[
@@ -664,7 +664,7 @@ def _build_dynamic_sources(bld):
     elif bld.env.AP_PERIPH:
         bld(
             features='dronecangen',
-            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/* libraries/AP_UAVCAN/dsdl/*', dir=True, src=False),
+            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/* libraries/AG_UAVCAN/dsdl/*', dir=True, src=False),
             output_dir='modules/DroneCAN/libcanard/dsdlc_generated/',
             name='dronecan',
             export_includes=[
@@ -720,7 +720,7 @@ def _build_recursion(bld):
 
     common_dirs_excl = [
         'modules',
-        'libraries/AP_HAL_*',
+        'libraries/AG_HAL_*',
     ]
 
     hal_dirs_patterns = [
@@ -737,16 +737,16 @@ def _build_recursion(bld):
     )
     if bld.env.IOMCU_FW is not None:
         if bld.env.IOMCU_FW:
-            dirs_to_recurse.append('libraries/AP_IOMCU/iofirmware')
+            dirs_to_recurse.append('libraries/AG_IOMCU/iofirmware')
 
     if bld.env.PERIPH_FW is not None:
         if bld.env.PERIPH_FW:
             dirs_to_recurse.append('Tools/AP_Periph')
 
-    dirs_to_recurse.append('libraries/AP_Scripting')
+    dirs_to_recurse.append('libraries/AG_Scripting')
 
     if bld.env.ENABLE_ONVIF:
-        dirs_to_recurse.append('libraries/AP_ONVIF')
+        dirs_to_recurse.append('libraries/AG_ONVIF')
 
     for p in hal_dirs_patterns:
         dirs_to_recurse += collect_dirs_to_recurse(

@@ -2,7 +2,7 @@
 
 #ifdef WITH_SITL_RGBLED
 
-#include <AP_HAL/HAL.h>
+#include <AG_HAL/HAL.h>
 
 #ifdef HAVE_SFML_GRAPHICS_H
 #include <SFML/Graphics.h>
@@ -10,7 +10,7 @@
 #include <SFML/Graphics.hpp>
 #endif
 
-#include <AP_Notify/AP_Notify.h>
+#include <AG_Notify/AG_Notify.h>
 
 void SIM_RGBLED::update_thread(void)
 {
@@ -21,7 +21,7 @@ void SIM_RGBLED::update_thread(void)
     }
 
     if (w == nullptr) {
-        AP_HAL::panic("Unable to create SIM_RGBLED window");
+        AG_HAL::panic("Unable to create SIM_RGBLED window");
     }
 
     while (true) {

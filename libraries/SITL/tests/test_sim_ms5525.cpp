@@ -1,7 +1,7 @@
 #include <AP_gtest.h>
 
 #include <SITL/SIM_MS5525.h>
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+const AG_HAL::HAL& hal = AG_HAL::get_HAL();
 
 using namespace SITL;
 

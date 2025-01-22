@@ -16,7 +16,7 @@
  */
 #include <assert.h>
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SIM_Calibration.h"
 
@@ -155,7 +155,7 @@ void SITL::Calibration::_calibration_poses(Vector3f& rot_accel)
     };
     const float secs_per_pose = 6;
     const float rate = radians(360 / secs_per_pose);
-    float tnow = AP_HAL::millis() * 1.0e-3;
+    float tnow = AG_HAL::millis() * 1.0e-3;
     float t_in_pose = fmod(tnow, secs_per_pose);
     uint8_t pose_num = ((unsigned)(tnow / secs_per_pose)) % ARRAY_SIZE(poses);
     const struct pose &pose = poses[pose_num];

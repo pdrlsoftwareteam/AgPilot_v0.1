@@ -9,7 +9,7 @@
 #pragma GCC optimize("O2")
 #endif
 #include "LowPassFilter.h"
-#include <AP_InternalError/AP_InternalError.h>
+#include <AG_InternalError/AG_InternalError.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // DigitalLPF
@@ -25,7 +25,7 @@ DigitalLPF<T>::DigitalLPF() {
 template <class T>
 T DigitalLPF<T>::apply(const T &sample, float cutoff_freq, float dt) {
     if (is_negative(cutoff_freq) || is_negative(dt)) {
-        INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
+        INTERNAL_ERROR(AG_InternalError::error_t::invalid_arg_or_result);
         _output = sample;
         return _output;
     }

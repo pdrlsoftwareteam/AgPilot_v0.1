@@ -42,7 +42,7 @@ void ModeBrake::run()
     }
 
     // set motors to full range
-    motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+    motors->set_desired_spool_state(AG_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // relax stop target if we might be landed
     if (copter.ap.land_complete_maybe) {

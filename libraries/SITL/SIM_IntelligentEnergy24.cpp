@@ -16,7 +16,7 @@
   Simulator for the IntelligentEnergy 2.4kWh FuelCell generator
 */
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "SIM_IntelligentEnergy24.h"
 #include "SITL.h"
@@ -25,12 +25,12 @@
 
 #include <GCS_MAVLink/GCS.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
 // table of user settable parameters
-const AP_Param::GroupInfo IntelligentEnergy24::var_info[] = {
+const AG_Param::GroupInfo IntelligentEnergy24::var_info[] = {
 
     // @Param: ENABLE
     // @DisplayName: IntelligentEnergy 2.4kWh FuelCell sim enable/disable
@@ -56,7 +56,7 @@ const AP_Param::GroupInfo IntelligentEnergy24::var_info[] = {
 
 IntelligentEnergy24::IntelligentEnergy24() : IntelligentEnergy::IntelligentEnergy()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 void IntelligentEnergy24::update(const struct sitl_input &input)
@@ -71,7 +71,7 @@ void IntelligentEnergy24::update(const struct sitl_input &input)
 void IntelligentEnergy24::update_send()
 {
     // just send a chunk of data at 1Hz:
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (now - last_sent_ms < 500) {
         return;
     }
@@ -125,6 +125,6 @@ void IntelligentEnergy24::update_send()
              (unsigned)err_code);
 
     if ((unsigned)write_to_autopilot(message, strlen(message)) != strlen(message)) {
-        AP_HAL::panic("Failed to write to autopilot: %s", strerror(errno));
+        AG_HAL::panic("Failed to write to autopilot: %s", strerror(errno));
     }
 }

@@ -2,7 +2,7 @@
 
 #if LOGGING_ENABLED == ENABLED
 
-// Code to Write and Read packets from AP_Logger log memory
+// Code to Write and Read packets from AG_Logger log memory
 // Code to interact with the user to dump or erase logs
 
 struct PACKED log_Control_Tuning {
@@ -47,7 +47,7 @@ void Copter::Log_Write_Control_Tuning()
 
     struct log_Control_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_CONTROL_TUNING_MSG),
-        time_us             : AP_HAL::micros64(),
+        time_us             : AG_HAL::micros64(),
         throttle_in         : attitude_control->get_throttle_in(),
         angle_boost         : attitude_control->angle_boost(),
         throttle_out        : motors->get_throttle(),
@@ -108,7 +108,7 @@ void Copter::Log_Write_Data(LogDataID id, int16_t value)
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Int16t pkt = {
             LOG_PACKET_HEADER_INIT(LOG_DATA_INT16_MSG),
-            time_us     : AP_HAL::micros64(),
+            time_us     : AG_HAL::micros64(),
             id          : (uint8_t)id,
             data_value  : value
         };
@@ -130,7 +130,7 @@ void Copter::Log_Write_Data(LogDataID id, uint16_t value)
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_UInt16t pkt = {
             LOG_PACKET_HEADER_INIT(LOG_DATA_UINT16_MSG),
-            time_us     : AP_HAL::micros64(),
+            time_us     : AG_HAL::micros64(),
             id          : (uint8_t)id,
             data_value  : value
         };
@@ -151,7 +151,7 @@ void Copter::Log_Write_Data(LogDataID id, int32_t value)
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Int32t pkt = {
             LOG_PACKET_HEADER_INIT(LOG_DATA_INT32_MSG),
-            time_us  : AP_HAL::micros64(),
+            time_us  : AG_HAL::micros64(),
             id          : (uint8_t)id,
             data_value  : value
         };
@@ -172,7 +172,7 @@ void Copter::Log_Write_Data(LogDataID id, uint32_t value)
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_UInt32t pkt = {
             LOG_PACKET_HEADER_INIT(LOG_DATA_UINT32_MSG),
-            time_us     : AP_HAL::micros64(),
+            time_us     : AG_HAL::micros64(),
             id          : (uint8_t)id,
             data_value  : value
         };
@@ -194,7 +194,7 @@ void Copter::Log_Write_Data(LogDataID id, float value)
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Float pkt = {
             LOG_PACKET_HEADER_INIT(LOG_DATA_FLOAT_MSG),
-            time_us     : AP_HAL::micros64(),
+            time_us     : AG_HAL::micros64(),
             id          : (uint8_t)id,
             data_value  : value
         };
@@ -215,7 +215,7 @@ void Copter::Log_Write_Parameter_Tuning(uint8_t param, float tuning_val, float t
 {
     struct log_ParameterTuning pkt_tune = {
         LOG_PACKET_HEADER_INIT(LOG_PARAMTUNE_MSG),
-        time_us        : AP_HAL::micros64(),
+        time_us        : AG_HAL::micros64(),
         parameter      : param,
         tuning_value   : tuning_val,
         tuning_min     : tune_min,
@@ -253,7 +253,7 @@ void Copter::Log_Write_SysID_Data(float waveform_time, float waveform_sample, fl
 #if MODE_SYSTEMID_ENABLED == ENABLED
     struct log_SysIdD pkt_sidd = {
         LOG_PACKET_HEADER_INIT(LOG_SYSIDD_MSG),
-        time_us         : AP_HAL::micros64(),
+        time_us         : AG_HAL::micros64(),
         waveform_time   : waveform_time,
         waveform_sample : waveform_sample,
         waveform_freq   : waveform_freq,
@@ -287,7 +287,7 @@ void Copter::Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitu
 #if MODE_SYSTEMID_ENABLED == ENABLED
     struct log_SysIdS pkt_sids = {
         LOG_PACKET_HEADER_INIT(LOG_SYSIDS_MSG),
-        time_us             : AP_HAL::micros64(),
+        time_us             : AG_HAL::micros64(),
         systemID_axis       : systemID_axis,
         waveform_magnitude  : waveform_magnitude,
         frequency_start     : frequency_start,
@@ -341,7 +341,7 @@ void Copter::Log_Write_Guided_Position_Target(ModeGuided::SubMode target_type, c
 {
     const log_Guided_Position_Target pkt {
         LOG_PACKET_HEADER_INIT(LOG_GUIDED_POSITION_TARGET_MSG),
-        time_us         : AP_HAL::micros64(),
+        time_us         : AG_HAL::micros64(),
         type            : (uint8_t)target_type,
         pos_target_x    : pos_target.x,
         pos_target_y    : pos_target.y,
@@ -366,7 +366,7 @@ void Copter::Log_Write_Guided_Attitude_Target(ModeGuided::SubMode target_type, f
 {
     const log_Guided_Attitude_Target pkt {
         LOG_PACKET_HEADER_INIT(LOG_GUIDED_ATTITUDE_TARGET_MSG),
-        time_us         : AP_HAL::micros64(),
+        time_us         : AG_HAL::micros64(),
         type            : (uint8_t)target_type,
         roll            : degrees(roll),       // rad to deg
         pitch           : degrees(pitch),      // rad to deg
@@ -381,7 +381,7 @@ void Copter::Log_Write_Guided_Attitude_Target(ModeGuided::SubMode target_type, f
 }
 
 // type and unit information can be found in
-// libraries/AP_Logger/Logstructure.h; search for "log_Units" for
+// libraries/AG_Logger/Logstructure.h; search for "log_Units" for
 // units and "Format characters" for field type information
 const struct LogStructure Copter::log_structure[] = {
     LOG_COMMON_STRUCTURES,
@@ -533,13 +533,13 @@ const struct LogStructure Copter::log_structure[] = {
 
 void Copter::Log_Write_Vehicle_Startup_Messages()
 {
-    // only 200(?) bytes are guaranteed by AP_Logger
+    // only 200(?) bytes are guaranteed by AG_Logger
     char frame_and_type_string[30];
     copter.motors->get_frame_and_type_string(frame_and_type_string, ARRAY_SIZE(frame_and_type_string));
     logger.Write_MessageF("%s", frame_and_type_string);
     logger.Write_Mode((uint8_t)flightmode->mode_number(), control_mode_reason);
     ahrs.Log_Write_Home_And_Origin();
-    gps.Write_AP_Logger_Log_Startup_messages();
+    gps.Write_AG_Logger_Log_Startup_messages();
 }
 
 void Copter::log_init(void)

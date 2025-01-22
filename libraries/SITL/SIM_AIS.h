@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_AIS_ENABLED
 #define HAL_SIM_AIS_ENABLED (CONFIG_HAL_BOARD == HAL_BOARD_SITL)

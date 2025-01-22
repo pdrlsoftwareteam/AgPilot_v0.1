@@ -13,14 +13,14 @@
  */
 #pragma once
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Common/AP_Common.h>
-#include <AP_Param/AP_Param.h>
-#include <AP_Common/Bitmask.h>
-#include <AP_Volz_Protocol/AP_Volz_Protocol.h>
-#include <AP_RobotisServo/AP_RobotisServo.h>
-#include <AP_SBusOut/AP_SBusOut.h>
-#include <AP_FETtecOneWire/AP_FETtecOneWire.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Common/AG_Common.h>
+#include <AG_Param/AG_Param.h>
+#include <AG_Common/Bitmask.h>
+#include <AG_Volz_Protocol/AG_Volz_Protocol.h>
+#include <AG_RobotisServo/AG_RobotisServo.h>
+#include <AG_SBusOut/AG_SBusOut.h>
+#include <AG_FETtecOneWire/AG_FETtecOneWire.h>
 
 #include "SRV_Channel_config.h"
 
@@ -30,7 +30,7 @@ class SRV_Channels;
 
 /*
   class SRV_Channel. The class SRV_Channels contains an array of
-  SRV_Channel objects. This is done to fit within the AP_Param limit
+  SRV_Channel objects. This is done to fit within the AG_Param limit
   of 64 parameters per object.
 */
 class SRV_Channel {
@@ -40,7 +40,7 @@ public:
     // constructor
     SRV_Channel(void);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     typedef enum
     {
@@ -357,7 +357,7 @@ public:
     // constructor
     SRV_Channels(void);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     // set the default function for a channel
     static void set_default_function(uint8_t chan, SRV_Channel::Aux_servo_function_t function);
@@ -503,7 +503,7 @@ public:
     static void calc_pwm(void);
 
     // return the ESC type for dshot commands
-    static AP_HAL::RCOutput::DshotEscType get_dshot_esc_type() { return AP_HAL::RCOutput::DshotEscType(_singleton->dshot_esc_type.get()); }
+    static AG_HAL::RCOutput::DshotEscType get_dshot_esc_type() { return AG_HAL::RCOutput::DshotEscType(_singleton->dshot_esc_type.get()); }
 
     static uint8_t get_dshot_rate() { return _singleton->dshot_rate.get(); }
 
@@ -557,7 +557,7 @@ public:
     static void zero_rc_outputs();
 
     // initialize before any call to push
-    static void init(uint32_t motor_mask = 0, AP_HAL::RCOutput::output_mode mode = AP_HAL::RCOutput::MODE_PWM_NONE);
+    static void init(uint32_t motor_mask = 0, AG_HAL::RCOutput::output_mode mode = AG_HAL::RCOutput::MODE_PWM_NONE);
 
     // return true if a channel is set to type GPIO
     static bool is_GPIO(uint8_t channel);
@@ -581,31 +581,31 @@ private:
     static Bitmask<SRV_Channel::k_nr_aux_servo_functions> function_mask;
     static bool initialised;
 
-    // this static arrangement is to avoid having static objects in AP_Param tables
+    // this static arrangement is to avoid having static objects in AG_Param tables
     static SRV_Channel *channels;
     static SRV_Channels *_singleton;
 
 #if AP_VOLZ_ENABLED
     // support for Volz protocol
-    AP_Volz_Protocol volz;
-    static AP_Volz_Protocol *volz_ptr;
+    AG_Volz_Protocol volz;
+    static AG_Volz_Protocol *volz_ptr;
 #endif
 
 #ifndef HAL_BUILD_AP_PERIPH
     // support for SBUS protocol
-    AP_SBusOut sbus;
-    static AP_SBusOut *sbus_ptr;
+    AG_SBusOut sbus;
+    static AG_SBusOut *sbus_ptr;
 #endif // HAL_BUILD_AP_PERIPH
 
 #if AP_ROBOTISSERVO_ENABLED
     // support for Robotis servo protocol
-    AP_RobotisServo robotis;
-    static AP_RobotisServo *robotis_ptr;
+    AG_RobotisServo robotis;
+    static AG_RobotisServo *robotis_ptr;
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
-    AP_FETtecOneWire fetteconwire;
-    static AP_FETtecOneWire *fetteconwire_ptr;
+    AG_FETtecOneWire fetteconwire;
+    static AG_FETtecOneWire *fetteconwire_ptr;
 #endif  // AP_FETTEC_ONEWIRE_ENABLED
 
     // mask of disabled channels

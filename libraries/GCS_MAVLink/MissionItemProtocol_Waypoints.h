@@ -4,7 +4,7 @@
 
 class MissionItemProtocol_Waypoints : public MissionItemProtocol {
 public:
-    MissionItemProtocol_Waypoints(class AP_Mission &_mission) :
+    MissionItemProtocol_Waypoints(class AG_Mission &_mission) :
         mission(_mission) {}
 
     // mission_type returns the MAV_MISSION mavlink enumeration value
@@ -39,7 +39,7 @@ protected:
     }
 
 private:
-    AP_Mission &mission;
+    AG_Mission &mission;
 
     // append_item() is called by the base class to add the supplied
     // item to the end of the list of stored items.

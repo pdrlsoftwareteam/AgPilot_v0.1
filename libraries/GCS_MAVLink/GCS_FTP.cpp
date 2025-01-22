@@ -14,15 +14,15 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
 #include "GCS.h"
 
-#include <AP_Filesystem/AP_Filesystem.h>
-#include <AP_HAL/utility/sparse-endian.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+#include <AG_Filesystem/AG_Filesystem.h>
+#include <AG_HAL/utility/sparse-endian.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 struct GCS_MAVLINK::ftp_state GCS_MAVLINK::ftp;
 
@@ -33,7 +33,7 @@ bool GCS_MAVLINK::ftp_init(void) {
 
     // check if ftp is disabled for memory savings
 #if !defined(HAL_BUILD_AP_PERIPH)
-    if (AP_BoardConfig::ftp_disabled()) {
+    if (AG_BoardConfig::ftp_disabled()) {
         goto failed;
     }
 #endif
@@ -49,7 +49,7 @@ bool GCS_MAVLINK::ftp_init(void) {
     }
 
     if (!hal.scheduler->thread_create(FUNCTOR_BIND_MEMBER(&GCS_MAVLINK::ftp_worker, void),
-                                      "FTP", 2560, AP_HAL::Scheduler::PRIORITY_IO, 0)) {
+                                      "FTP", 2560, AG_HAL::Scheduler::PRIORITY_IO, 0)) {
         goto failed;
     }
 
@@ -119,7 +119,7 @@ bool GCS_MAVLINK::send_ftp_reply(const pending_ftp &reply)
     if (reply.req_opcode == FTP_OP::TerminateSession) {
         ftp.last_send_ms = 0;
     } else {
-        ftp.last_send_ms = AP_HAL::millis();
+        ftp.last_send_ms = AG_HAL::millis();
     }
     return true;
 }
@@ -191,7 +191,7 @@ void GCS_MAVLINK::ftp_worker(void) {
             continue;
         }
 
-        uint32_t now = AP_HAL::millis();
+        uint32_t now = AG_HAL::millis();
 
         // check for session termination
         if (request.session != ftp.current_session &&
@@ -498,7 +498,7 @@ void GCS_MAVLINK::ftp_worker(void) {
                         uint32_t burst_delay_ms = 0;
                         if (valid_channel(request.chan)) {
                             auto *port = mavlink_comm_port[request.chan];
-                            if (port != nullptr && port->get_flow_control() != AP_HAL::UARTDriver::FLOW_CONTROL_ENABLE) {
+                            if (port != nullptr && port->get_flow_control() != AG_HAL::UARTDriver::FLOW_CONTROL_ENABLE) {
                                 const uint32_t bw = port->bw_in_bytes_per_second();
                                 const uint16_t pkt_size = PAYLOAD_SIZE(request.chan, FILE_TRANSFER_PROTOCOL) - (sizeof(reply.data) - max_read);
                                 burst_delay_ms = 3000 * pkt_size / bw;

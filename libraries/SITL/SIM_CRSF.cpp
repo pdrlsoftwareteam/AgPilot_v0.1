@@ -22,7 +22,7 @@
 
 using namespace SITL;
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 const char *CRSF::dataid_string(DataID id, ssize_t& len)
 {
@@ -59,7 +59,7 @@ void CRSF::update()
     }
 
     // update every 400ms
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (now - _last_update_ms < 400) {
         return;
     }

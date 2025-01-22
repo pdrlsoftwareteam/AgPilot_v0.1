@@ -16,12 +16,12 @@
 }
 
 /*
-* Override the WEAK version of AP_HAL_SITL/system.cpp panic() instead of staying in an infinite loop
+* Override the WEAK version of AG_HAL_SITL/system.cpp panic() instead of staying in an infinite loop
 * This is used by the gtest suite to test for an exit signal caused by a test statement and continue testing
 * Printing to stderr  is required for gtest matching
 */
 #define AP_GTEST_PANIC() \
-void AP_HAL::panic(const char *errormsg, ...) \
+void AG_HAL::panic(const char *errormsg, ...) \
 { \
     va_list ap; \
     auto outputs = {stdout, stderr}; \

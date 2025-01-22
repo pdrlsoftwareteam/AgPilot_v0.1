@@ -1,7 +1,7 @@
 #include "UserParameters.h"
 
 // "USR" + 13 chars remaining for param name
-const AP_Param::GroupInfo UserParameters::var_info[] = {
+const AG_Param::GroupInfo UserParameters::var_info[] = {
 
     // Put your parameters definition here
     // Note the maximum length of parameter name is 13 chars
@@ -14,5 +14,5 @@ const AP_Param::GroupInfo UserParameters::var_info[] = {
 
 UserParameters::UserParameters()
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }

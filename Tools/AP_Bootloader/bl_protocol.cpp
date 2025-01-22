@@ -39,9 +39,9 @@
  *
  ****************************************************************************/
 
-#include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Math/crc.h>
+#include <AG_HAL/AG_HAL.h>
+#include <AG_Math/AG_Math.h>
+#include <AG_Math/crc.h>
 #include "ch.h"
 #include "hal.h"
 #include "hwdef.h"
@@ -49,11 +49,11 @@
 #include "bl_protocol.h"
 #include "support.h"
 #include "can.h"
-#include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
+#include <AG_HAL_ChibiOS/hwdef/common/watchdog.h>
 #if EXT_FLASH_SIZE_MB
-#include <AP_FlashIface/AP_FlashIface_JEDEC.h>
+#include <AG_FlashIface/AG_FlashIface_JEDEC.h>
 #endif
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
+#include <AG_CheckFirmware/AG_CheckFirmware.h>
 
 // #pragma GCC optimize("O0")
 
@@ -154,7 +154,7 @@ static int isVerified = 0;
 
 
 #if EXT_FLASH_SIZE_MB
-extern AP_FlashIface_JEDEC ext_flash;
+extern AG_FlashIface_JEDEC ext_flash;
 #endif
 
 #ifndef BOOT_FROM_EXT_FLASH
@@ -695,20 +695,20 @@ bootloader(unsigned timeout)
                 if (!ext_flash.start_sector_erase(sector_number, delay_ms, timeout_ms)) {
                     goto cmd_fail;
                 }
-                uint32_t next_check_ms = AP_HAL::millis() + delay_ms;
+                uint32_t next_check_ms = AG_HAL::millis() + delay_ms;
                 while (true) {
                     cout(&pct_done, sizeof(pct_done));
-                    if (AP_HAL::millis() > next_check_ms) {
+                    if (AG_HAL::millis() > next_check_ms) {
                         if (!ext_flash.is_device_busy()) {
                             pct_done = erased_bytes*100/cmd_erase_bytes;
                             uprintf("PCT DONE: %d\n", pct_done);
                             break;
                         }
-                        if ((AP_HAL::millis() + timeout_ms) > next_check_ms) {
+                        if ((AG_HAL::millis() + timeout_ms) > next_check_ms) {
                             // We are out of time, return error
                             goto cmd_fail;
                         }
-                        next_check_ms = AP_HAL::millis()+delay_ms;
+                        next_check_ms = AG_HAL::millis()+delay_ms;
                     }
                     chThdSleep(chTimeMS2I(delay_ms));
                 }
@@ -794,14 +794,14 @@ bootloader(unsigned timeout)
                     // uprintf("ext flash write command failed\n");
                     goto cmd_fail;
                 }
-                start_time_us = AP_HAL::micros64();
+                start_time_us = AG_HAL::micros64();
                 // prepare for next run
                 offset += programming;
                 size -= programming;
                 while (true) {
-                    if (AP_HAL::micros64() > (start_time_us+delay_us)) {
+                    if (AG_HAL::micros64() > (start_time_us+delay_us)) {
                         if (!ext_flash.is_device_busy()) {
-                            // uprintf("flash program Successful, elapsed %ld us\n", uint32_t(AP_HAL::micros64() - start_time_us));
+                            // uprintf("flash program Successful, elapsed %ld us\n", uint32_t(AG_HAL::micros64() - start_time_us));
                             break;
                         } else {
                             // uprintf("Typical flash program time reached, Still Busy?!\n");
@@ -1133,11 +1133,11 @@ bootloader(unsigned timeout)
                     // uprintf("ext flash write command failed\n");
                     goto cmd_fail;
                 }
-                uint64_t start_time_us = AP_HAL::micros64();
+                uint64_t start_time_us = AG_HAL::micros64();
                 while (true) {
-                    if (AP_HAL::micros64() > (start_time_us+delay_us)) {
+                    if (AG_HAL::micros64() > (start_time_us+delay_us)) {
                         if (!ext_flash.is_device_busy()) {
-                            // uprintf("flash program Successful, elapsed %ld us\n", uint32_t(AP_HAL::micros64() - start_time_us));
+                            // uprintf("flash program Successful, elapsed %ld us\n", uint32_t(AG_HAL::micros64() - start_time_us));
                             break;
                         } else {
                             // uprintf("Typical flash program time reached, Still Busy?!\n");

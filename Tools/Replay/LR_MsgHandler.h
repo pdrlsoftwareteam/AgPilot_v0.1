@@ -1,10 +1,10 @@
 #pragma once
 
 #include "MsgHandler.h"
-#include <AP_AHRS/AP_AHRS.h>
-#include <AP_GPS/AP_GPS.h>
-#include <AP_NavEKF2/AP_NavEKF2.h>
-#include <AP_NavEKF3/AP_NavEKF3.h>
+#include <AG_AHRS/AG_AHRS.h>
+#include <AG_GPS/AG_GPS.h>
+#include <AG_NavEKF2/AG_NavEKF2.h>
+#include <AG_NavEKF3/AG_NavEKF3.h>
 
 class LR_MsgHandler : public MsgHandler {
 public:

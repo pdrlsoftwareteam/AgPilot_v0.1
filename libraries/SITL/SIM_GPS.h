@@ -23,7 +23,7 @@ param set SERIAL5_PROTOCOL 5
 
 #pragma once
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 
 #ifndef HAL_SIM_GPS_ENABLED
 #define HAL_SIM_GPS_ENABLED (AP_SIM_ENABLED && !defined(HAL_BUILD_AP_PERIPH))

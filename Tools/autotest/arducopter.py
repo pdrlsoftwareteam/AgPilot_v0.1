@@ -3911,7 +3911,7 @@ class AutoTestCopter(AutoTest):
         )
 
     def get_system_clock_utc(self, time_seconds):
-        # this is a copy of ArduPilot's AP_RTC function!
+        # this is a copy of ArduPilot's AG_RTC function!
         # separate time into ms, sec, min, hour and days but all expressed
         # in milliseconds
         time_ms = time_seconds * 1000
@@ -6921,12 +6921,12 @@ class AutoTestCopter(AutoTest):
         if ex is not None:
             raise ex
 
-    def AC_Avoidance_Proximity(self):
+    def AG_Avoidance_Proximity(self):
         '''Test proximity avoidance slide behaviour'''
         self.fly_proximity_avoidance_test_alt_no_avoid()
         self.fly_proximity_avoidance_test_corners()
 
-    def AC_Avoidance_Fence(self):
+    def AG_Avoidance_Fence(self):
         '''Test fence avoidance slide behaviour'''
         self.context_push()
         ex = None
@@ -7109,7 +7109,7 @@ class AutoTestCopter(AutoTest):
         if ex is not None:
             raise ex
 
-    def AC_Avoidance_Beacon(self):
+    def AG_Avoidance_Beacon(self):
         '''Test beacon avoidance slide behaviour'''
         self.context_push()
         ex = None
@@ -8847,7 +8847,7 @@ class AutoTestCopter(AutoTest):
         if ex is not None:
             raise ex
 
-    def AP_Avoidance(self):
+    def AGP_Avoidance(self):
         '''ADSB-based avoidance'''
         self.set_parameters({
             "AVD_ENABLE": 1,
@@ -9366,7 +9366,7 @@ class AutoTestCopter(AutoTest):
         if not lines[0].startswith("TasksV2"):
             raise NotAchievedException("Expected TasksV2 as first line first not (%s)" % lines[0])
         # last line is empty, so -2 here
-        if not lines[-2].startswith("AP_Vehicle::update_arming"):
+        if not lines[-2].startswith("AG_Vehicle::update_arming"):
             raise NotAchievedException("Expected EFI last not (%s)" % lines[-2])
 
     def RTL_TO_RALLY(self, target_system=1, target_component=1):
@@ -9617,9 +9617,9 @@ class AutoTestCopter(AutoTest):
              self.EK3AccelBias,
              self.StabilityPatch,
              self.OBSTACLE_DISTANCE_3D,
-             self.AC_Avoidance_Proximity,
-             self.AC_Avoidance_Fence,
-             self.AC_Avoidance_Beacon,
+             self.AG_Avoidance_Proximity,
+             self.AG_Avoidance_Fence,
+             self.AG_Avoidance_Beacon,
              self.BaroWindCorrection,
              self.SetpointGlobalPos,
              self.ThrowDoubleDrop,
@@ -9773,7 +9773,7 @@ class AutoTestCopter(AutoTest):
             self.AltEstimation,
             self.EKFSource,
             self.GSF,
-            self.AP_Avoidance,
+            self.AGP_Avoidance,
             self.SMART_RTL,
             self.RTL_TO_RALLY,
             self.FlyEachFrame,

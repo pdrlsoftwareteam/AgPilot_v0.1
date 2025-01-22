@@ -31,20 +31,20 @@
 #endif
 
 #include <GCS_MAVLink/GCS.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_Param/AP_Param.h>
-#include <AP_Declination/AP_Declination.h>
-#include <AP_Terrain/AP_Terrain.h>
-#include <AP_Scheduler/AP_Scheduler.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_Param/AG_Param.h>
+#include <AG_Declination/AG_Declination.h>
+#include <AG_Terrain/AG_Terrain.h>
+#include <AG_Scheduler/AG_Scheduler.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
 #if USE_PICOJSON
 #include "picojson.h"
-#include <AP_Filesystem/AP_Filesystem.h>
+#include <AG_Filesystem/AG_Filesystem.h>
 #endif
 
 using namespace SITL;
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 /*
   parent class for all simulator types
@@ -62,7 +62,7 @@ Aircraft::Aircraft(const char *frame_str) :
 
     // allow for orientation settings, such as with tailsitters
     enum ap_var_type ptype;
-    ahrs_orientation = (AP_Int8 *)AP_Param::find("AHRS_ORIENTATION", &ptype);
+    ahrs_orientation = (AP_Int8 *)AG_Param::find("AHRS_ORIENTATION", &ptype);
 
     // ahrs_orientation->get() returns ROTATION_NONE here, regardless of the actual value
     enum Rotation imu_rotation = ahrs_orientation?(enum Rotation)ahrs_orientation->get():ROTATION_NONE;
@@ -110,7 +110,7 @@ void Aircraft::set_start_location(const Location &start_loc, const float start_y
 float Aircraft::ground_height_difference() const
 {
 #if AP_TERRAIN_AVAILABLE
-    AP_Terrain *terrain = AP::terrain();
+    AG_Terrain *terrain = AP::terrain();
     float h1, h2;
     if (sitl &&
         terrain != nullptr &&
@@ -174,13 +174,13 @@ void Aircraft::update_position(void)
 // @Field: PE: Position - East component
 // @Field: PD: Position - Down component
     AP::logger().WriteStreaming("SITL", "TimeUS,VN,VE,VD,AN,AE,AD,PN,PE,PD", "Qfffffffff",
-                                           AP_HAL::micros64(),
+                                           AG_HAL::micros64(),
                                            velocity_ef.x, velocity_ef.y, velocity_ef.z,
                                            accel_ef.x, accel_ef.y, accel_ef.z,
                                            pos_home.x, pos_home.y, pos_home.z);
 #endif
 
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
     if (now - last_one_hz_ms >= 1000) {
         // shift origin of position at 1Hz to current location
         // this prevents sperical errors building up in the GPS data
@@ -202,7 +202,7 @@ void Aircraft::update_mag_field_bf()
     float intensity;
     float declination;
     float inclination;
-    AP_Declination::get_mag_field_ef(location.lat * 1e-7f, location.lng * 1e-7f, intensity, declination, inclination);
+    AG_Declination::get_mag_field_ef(location.lat * 1e-7f, location.lng * 1e-7f, intensity, declination, inclination);
 
     // create a field vector and rotate to the required orientation
     Vector3f mag_ef(1e3f * intensity, 0.0f, 0.0f);
@@ -477,7 +477,7 @@ void Aircraft::fill_fdm(struct sitl_fdm &fdm)
         Vector3f vel = get_velocity_ef();
         AP::logger().WriteStreaming("SIM2", "TimeUS,PN,PE,PD,VN,VE,VD,As",
                                     "Qdddffff",
-                                    AP_HAL::micros64(),
+                                    AG_HAL::micros64(),
                                     pos.x, pos.y, pos.z,
                                     vel.x, vel.y, vel.z,
                                     airspeed_pitot);
@@ -494,7 +494,7 @@ float Aircraft::perpendicular_distance_to_rangefinder_surface() const
     case ROTATION_NONE ... ROTATION_YAW_315:
         return sitl->measure_distance_at_angle_bf(location, sitl->sonar_rot.get()*45);
     default:
-        AP_BoardConfig::config_error("Bad simulated sonar rotation");
+        AG_BoardConfig::config_error("Bad simulated sonar rotation");
     }
 }
 
@@ -559,7 +559,7 @@ float Aircraft::rangefinder_range() const
 }
 
 
-// potentially replace this with a call to AP_HAL::Util::get_hw_rtc
+// potentially replace this with a call to AG_HAL::Util::get_hw_rtc
 uint64_t Aircraft::get_wall_time_us() const
 {
 #if defined(__CYGWIN__) || defined(__CYGWIN64__)
@@ -578,7 +578,7 @@ uint64_t Aircraft::get_wall_time_us() const
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return uint64_t(ts.tv_sec * 1000000ULL + ts.tv_nsec / 1000ULL);
 #else
-    return AP_HAL::micros64();
+    return AG_HAL::micros64();
 #endif
 }
 
@@ -658,9 +658,9 @@ void Aircraft::update_dynamics(const Vector3f &rot_accel)
 
     // constrain height to the ground
     if (on_ground()) {
-        if (!was_on_ground && AP_HAL::millis() - last_ground_contact_ms > 1000) {
+        if (!was_on_ground && AG_HAL::millis() - last_ground_contact_ms > 1000) {
             GCS_SEND_TEXT(MAV_SEVERITY_INFO, "SIM Hit ground at %f m/s", velocity_ef.z);
-            last_ground_contact_ms = AP_HAL::millis();
+            last_ground_contact_ms = AG_HAL::millis();
         }
         position.z = -(ground_level + frame_height - home.alt * 0.01f + ground_height_difference());
 
@@ -863,7 +863,7 @@ void Aircraft::smooth_sensors(void)
 // @Field: Y2: DCM Yaw
     AP::logger().WriteStreaming("SMOO", "TimeUS,AEx,AEy,AEz,DPx,DPy,DPz,R,P,Y,R2,P2,Y2",
                                            "Qffffffffffff",
-                                           AP_HAL::micros64(),
+                                           AG_HAL::micros64(),
                                            degrees(angle_differential.x),
                                            degrees(angle_differential.y),
                                            degrees(angle_differential.z),
@@ -901,7 +901,7 @@ float Aircraft::filtered_idx(float v, uint8_t idx)
     servo_filter[idx].set_cutoff_frequency(cutoff);
 
     if (idx >= ARRAY_SIZE(servo_filter)) {
-        AP_HAL::panic("Attempt to filter invalid servo at offset %u", (unsigned)idx);
+        AG_HAL::panic("Attempt to filter invalid servo at offset %u", (unsigned)idx);
     }
 
     return servo_filter[idx].apply(v, frame_time_us * 1.0e-6f);
@@ -1020,7 +1020,7 @@ void Aircraft::update_external_payload(const struct sitl_input &input)
 
 void Aircraft::add_shove_forces(Vector3f &rot_accel, Vector3f &body_accel)
 {
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (sitl == nullptr) {
         return;
     }
@@ -1079,7 +1079,7 @@ float Aircraft::get_local_updraft(const Vector3d &currentPos)
             thermals_y[0] = -260.0;
             break;
         default:
-            AP_BoardConfig::config_error("Bad thermal scenario");
+            AG_BoardConfig::config_error("Bad thermal scenario");
     }
 
     // Wind drift at this altitude
@@ -1109,7 +1109,7 @@ void Aircraft::add_twist_forces(Vector3f &rot_accel)
     if (sitl->gnd_behav != -1) {
         ground_behavior = (GroundBehaviour)sitl->gnd_behav.get();
     }
-    const uint32_t now = AP_HAL::millis();
+    const uint32_t now = AG_HAL::millis();
     if (sitl == nullptr) {
         return;
     }

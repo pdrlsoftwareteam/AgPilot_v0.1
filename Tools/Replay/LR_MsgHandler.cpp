@@ -2,11 +2,11 @@
 #include "LogReader.h"
 #include "Replay.h"
 
-#include <AP_DAL/AP_DAL.h>
+#include <AG_DAL/AG_DAL.h>
 
 #include <cinttypes>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 #define MSG_CREATE(sname,msgbytes) log_ ##sname msg; memcpy((void*)&msg, (msgbytes)+3, sizeof(msg));
 
@@ -28,14 +28,14 @@ void LR_MsgHandler_RFRF::process_message(uint8_t *msgbytes)
       when we force an EKF we map the trigger flags over
      */
     if (replay_force_ekf2) {
-        MAP_FLAG(AP_DAL::FrameType::InitialiseFilterEKF3, AP_DAL::FrameType::InitialiseFilterEKF2);
-        MAP_FLAG(AP_DAL::FrameType::UpdateFilterEKF3, AP_DAL::FrameType::UpdateFilterEKF2);
-        MAP_FLAG(AP_DAL::FrameType::LogWriteEKF3, AP_DAL::FrameType::LogWriteEKF2);
+        MAP_FLAG(AG_DAL::FrameType::InitialiseFilterEKF3, AG_DAL::FrameType::InitialiseFilterEKF2);
+        MAP_FLAG(AG_DAL::FrameType::UpdateFilterEKF3, AG_DAL::FrameType::UpdateFilterEKF2);
+        MAP_FLAG(AG_DAL::FrameType::LogWriteEKF3, AG_DAL::FrameType::LogWriteEKF2);
     }
     if (replay_force_ekf3) {
-        MAP_FLAG(AP_DAL::FrameType::InitialiseFilterEKF2, AP_DAL::FrameType::InitialiseFilterEKF3);
-        MAP_FLAG(AP_DAL::FrameType::UpdateFilterEKF2, AP_DAL::FrameType::UpdateFilterEKF3);
-        MAP_FLAG(AP_DAL::FrameType::LogWriteEKF2, AP_DAL::FrameType::LogWriteEKF3);
+        MAP_FLAG(AG_DAL::FrameType::InitialiseFilterEKF2, AG_DAL::FrameType::InitialiseFilterEKF3);
+        MAP_FLAG(AG_DAL::FrameType::UpdateFilterEKF2, AG_DAL::FrameType::UpdateFilterEKF3);
+        MAP_FLAG(AG_DAL::FrameType::LogWriteEKF2, AG_DAL::FrameType::LogWriteEKF3);
     }
 #undef MAP_FLAG
     AP::dal().handle_message(msg, ekf2, ekf3);
@@ -51,27 +51,27 @@ void LR_MsgHandler_REV2::process_message(uint8_t *msgbytes)
 {
     MSG_CREATE(REV2, msgbytes);
 
-    switch ((AP_DAL::Event)msg.event) {
+    switch ((AG_DAL::Event)msg.event) {
 
-    case AP_DAL::Event::resetGyroBias:
+    case AG_DAL::Event::resetGyroBias:
         ekf2.resetGyroBias();
         break;
-    case AP_DAL::Event::resetHeightDatum:
+    case AG_DAL::Event::resetHeightDatum:
         ekf2.resetHeightDatum();
         break;
-    case AP_DAL::Event::setTerrainHgtStable:
+    case AG_DAL::Event::setTerrainHgtStable:
         ekf2.setTerrainHgtStable(true);
         break;
-    case AP_DAL::Event::unsetTerrainHgtStable:
+    case AG_DAL::Event::unsetTerrainHgtStable:
         ekf2.setTerrainHgtStable(false);
         break;
-    case AP_DAL::Event::requestYawReset:
+    case AG_DAL::Event::requestYawReset:
         ekf2.requestYawReset();
         break;
-    case AP_DAL::Event::checkLaneSwitch:
+    case AG_DAL::Event::checkLaneSwitch:
         ekf2.checkLaneSwitch();
         break;
-    case AP_DAL::Event::setSourceSet0 ... AP_DAL::Event::setSourceSet2:
+    case AG_DAL::Event::setSourceSet0 ... AG_DAL::Event::setSourceSet2:
         break;
     }
     if (replay_force_ekf3) {
@@ -110,28 +110,28 @@ void LR_MsgHandler_REV3::process_message(uint8_t *msgbytes)
 {
     MSG_CREATE(REV3, msgbytes);
 
-    switch ((AP_DAL::Event)msg.event) {
+    switch ((AG_DAL::Event)msg.event) {
 
-    case AP_DAL::Event::resetGyroBias:
+    case AG_DAL::Event::resetGyroBias:
         ekf3.resetGyroBias();
         break;
-    case AP_DAL::Event::resetHeightDatum:
+    case AG_DAL::Event::resetHeightDatum:
         ekf3.resetHeightDatum();
         break;
-    case AP_DAL::Event::setTerrainHgtStable:
+    case AG_DAL::Event::setTerrainHgtStable:
         ekf3.setTerrainHgtStable(true);
         break;
-    case AP_DAL::Event::unsetTerrainHgtStable:
+    case AG_DAL::Event::unsetTerrainHgtStable:
         ekf3.setTerrainHgtStable(false);
         break;
-    case AP_DAL::Event::requestYawReset:
+    case AG_DAL::Event::requestYawReset:
         ekf3.requestYawReset();
         break;
-    case AP_DAL::Event::checkLaneSwitch:
+    case AG_DAL::Event::checkLaneSwitch:
         ekf3.checkLaneSwitch();
         break;
-    case AP_DAL::Event::setSourceSet0 ... AP_DAL::Event::setSourceSet2:
-        ekf3.setPosVelYawSourceSet(uint8_t(msg.event)-uint8_t(AP_DAL::Event::setSourceSet0));
+    case AG_DAL::Event::setSourceSet0 ... AG_DAL::Event::setSourceSet2:
+        ekf3.setPosVelYawSourceSet(uint8_t(msg.event)-uint8_t(AG_DAL::Event::setSourceSet0));
         break;
     }
 
@@ -295,7 +295,7 @@ void LR_MsgHandler_REVH::process_message(uint8_t *msgbytes)
     AP::dal().handle_message(msg, ekf2, ekf3);
 }
 
-#include <AP_AHRS/AP_AHRS.h>
+#include <AG_AHRS/AG_AHRS.h>
 #include "VehicleType.h"
 
 bool LR_MsgHandler_PARM::set_parameter(const char *name, const float value)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Copter.h"
-#include <AP_Math/chirp.h>
+#include <AG_Math/chirp.h>
 class Parameters;
 class ParametersG2;
 
@@ -52,7 +52,7 @@ public:
     virtual void run() = 0;
     virtual bool requires_GPS() const = 0;
     virtual bool has_manual_throttle() const = 0;
-    virtual bool allows_arming(AP_Arming::Method method) const = 0;
+    virtual bool allows_arming(AG_Arming::Method method) const = 0;
     virtual bool is_autopilot() const { return false; }
     virtual bool has_user_takeoff(bool must_navigate) const { return false; }
     virtual bool in_guided_mode() const { return false; }
@@ -160,12 +160,12 @@ protected:
     // convenience references to avoid code churn in conversion:
     Parameters &g;
     ParametersG2 &g2;
-    AC_WPNav *&wp_nav;
-    AC_Loiter *&loiter_nav;
-    AC_PosControl *&pos_control;
-    AP_InertialNav &inertial_nav;
-    AP_AHRS &ahrs;
-    AC_AttitudeControl_t *&attitude_control;
+    AG_WPNav *&wp_nav;
+    AG_Loiter *&loiter_nav;
+    AG_PosControl *&pos_control;
+    AG_InertialNav &inertial_nav;
+    AG_AHRS &ahrs;
+    AG_AttitudeControl_t *&attitude_control;
     MOTOR_CLASS *&motors;
     RC_Channel *&channel_roll;
     RC_Channel *&channel_pitch;
@@ -234,7 +234,7 @@ public:
             RESETTOARMEDYAW =  5,  // point towards heading at time motors were armed
             ANGLE_RATE =       6,  // turn at a specified rate from a starting angle
             RATE =             7,  // turn at a specified rate (held in auto_yaw_rate)
-            CIRCLE =           8,  // use AC_Circle's provided yaw (used during Loiter-Turns commands)
+            CIRCLE =           8,  // use AG_Circle's provided yaw (used during Loiter-Turns commands)
             PILOT_RATE =       9,  // target rate from pilot stick
             WEATHERVANE =     10,  // yaw into wind
         };
@@ -260,7 +260,7 @@ public:
 
         bool reached_fixed_yaw_target();
 
-        AC_AttitudeControl::HeadingCommand get_heading();
+        AG_AttitudeControl::HeadingCommand get_heading();
 
     private:
 
@@ -325,7 +325,7 @@ public:
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
+    bool allows_arming(AG_Arming::Method method) const override { return true; };
     bool is_autopilot() const override { return false; }
     bool has_user_takeoff(bool must_navigate) const override {
         return !must_navigate;
@@ -356,7 +356,7 @@ public:
 
     bool requires_GPS() const override;
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override;
+    bool allows_arming(AG_Arming::Method method) const override;
     bool is_autopilot() const override { return true; }
     bool in_guided_mode() const override { return _mode == SubMode::NAVGUIDED || _mode == SubMode::NAV_SCRIPT_TIME; }
 
@@ -410,7 +410,7 @@ public:
     void payload_place_start();
 
     // for GCS_MAVLink to call:
-    bool do_guided(const AP_Mission::Mission_Command& cmd);
+    bool do_guided(const AG_Mission::Mission_Command& cmd);
 
     // Go straight to landing sequence via DO_LAND_START, if succeeds pretend to be Auto RTL mode
     bool jump_to_landing_sequence_auto_RTL(ModeReason reason);
@@ -419,13 +419,13 @@ public:
     bool nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4);
     void nav_script_time_done(uint16_t id);
 
-    AP_Mission mission{
-        FUNCTOR_BIND_MEMBER(&ModeAuto::start_command, bool, const AP_Mission::Mission_Command &),
-        FUNCTOR_BIND_MEMBER(&ModeAuto::verify_command, bool, const AP_Mission::Mission_Command &),
+    AG_Mission mission{
+        FUNCTOR_BIND_MEMBER(&ModeAuto::start_command, bool, const AG_Mission::Mission_Command &),
+        FUNCTOR_BIND_MEMBER(&ModeAuto::verify_command, bool, const AG_Mission::Mission_Command &),
         FUNCTOR_BIND_MEMBER(&ModeAuto::exit_mission, void)};
 
     // Mission change detector
-    AP_Mission_ChangeDetector mis_change_detector;
+    AG_Mission_ChangeDetector mis_change_detector;
 
 
 protected:
@@ -447,8 +447,8 @@ private:
         AllowWeatherVaning                 = (1 << 7U),
     };
 
-    bool start_command(const AP_Mission::Mission_Command& cmd);
-    bool verify_command(const AP_Mission::Mission_Command& cmd);
+    bool start_command(const AG_Mission::Mission_Command& cmd);
+    bool verify_command(const AG_Mission::Mission_Command& cmd);
     void exit_mission();
 
     bool check_for_mission_change();    // detect external changes to mission
@@ -464,7 +464,7 @@ private:
     void loiter_to_alt_run();
     void nav_attitude_time_run();
 
-    Location loc_from_cmd(const AP_Mission::Mission_Command& cmd, const Location& default_loc) const;
+    Location loc_from_cmd(const AG_Mission::Mission_Command& cmd, const Location& default_loc) const;
 
     void payload_place_run();
     bool payload_place_run_should_run();
@@ -476,62 +476,62 @@ private:
 
     bool shift_alt_to_current_alt(Location& target_loc) const;
 
-    void do_takeoff(const AP_Mission::Mission_Command& cmd);
-    void do_nav_wp(const AP_Mission::Mission_Command& cmd);
-    bool set_next_wp(const AP_Mission::Mission_Command& current_cmd, const Location &default_loc);
-    void do_land(const AP_Mission::Mission_Command& cmd);
-    void do_loiter_unlimited(const AP_Mission::Mission_Command& cmd);
-    void do_circle(const AP_Mission::Mission_Command& cmd);
-    void do_loiter_time(const AP_Mission::Mission_Command& cmd);
-    void do_loiter_to_alt(const AP_Mission::Mission_Command& cmd);
-    void do_spline_wp(const AP_Mission::Mission_Command& cmd);
-    void get_spline_from_cmd(const AP_Mission::Mission_Command& cmd, const Location& default_loc, Location& dest_loc, Location& next_dest_loc, bool& next_dest_loc_is_spline);
+    void do_takeoff(const AG_Mission::Mission_Command& cmd);
+    void do_nav_wp(const AG_Mission::Mission_Command& cmd);
+    bool set_next_wp(const AG_Mission::Mission_Command& current_cmd, const Location &default_loc);
+    void do_land(const AG_Mission::Mission_Command& cmd);
+    void do_loiter_unlimited(const AG_Mission::Mission_Command& cmd);
+    void do_circle(const AG_Mission::Mission_Command& cmd);
+    void do_loiter_time(const AG_Mission::Mission_Command& cmd);
+    void do_loiter_to_alt(const AG_Mission::Mission_Command& cmd);
+    void do_spline_wp(const AG_Mission::Mission_Command& cmd);
+    void get_spline_from_cmd(const AG_Mission::Mission_Command& cmd, const Location& default_loc, Location& dest_loc, Location& next_dest_loc, bool& next_dest_loc_is_spline);
 #if NAV_GUIDED == ENABLED
-    void do_nav_guided_enable(const AP_Mission::Mission_Command& cmd);
-    void do_guided_limits(const AP_Mission::Mission_Command& cmd);
+    void do_nav_guided_enable(const AG_Mission::Mission_Command& cmd);
+    void do_guided_limits(const AG_Mission::Mission_Command& cmd);
 #endif
-    void do_nav_delay(const AP_Mission::Mission_Command& cmd);
-    void do_wait_delay(const AP_Mission::Mission_Command& cmd);
-    void do_within_distance(const AP_Mission::Mission_Command& cmd);
-    void do_yaw(const AP_Mission::Mission_Command& cmd);
-    void do_change_speed(const AP_Mission::Mission_Command& cmd);
-    void do_set_home(const AP_Mission::Mission_Command& cmd);
-    void do_roi(const AP_Mission::Mission_Command& cmd);
-    void do_mount_control(const AP_Mission::Mission_Command& cmd);
+    void do_nav_delay(const AG_Mission::Mission_Command& cmd);
+    void do_wait_delay(const AG_Mission::Mission_Command& cmd);
+    void do_within_distance(const AG_Mission::Mission_Command& cmd);
+    void do_yaw(const AG_Mission::Mission_Command& cmd);
+    void do_change_speed(const AG_Mission::Mission_Command& cmd);
+    void do_set_home(const AG_Mission::Mission_Command& cmd);
+    void do_roi(const AG_Mission::Mission_Command& cmd);
+    void do_mount_control(const AG_Mission::Mission_Command& cmd);
 #if PARACHUTE == ENABLED
-    void do_parachute(const AP_Mission::Mission_Command& cmd);
+    void do_parachute(const AG_Mission::Mission_Command& cmd);
 #endif
 #if AP_WINCH_ENABLED
-    void do_winch(const AP_Mission::Mission_Command& cmd);
+    void do_winch(const AG_Mission::Mission_Command& cmd);
 #endif
-    void do_payload_place(const AP_Mission::Mission_Command& cmd);
+    void do_payload_place(const AG_Mission::Mission_Command& cmd);
     void do_RTL(void);
 #if AP_SCRIPTING_ENABLED
-    void do_nav_script_time(const AP_Mission::Mission_Command& cmd);
+    void do_nav_script_time(const AG_Mission::Mission_Command& cmd);
 #endif
-    void do_nav_attitude_time(const AP_Mission::Mission_Command& cmd);
+    void do_nav_attitude_time(const AG_Mission::Mission_Command& cmd);
 
     bool verify_takeoff();
     bool verify_land();
     bool verify_payload_place();
     bool verify_loiter_unlimited();
-    bool verify_loiter_time(const AP_Mission::Mission_Command& cmd);
+    bool verify_loiter_time(const AG_Mission::Mission_Command& cmd);
     bool verify_loiter_to_alt() const;
     bool verify_RTL();
     bool verify_wait_delay();
     bool verify_within_distance();
     bool verify_yaw();
-    bool verify_nav_wp(const AP_Mission::Mission_Command& cmd);
-    bool verify_circle(const AP_Mission::Mission_Command& cmd);
-    bool verify_spline_wp(const AP_Mission::Mission_Command& cmd);
+    bool verify_nav_wp(const AG_Mission::Mission_Command& cmd);
+    bool verify_circle(const AG_Mission::Mission_Command& cmd);
+    bool verify_spline_wp(const AG_Mission::Mission_Command& cmd);
 #if NAV_GUIDED == ENABLED
-    bool verify_nav_guided_enable(const AP_Mission::Mission_Command& cmd);
+    bool verify_nav_guided_enable(const AG_Mission::Mission_Command& cmd);
 #endif
-    bool verify_nav_delay(const AP_Mission::Mission_Command& cmd);
+    bool verify_nav_delay(const AG_Mission::Mission_Command& cmd);
 #if AP_SCRIPTING_ENABLED
     bool verify_nav_script_time();
 #endif
-    bool verify_nav_attitude_time(const AP_Mission::Mission_Command& cmd);
+    bool verify_nav_attitude_time(const AG_Mission::Mission_Command& cmd);
 
     // Loiter control
     uint16_t loiter_time_max;                // How long we should stay in Loiter Mode for mission scripting (time in seconds)
@@ -616,7 +616,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    bool allows_arming(AG_Arming::Method method) const override { return false; };
     bool is_autopilot() const override { return false; }
 
     void timeout_to_loiter_ms(uint32_t timeout_ms);
@@ -646,7 +646,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    bool allows_arming(AG_Arming::Method method) const override { return false; };
     bool is_autopilot() const override { return true; }
 
 protected:
@@ -676,7 +676,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override;
+    bool allows_arming(AG_Arming::Method method) const override;
     bool is_autopilot() const override { return true; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
     bool in_guided_mode() const override { return true; }
@@ -815,7 +815,7 @@ public:
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    bool allows_arming(AG_Arming::Method method) const override { return false; };
     bool is_autopilot() const override { return true; }
 
     bool is_landing() const override { return true; };
@@ -856,7 +856,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
+    bool allows_arming(AG_Arming::Method method) const override { return true; };
     bool is_autopilot() const override { return false; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
     bool allows_autotune() const override { return true; }
@@ -901,7 +901,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
+    bool allows_arming(AG_Arming::Method method) const override { return true; };
     bool is_autopilot() const override { return false; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
     bool allows_autotune() const override { return true; }
@@ -988,7 +988,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    bool allows_arming(AG_Arming::Method method) const override { return false; };
     bool is_autopilot() const override { return true; }
 
     bool requires_terrain_failsafe() const override { return true; }
@@ -1099,7 +1099,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
+    bool allows_arming(AG_Arming::Method method) const override { return false; }
     bool is_autopilot() const override { return true; }
 
     void save_position();
@@ -1154,7 +1154,7 @@ public:
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
+    bool allows_arming(AG_Arming::Method method) const override { return true; };
     bool is_autopilot() const override { return false; }
     bool allows_save_trim() const override { return true; }
     bool allows_autotune() const override { return true; }
@@ -1181,13 +1181,13 @@ public:
 
     bool requires_GPS() const override { return false; }
     bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    bool allows_arming(AG_Arming::Method method) const override { return false; };
     bool is_autopilot() const override { return false; }
     bool logs_attitude() const override { return true; }
 
     void set_magnitude(float input) { waveform_magnitude.set(input); }
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
     Chirp chirp_input;
 
@@ -1253,7 +1253,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
+    bool allows_arming(AG_Arming::Method method) const override { return false; }
     bool is_autopilot() const override { return true; }
 
     bool set_velocity(const Vector3f& velocity_neu);
@@ -1299,7 +1299,7 @@ public:
 
     bool requires_GPS() const override { return true; }
     bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; }
+    bool allows_arming(AG_Arming::Method method) const override { return true; }
     bool is_autopilot() const override { return true; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
 
@@ -1309,7 +1309,7 @@ public:
     // return manual control to the pilot
     void return_to_manual_control(bool maintain_target);
 
-    static const struct AP_Param::GroupInfo var_info[];
+    static const struct AG_Param::GroupInfo var_info[];
 
 protected:
 

@@ -22,7 +22,7 @@
   actuation demand and achieved rate to get out of phase.
 
   this filter was originally written by Paul Riseborough for fixed
-  wing use. It was adapted for wider use in AC_PID by Andrew Tridgell
+  wing use. It was adapted for wider use in AG_PID by Andrew Tridgell
  */
 #include "SlewLimiter.h"
 
@@ -52,7 +52,7 @@ float SlewLimiter::modifier(float sample, float dt)
     const float slew_rate = slew_filter.apply((sample - last_sample) / dt, dt);
     last_sample = sample;
 
-    uint32_t now_ms = AP_HAL::millis();
+    uint32_t now_ms = AG_HAL::millis();
 
     // Apply a filter to decay maximum seen slew rate once the value had left the window period
     const float decay_alpha = fminf(dt, slew_rate_tau) / slew_rate_tau;

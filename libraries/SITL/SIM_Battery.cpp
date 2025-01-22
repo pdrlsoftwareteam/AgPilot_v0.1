@@ -130,7 +130,7 @@ void Battery::init_voltage(float voltage)
 
 void Battery::set_current(float current)
 {
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     float dt = (now - last_us) * 1.0e-6;
     if (dt > 0.1) {
         // we stopped updating

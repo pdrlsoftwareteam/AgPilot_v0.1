@@ -20,43 +20,43 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include <AP_HAL/AP_HAL.h>
-extern const AP_HAL::HAL& hal;
+#include <AG_HAL/AG_HAL.h>
+extern const AG_HAL::HAL& hal;
 
-#include <AP_Math/AP_Math.h>
+#include <AG_Math/AG_Math.h>
 
 #include "RC_Channel.h"
 #include <GCS_MAVLink/GCS.h>
 
-#include <AC_Avoidance/AC_Avoid.h>
-#include <AC_Sprayer/AC_Sprayer.h>
-#include <AP_Camera/AP_Camera.h>
-#include <AP_Camera/AP_RunCam.h>
-#include <AP_Compass/AP_Compass.h>
-#include <AP_Generator/AP_Generator.h>
-#include <AP_Gripper/AP_Gripper.h>
-#include <AP_GyroFFT/AP_GyroFFT.h>
-#include <AP_ADSB/AP_ADSB.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_BattMonitor/AP_BattMonitor.h>
-#include <AP_LandingGear/AP_LandingGear.h>
-#include <AP_Logger/AP_Logger.h>
-#include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
-#include <AP_Arming/AP_Arming.h>
-#include <AP_Avoidance/AP_Avoidance.h>
-#include <AP_GPS/AP_GPS.h>
-#include <AC_Fence/AC_Fence.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
-#include <AP_AHRS/AP_AHRS.h>
-#include <AP_Mount/AP_Mount.h>
-#include <AP_Notify/AP_Notify.h>
-#include <AP_VideoTX/AP_VideoTX.h>
-#include <AP_Torqeedo/AP_Torqeedo.h>
-#include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AG_Avoidance/AG_Avoid.h>
+#include <AG_Sprayer/AG_Sprayer.h>
+#include <AG_Camera/AG_Camera.h>
+#include <AG_Camera/AG_RunCam.h>
+#include <AG_Compass/AG_Compass.h>
+#include <AG_Generator/AG_Generator.h>
+#include <AG_Gripper/AG_Gripper.h>
+#include <AG_GyroFFT/AG_GyroFFT.h>
+#include <AG_ADSB/AG_ADSB.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
+#include <AG_BattMonitor/AG_BattMonitor.h>
+#include <AG_LandingGear/AG_LandingGear.h>
+#include <AG_Logger/AG_Logger.h>
+#include <AG_ServoRelayEvents/AG_ServoRelayEvents.h>
+#include <AG_Arming/AG_Arming.h>
+#include <AGP_Avoidance/AGP_Avoidance.h>
+#include <AG_GPS/AG_GPS.h>
+#include <AG_Fence/AG_Fence.h>
+#include <AG_OpticalFlow/AG_OpticalFlow.h>
+#include <AG_VisualOdom/AG_VisualOdom.h>
+#include <AG_AHRS/AG_AHRS.h>
+#include <AG_Mount/AG_Mount.h>
+#include <AG_Notify/AG_Notify.h>
+#include <AG_VideoTX/AG_VideoTX.h>
+#include <AG_Torqeedo/AG_Torqeedo.h>
+#include <AG_Vehicle/AG_Vehicle_Type.h>
 #define SWITCH_DEBOUNCE_TIME_MS  200
 
-const AP_Param::GroupInfo RC_Channel::var_info[] = {
+const AG_Param::GroupInfo RC_Channel::var_info[] = {
     // @Param: MIN
     // @DisplayName: RC min PWM
     // @Description: RC minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.
@@ -116,7 +116,7 @@ const AP_Param::GroupInfo RC_Channel::var_info[] = {
 // constructor
 RC_Channel::RC_Channel(void)
 {
-    AP_Param::setup_object_defaults(this, var_info);
+    AG_Param::setup_object_defaults(this, var_info);
 }
 
 void RC_Channel::set_range(uint16_t high)
@@ -348,7 +348,7 @@ void RC_Channel::set_override(const uint16_t v, const uint32_t timestamp_ms)
         return;
     }
 
-    last_override_time = timestamp_ms != 0 ? timestamp_ms : AP_HAL::millis();
+    last_override_time = timestamp_ms != 0 ? timestamp_ms : AG_HAL::millis();
     override_value = v;
     rc().new_override_received();
 }
@@ -376,7 +376,7 @@ bool RC_Channel::has_override() const
         return false;
     }
 
-    return (AP_HAL::millis() - last_override_time < override_timeout_ms);
+    return (AG_HAL::millis() - last_override_time < override_timeout_ms);
 }
 
 /*
@@ -457,7 +457,7 @@ bool RC_Channel::debounce_completed(int8_t position)
         switch_state.debounce_position = position;
     } else {
         // switch change detected
-        const uint32_t tnow_ms = AP_HAL::millis();
+        const uint32_t tnow_ms = AG_HAL::millis();
 
         // position not established yet
         if (switch_state.debounce_position != position) {
@@ -565,7 +565,7 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const AuxSwitchPo
         gcs().send_text(MAV_SEVERITY_WARNING, "Failed to init: RC%u_OPTION: %u\n",
                         (unsigned)(this->ch_in+1), (unsigned)ch_option);
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        AP_BoardConfig::config_error("Failed to init: RC%u_OPTION: %u",
+        AG_BoardConfig::config_error("Failed to init: RC%u_OPTION: %u",
                                      (unsigned)(this->ch_in+1), (unsigned)ch_option);
 #endif
         break;
@@ -703,13 +703,13 @@ void RC_Channel::do_aux_function_armdisarm(const AuxSwitchPos ch_flag)
     // arm or disarm the vehicle
     switch (ch_flag) {
     case AuxSwitchPos::HIGH:
-        AP::arming().arm(AP_Arming::Method::AUXSWITCH, true);
+        AP::arming().arm(AG_Arming::Method::AUXSWITCH, true);
         break;
     case AuxSwitchPos::MIDDLE:
         // nothing
         break;
     case AuxSwitchPos::LOW:
-        AP::arming().disarm(AP_Arming::Method::AUXSWITCH);
+        AP::arming().disarm(AG_Arming::Method::AUXSWITCH);
         break;
     }
 }
@@ -717,16 +717,16 @@ void RC_Channel::do_aux_function_armdisarm(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_avoid_adsb(const AuxSwitchPos ch_flag)
 {
 #if HAL_ADSB_ENABLED
-    AP_Avoidance *avoidance = AP::ap_avoidance();
+    AGP_Avoidance *avoidance = AP::ap_avoidance();
     if (avoidance == nullptr) {
         return;
     }
     if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_ADSB *adsb = AP::ADSB();
+        AG_ADSB *adsb = AP::ADSB();
         if (adsb == nullptr) {
             return;
         }
-        // try to enable AP_Avoidance
+        // try to enable AGP_Avoidance
         if (!adsb->enabled() || !adsb->healthy()) {
             gcs().send_text(MAV_SEVERITY_CRITICAL, "ADSB not available");
             return;
@@ -737,7 +737,7 @@ void RC_Channel::do_aux_function_avoid_adsb(const AuxSwitchPos ch_flag)
         return;
     }
 
-    // disable AP_Avoidance
+    // disable AGP_Avoidance
     avoidance->disable();
     AP::logger().Write_Event(LogEvent::AVOIDANCE_ADSB_DISABLE);
     gcs().send_text(MAV_SEVERITY_CRITICAL, "ADSB Avoidance Disabled");
@@ -747,7 +747,7 @@ void RC_Channel::do_aux_function_avoid_adsb(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_avoid_proximity(const AuxSwitchPos ch_flag)
 {
 #if !APM_BUILD_TYPE(APM_BUILD_ArduPlane)
-    AC_Avoid *avoid = AP::ac_avoid();
+    AG_Avoid *avoid = AP::ac_avoid();
     if (avoid == nullptr) {
         return;
     }
@@ -770,7 +770,7 @@ void RC_Channel::do_aux_function_avoid_proximity(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_camera_trigger(const AuxSwitchPos ch_flag)
 {
     if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_Camera *camera = AP::camera();
+        AG_Camera *camera = AP::camera();
         if (camera == nullptr) {
             return;
         }
@@ -780,7 +780,7 @@ void RC_Channel::do_aux_function_camera_trigger(const AuxSwitchPos ch_flag)
 
 bool RC_Channel::do_aux_function_record_video(const AuxSwitchPos ch_flag)
 {
-    AP_Camera *camera = AP::camera();
+    AG_Camera *camera = AP::camera();
     if (camera == nullptr) {
         return false;
     }
@@ -789,7 +789,7 @@ bool RC_Channel::do_aux_function_record_video(const AuxSwitchPos ch_flag)
 
 bool RC_Channel::do_aux_function_camera_zoom(const AuxSwitchPos ch_flag)
 {
-    AP_Camera *camera = AP::camera();
+    AG_Camera *camera = AP::camera();
     if (camera == nullptr) {
         return false;
     }
@@ -810,7 +810,7 @@ bool RC_Channel::do_aux_function_camera_zoom(const AuxSwitchPos ch_flag)
 
 bool RC_Channel::do_aux_function_camera_manual_focus(const AuxSwitchPos ch_flag)
 {
-    AP_Camera *camera = AP::camera();
+    AG_Camera *camera = AP::camera();
     if (camera == nullptr) {
         return false;
     }
@@ -834,7 +834,7 @@ bool RC_Channel::do_aux_function_camera_manual_focus(const AuxSwitchPos ch_flag)
 bool RC_Channel::do_aux_function_camera_auto_focus(const AuxSwitchPos ch_flag)
 {
     if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_Camera *camera = AP::camera();
+        AG_Camera *camera = AP::camera();
         if (camera == nullptr) {
             return false;
         }
@@ -847,7 +847,7 @@ bool RC_Channel::do_aux_function_camera_auto_focus(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_runcam_control(const AuxSwitchPos ch_flag)
 {
 #if HAL_RUNCAM_ENABLED
-    AP_RunCam *runcam = AP::runcam();
+    AG_RunCam *runcam = AP::runcam();
     if (runcam == nullptr) {
         return;
     }
@@ -869,7 +869,7 @@ void RC_Channel::do_aux_function_runcam_control(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_runcam_osd_control(const AuxSwitchPos ch_flag)
 {
 #if HAL_RUNCAM_ENABLED
-    AP_RunCam *runcam = AP::runcam();
+    AG_RunCam *runcam = AP::runcam();
     if (runcam == nullptr) {
         return;
     }
@@ -890,7 +890,7 @@ void RC_Channel::do_aux_function_runcam_osd_control(const AuxSwitchPos ch_flag)
 // enable or disable the fence
 void RC_Channel::do_aux_function_fence(const AuxSwitchPos ch_flag)
 {
-    AC_Fence *fence = AP::fence();
+    AG_Fence *fence = AP::fence();
     if (fence == nullptr) {
         return;
     }
@@ -902,7 +902,7 @@ void RC_Channel::do_aux_function_fence(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_clear_wp(const AuxSwitchPos ch_flag)
 {
     if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_Mission *mission = AP::mission();
+        AG_Mission *mission = AP::mission();
         if (mission == nullptr) {
             return;
         }
@@ -912,7 +912,7 @@ void RC_Channel::do_aux_function_clear_wp(const AuxSwitchPos ch_flag)
 
 void RC_Channel::do_aux_function_relay(const uint8_t relay, bool val)
 {
-    AP_ServoRelayEvents *servorelayevents = AP::servorelayevents();
+    AG_ServoRelayEvents *servorelayevents = AP::servorelayevents();
     if (servorelayevents == nullptr) {
         return;
     }
@@ -922,7 +922,7 @@ void RC_Channel::do_aux_function_relay(const uint8_t relay, bool val)
 #if HAL_GENERATOR_ENABLED
 void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
 {
-    AP_Generator *generator = AP::generator();
+    AG_Generator *generator = AP::generator();
     if (generator == nullptr) {
         return;
     }
@@ -944,7 +944,7 @@ void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
 #if HAL_SPRAYER_ENABLED
 void RC_Channel::do_aux_function_sprayer(const AuxSwitchPos ch_flag)
 {
-    AC_Sprayer *sprayer = AP::sprayer();
+    AG_Sprayer *sprayer = AP::sprayer();
     if (sprayer == nullptr) {
         return;
     }
@@ -958,7 +958,7 @@ void RC_Channel::do_aux_function_sprayer(const AuxSwitchPos ch_flag)
 #if AP_GRIPPER_ENABLED
 void RC_Channel::do_aux_function_gripper(const AuxSwitchPos ch_flag)
 {
-    AP_Gripper *gripper = AP::gripper();
+    AG_Gripper *gripper = AP::gripper();
     if (gripper == nullptr) {
         return;
     }
@@ -981,13 +981,13 @@ void RC_Channel::do_aux_function_lost_vehicle_sound(const AuxSwitchPos ch_flag)
 {
     switch (ch_flag) {
     case AuxSwitchPos::HIGH:
-        AP_Notify::flags.vehicle_lost = true;
+        AG_Notify::flags.vehicle_lost = true;
         break;
     case AuxSwitchPos::MIDDLE:
         // nothing
         break;
     case AuxSwitchPos::LOW:
-        AP_Notify::flags.vehicle_lost = false;
+        AG_Notify::flags.vehicle_lost = false;
         break;
     }
 }
@@ -1014,7 +1014,7 @@ void RC_Channel::do_aux_function_mission_reset(const AuxSwitchPos ch_flag)
     if (ch_flag != AuxSwitchPos::HIGH) {
         return;
     }
-    AP_Mission *mission = AP::mission();
+    AG_Mission *mission = AP::mission();
     if (mission == nullptr) {
         return;
     }
@@ -1024,7 +1024,7 @@ void RC_Channel::do_aux_function_mission_reset(const AuxSwitchPos ch_flag)
 void RC_Channel::do_aux_function_fft_notch_tune(const AuxSwitchPos ch_flag)
 {
 #if HAL_GYROFFT_ENABLED
-    AP_GyroFFT *fft = AP::fft();
+    AG_GyroFFT *fft = AP::fft();
     if (fft == nullptr) {
         return;
     }
@@ -1064,7 +1064,7 @@ bool RC_Channel::run_aux_function(aux_func_t ch_option, AuxSwitchPos pos, AuxFun
         "s#---",
         "F----",
         "QHBBB",
-        AP_HAL::micros64(),
+        AG_HAL::micros64(),
         uint16_t(ch_option),
         uint8_t(pos),
         uint8_t(source),
@@ -1167,7 +1167,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
     case AUX_FUNC::DISARM:
         if (ch_flag == AuxSwitchPos::HIGH) {
-            AP::arming().disarm(AP_Arming::Method::AUXSWITCH);
+            AP::arming().disarm(AG_Arming::Method::AUXSWITCH);
         }
         break;
 
@@ -1180,19 +1180,19 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
 #if AP_LANDINGGEAR_ENABLED
     case AUX_FUNC::LANDING_GEAR: {
-        AP_LandingGear *lg = AP_LandingGear::get_singleton();
+        AG_LandingGear *lg = AG_LandingGear::get_singleton();
         if (lg == nullptr) {
             break;
         }
         switch (ch_flag) {
         case AuxSwitchPos::LOW:
-            lg->set_position(AP_LandingGear::LandingGear_Deploy);
+            lg->set_position(AG_LandingGear::LandingGear_Deploy);
             break;
         case AuxSwitchPos::MIDDLE:
             // nothing
             break;
         case AuxSwitchPos::HIGH:
-            lg->set_position(AP_LandingGear::LandingGear_Retract);
+            lg->set_position(AG_LandingGear::LandingGear_Retract);
             break;
         }
         break;
@@ -1209,7 +1209,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
 #if AP_AIRSPEED_ENABLED
     case AUX_FUNC::DISABLE_AIRSPEED_USE: {
-        AP_Airspeed *airspeed = AP::airspeed();
+        AG_Airspeed *airspeed = AP::airspeed();
         if (airspeed == nullptr) {
             break;
         }
@@ -1246,7 +1246,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 #if HAL_VISUALODOM_ENABLED
     case AUX_FUNC::VISODOM_ALIGN:
         if (ch_flag == AuxSwitchPos::HIGH) {
-            AP_VisualOdom *visual_odom = AP::visualodom();
+            AG_VisualOdom *visual_odom = AP::visualodom();
             if (visual_odom != nullptr) {
                 visual_odom->request_align_yaw_to_ahrs();
             }
@@ -1273,7 +1273,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
 #if AP_OPTICALFLOW_ENABLED
     case AUX_FUNC::OPTFLOW_CAL: {
-        AP_OpticalFlow *optflow = AP::opticalflow();
+        AG_OpticalFlow *optflow = AP::opticalflow();
         if (optflow == nullptr) {
             gcs().send_text(MAV_SEVERITY_CRITICAL, "OptFlow Cal: failed sensor not enabled");
             break;
@@ -1308,7 +1308,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
     case AUX_FUNC::CAM_MODE_TOGGLE: {
         // Momentary switch to for cycling camera modes
-        AP_Camera *camera = AP_Camera::get_singleton();
+        AG_Camera *camera = AG_Camera::get_singleton();
         if (camera == nullptr) {
             break;
         }
@@ -1341,7 +1341,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
 #if HAL_MOUNT_ENABLED
     case AUX_FUNC::RETRACT_MOUNT1: {
-        AP_Mount *mount = AP::mount();
+        AG_Mount *mount = AP::mount();
         if (mount == nullptr) {
             break;
         }
@@ -1360,7 +1360,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     }
 
     case AUX_FUNC::MOUNT_LOCK: {
-        AP_Mount *mount = AP::mount();
+        AG_Mount *mount = AP::mount();
         if (mount == nullptr) {
             break;
         }
@@ -1370,7 +1370,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 #endif
 
     case AUX_FUNC::LOG_PAUSE: {
-        AP_Logger *logger = AP_Logger::get_singleton();
+        AG_Logger *logger = AG_Logger::get_singleton();
         switch (ch_flag) {
         case AuxSwitchPos::LOW:
             logger->log_pause(false);
@@ -1414,7 +1414,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         case AuxSwitchPos::HIGH:
             // request arm, disable emergency motor stop
             SRV_Channels::set_emergency_stop(false);
-            AP::arming().arm(AP_Arming::Method::AUXSWITCH, true);
+            AP::arming().arm(AG_Arming::Method::AUXSWITCH, true);
             break;
         case AuxSwitchPos::MIDDLE:
             // disable emergency motor stop
@@ -1442,7 +1442,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     // clear torqeedo error
     case AUX_FUNC::TORQEEDO_CLEAR_ERR: {
         if (ch_flag == AuxSwitchPos::HIGH) {
-            AP_Torqeedo *torqeedo = AP_Torqeedo::get_singleton();
+            AG_Torqeedo *torqeedo = AG_Torqeedo::get_singleton();
             if (torqeedo != nullptr) {
                 torqeedo->clear_motor_error();
             }

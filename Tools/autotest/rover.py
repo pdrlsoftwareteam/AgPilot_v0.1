@@ -572,7 +572,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.disarm_vehicle()
         self.progress("RTL Mission OK (%fm)" % home_distance)
 
-    def AC_Avoidance(self):
+    def AG_Avoidance(self):
         '''Test AC Avoidance switch'''
         self.context_push()
         ex = None
@@ -5478,13 +5478,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 self.progress("Have now seen all expected messages")
                 break
 
-    def AP_Proximity_MAV(self):
+    def AG_Proximity_MAV(self):
         '''Test MAV proximity backend'''
         self.context_push()
         ex = None
         try:
             self.set_parameters({
-                "PRX1_TYPE": 2,  # AP_Proximity_MAV
+                "PRX1_TYPE": 2,  # AG_Proximity_MAV
                 "OA_TYPE": 2,  # dijkstra
                 "OA_DB_OUTPUT": 3,  # send all items
             })
@@ -6304,7 +6304,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.RCOverridesCancel,
             self.MANUAL_CONTROL,
             self.Sprayer,
-            self.AC_Avoidance,
+            self.AG_Avoidance,
             self.CameraMission,
             self.Gripper,
             self.GripperMission,
@@ -6340,7 +6340,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.SetpointGlobalVel,
             self.AccelCal,
             self.RangeFinder,
-            self.AP_Proximity_MAV,
+            self.AG_Proximity_MAV,
             self.EndMissionBehavior,
             self.FlashStorage,
             self.FRAMStorage,

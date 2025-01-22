@@ -40,7 +40,7 @@ void Copter::esc_calibration_startup_check()
                 // send message to gcs
                 gcs().send_text(MAV_SEVERITY_CRITICAL,"ESC calibration: Restart board");
                 // turn on esc calibration notification
-                AP_Notify::flags.esc_calibration = true;
+                AG_Notify::flags.esc_calibration = true;
                 // block until we restart
                 while(1) { hal.scheduler->delay(5); }
             }
@@ -134,8 +134,8 @@ void Copter::esc_calibration_auto()
 // flash LEDs to notify the user that ESC calibration is happening
 void Copter::esc_calibration_notify()
 {
-    AP_Notify::flags.esc_calibration = true;
-    uint32_t now = AP_HAL::millis();
+    AG_Notify::flags.esc_calibration = true;
+    uint32_t now = AG_HAL::millis();
     if (now - esc_calibration_notify_update_ms > 20) {
         esc_calibration_notify_update_ms = now;
         notify.update();
@@ -160,8 +160,8 @@ void Copter::esc_calibration_setup()
 
     // wait for safety switch to be pressed
     uint32_t tstart = 0;
-    while (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
-        const uint32_t tnow = AP_HAL::millis();
+    while (hal.util->safety_switch_state() == AG_HAL::Util::SAFETY_DISARMED) {
+        const uint32_t tnow = AG_HAL::millis();
         if (tnow - tstart >= 5000) {
             gcs().send_text(MAV_SEVERITY_INFO,"ESC calibration: Push safety switch");
             tstart = tnow;

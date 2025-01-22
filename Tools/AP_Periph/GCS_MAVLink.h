@@ -30,7 +30,7 @@ private:
 
     uint32_t telem_delay() const override { return 0; }
     void handleMessage(const mavlink_message_t &msg) override { handle_common_message(msg); }
-    bool handle_guided_request(AP_Mission::Mission_Command &cmd) override { return true; }
+    bool handle_guided_request(AG_Mission::Mission_Command &cmd) override { return true; }
     MAV_RESULT handle_preflight_reboot(const mavlink_command_long_t &packet, const mavlink_message_t &msg) override;
     uint8_t sysid_my_gcs() const override;
 
@@ -51,7 +51,7 @@ protected:
  * a GCS singleton used for many example sketches and tools
  */
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 class GCS_Periph : public GCS
 {
@@ -64,7 +64,7 @@ protected:
     uint8_t sysid_this_mav() const override;
 
     GCS_MAVLINK_Periph *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
-                                               AP_HAL::UARTDriver &uart) override {
+                                               AG_HAL::UARTDriver &uart) override {
         return new GCS_MAVLINK_Periph(params, uart);
     }
 

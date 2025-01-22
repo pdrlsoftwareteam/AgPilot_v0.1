@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <AP_HAL/AP_HAL.h>
+#include <AG_HAL/AG_HAL.h>
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -67,10 +67,10 @@ SilentWings::SilentWings(const char *frame_str) :
     // Set a few other parameters to specific values to keep the calibration checks happy.
     // TO DO: fix this. Setting parameters in this way doesn't appear to have any effect.
     for (uint8_t i = 0; i < ARRAY_SIZE(sim_defaults); i++) {
-        AP_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
+        AG_Param::set_default_by_name(sim_defaults[i].name, sim_defaults[i].value);
         if (sim_defaults[i].save) {
             enum ap_var_type ptype;
-            AP_Param *p = AP_Param::find(sim_defaults[i].name, &ptype);
+            AG_Param *p = AG_Param::find(sim_defaults[i].name, &ptype);
             if (!p->configured()) {
                 p->save();
             }
@@ -226,13 +226,13 @@ void SilentWings::process_packet()
     // Auto-adjust to Silent Wings' frame rate
     // This affects the data rate (without this adjustment, the data rate is
     // low no matter what the output_udp_rate in SW's options.dat file is).
-    double deltat = (AP_HAL::millis() - last_data_time_ms) / 1000.0f;
+    double deltat = (AG_HAL::millis() - last_data_time_ms) / 1000.0f;
 
     if (deltat < 0.01 && deltat > 0) {
         adjust_frame_time(1.0/deltat);
     }
 
-    last_data_time_ms = AP_HAL::millis();
+    last_data_time_ms = AG_HAL::millis();
 
     report.data_count++;
     report.frame_count++;
@@ -259,7 +259,7 @@ void SilentWings::process_packet()
  */
 bool SilentWings::interim_update()
 {
-    if (AP_HAL::millis() - last_data_time_ms > 200) {
+    if (AG_HAL::millis() - last_data_time_ms > 200) {
         // don't extrapolate beyond 0.2s
         return false;
     }
@@ -304,7 +304,7 @@ void SilentWings::update(const struct sitl_input &input)
 
     update_mag_field_bf();
 
-    uint32_t now = AP_HAL::millis();
+    uint32_t now = AG_HAL::millis();
 
     if (report.last_report_ms == 0) {
         report.last_report_ms = now;

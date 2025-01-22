@@ -14,24 +14,24 @@
 
 #define ALLOW_DOUBLE_MATH_FUNCTIONS
 
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_HAL/AP_HAL.h>
+#include <AG_BoardConfig/AG_BoardConfig.h>
+#include <AG_HAL/AG_HAL.h>
 #include <SITL/SITL.h>
-#include <AP_Common/NMEA.h>
+#include <AG_Common/NMEA.h>
 
 // simulated CAN GPS devices get fed from our SITL estimates:
 #if HAL_SIM_GPS_EXTERNAL_FIFO_ENABLED
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <AP_HAL_SITL/AP_HAL_SITL.h>
+#include <AG_HAL_SITL/AG_HAL_SITL.h>
 extern const HAL_SITL& hal_sitl;
 #endif
 
-// the number of GPS leap seconds - copied from AP_GPS.h
+// the number of GPS leap seconds - copied from AG_GPS.h
 #define GPS_LEAPSECONDS_MILLIS 18000ULL
 
-extern const AP_HAL::HAL& hal;
+extern const AG_HAL::HAL& hal;
 
 using namespace SITL;
 
@@ -47,7 +47,7 @@ GPS::GPS(uint8_t _instance) :
     // number:
     const uint8_t num = num_gps * hal_sitl.get_instance() + instance;
     if (asprintf(&_gps_fifo, "/tmp/gps_fifo%u", (unsigned)num) == -1) {  // FIXME - needs to work with simulated periph-gps
-        AP_BoardConfig::allocation_error("gps_fifo filepath");
+        AG_BoardConfig::allocation_error("gps_fifo filepath");
     }
     if (mkfifo(_gps_fifo, 0666) < 0) {
         if (errno != EEXIST) {
@@ -137,7 +137,7 @@ ssize_t GPS::write_to_autopilot(const char *p, size_t size) const
  */
 static void simulation_timeval(struct timeval *tv)
 {
-    uint64_t now = AP_HAL::micros64();
+    uint64_t now = AG_HAL::micros64();
     static uint64_t first_usec;
     static struct timeval first_tv;
     if (first_usec == 0) {
@@ -365,7 +365,7 @@ void GPS::update_ubx(const struct gps_data *d)
     status.differential_status = 0;
     status.res = 0;
     status.time_to_first_fix = 0;
-    status.uptime = AP_HAL::millis();
+    status.uptime = AG_HAL::millis();
 
     velned.time = time_week_ms;
     velned.ned_north = 100.0f * d->speedN;
@@ -1019,7 +1019,7 @@ uint32_t GPS::CalculateBlockCRC32(uint32_t length, uint8_t *buffer, uint32_t crc
 }
 
 /*
-  read file data logged from AP_GPS_DEBUG_LOGGING_ENABLED
+  read file data logged from AG_GPS_DEBUG_LOGGING_ENABLED
  */
 #if AP_SIM_GPS_FILE_ENABLED
 void GPS::update_file()
@@ -1050,7 +1050,7 @@ void GPS::update_file()
             header.magic != magic) {
             goto rewind_file;
         }
-        if (header.time_ms+base_time[instance] > AP_HAL::millis()) {
+        if (header.time_ms+base_time[instance] > AG_HAL::millis()) {
             // not ready for this data yet
             ::lseek(fd[instance], -sizeof(header), SEEK_CUR);
             return;
@@ -1067,7 +1067,7 @@ void GPS::update_file()
 
 rewind_file:
     ::printf("GPS[%u] rewind\n", unsigned(instance));
-    base_time[instance] = AP_HAL::millis();
+    base_time[instance] = AG_HAL::millis();
     ::lseek(fd[instance], 0, SEEK_SET);
     delete[] buf;
 }
@@ -1088,7 +1088,7 @@ void GPS::update()
     const double speedN = _sitl->state.speedN;
     const double speedE = _sitl->state.speedE;
     const double speedD = _sitl->state.speedD;
-    const uint32_t now_ms = AP_HAL::millis();
+    const uint32_t now_ms = AG_HAL::millis();
 
     if (now_ms < 20000) {
         // apply the init offsets for the first 20s. This allows for

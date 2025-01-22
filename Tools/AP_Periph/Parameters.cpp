@@ -1,8 +1,8 @@
 
-#include <AP_HAL/AP_HAL_Boards.h>
+#include <AG_HAL/AG_HAL_Boards.h>
 #include "AP_Periph.h"
 
-extern const AP_HAL::HAL &hal;
+extern const AG_HAL::HAL &hal;
 
 #ifndef HAL_PERIPH_LED_BRIGHT_DEFAULT
 #define HAL_PERIPH_LED_BRIGHT_DEFAULT 100
@@ -62,7 +62,7 @@ extern const AP_HAL::HAL &hal;
  *
  */
 
-const AP_Param::Info AP_Periph_FW::var_info[] = {
+const AG_Param::Info AP_Periph_FW::var_info[] = {
     // @Param: FORMAT_VERSION
     // @DisplayName: Eeprom format version number
     // @Description: This value is incremented when changes are made to the eeprom format
@@ -102,7 +102,7 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     // @Values: 0:Disabled,1:UAVCAN,4:PiccoloCAN,5:CANTester,6:EFI_NWPMU,7:USD1,8:KDECAN
     // @User: Advanced
     // @RebootRequired: True
-    GARRAY(can_protocol,     0, "CAN_PROTOCOL", AP_CANManager::Driver_Type_UAVCAN),
+    GARRAY(can_protocol,     0, "CAN_PROTOCOL", AG_CANManager::Driver_Type_UAVCAN),
     
     // @Param: CAN2_BAUDRATE
     // @DisplayName: Bitrate of CAN2 interface
@@ -118,7 +118,7 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     // @Values: 0:Disabled,1:UAVCAN,4:PiccoloCAN,5:CANTester,6:EFI_NWPMU,7:USD1,8:KDECAN
     // @User: Advanced
     // @RebootRequired: True
-    GARRAY(can_protocol,     1, "CAN2_PROTOCOL", AP_CANManager::Driver_Type_UAVCAN),
+    GARRAY(can_protocol,     1, "CAN2_PROTOCOL", AG_CANManager::Driver_Type_UAVCAN),
 #endif
 
 #if HAL_NUM_CAN_IFACES >= 3
@@ -136,7 +136,7 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     // @Values: 0:Disabled,1:UAVCAN,4:PiccoloCAN,5:CANTester,6:EFI_NWPMU,7:USD1,8:KDECAN
     // @User: Advanced
     // @RebootRequired: True
-    GARRAY(can_protocol,    2, "CAN3_PROTOCOL", AP_CANManager::Driver_Type_UAVCAN),
+    GARRAY(can_protocol,    2, "CAN3_PROTOCOL", AG_CANManager::Driver_Type_UAVCAN),
 #endif
 
 #if HAL_CANFD_SUPPORTED
@@ -205,8 +205,8 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 #ifdef HAL_PERIPH_ENABLE_GPS
     // GPS driver
     // @Group: GPS
-    // @Path: ../libraries/AP_GPS/AP_GPS.cpp
-    GOBJECT(gps, "GPS", AP_GPS),
+    // @Path: ../libraries/AG_GPS/AG_GPS.cpp
+    GOBJECT(gps, "GPS", AG_GPS),
 
     // @Param: GPS_PORT
     // @DisplayName: GPS Serial Port
@@ -230,21 +230,21 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
 #ifdef HAL_PERIPH_ENABLE_BATTERY
     // @Group: BATT
-    // @Path: ../libraries/AP_BattMonitor/AP_BattMonitor.cpp
-    GOBJECT(battery, "BATT", AP_BattMonitor),
+    // @Path: ../libraries/AG_BattMonitor/AG_BattMonitor.cpp
+    GOBJECT(battery, "BATT", AG_BattMonitor),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_MAG
     // @Group: COMPASS_
-    // @Path: ../libraries/AP_Compass/AP_Compass.cpp
+    // @Path: ../libraries/AG_Compass/AG_Compass.cpp
     GOBJECT(compass,         "COMPASS_",     Compass),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_BARO
     // Baro driver
     // @Group: BARO
-    // @Path: ../libraries/AP_Baro/AP_Baro.cpp
-    GOBJECT(baro, "BARO", AP_Baro),
+    // @Path: ../libraries/AG_Baro/AG_Baro.cpp
+    GOBJECT(baro, "BARO", AG_Baro),
 
     // @Param: BARO_ENABLE
     // @DisplayName: Barometer Enable
@@ -268,8 +268,8 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 #ifdef HAL_PERIPH_ENABLE_AIRSPEED
     // Airspeed driver
     // @Group: ARSPD
-    // @Path: ../libraries/AP_Airspeed/AP_Airspeed.cpp
-    GOBJECT(airspeed, "ARSPD", AP_Airspeed),
+    // @Path: ../libraries/AG_Airspeed/AG_Airspeed.cpp
+    GOBJECT(airspeed, "ARSPD", AG_Airspeed),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_RANGEFINDER
@@ -302,7 +302,7 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     
     // Rangefinder driver
     // @Group: RNGFND
-    // @Path: ../libraries/AP_RangeFinder/AP_RangeFinder.cpp
+    // @Path: ../libraries/AG_RangeFinder/AG_RangeFinder.cpp
     GOBJECT(rangefinder, "RNGFND", RangeFinder),
 #endif
 
@@ -399,8 +399,8 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
     // @Group: TEMP
-    // @Path: ../libraries/AP_TemperatureSensor/AP_TemperatureSensor.cpp
-    GOBJECT(temperature_sensor,         "TEMP",     AP_TemperatureSensor),
+    // @Path: ../libraries/AG_TemperatureSensor/AG_TemperatureSensor.cpp
+    GOBJECT(temperature_sensor,         "TEMP",     AG_TemperatureSensor),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_MSP
@@ -416,14 +416,14 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     
 #ifdef HAL_PERIPH_ENABLE_NOTIFY
     // @Group: NTF_
-    // @Path: ../libraries/AP_Notify/AP_Notify.cpp
-    GOBJECT(notify, "NTF_",  AP_Notify),
+    // @Path: ../libraries/AG_Notify/AG_Notify.cpp
+    GOBJECT(notify, "NTF_",  AG_Notify),
 #endif
 
 #if HAL_LOGGING_ENABLED
     // @Group: LOG
-    // @Path: ../libraries/AP_Logger/AP_Logger.cpp
-    GOBJECT(logger,           "LOG",  AP_Logger),
+    // @Path: ../libraries/AG_Logger/AG_Logger.cpp
+    GOBJECT(logger,           "LOG",  AG_Logger),
 
     // @Param: LOG_BITMASK
     // @DisplayName: Log bitmask
@@ -442,20 +442,20 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     GSCALAR(sysid_this_mav,         "SYSID_THISMAV",  MAV_SYSTEM_ID),
 
     // @Group: SERIAL
-    // @Path: ../libraries/AP_SerialManager/AP_SerialManager.cpp
-    GOBJECT(serial_manager, "SERIAL",   AP_SerialManager),
+    // @Path: ../libraries/AG_SerialManager/AG_SerialManager.cpp
+    GOBJECT(serial_manager, "SERIAL",   AG_SerialManager),
 #endif
 
 #if AP_SCRIPTING_ENABLED
     // @Group: SCR_
-    // @Path: ../libraries/AP_Scripting/AP_Scripting.cpp
-    GOBJECT(scripting, "SCR_", AP_Scripting),
+    // @Path: ../libraries/AG_Scripting/AG_Scripting.cpp
+    GOBJECT(scripting, "SCR_", AG_Scripting),
 #endif
 
 #if AP_STATS_ENABLED
     // @Group: Node
-    // @Path: ../libraries/AP_Stats/AP_Stats.cpp
-    GOBJECT(node_stats, "STAT", AP_Stats),
+    // @Path: ../libraries/AG_Stats/AG_Stats.cpp
+    GOBJECT(node_stats, "STAT", AG_Stats),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_EFI
@@ -479,8 +479,8 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
     // EFI driver
     // @Group: EFI
-    // @Path: ../libraries/AP_EFI/AP_EFI.cpp
-    GOBJECT(efi, "EFI", AP_EFI),
+    // @Path: ../libraries/AG_EFI/AG_EFI.cpp
+    GOBJECT(efi, "EFI", AG_EFI),
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PRX
@@ -513,14 +513,14 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
     // Proximity driver
     // @Group: PRX
-    // @Path: ../libraries/AP_RangeFinder/AP_Proximity.cpp
-    GOBJECT(proximity, "PRX", AP_Proximity),
+    // @Path: ../libraries/AG_RangeFinder/AG_Proximity.cpp
+    GOBJECT(proximity, "PRX", AG_Proximity),
 #endif
 
 #if HAL_NMEA_OUTPUT_ENABLED
     // @Group: NMEA_
-    // @Path: ../libraries/AP_NMEA_Output/AP_NMEA_Output.cpp
-    GOBJECT(nmea, "NMEA_",   AP_NMEA_Output),
+    // @Path: ../libraries/AG_NMEA_Output/AG_NMEA_Output.cpp
+    GOBJECT(nmea, "NMEA_",   AG_NMEA_Output),
 #endif
 
     AP_VAREND
@@ -529,15 +529,15 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
 void AP_Periph_FW::load_parameters(void)
 {
-    AP_Param::setup_sketch_defaults();
+    AG_Param::setup_sketch_defaults();
 
-    AP_Param::check_var_info();
+    AG_Param::check_var_info();
 
     if (!g.format_version.load() ||
         g.format_version != Parameters::k_format_version) {
         // erase all parameters
         StorageManager::erase();
-        AP_Param::erase_all();
+        AG_Param::erase_all();
 
         // save the current format version
         g.format_version.set_and_save(Parameters::k_format_version);
@@ -545,5 +545,5 @@ void AP_Periph_FW::load_parameters(void)
     g.format_version.set_default(Parameters::k_format_version);
 
     // Load all auto-loaded EEPROM variables
-    AP_Param::load_all();
+    AG_Param::load_all();
 }
