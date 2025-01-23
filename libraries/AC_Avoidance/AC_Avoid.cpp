@@ -36,6 +36,9 @@
 
 const AP_Param::GroupInfo AC_Avoid::var_info[] = {
 
+	    AP_GROUPINFO("FLAG", 10, AC_Avoid, _man_flag, false),
+		AP_GROUPINFO("ALT", 11, AC_Avoid, _min_alt_avoid, 300.0),
+
     // @Param: ENABLE
     // @DisplayName: Avoidance control enable/disable
     // @Description: Enabled/disable avoidance input sources
@@ -50,7 +53,7 @@ const AP_Param::GroupInfo AC_Avoid::var_info[] = {
     // @Increment: 10
     // @Range: 0 4500
     // @User: Standard
-    AP_GROUPINFO_FRAME("ANGLE_MAX", 2,  AC_Avoid, _angle_max, 1000, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER),
+    AP_GROUPINFO_FRAME("ANGLE_MAX", 2,  AC_Avoid, _angle_max, 1000, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER),
 
     // @Param{Copter}: DIST_MAX
     // @DisplayName: Avoidance distance maximum in non-GPS flight modes
@@ -58,7 +61,7 @@ const AP_Param::GroupInfo AC_Avoid::var_info[] = {
     // @Units: m
     // @Range: 1 30
     // @User: Standard
-    AP_GROUPINFO_FRAME("DIST_MAX", 3,  AC_Avoid, _dist_max, AC_AVOID_NONGPS_DIST_MAX_DEFAULT, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER),
+    AP_GROUPINFO_FRAME("DIST_MAX", 3,  AC_Avoid, _dist_max, AC_AVOID_NONGPS_DIST_MAX_DEFAULT, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER),
 
     // @Param: MARGIN
     // @DisplayName: Avoidance distance margin in GPS modes
@@ -73,7 +76,7 @@ const AP_Param::GroupInfo AC_Avoid::var_info[] = {
     // @Description: Avoidance behaviour (slide or stop)
     // @Values: 0:Slide,1:Stop
     // @User: Standard
-    AP_GROUPINFO_FRAME("BEHAVE", 5, AC_Avoid, _behavior, AP_AVOID_BEHAVE_DEFAULT, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER | AP_PARAM_FRAME_ROVER),
+    AP_GROUPINFO_FRAME("BEHAVE", 5, AC_Avoid, _behavior, AP_AVOID_BEHAVE_DEFAULT, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER | AP_PARAM_FRAME_ROVER),
 
     // @Param: BACKUP_SPD
     // @DisplayName: Avoidance maximum backup speed
@@ -89,7 +92,7 @@ const AP_Param::GroupInfo AC_Avoid::var_info[] = {
     // @Units: m
     // @Range: 0 6
     // @User: Standard
-    AP_GROUPINFO_FRAME("ALT_MIN", 7, AC_Avoid, _alt_min, 0.0f, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER),
+    AP_GROUPINFO_FRAME("ALT_MIN", 7, AC_Avoid, _alt_min, 0.0f, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER),
 
     // @Param: ACCEL_MAX
     // @DisplayName: Avoidance maximum acceleration
@@ -184,10 +187,16 @@ void AC_Avoid::adjust_velocity_fence(float kP, float accel_cmss, Vector3f &desir
 */
 void AC_Avoid::adjust_velocity(Vector3f &desired_vel_cms, bool &backing_up, float kP, float accel_cmss, float kP_z, float accel_cmss_z, float dt)
 {
+	float _curr_alt;
+    AP::ahrs().get_relative_position_D_home(_curr_alt);
+    _curr_alt = -_curr_alt * 100; // translate Down to Up
+    //printf("curr_alt: %f\n",_curr_alt);
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag || (_curr_alt < _min_alt_avoid)) {
+     //   printf("Not going to work\n");
         return;
     }
+    //printf("Going to work\n");
 
     // make a copy of input velocity, because desired_vel_cms might be changed
     const Vector3f desired_vel_cms_original = desired_vel_cms;
@@ -350,8 +359,12 @@ void AC_Avoid::adjust_velocity_z(float kP, float accel_cmss, float& climb_rate_c
 {
 #ifdef AP_AVOID_ENABLE_Z
 
+	float _curr_alt;
+    AP::ahrs().get_relative_position_D_home(_curr_alt);
+    _curr_alt = -_curr_alt * 100; // translate Down to Up
+
     // exit immediately if disabled
-    if (_enabled == AC_AVOID_DISABLED) {
+    if (_enabled == AC_AVOID_DISABLED || _man_flag || (_curr_alt < _min_alt_avoid)) {
         return;
     }
     

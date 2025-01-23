@@ -32,6 +32,9 @@ const int16_t OA_TIMEOUT_MS = 3000;     // results over 3 seconds old are ignore
 
 const AP_Param::GroupInfo AP_OAPathPlanner::var_info[] = {
 
+	    AP_GROUPINFO("FLAG", 7, AP_OAPathPlanner, _auto_flag, false),
+
+
     // @Param: TYPE
     // @DisplayName: Object Avoidance Path Planning algorithm to use
     // @Description: Enabled/disable path planning around obstacles

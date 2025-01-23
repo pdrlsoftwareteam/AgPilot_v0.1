@@ -34,7 +34,6 @@
 #include <AP_RTC/AP_RTC.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #ifdef HAVE_AP_BLHELI_SUPPORT
-#include <AP_BLheli/AP_BLHeli.h>
 #endif
 #include <math.h>
 
@@ -557,13 +556,10 @@ void AP_Spektrum_Telem::calc_gps_status()
 void AP_Spektrum_Telem::calc_esc()
 {
 #ifdef HAVE_AP_BLHELI_SUPPORT
-    AP_BLHeli* blh = AP_BLHeli::get_singleton();
 
     if (blh == nullptr) {
         return;
     }
-
-    AP_BLHeli::telem_data td;
 
     if (!blh->get_telem_data(0, td)) {
         return;

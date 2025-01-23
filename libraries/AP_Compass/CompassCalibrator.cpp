@@ -232,12 +232,27 @@ void CompassCalibrator::pull_sample()
         mag_sample = _last_sample;
     }
     if (_running() && _samples_collected < COMPASS_CAL_NUM_SAMPLES && accept_sample(mag_sample.get())) {
-        update_completion_mask(mag_sample.get());
-        _sample_buffer[_samples_collected] = mag_sample;
-        _samples_collected++;
+            update_completion_mask(mag_sample.get());
+            _sample_buffer[_samples_collected] = mag_sample;
+            _samples_collected++;
+//            if(_samples_collected >= 400)
+//            {
+//                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "samples are collected");
+//            }
+        }
     }
-}
 
+bool CompassCalibrator::is_aligned_with_axis(const Vector3f& v, const Vector3f& axis, float tolerance) {
+    // Normalize the input vector and the axis
+    Vector3f v_norm = v.normalized();
+    Vector3f axis_norm = axis.normalized();
+
+    // Calculate the dot product between the vectors
+    float dot_product = v_norm.dot(axis_norm);
+
+    // Check if the dot product is close to 1 (vectors are aligned)
+    return fabs(dot_product - 1.0f) < tolerance;
+}
 
 void CompassCalibrator::update_cal_settings()
 {
@@ -258,20 +273,62 @@ void CompassCalibrator::update_cal_settings()
 
 // update completion mask based on latest sample
 // used to ensure we have collected samples in all directions
-void CompassCalibrator::update_completion_mask(const Vector3f& v)
-{
+void CompassCalibrator::update_completion_mask(const Vector3f& v) {
+    // Create the soft iron correction matrix using parameters
     Matrix3f softiron {
         _params.diag.x,    _params.offdiag.x, _params.offdiag.y,
         _params.offdiag.x, _params.diag.y,    _params.offdiag.z,
         _params.offdiag.y, _params.offdiag.z, _params.diag.z
     };
+
+    // Apply the soft iron correction and offset to the input vector
     Vector3f corrected = softiron * (v + _params.offset);
-    int section = AP_GeodesicGrid::section(corrected, true);
-    if (section < 0) {
-        return;
+
+    // Define the axes we are interested in
+    Vector3f axes[3] = {
+        Vector3f(1.0f, 0.0f, 0.0f), // X axis
+        Vector3f(0.0f, 1.0f, 0.0f), // Y axis
+        Vector3f(0.0f, 0.0f, 1.0f)  // Z axis
+    };
+
+    // Tolerance for alignment
+    float tolerance = 0.1f; // Adjust this value as needed
+
+    // Check if the corrected vector is aligned with any of the axes
+    for (int i = 0; i < 3; ++i) {
+        if (is_aligned_with_axis(corrected, axes[i], tolerance)) {
+            // Update the completion mask for the aligned axis
+            _completion_mask[i / 8] |= 1 << (i % 8);
+            // Increment the sample count for the aligned axis
+            if (i == 0 && _x_axis_sample_count < MAX_SAMPLES_PER_AXIS) {
+                _x_axis_sample_count++;
+            } else if (i == 1 && _y_axis_sample_count < MAX_SAMPLES_PER_AXIS) {
+                _y_axis_sample_count++;
+            } else if (i == 2 && _z_axis_sample_count < 140) {
+                _z_axis_sample_count++;
+            }
+            break;
+        }
     }
-    _completion_mask[section / 8] |= 1 << (section % 8);
+    if(_x_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_x_axis_sample_count_finished)
+    {
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "X axis samples are collected");
+        _x_axis_sample_count_finished = true;
+    }
+
+    if(_y_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_y_axis_sample_count_finished)
+    {
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Y axis samples are collected");
+        _y_axis_sample_count_finished = true;
+    }
+
+    if(_z_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_z_axis_sample_count_finished)
+    {
+//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Z axis samples are collected");
+        _z_axis_sample_count_finished = true;
+    }
 }
+
 
 // reset and update the completion mask using all samples in the sample buffer
 void CompassCalibrator::update_completion_mask()
@@ -362,7 +419,12 @@ void CompassCalibrator::reset_state()
     _params.diag = Vector3f(1.0f,1.0f,1.0f);
     _params.offdiag.zero();
     _params.scale_factor = 0;
-
+    _x_axis_sample_count = 0;
+    _y_axis_sample_count = 0;
+    _z_axis_sample_count = 0;
+    _x_axis_sample_count_finished = false;
+    _y_axis_sample_count_finished = false;
+    _z_axis_sample_count_finished = false;
     memset(_completion_mask, 0, sizeof(_completion_mask));
     initialize_fit();
 }
@@ -535,9 +597,11 @@ bool CompassCalibrator::accept_sample(const Vector3f& sample, uint16_t skip_inde
         return false;
     }
 
-    float min_distance = _params.radius * 2*sinf(theta/2);
+    // Reduce the minimum distance by a factor to allow tighter packing
+    float reduction_factor = 0.5f; // Adjust this factor to control the packing density
+    float min_distance = reduction_factor * _params.radius * 2 * sinf(theta / 2);
 
-    for (uint16_t i = 0; i<_samples_collected; i++) {
+    for (uint16_t i = 0; i < _samples_collected; i++) {
         if (i != skip_index) {
             float distance = (sample - _sample_buffer[i].get()).length();
             if (distance < min_distance) {

@@ -20,7 +20,6 @@
 #include <AP_Volz_Protocol/AP_Volz_Protocol.h>
 #include <AP_RobotisServo/AP_RobotisServo.h>
 #include <AP_SBusOut/AP_SBusOut.h>
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_FETtecOneWire/AP_FETtecOneWire.h>
 
 #include "SRV_Channel_config.h"
@@ -602,12 +601,6 @@ private:
     // support for Robotis servo protocol
     AP_RobotisServo robotis;
     static AP_RobotisServo *robotis_ptr;
-#endif
-
-#if HAL_SUPPORT_RCOUT_SERIAL
-    // support for BLHeli protocol
-    AP_BLHeli blheli;
-    static AP_BLHeli *blheli_ptr;
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED

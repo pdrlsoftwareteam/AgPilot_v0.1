@@ -42,6 +42,11 @@ public:
     
     bool get_local_time(uint8_t &hour, uint8_t &min, uint8_t &sec, uint16_t &ms) const;
 
+    bool get_local_date_time(uint16_t &year, uint8_t &month, uint8_t &day,
+                                     uint8_t &hour, uint8_t &min, uint8_t &sec, uint16_t &ms) const;
+
+	bool is_leap_year(uint16_t year) const;
+
     uint32_t get_time_utc(int32_t hour, int32_t min, int32_t sec, int32_t ms);
 
     // replacement for mktime()

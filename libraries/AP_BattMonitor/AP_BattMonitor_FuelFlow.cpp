@@ -6,7 +6,8 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <GCS_MAVLink/GCS.h>
-
+#include "AC_Sprayer/AC_Sprayer.h"
+#include "AP_AHRS/AP_AHRS.h"
 /*
   "battery" monitor for liquid fuel flow systems that give a pulse on
   a pin for fixed volumes of fuel.
@@ -35,6 +36,7 @@ AP_BattMonitor_FuelFlow::AP_BattMonitor_FuelFlow(AP_BattMonitor &mon,
     // we can't tell if it is healthy as we expect zero pulses when no
     // fuel is flowing
     _state.healthy = true;
+      _state.has_time_remaining = true;
 }
 
 /*
@@ -126,6 +128,37 @@ void AP_BattMonitor_FuelFlow::read()
 
     // map consumed_wh using fixed voltage of 1
     _state.consumed_wh = _state.consumed_mah;
+    _state.time_remaining += state.pulse_count;
+
+	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
+	AP_AHRS &ahrs = AP::ahrs();
+
+	float gndSpeed = ahrs.groundspeed();
+
+	if (AP::sprayer()->spraying() && gndSpeed >= 1.0f) {
+		static uint64_t time_ms = AP_HAL::millis();
+		static uint64_t pcount = 0;
+		static uint16_t cnt = 0;
+
+		// Accumulate pulse count and count if within the 3-second window
+		if (AP_HAL::millis() - time_ms < 3000) {
+			pcount += state.pulse_count;
+			cnt++;
+		} else {
+			// Check tank status at the end of the 3-second window
+			if (cnt > 0 && pcount == 0) {
+				static int gcs_count = 0;
+				gcs().send_text(MAV_SEVERITY_WARNING, "Pani Samplay %d", gcs_count++);
+				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
+			}
+
+			// Reset tracking variables
+			time_ms = AP_HAL::millis();
+			pcount = 0;
+			cnt = 0;
+		}
+	}
+
 }
 
 #endif  // AP_BATTERY_FUELFLOW_ENABLED

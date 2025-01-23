@@ -78,7 +78,6 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_Radio',
     'AP_TempCalibration',
     'AP_VisualOdom',
-    'AP_BLHeli',
     'AP_ROMFS',
     'AP_Proximity',
     'AP_Gripper',
@@ -113,6 +112,9 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_AIS',
     'AP_OpenDroneID',
     'AP_CheckFirmware',
+    'AP_KEYSTORE',
+    'AP_LIBNPNT',
+    'AP_PDRL_Commander',
 ]
 
 def get_legacy_defines(sketch_name, bld):

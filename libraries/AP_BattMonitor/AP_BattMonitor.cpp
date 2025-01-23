@@ -20,6 +20,7 @@
 #include "AP_BattMonitor_Torqeedo.h"
 #include "AP_BattMonitor_FuelLevel_Analog.h"
 #include "AP_BattMonitor_Synthetic_Current.h"
+#include "AP_BattMonitor_XKC_Y25_NPN.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -376,6 +377,10 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_EFI(*this, state[instance], _params[instance]);
                 break;
 #endif // AP_BATTERY_EFI_ENABLED
+
+            case Type::XKC_Y25_NPN:
+            	drivers[instance] = new AP_BattMonitor_XKC_Y25_NPN(*this, state[instance], _params[instance]);
+            	break;
             case Type::NONE:
             default:
                 break;

@@ -141,6 +141,13 @@ void AP_Compass_MMC5XX3::timer()
     const uint16_t sensitivity = 4096U; // counts per Gauss, 16 bit mode
     constexpr float counts_to_milliGauss = 1.0e3f / sensitivity;
 
+    uint32_t now = AP_HAL::millis();
+    if (now - last_sample_ms > 500) {
+        // seems to be stuck or on first sample, reset state machine
+        state = MMCState::STATE_SET;
+        last_sample_ms = now;
+    }
+
     /*
       we use the SET/RESET method to remove bridge offset every
       measure_count_limit measurements. This involves a fairly complex
@@ -250,6 +257,12 @@ void AP_Compass_MMC5XX3::timer()
             offset = offset * 0.5f + new_offset * 0.5f;
         }
 
+        last_sample_ms = AP_HAL::millis();
+        // sensor is not FRD
+//        field.y = -field.y;
+        field.x = -field.x;
+        field.z = -field.z;
+
         accumulate_sample(field, compass_instance);
 
         if (!dev->write_register(REG_CONTROL0, REG_CONTROL0_TMM)) {
@@ -288,6 +301,13 @@ void AP_Compass_MMC5XX3::timer()
                        float((data1[4] << 8) + data1[5]) - zero_offset};
         field *= counts_to_milliGauss;
         field -= offset;
+        // sensor is not FRD
+        last_sample_ms = AP_HAL::millis();
+        // sensor is not FRD
+//        field.y = -field.y;
+        field.x = -field.x;
+        field.z = -field.z;
+
         accumulate_sample(field, compass_instance);
 
         // we stay in STATE_MEASURE for measure_count_limit cycles

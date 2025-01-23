@@ -4,7 +4,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-#define LOITER_SPEED_DEFAULT                1250.0f // default loiter speed in cm/s
+#define LOITER_SPEED_DEFAULT                800.0f // default loiter speed in cm/s
 #define LOITER_SPEED_MIN                    20.0f   // minimum loiter speed in cm/s
 #define LOITER_ACCEL_MAX_DEFAULT            500.0f  // default acceleration in loiter mode
 #define LOITER_BRAKE_ACCEL_DEFAULT          250.0f  // minimum acceleration in loiter mode

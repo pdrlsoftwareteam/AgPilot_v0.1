@@ -29,6 +29,7 @@
 #include "AP_Proximity_DroneCAN.h"
 
 #include <AP_Logger/AP_Logger.h>
+#include "GCS_MAVLink/GCS.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -46,7 +47,7 @@ const AP_Param::GroupInfo AP_Proximity::var_info[] = {
     // @Description: Ignore proximity data that is within 1 meter of the ground below the vehicle. This requires a downward facing rangefinder
     // @Values: 0:Disabled, 1:Enabled
     // @User: Standard
-    AP_GROUPINFO_FRAME("_IGN_GND", 16, AP_Proximity, _ign_gnd_enable, 0, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER),
+    AP_GROUPINFO_FRAME("_IGN_GND", 16, AP_Proximity, _ign_gnd_enable, 0, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER),
 
     // @Param: _LOG_RAW
     // @DisplayName: Proximity raw distances log
@@ -72,7 +73,7 @@ const AP_Param::GroupInfo AP_Proximity::var_info[] = {
     // @Units: m
     // @Range: 0 10
     // @User: Advanced
-    AP_GROUPINFO_FRAME("_ALT_MIN", 25, AP_Proximity, _alt_min, 1.0f, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_HELI | AP_PARAM_FRAME_TRICOPTER),
+    AP_GROUPINFO_FRAME("_ALT_MIN", 25, AP_Proximity, _alt_min, 1.0f, AP_PARAM_FRAME_COPTER | AP_PARAM_FRAME_TRICOPTER),
 
     // @Group: 1
     // @Path: AP_Proximity_Params.cpp
@@ -228,6 +229,15 @@ void AP_Proximity::update()
     boundary.check_face_timeout();
 }
 
+float AP_Proximity::getDist(){
+
+	    Proximity_Distance_Array dist_array{};
+	    get_horizontal_distances(dist_array);
+	    return dist_array.distance[0];
+//	    printf("prx dist: %f\n",dist_array.distance[0]);
+//		gcs().send_text(MAV_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
+
+}
 AP_Proximity::Type AP_Proximity::get_type(uint8_t instance) const
 {
     if (instance < PROXIMITY_MAX_INSTANCES) {

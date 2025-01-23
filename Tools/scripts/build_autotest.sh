@@ -75,7 +75,7 @@ python setup.py build install --user
 popd
 
 echo "Updating pymavlink"
-pushd APM/modules/mavlink/pymavlink
+pushd APM/modules/bhumi_mavlink/pymavlink
 git show
 python setup.py build install --user
 popd
