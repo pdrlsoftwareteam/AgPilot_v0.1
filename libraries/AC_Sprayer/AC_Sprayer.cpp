@@ -133,46 +133,8 @@ void AC_Sprayer::update()
         velocity.zero();
     }
 
-    // float ground_speed = velocity.xy().length() * 100.0;
 
-    // get the current time
-    // const uint32_t now = AP_HAL::millis();
-
-    bool should_be_spraying = _flags.spraying;
-    // check our speed vs the minimum
-        // if we are not already spraying
-            // set the timer if this is the first time we've surpassed the min speed
-                // check if we've been over the speed long enough to engage the sprayer
-        // reset the speed under timer
-        // we are under the min speed.
-            // set the timer if this is the first time we've dropped below the min speed
-                // check if we've been over the speed long enough to engage the sprayer
-        // reset the speed over timer
-//                if((now - _speed_over_min_time) > AC_SPRAYER_DEFAULT_TURN_ON_DELAY) {
-//                    should_be_spraying = true;
-//                    _speed_over_min_time = 0;
-//                }
-//            }
-//        }
-//        // reset the speed under timer
-//        _speed_under_min_time = 0;
-//    } else {
-//        // we are under the min speed.
-//        if (_flags.spraying) {
-//            // set the timer if this is the first time we've dropped below the min speed
-//            if (_speed_under_min_time == 0) {
-//                _speed_under_min_time = now;
-//            }else{
-//                // check if we've been over the speed long enough to engage the sprayer
-//                if((now - _speed_under_min_time) > AC_SPRAYER_DEFAULT_SHUT_OFF_DELAY) {
-//                    should_be_spraying = false;
-//                    _speed_under_min_time = 0;
-//                }
-//            }
-//        }
-//        // reset the speed over timer
-//        _speed_over_min_time = 0;
-//    }
+    bool should_be_spraying = 1;
 
     // if testing pump output speed as if traveling at 1m/s
     if (_flags.testing) {
@@ -181,11 +143,18 @@ void AC_Sprayer::update()
 
     // if spraying or testing update the pump servo position
     if (should_be_spraying) {
-        float pos = 100 *_pump_pct_1ms/*ground_speed * _pump_pct_1ms*/;
+        float input_min = 10.0;
+        float input_max = 100.0;
+        float min_value = 3000.0;
+        float max_value = 10000.0;
+
+        float pos = min_value + ((_pump_pct_1ms - input_min) / (input_max - input_min)) * (max_value - min_value);
 
         pos = MAX(pos, 100 *_pump_min_pct); // ensure min pump speed
 
         pos = MIN(pos,10000); // clamp to range
+//        printf("POS: %f\t_pump_pct_1ms: %f\n",pos,(float)_pump_pct_1ms);
+
         SRV_Channels::move_servo(SRV_Channel::k_sprayer_pump, pos, 0, 10000);
         SRV_Channels::set_output_pwm(SRV_Channel::k_sprayer_spinner, _spinner_pwm);
 //         printf("POS: %f\t_spinner_pwm: %d\n",pos,(int)_spinner_pwm);
@@ -198,12 +167,12 @@ void AC_Sprayer::update()
 
 void AC_Sprayer::setPulseCount(uint64_t value)
 {
-	Pulse_count = value;
+    Pulse_count = value;
 }
 
 uint64_t AC_Sprayer::getPulseCount()
 {
-	return Pulse_count;
+    return Pulse_count;
 }
 
 namespace AP {
