@@ -24,6 +24,9 @@ public:
 
     void init(void) override {}
 
+	uint64_t pcount = 0;
+	uint16_t cnt = 0;
+
 private:
     void irq_handler(uint8_t pin, bool pin_state, uint32_t timestamp);
 

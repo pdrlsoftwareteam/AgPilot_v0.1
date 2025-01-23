@@ -65,7 +65,10 @@ public:
     void update();
 
     static const struct AP_Param::GroupInfo var_info[];
+    void setPulseCount(uint64_t value);
+    uint64_t getPulseCount();
 
+    uint64_t Pulse_count;
 private:
 
     // parameters
