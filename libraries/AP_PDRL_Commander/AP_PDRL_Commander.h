@@ -82,6 +82,7 @@ public:
 	void sendKey();
 	void sendLogFile(mavlink_command_transfer_t *rcvedPacket);
 	void sendLogFileSignature(mavlink_command_transfer_t *rcvedPacket);
+	void sendSprayStatus();
 	void sendCommand(
 			uint16_t item_offset,
 			uint8_t command,

@@ -172,7 +172,7 @@ bool AP_RTC::get_local_date_time(uint16_t &year, uint8_t &month, uint8_t &day,
     hal.console->printf("Time: %02u:%02u:%02u.%03u\n", hour, min, sec, ms);
 
     // Calculate the date (day, month, year)
-    int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    uint32_t days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     year = 1970;
 
     while (days_since_epoch >= (is_leap_year(year) ? DAYS_PER_LEAP_YEAR : DAYS_PER_YEAR)) {

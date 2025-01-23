@@ -8,6 +8,10 @@
 #include "AP_LIBNPNT/PdrlBootPlugin.h"
 #include "AC_Avoidance/AP_OAPathPlanner.h"
 #include "AC_Avoidance/AC_Avoid.h"
+#include "AC_Sprayer/AC_Sprayer.h"
+#include "AP_AHRS/AP_AHRS.h"
+#include "AP_BattMonitor/AP_BattMonitor_FuelFlow.h"
+#include "AP_Arming/AP_Arming.h"
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
 #include "hal.h"
 #include "hwdef.h"
@@ -60,11 +64,11 @@ void AP_PDRL_COMMANDER::sendDroneID()
 
 void AP_PDRL_COMMANDER::sendKey()
 {
-//	uint16_t keyLen = 0;
+	//	uint16_t keyLen = 0;
 	keyStore->keyTransferTest = KEY_TRANSFER_IDEAL;
 	uint8_t *ptr = (uint8_t*)pdrlPublicKey;
 	uint16_t keyLen = strlen(pdrlPublicKey);
-//	keyStore->readKey(keyStore->temp5kBuff ,&keyLen,KEY_TYPE_PUBLIC);
+	//	keyStore->readKey(keyStore->temp5kBuff ,&keyLen,KEY_TYPE_PUBLIC);
 	uint16_t numberOfBlockToSend = (( KEY_TRANSFER_BLOCK_SIZE-(keyLen%KEY_TRANSFER_BLOCK_SIZE) )+keyLen) / KEY_TRANSFER_BLOCK_SIZE;
 	for(int i = 0 ; i < numberOfBlockToSend;i++)
 	{
@@ -196,6 +200,28 @@ void AP_PDRL_COMMANDER::sendLogFileSignature(mavlink_command_transfer_t *rcvedPa
 	return;
 }
 
+void AP_PDRL_COMMANDER::sendSprayStatus()
+{
+
+	if(AP::arming().is_armed())
+	{
+		uint8_t dataBuff[100] = {0};
+		// send spray status only if the sprayer is enabled
+		dataBuff[0] = AP::sprayer()->spraying() || AP::sprayer()->running();
+
+		if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
+		{
+			sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
+			//		printf("Sent Spray Status: %d\n",dataBuff[0]);
+			return;
+		}
+		dataBuff[0] = 0;
+		sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
+
+	}
+
+}
+
 void AP_PDRL_COMMANDER::sendCommand(
 		uint16_t item_offset,
 		uint8_t command,
@@ -277,6 +303,9 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	COMMAND_PDRL command = (COMMAND_PDRL)packet.command;
 	switch(command)
 	{
+	case COMMAND_SET_SPRAY_STATUS:
+		break;
+
 	case COMMAND_GET_DRONE_ID:
 		//load varibles with required data
 		sendDroneID();
@@ -284,7 +313,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_START_KEY_GENERATION:
 	{
-//		keyStore->setGenarateKeyFlagForReboot();
+		//		keyStore->setGenarateKeyFlagForReboot();
 		keyStore->keyTransferTest = KEY_TRANSFER_GENARATE_KEY;
 		//reboot device
 		//			hal.scheduler->reboot(true);
@@ -345,12 +374,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "3z91vt18";
 		// End section oemName
 
-	    strcpy(oemName,"m");
-        // if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-        // {
-        //     lastUnlock = AP_HAL::millis();
-        //     isUnlocked = true;
-        // }
+		strcpy(oemName,"m");
+		// if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+		// {
+		//     lastUnlock = AP_HAL::millis();
+		//     isUnlocked = true;
+		// }
 	}
 	break;
 
@@ -413,11 +442,11 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		flag_Status[14] = AP::ac_avoid()->get_manFlag();
 		flag_Status[15] = 0x4F;
 		flag_Status[16] = AP::ap_oapathplanner()->get_autoFlag();
-		sendCommand(0,COMMAND_GET_FLIGHT_PAYLOAD_DETAILS,COMMAND_TYPE_GET,0,17,2,flag_Status);
-//		gcs().send_text(MAV_SEVERITY_ERROR, "Sent flag status");
+		sendCommand(0,COMMAND_SET_FLIGHT_PAYLOAD_DETAILS,COMMAND_TYPE_GET,0,17,2,flag_Status);
+		//		gcs().send_text(MAV_SEVERITY_ERROR, "Sent flag status");
 
 	}
-		break;
+	break;
 
 	case COMMAND_GET_FLIGHT_PAYLOAD_DETAILS:
 		break;
