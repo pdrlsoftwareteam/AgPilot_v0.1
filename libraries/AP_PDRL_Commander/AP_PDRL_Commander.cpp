@@ -41,14 +41,14 @@ AP_PDRL_COMMANDER::~AP_PDRL_COMMANDER()
 void AP_PDRL_COMMANDER::getUniqueBoardID(char buf[100])
 {
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-	char serialid[] = "P0000100000000000000000001234";
+	char serialid[] = "AG000100000000000000000001234";
 	memcpy(buf,serialid,29);
 #else
 	uint8_t serialid[12];
 	memcpy(serialid, (const void *)UDID_START, 12);
 
 	// this format is chosen to match the format used by HAL_PX4
-	snprintf(buf, 31, "P00001%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+	snprintf(buf, 31, "AG0001%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 			(unsigned)serialid[3], (unsigned)serialid[2], (unsigned)serialid[1], (unsigned)serialid[0],
 			(unsigned)serialid[7], (unsigned)serialid[6], (unsigned)serialid[5], (unsigned)serialid[4],
 			(unsigned)serialid[11], (unsigned)serialid[10], (unsigned)serialid[9],(unsigned)serialid[8]);
