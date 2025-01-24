@@ -52,6 +52,7 @@
 #include "entropy_poll.h"
 
 #include <string.h>
+#include <time.h>
 
 #if defined(MBEDTLS_PKCS1_V21)
 #include "mbedtls_md.h"
@@ -573,7 +574,7 @@ int mbedtls_rsa_gen_key( mbedtls_rsa_context *ctx,
     do
     {
 #if USE_PRIME_LOOPUP
-    	uint32_t index  = millis();
+    	uint32_t index = millis();
     	index = index%MAX_PRIME_LOOKUP_NUM;
     	static int cnt = 0;
     	ctx->P.n = 32;

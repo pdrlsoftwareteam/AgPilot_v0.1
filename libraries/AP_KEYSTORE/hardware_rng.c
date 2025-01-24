@@ -50,6 +50,7 @@
 
 #include "mbedtls_config.h"
 
+
 #ifdef MBEDTLS_ENTROPY_HARDWARE_ALT
 
 #include "entropy_poll.h"
@@ -62,7 +63,7 @@ int mbedtls_hardware_poll( void *Data, unsigned char *Output, size_t Len, size_t
 		
   for (index = 0; index < Len/4; index++)
   {
-        randomValue = rand();
+       randomValue=rand();
       *oLen += 4;
       memset(&(Output[index * 4]), (int)randomValue, 4);
   }
