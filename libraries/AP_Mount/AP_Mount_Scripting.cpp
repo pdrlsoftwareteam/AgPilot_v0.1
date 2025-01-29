@@ -3,14 +3,14 @@
 #if HAL_MOUNT_SCRIPTING_ENABLED
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
 #define AP_MOUNT_SCRIPTING_TIMEOUT_MS    1000   // scripting mount becomes unhealthy after 1sec with no updates
 
 #define AP_MOUNT_SCRIPTING_DEBUG 0
-#define debug(fmt, args ...) do { if (AP_MOUNT_SCRIPTING_DEBUG) { GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Siyi: " fmt, ## args); } } while (0)
+#define debug(fmt, args ...) do { if (AP_MOUNT_SCRIPTING_DEBUG) { GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Siyi: " fmt, ## args); } } while (0)
 
 // update mount position - should be called periodically
 void AP_Mount_Scripting::update()
@@ -18,7 +18,7 @@ void AP_Mount_Scripting::update()
     // update based on mount mode
     switch (get_mode()) {
         // move mount to a "retracted" position.  To-Do: remove support and replace with a relaxed mode?
-        case MAV_MOUNT_MODE_RETRACT: {
+        case AGPILOT_MOUNT_MODE_RETRACT: {
             const Vector3f &angle_bf_target = _params.retract_angles.get();
             target_angle_rad.roll = ToRad(angle_bf_target.x);
             target_angle_rad.pitch = ToRad(angle_bf_target.y);
@@ -33,7 +33,7 @@ void AP_Mount_Scripting::update()
         }
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             const Vector3f &angle_bf_target = _params.neutral_angles.get();
             target_angle_rad.roll = ToRad(angle_bf_target.x);
             target_angle_rad.pitch = ToRad(angle_bf_target.y);
@@ -48,7 +48,7 @@ void AP_Mount_Scripting::update()
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 target_angle_rad = mavt_target.angle_rad;
@@ -66,7 +66,7 @@ void AP_Mount_Scripting::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's rc inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -84,7 +84,7 @@ void AP_Mount_Scripting::update()
         }
 
         // point mount towards a GPS point
-        case MAV_MOUNT_MODE_GPS_POINT: {
+        case AGPILOT_MOUNT_MODE_GPS_POINT: {
             target_loc_valid = _roi_target_set;
             if (target_loc_valid) {
                 target_loc = _roi_target;
@@ -97,7 +97,7 @@ void AP_Mount_Scripting::update()
         }
 
         // point mount towards home
-        case MAV_MOUNT_MODE_HOME_LOCATION: {
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION: {
             target_loc_valid = AP::ahrs().home_is_set();
             if (target_loc_valid) {
                 target_loc = AP::ahrs().get_home();
@@ -110,7 +110,7 @@ void AP_Mount_Scripting::update()
         }
 
         // point mount towards another vehicle
-        case MAV_MOUNT_MODE_SYSID_TARGET: {
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET: {
             target_loc_valid = _target_sysid_location_set;
             if (target_loc_valid) {
                 target_loc = _target_sysid_location;

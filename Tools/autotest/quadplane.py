@@ -300,52 +300,52 @@ class AutoTestQuadPlane(AutoTest):
         self.wait_disarmed(timeout=120) # give quadplane a long time to land
 
     def EXTENDED_SYS_STATE_SLT(self):
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, 10)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, 10)
         self.change_mode("QHOVER")
-        self.assert_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                       mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND)
+        self.assert_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                       mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND)
         self.change_mode("FBWA")
-        self.assert_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_FW,
-                                       mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND)
+        self.assert_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_FW,
+                                       mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND)
         self.change_mode("QHOVER")
 
         self.wait_ready_to_arm()
         self.arm_vehicle()
 
         # should not change just because we arm:
-        self.assert_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                       mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND)
+        self.assert_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                       mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND)
         self.change_mode("MANUAL")
-        self.assert_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_FW,
-                                       mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND)
+        self.assert_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_FW,
+                                       mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND)
         self.change_mode("QHOVER")
 
         self.progress("Taking off")
         self.set_rc(3, 1750)
         self.wait_altitude(1, 5, relative=True)
-        self.assert_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                       mavutil.mavlink.MAV_LANDED_STATE_IN_AIR)
+        self.assert_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                       mavutil.mavlink.AGPILOT_LANDED_STATE_IN_AIR)
         self.wait_altitude(10, 15, relative=True)
 
         self.progress("Transitioning to fixed wing")
         self.change_mode("FBWA")
         self.set_rc(3, 1900) # apply spurs
-        self.wait_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_TRANSITION_TO_FW,
-                                     mavutil.mavlink.MAV_LANDED_STATE_IN_AIR)
-        self.wait_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_FW,
-                                     mavutil.mavlink.MAV_LANDED_STATE_IN_AIR)
+        self.wait_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_TRANSITION_TO_FW,
+                                     mavutil.mavlink.AGPILOT_LANDED_STATE_IN_AIR)
+        self.wait_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_FW,
+                                     mavutil.mavlink.AGPILOT_LANDED_STATE_IN_AIR)
 
         self.progress("Transitioning to multicopter")
         self.set_rc(3, 1500) # apply reins
         self.change_mode("QHOVER")
         # for a standard quadplane there is no transition-to-mc stage.
         # tailsitters do have such a state.
-        self.wait_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                     mavutil.mavlink.MAV_LANDED_STATE_IN_AIR)
+        self.wait_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                     mavutil.mavlink.AGPILOT_LANDED_STATE_IN_AIR)
         self.change_mode("QLAND")
         self.wait_altitude(0, 2, relative=True, timeout=60)
-        self.wait_extended_sys_state(mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                     mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND)
+        self.wait_extended_sys_state(mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                     mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND)
         self.mav.motors_disarmed_wait()
 
     def EXTENDED_SYS_STATE(self):
@@ -791,7 +791,7 @@ class AutoTestQuadPlane(AutoTest):
         new_alt = 100
         initial_altitude = self.get_altitude(relative=False, timeout=2)
         self.run_cmd_int(
-            mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+            mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
             0,
             1,  # reposition flags; 1 means "change to guided"
             0,
@@ -799,7 +799,7 @@ class AutoTestQuadPlane(AutoTest):
             int(loc.lat * 1e7),
             int(loc.lng * 1e7),
             new_alt,    # alt
-            frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
         )
         self.wait_altitude(
             new_alt-1,
@@ -851,7 +851,7 @@ class AutoTestQuadPlane(AutoTest):
         self.location_offset_ne(loc, ofs_n, ofs_e)
         initial_altitude = self.get_altitude(relative=False, timeout=2)
         self.run_cmd_int(
-            mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+            mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
             0,
             1,  # reposition flags; 1 means "change to guided"
             0,
@@ -859,7 +859,7 @@ class AutoTestQuadPlane(AutoTest):
             int(loc.lat * 1e7),
             int(loc.lng * 1e7),
             reposition_alt,    # alt
-            frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
         )
         self.wait_altitude(
             reposition_alt-1,
@@ -1033,7 +1033,7 @@ class AutoTestQuadPlane(AutoTest):
             disarmed = True
         except ValueError as e:
             self.progress("Got %s" % repr(e))
-            if "Expected MAV_RESULT_ACCEPTED got MAV_RESULT_FAILED" not in str(e):
+            if "Expected AGPILOT_RESULT_ACCEPTED got AGPILOT_RESULT_FAILED" not in str(e):
                 raise e
         if disarmed:
             raise NotAchievedException("Disarmed when we shouldn't have")
@@ -1045,20 +1045,20 @@ class AutoTestQuadPlane(AutoTest):
         self.takeoff(5, 'QHOVER')
         self.change_mode('QLAND')
         try:
-            self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, 10)
+            self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, 10)
             self.wait_extended_sys_state(
-                landed_state=mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND,
-                vtol_state=mavutil.mavlink.MAV_VTOL_STATE_MC,
+                landed_state=mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND,
+                vtol_state=mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
                 timeout=60
             )
         except Exception:
-            self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, 0)
+            self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, 0)
             raise
 
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, -1)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, -1)
         self.disarm_vehicle()
 
-    def MAV_CMD_NAV_LOITER_TO_ALT(self, target_system=1, target_component=1):
+    def AGPILOT_CMD_NAV_LOITER_TO_ALT(self, target_system=1, target_component=1):
         '''ensure consecutive loiter to alts work'''
         self.load_mission('mission.txt')
         self.change_mode('AUTO')
@@ -1160,19 +1160,19 @@ class AutoTestQuadPlane(AutoTest):
         self.delay_sim_time(5)
         self.set_rc(9, 1000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             True,
             True)
         self.set_rc(9, 2000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             False,
             True)
         self.set_rc(9, 1000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             True,
             True)
@@ -1229,7 +1229,7 @@ class AutoTestQuadPlane(AutoTest):
             self.MidAirDisarmDisallowed,
             self.BootInAUTO,
             self.Ship,
-            self.MAV_CMD_NAV_LOITER_TO_ALT,
+            self.AGPILOT_CMD_NAV_LOITER_TO_ALT,
             self.LoiterAltQLand,
             self.VTOLLandSpiral,
             self.VTOLQuicktune,

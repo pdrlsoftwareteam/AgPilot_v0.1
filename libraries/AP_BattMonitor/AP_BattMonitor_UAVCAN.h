@@ -48,7 +48,7 @@ public:
 
     bool get_cycle_count(uint16_t &cycles) const override;
 
-    // return mavlink fault bitmask (see MAV_BATTERY_FAULT enum)
+    // return mavlink fault bitmask (see AGPILOT_BATTERY_FAULT enum)
     uint32_t get_mavlink_fault_bitmask() const override;
 
     static void subscribe_msgs(AP_UAVCAN* ap_uavcan);

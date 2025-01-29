@@ -8,12 +8,12 @@
 #include "AP_OpticalFlow_Pixart.h"
 #include "AP_OpticalFlow_PX4Flow.h"
 #include "AP_OpticalFlow_CXOF.h"
-#include "AP_OpticalFlow_MAV.h"
+#include "AP_OpticalFlow_AGPILOT.h"
 #include "AP_OpticalFlow_HereFlow.h"
 #include "AP_OpticalFlow_MSP.h"
 #include "AP_OpticalFlow_UPFLOW.h"
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -31,7 +31,7 @@ const AP_Param::GroupInfo AP_OpticalFlow::var_info[] = {
     // @Param: _TYPE
     // @DisplayName: Optical flow sensor type
     // @Description: Optical flow sensor type
-    // @Values: 0:None, 1:PX4Flow, 2:Pixart, 3:Bebop, 4:CXOF, 5:MAVLink, 6:DroneCAN, 7:MSP, 8:UPFLOW
+    // @Values: 0:None, 1:PX4Flow, 2:Pixart, 3:Bebop, 4:CXOF, 5:AGPILOTLink, 6:DroneCAN, 7:MSP, 8:UPFLOW
     // @User: Standard
     // @RebootRequired: True
     AP_GROUPINFO_FLAGS("_TYPE", 0,  AP_OpticalFlow,    _type,   (float)OPTICAL_FLOW_TYPE_DEFAULT, AP_PARAM_FLAG_ENABLE),
@@ -148,9 +148,9 @@ void AP_OpticalFlow::init(uint32_t log_bit)
         backend = AP_OpticalFlow_CXOF::detect(*this);
 #endif
         break;
-    case Type::MAVLINK:
-#if AP_OPTICALFLOW_MAV_ENABLED
-        backend = AP_OpticalFlow_MAV::detect(*this);
+    case Type::AGPILOTLINK:
+#if AP_OPTICALFLOW_AGPILOT_ENABLED
+        backend = AP_OpticalFlow_AGPILOT::detect(*this);
 #endif
         break;
     case Type::UAVCAN:
@@ -204,7 +204,7 @@ void AP_OpticalFlow::update(void)
             _flowScalerY.set_and_save_ifchanged((flow_scalery_as_multiplier - 1.0) * 1000.0);
             _flowScalerX.notify();
             _flowScalerY.notify();
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "FlowCal: FLOW_FXSCALER=%d, FLOW_FYSCALER=%d", (int)_flowScalerX, (int)_flowScalerY);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "FlowCal: FLOW_FXSCALER=%d, FLOW_FYSCALER=%d", (int)_flowScalerX, (int)_flowScalerY);
         }
     }
 }
@@ -241,7 +241,7 @@ void AP_OpticalFlow::start_calibration()
     if (_calibrator == nullptr) {
         _calibrator = new AP_OpticalFlow_Calibrator();
         if (_calibrator == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "FlowCal: failed to start");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "FlowCal: failed to start");
             return;
         }
     }

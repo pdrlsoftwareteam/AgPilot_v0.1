@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 
 #include "AP_NavEKF3_core.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
@@ -801,7 +801,7 @@ bool NavEKF3::InitialiseFilter(void)
 
         // check if there is enough memory to create the EKF cores
         if (AP::dal().available_memory() < sizeof(NavEKF3_core)*num_cores + 4096) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 not enough memory");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 not enough memory");
             _enable.set(0);
             num_cores = 0;
             return false;
@@ -812,7 +812,7 @@ bool NavEKF3::InitialiseFilter(void)
         if (core == nullptr) {
             _enable.set(0);
             num_cores = 0;
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 allocation failed");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 allocation failed");
             return false;
         }
 
@@ -984,7 +984,7 @@ void NavEKF3::UpdateFilter(void)
             coreLastTimePrimary_us[primary] = imuSampleTime_us;
             primary = newPrimaryIndex;
             lastLaneSwitch_ms = AP::dal().millis();
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 lane switch %u", primary);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 lane switch %u", primary);
         }       
     }
 
@@ -1044,7 +1044,7 @@ void NavEKF3::checkLaneSwitch(void)
         updateLaneSwitchPosDownResetData(newPrimaryIndex, primary);
         primary = newPrimaryIndex;
         lastLaneSwitch_ms = now;
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 lane switch %u", primary);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 lane switch %u", primary);
     }
 }
 
@@ -1397,7 +1397,7 @@ bool NavEKF3::setOriginLLH(const Location &loc)
         // or if the EKF origin has already been set.
         // This is to prevent accidental setting of EKF origin with an
         // invalid position or height or causing upsets from a shifting origin.
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF3 refusing set origin");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "EKF3 refusing set origin");
         return false;
     }
     bool ret = false;
@@ -1795,7 +1795,7 @@ void NavEKF3::getFilterStatus(nav_filter_status &status) const
 }
 
 // send an EKF_STATUS_REPORT message to GCS
-void NavEKF3::send_status_report(GCS_MAVLINK &link) const
+void NavEKF3::send_status_report(GCS_AGPILOTLINK &link) const
 {
     if (core) {
         core[primary].send_status_report(link);

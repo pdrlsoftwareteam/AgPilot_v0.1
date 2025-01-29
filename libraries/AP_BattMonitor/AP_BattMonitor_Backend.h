@@ -71,7 +71,7 @@ public:
     // reset remaining percentage to given value
     virtual bool reset_remaining(float percentage);
 
-    // return mavlink fault bitmask (see MAV_BATTERY_FAULT enum)
+    // return mavlink fault bitmask (see AGPILOT_BATTERY_FAULT enum)
     virtual uint32_t get_mavlink_fault_bitmask() const { return 0; }
 
     // logging functions 

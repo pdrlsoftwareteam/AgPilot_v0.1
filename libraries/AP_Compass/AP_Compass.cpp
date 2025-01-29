@@ -8,7 +8,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_Compass_config.h"
 
@@ -1479,7 +1479,7 @@ void Compass::_detect_backends(void)
                 }
                 // We have found a replacement mag, let's replace the existing one
                 // with this by setting the priority to zero and calling uavcan probe 
-                gcs().send_text(MAV_SEVERITY_ALERT, "Mag: Compass #%d with DEVID %lu replaced", uint8_t(i), (unsigned long)_priority_did_list[i]);
+                gcs().send_text(AGPILOT_SEVERITY_ALERT, "Mag: Compass #%d with DEVID %lu replaced", uint8_t(i), (unsigned long)_priority_did_list[i]);
                 _priority_did_stored_list[i].set_and_save(0);
                 _priority_did_list[i] = 0;
 
@@ -1587,7 +1587,7 @@ void Compass::_reset_compass_id()
         }
         if (!_get_state(i).registered) {
             _priority_did_stored_list[i].set_and_save(0);
-            GCS_SEND_TEXT(MAV_SEVERITY_ALERT, "Mag: Compass #%d with DEVID %lu removed", uint8_t(i), (unsigned long)_priority_did_list[i]);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ALERT, "Mag: Compass #%d with DEVID %lu removed", uint8_t(i), (unsigned long)_priority_did_list[i]);
         }
     }
 

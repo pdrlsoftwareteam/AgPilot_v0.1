@@ -30,7 +30,7 @@
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 #include <AP_EFI/AP_EFI_Currawong_ECU.h>
@@ -408,7 +408,7 @@ void AP_PiccoloCAN::update()
     }
 }
 
-// send ESC telemetry messages over MAVLink
+// send ESC telemetry messages over AGPILOTLink
 void AP_PiccoloCAN::send_esc_telemetry_mavlink(uint8_t mav_chan)
 {
     // Arrays to store ESC telemetry data

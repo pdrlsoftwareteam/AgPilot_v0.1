@@ -20,7 +20,7 @@
 #if AP_FILESYSTEM_MISSION_ENABLED
 
 #include "AP_Filesystem_backend.h"
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Common/ExpandingString.h>
 
 class AP_Filesystem_Mission : public AP_Filesystem_Backend
@@ -47,7 +47,7 @@ private:
     // header at front of the file
     struct header {
         uint16_t magic = mission_magic;
-        uint16_t data_type; // MAV_MISSION_TYPE_*
+        uint16_t data_type; // AGPILOT_MISSION_TYPE_*
         uint16_t options; // optional features
         uint16_t start; // first WP num, 0 for full upload
         uint16_t num_items;
@@ -58,17 +58,17 @@ private:
         ExpandingString *writebuf;
         uint32_t file_ofs;
         uint32_t num_items;
-        enum MAV_MISSION_TYPE mtype;
+        enum AGPILOT_MISSION_TYPE mtype;
         uint32_t last_op_ms;
     } file[max_open_file];
 
-    bool check_file_name(const char *fname, enum MAV_MISSION_TYPE &mtype);
+    bool check_file_name(const char *fname, enum AGPILOT_MISSION_TYPE &mtype);
 
     // get one item
-    bool get_item(uint32_t idx, enum MAV_MISSION_TYPE mtype, mavlink_mission_item_int_t &item) const;
+    bool get_item(uint32_t idx, enum AGPILOT_MISSION_TYPE mtype, mavlink_mission_item_int_t &item) const;
 
     // get number of items
-    uint32_t get_num_items(enum MAV_MISSION_TYPE mtype) const;
+    uint32_t get_num_items(enum AGPILOT_MISSION_TYPE mtype) const;
 
     // finish loading items
     bool finish_upload(const rfile &r);

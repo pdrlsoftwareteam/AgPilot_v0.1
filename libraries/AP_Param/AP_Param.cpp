@@ -29,7 +29,7 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <StorageManager/StorageManager.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_InternalError/AP_InternalError.h>
@@ -66,9 +66,9 @@ AP_Param *AP_Param::_singleton;
 // Note about AP_Vector3f handling.
 // The code has special cases for AP_Vector3f to allow it to be viewed
 // as both a single 3 element vector and as a set of 3 AP_Float
-// variables. This is done to make it possible for MAVLink to see
+// variables. This is done to make it possible for AGPILOTLink to see
 // vectors as parameters, which allows users to save their compass
-// offsets in MAVLink parameter files. The code involves quite a few
+// offsets in AGPILOTLink parameter files. The code involves quite a few
 // special cases which could be generalised to any vector/matrix type
 // if we end up needing this behaviour for other than AP_Vector3f
 
@@ -2511,7 +2511,7 @@ void AP_Param::send_parameter(const char *name, enum ap_var_type var_type, uint8
     // for vectors we need to send 3 messages. Note that we also come here for the case
     // of a set of the first element of a AP_Vector3f. This happens as the ap->save() call can't
     // distinguish between a vector and scalar save. It means that setting first element of a vector
-    // via MAVLink results in sending all 3 elements to the GCS
+    // via AGPILOTLink results in sending all 3 elements to the GCS
 #if HAL_GCS_ENABLED
     const Vector3f &v = ((AP_Vector3f *)this)->get();
     char name2[AP_MAX_NAME_SIZE+1];

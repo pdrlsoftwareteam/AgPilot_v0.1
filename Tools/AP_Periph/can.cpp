@@ -2340,13 +2340,13 @@ void AP_Periph_FW::can_rangefinder_update(void)
         break;
     }
     switch (rangefinder.get_mav_distance_sensor_type_orient(ROTATION_NONE)) {
-    case MAV_DISTANCE_SENSOR_LASER:
+    case AGPILOT_DISTANCE_SENSOR_LASER:
         pkt.sensor_type = UAVCAN_EQUIPMENT_RANGE_SENSOR_MEASUREMENT_SENSOR_TYPE_LIDAR;
         break;
-    case MAV_DISTANCE_SENSOR_ULTRASOUND:
+    case AGPILOT_DISTANCE_SENSOR_ULTRASOUND:
         pkt.sensor_type = UAVCAN_EQUIPMENT_RANGE_SENSOR_MEASUREMENT_SENSOR_TYPE_SONAR;
         break;
-    case MAV_DISTANCE_SENSOR_RADAR:
+    case AGPILOT_DISTANCE_SENSOR_RADAR:
         pkt.sensor_type = UAVCAN_EQUIPMENT_RANGE_SENSOR_MEASUREMENT_SENSOR_TYPE_RADAR;
         break;
     default:
@@ -2436,7 +2436,7 @@ void AP_Periph_FW::can_proximity_update()
 
 #ifdef HAL_PERIPH_ENABLE_ADSB
 /*
-  map an ADSB_VEHICLE MAVLink message to a UAVCAN TrafficReport message
+  map an ADSB_VEHICLE AGPILOTLink message to a UAVCAN TrafficReport message
  */
 void AP_Periph_FW::can_send_ADSB(struct __mavlink_adsb_vehicle_t &msg)
 {

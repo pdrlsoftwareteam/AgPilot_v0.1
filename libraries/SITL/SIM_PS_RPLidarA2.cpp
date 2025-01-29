@@ -20,7 +20,7 @@
 
 #if HAL_SIM_PS_RPLIDARA2_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 #include <errno.h>
 

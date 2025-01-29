@@ -125,7 +125,7 @@ public:
     typedef uint16_t CanIOFlags;
     static const CanIOFlags Loopback = 1;
     static const CanIOFlags AbortOnError = 2;
-    static const CanIOFlags IsMAVCAN = 4;
+    static const CanIOFlags IsAGPILOTCAN = 4;
 
     // Single Rx Frame with related info
     struct CanRxItem {

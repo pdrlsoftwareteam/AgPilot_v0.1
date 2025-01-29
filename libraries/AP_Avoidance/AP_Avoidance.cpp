@@ -6,7 +6,7 @@ extern const AP_HAL::HAL& hal;
 
 #include <limits>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 #define AVOIDANCE_DEBUGGING 0
@@ -19,7 +19,7 @@ extern const AP_HAL::HAL& hal;
     #define AP_AVOIDANCE_FAIL_DISTANCE_XY_DEFAULT       300
     #define AP_AVOIDANCE_FAIL_DISTANCE_Z_DEFAULT        100
     #define AP_AVOIDANCE_RECOVERY_DEFAULT               RecoveryAction::RESUME_IF_AUTO_ELSE_LOITER
-    #define AP_AVOIDANCE_FAIL_ACTION_DEFAULT            MAV_COLLISION_ACTION_REPORT
+    #define AP_AVOIDANCE_FAIL_ACTION_DEFAULT            AGPILOT_COLLISION_ACTION_REPORT
 #else // APM_BUILD_TYPE(APM_BUILD_ArduCopter),Heli, Rover, Boat
     #define AP_AVOIDANCE_WARN_TIME_DEFAULT              30
     #define AP_AVOIDANCE_FAIL_TIME_DEFAULT              30
@@ -28,7 +28,7 @@ extern const AP_HAL::HAL& hal;
     #define AP_AVOIDANCE_FAIL_DISTANCE_XY_DEFAULT       100
     #define AP_AVOIDANCE_FAIL_DISTANCE_Z_DEFAULT        100
     #define AP_AVOIDANCE_RECOVERY_DEFAULT               RecoveryAction::RTL
-    #define AP_AVOIDANCE_FAIL_ACTION_DEFAULT            MAV_COLLISION_ACTION_REPORT
+    #define AP_AVOIDANCE_FAIL_ACTION_DEFAULT            AGPILOT_COLLISION_ACTION_REPORT
 #endif
 
 #if AVOIDANCE_DEBUGGING
@@ -60,7 +60,7 @@ const AP_Param::GroupInfo AP_Avoidance::var_info[] = {
     // @Description: Specifies aircraft behaviour when a collision may occur
     // @Values: 0:None,1:Report
     // @User: Advanced
-    AP_GROUPINFO("W_ACTION",    3, AP_Avoidance, _warn_action, MAV_COLLISION_ACTION_REPORT),
+    AP_GROUPINFO("W_ACTION",    3, AP_Avoidance, _warn_action, AGPILOT_COLLISION_ACTION_REPORT),
 
     // @Param: F_RCVRY
     // @DisplayName: Recovery behaviour after a fail event
@@ -157,7 +157,7 @@ void AP_Avoidance::init(void)
     }
     _obstacle_count = 0;
     _last_state_change_ms = 0;
-    _threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
+    _threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
     _gcs_cleared_messages_first_sent = std::numeric_limits<uint32_t>::max();
     _current_most_serious_threat = -1;
 }
@@ -193,7 +193,7 @@ bool AP_Avoidance::check_startup()
 
 // vel is north/east/down!
 void AP_Avoidance::add_obstacle(const uint32_t obstacle_timestamp_ms,
-                                const MAV_COLLISION_SRC src,
+                                const AGPILOT_COLLISION_SRC src,
                                 const uint32_t src_id,
                                 const Location &loc,
                                 const Vector3f &vel_ned)
@@ -242,7 +242,7 @@ void AP_Avoidance::add_obstacle(const uint32_t obstacle_timestamp_ms,
 }
 
 void AP_Avoidance::add_obstacle(const uint32_t obstacle_timestamp_ms,
-                                const MAV_COLLISION_SRC src,
+                                const AGPILOT_COLLISION_SRC src,
                                 const uint32_t src_id,
                                 const Location &loc,
                                 const float cog,
@@ -270,7 +270,7 @@ void AP_Avoidance::get_adsb_samples()
         uint32_t src_id = src_id_for_adsb_vehicle(vehicle);
         Location loc = _adsb.get_location(vehicle);
         add_obstacle(vehicle.last_update_ms,
-                   MAV_COLLISION_SRC_ADSB,
+                   AGPILOT_COLLISION_SRC_ADSB,
                    src_id,
                    loc,
                    vehicle.info.heading * 0.01,
@@ -340,36 +340,36 @@ void AP_Avoidance::update_threat_level(const Location &my_loc,
     Location &obstacle_loc = obstacle._location;
     Vector3f &obstacle_vel = obstacle._velocity;
 
-    obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
+    obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
 
     const uint32_t obstacle_age = AP_HAL::millis() - obstacle.timestamp_ms;
     float closest_xy = closest_approach_xy(my_loc, my_vel, obstacle_loc, obstacle_vel, _fail_time_horizon + obstacle_age/1000);
     if (closest_xy < _fail_distance_xy) {
-        obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_HIGH;
+        obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_HIGH;
     } else {
         closest_xy = closest_approach_xy(my_loc, my_vel, obstacle_loc, obstacle_vel, _warn_time_horizon + obstacle_age/1000);
         if (closest_xy < _warn_distance_xy) {
-            obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_LOW;
+            obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_LOW;
         }
     }
 
     // check for vertical separation; our threat level is the minimum
     // of vertical and horizontal threat levels
     float closest_z = closest_approach_z(my_loc, my_vel, obstacle_loc, obstacle_vel, _warn_time_horizon + obstacle_age/1000);
-    if (obstacle.threat_level != MAV_COLLISION_THREAT_LEVEL_NONE) {
+    if (obstacle.threat_level != AGPILOT_COLLISION_THREAT_LEVEL_NONE) {
         if (closest_z > _warn_distance_z) {
-            obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
+            obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
         } else {
             closest_z = closest_approach_z(my_loc, my_vel, obstacle_loc, obstacle_vel, _fail_time_horizon + obstacle_age/1000);
             if (closest_z > _fail_distance_z) {
-                obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_LOW;
+                obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_LOW;
             }
         }
     }
 
     // If we haven't heard from a vehicle then assume it is no threat
     if (obstacle_age > MAX_OBSTACLE_AGE_MS) {
-        obstacle.threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
+        obstacle.threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
     }
 
     // could optimise this to not calculate a lot of this if threat
@@ -386,28 +386,28 @@ void AP_Avoidance::update_threat_level(const Location &my_loc,
     }
 }
 
-MAV_COLLISION_THREAT_LEVEL AP_Avoidance::current_threat_level() const {
+AGPILOT_COLLISION_THREAT_LEVEL AP_Avoidance::current_threat_level() const {
     if (_obstacles == nullptr) {
-        return MAV_COLLISION_THREAT_LEVEL_NONE;
+        return AGPILOT_COLLISION_THREAT_LEVEL_NONE;
     }
     if (_current_most_serious_threat == -1) {
-        return MAV_COLLISION_THREAT_LEVEL_NONE;
+        return AGPILOT_COLLISION_THREAT_LEVEL_NONE;
     }
     return _obstacles[_current_most_serious_threat].threat_level;
 }
 
-void AP_Avoidance::send_collision_all(const AP_Avoidance::Obstacle &threat, MAV_COLLISION_ACTION behaviour) const
+void AP_Avoidance::send_collision_all(const AP_Avoidance::Obstacle &threat, AGPILOT_COLLISION_ACTION behaviour) const
 {
     const mavlink_collision_t packet{
         id: threat.src_id,
         time_to_minimum_delta: threat.time_to_closest_approach,
         altitude_minimum_delta: threat.closest_approach_z,
         horizontal_minimum_delta: threat.closest_approach_xy,
-        src: MAV_COLLISION_SRC_ADSB,
+        src: AGPILOT_COLLISION_SRC_ADSB,
         action: (uint8_t)behaviour,
         threat_level: (uint8_t)threat.threat_level,
     };
-    gcs().send_to_active_channels(MAVLINK_MSG_ID_COLLISION, (const char *)&packet);
+    gcs().send_to_active_channels(AGPILOTLINK_MSG_ID_COLLISION, (const char *)&packet);
 }
 
 void AP_Avoidance::handle_threat_gcs_notify(AP_Avoidance::Obstacle *threat)
@@ -417,7 +417,7 @@ void AP_Avoidance::handle_threat_gcs_notify(AP_Avoidance::Obstacle *threat)
     }
 
     uint32_t now = AP_HAL::millis();
-    if (threat->threat_level == MAV_COLLISION_THREAT_LEVEL_NONE) {
+    if (threat->threat_level == AGPILOT_COLLISION_THREAT_LEVEL_NONE) {
         // only send cleared messages for a few seconds:
         if (_gcs_cleared_messages_first_sent == 0) {
             _gcs_cleared_messages_first_sent = now;
@@ -534,18 +534,18 @@ void AP_Avoidance::update()
 
 void AP_Avoidance::handle_avoidance_local(AP_Avoidance::Obstacle *threat)
 {
-    MAV_COLLISION_THREAT_LEVEL new_threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
-    MAV_COLLISION_ACTION action = MAV_COLLISION_ACTION_NONE;
+    AGPILOT_COLLISION_THREAT_LEVEL new_threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
+    AGPILOT_COLLISION_ACTION action = AGPILOT_COLLISION_ACTION_NONE;
 
     if (threat != nullptr) {
         new_threat_level = threat->threat_level;
-        if (new_threat_level == MAV_COLLISION_THREAT_LEVEL_HIGH) {
-            action = (MAV_COLLISION_ACTION)_fail_action.get();
+        if (new_threat_level == AGPILOT_COLLISION_THREAT_LEVEL_HIGH) {
+            action = (AGPILOT_COLLISION_ACTION)_fail_action.get();
             Location my_loc;
-            if (action != MAV_COLLISION_ACTION_NONE && _fail_altitude_minimum > 0 &&
+            if (action != AGPILOT_COLLISION_ACTION_NONE && _fail_altitude_minimum > 0 &&
                 AP::ahrs().get_location(my_loc) && ((my_loc.alt*0.01f) < _fail_altitude_minimum)) {
                 // disable avoidance when close to ground, report only
-                action = MAV_COLLISION_ACTION_REPORT;
+                action = AGPILOT_COLLISION_ACTION_REPORT;
 			}
 		}
     }
@@ -556,9 +556,9 @@ void AP_Avoidance::handle_avoidance_local(AP_Avoidance::Obstacle *threat)
         // transition to higher states immediately, recovery to lower states more slowly
         if (((now - _last_state_change_ms) > AP_AVOIDANCE_STATE_RECOVERY_TIME_MS) || (new_threat_level > _threat_level)) {
             // handle recovery from high threat level
-            if (_threat_level == MAV_COLLISION_THREAT_LEVEL_HIGH) {
+            if (_threat_level == AGPILOT_COLLISION_THREAT_LEVEL_HIGH) {
                 handle_recovery(RecoveryAction(_fail_recovery.get()));
-                _latest_action = MAV_COLLISION_ACTION_NONE;
+                _latest_action = AGPILOT_COLLISION_ACTION_NONE;
             }
 
             // update state
@@ -568,7 +568,7 @@ void AP_Avoidance::handle_avoidance_local(AP_Avoidance::Obstacle *threat)
     }
 
     // handle ongoing threat by calling vehicle specific handler
-    if ((threat != nullptr) && (_threat_level == MAV_COLLISION_THREAT_LEVEL_HIGH) && (action > MAV_COLLISION_ACTION_REPORT)) {
+    if ((threat != nullptr) && (_threat_level == AGPILOT_COLLISION_THREAT_LEVEL_HIGH) && (action > AGPILOT_COLLISION_ACTION_REPORT)) {
         _latest_action = handle_avoidance(threat, action);
     }
 }
@@ -581,7 +581,7 @@ void AP_Avoidance::handle_msg(const mavlink_message_t &msg)
         return;
     }
 
-    if (msg.msgid != MAVLINK_MSG_ID_GLOBAL_POSITION_INT) {
+    if (msg.msgid != AGPILOTLINK_MSG_ID_GLOBAL_POSITION_INT) {
         // we only take position from GLOBAL_POSITION_INT
         return;
     }
@@ -606,7 +606,7 @@ void AP_Avoidance::handle_msg(const mavlink_message_t &msg)
         packet.vz * 0.01f
     };
     add_obstacle(AP_HAL::millis(),
-                 MAV_COLLISION_SRC_MAVLINK_GPS_GLOBAL_INT,
+                 AGPILOT_COLLISION_SRC_AGPILOTLINK_GPS_GLOBAL_INT,
                  msg.sysid,
                  loc,
                  vel);

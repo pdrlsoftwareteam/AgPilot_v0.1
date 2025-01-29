@@ -50,10 +50,10 @@ module load graph
 @alias add gahrsanupitch g degrees(ATTITUDE.pitch) degrees(AHRS2.pitch) degrees(AHRS3.pitch)
 @alias add gcmppitch g degrees(SIMSTATE.pitch) degrees(ATTITUDE.pitch) degrees(AHRS2.pitch)
 @alias add gcmproll g degrees(SIMSTATE.roll) degrees(ATTITUDE.roll) degrees(AHRS2.roll)
-@alias add grollp g NAV_CONTROLLER_OUTPUT.nav_roll-degrees(ATTITUDE.roll) (SERVO_OUTPUT_RAW.servo1_raw-MAV.params['RC1_TRIM'])*0.1 
+@alias add grollp g NAV_CONTROLLER_OUTPUT.nav_roll-degrees(ATTITUDE.roll) (SERVO_OUTPUT_RAW.servo1_raw-AGPILOT.params['RC1_TRIM'])*0.1 
 @alias add gradio g RADIO.rssi RADIO.noise RADIO.remrssi RADIO.remnoise 
 @alias add gbatt g SYS_STATUS.current_battery
-@alias add gnavroll g NAV_CONTROLLER_OUTPUT.nav_roll-degrees(ATTITUDE.roll) (SERVO_OUTPUT_RAW.servo1_raw-MAV.params['RC1_TRIM'])*0.1
+@alias add gnavroll g NAV_CONTROLLER_OUTPUT.nav_roll-degrees(ATTITUDE.roll) (SERVO_OUTPUT_RAW.servo1_raw-AGPILOT.params['RC1_TRIM'])*0.1
 @alias add gcontrol g RC_CHANNELS.chan1_raw RC_CHANNELS.chan2_raw SERVO_OUTPUT_RAW.servo1_raw SERVO_OUTPUT_RAW.servo2_raw
 @alias add gmag g RAW_IMU.xmag RAW_IMU.ymag RAW_IMU.zmag mag_field(RAW_IMU)
 @alias add gmagcmp g RAW_IMU.xmag RAW_IMU.ymag RAW_IMU.zmag SCALED_IMU2.xmag SCALED_IMU2.ymag SCALED_IMU2.zmag

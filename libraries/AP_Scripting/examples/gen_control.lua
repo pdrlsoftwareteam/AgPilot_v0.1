@@ -60,9 +60,9 @@ GENCTL_VOLT_TARG = bind_add_param('VOLT_TARG', 11, 0)
 -- maximum slew rate in percent/second for throttle change
 GENCTL_SLEW_RATE = bind_add_param('SLEW_RATE', 12, 100)
 
-local MAV_SEVERITY_INFO = 6
-local MAV_SEVERITY_NOTICE = 5
-local MAV_SEVERITY_EMERGENCY = 0
+local AGPILOT_SEVERITY_INFO = 6
+local AGPILOT_SEVERITY_NOTICE = 5
+local AGPILOT_SEVERITY_EMERGENCY = 0
 
 local switch = nil
 local thr_pwm = GENCTL_PWM_MIN:get()
@@ -157,11 +157,11 @@ function update()
    local sw_pos = switch:get_aux_switch_pos()
    if sw_pos ~= last_switch_pos then
       if sw_pos == 0 then
-         gcs:send_text(MAV_SEVERITY_INFO,"GenCtl: off")
+         gcs:send_text(AGPILOT_SEVERITY_INFO,"GenCtl: off")
       elseif sw_pos == 1 then
-         gcs:send_text(MAV_SEVERITY_INFO,"GenCtl: idle")
+         gcs:send_text(AGPILOT_SEVERITY_INFO,"GenCtl: idle")
       else
-         gcs:send_text(MAV_SEVERITY_INFO,"GenCtl: run")
+         gcs:send_text(AGPILOT_SEVERITY_INFO,"GenCtl: run")
       end
       last_switch_pos = sw_pos
    end
@@ -196,7 +196,7 @@ end
 function protected_wrapper()
   local success, err = pcall(update)
   if not success then
-     gcs:send_text(MAV_SEVERITY_EMERGENCY, "Internal Error: " .. err)
+     gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, "Internal Error: " .. err)
      -- when we fault we run the update function again after 1s, slowing it
      -- down a bit so we don't flood the console with errors
      --return protected_wrapper, 1000
@@ -205,7 +205,7 @@ function protected_wrapper()
   return protected_wrapper, 1000/UPDATE_RATE_HZ
 end
 
-gcs:send_text(MAV_SEVERITY_INFO,"Loaded gen_control.lua")
+gcs:send_text(AGPILOT_SEVERITY_INFO,"Loaded gen_control.lua")
 
 -- start running update loop
 return protected_wrapper()

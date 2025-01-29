@@ -449,7 +449,7 @@ void AP_ToneAlarm::update()
 }
 
 
-#if AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED
+#if AP_NOTIFY_AGPILOTLINK_PLAY_TUNE_SUPPORT_ENABLED
 /*
  *  handle a PLAY_TUNE message
  */

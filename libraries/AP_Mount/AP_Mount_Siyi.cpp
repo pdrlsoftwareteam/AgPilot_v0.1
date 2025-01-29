@@ -3,8 +3,8 @@
 #if HAL_MOUNT_SIYI_ENABLED
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
-#include <GCS_MAVLink/include/mavlink/v2.0/checksum.h>
+#include <GCS_AGPILOTLink/GCS.h>
+#include <GCS_AGPILOTLink/include/mavlink/v2.0/checksum.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 
 extern const AP_HAL::HAL& hal;
@@ -21,7 +21,7 @@ extern const AP_HAL::HAL& hal;
 #define AP_MOUNT_SIYI_LOCK_RESEND_COUNT 5   // lock value is resent to gimbal every 5 iterations
 
 #define AP_MOUNT_SIYI_DEBUG 0
-#define debug(fmt, args ...) do { if (AP_MOUNT_SIYI_DEBUG) { GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Siyi: " fmt, ## args); } } while (0)
+#define debug(fmt, args ...) do { if (AP_MOUNT_SIYI_DEBUG) { GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Siyi: " fmt, ## args); } } while (0)
 
 // init - performs any required initialisation for this instance
 void AP_Mount_Siyi::init()
@@ -31,7 +31,7 @@ void AP_Mount_Siyi::init()
     _uart = serial_manager.find_serial(AP_SerialManager::SerialProtocol_Gimbal, 0);
     if (_uart != nullptr) {
         _initialised = true;
-        set_mode((enum MAV_MOUNT_MODE)_params.default_mode.get());
+        set_mode((enum AGPILOT_MOUNT_MODE)_params.default_mode.get());
     }
 
 }
@@ -69,21 +69,21 @@ void AP_Mount_Siyi::update()
     // update based on mount mode
     switch (get_mode()) {
         // move mount to a "retracted" position.  To-Do: remove support and replace with a relaxed mode?
-        case MAV_MOUNT_MODE_RETRACT: {
+        case AGPILOT_MOUNT_MODE_RETRACT: {
             const Vector3f &angle_bf_target = _params.retract_angles.get();
             send_target_angles(ToRad(angle_bf_target.y), ToRad(angle_bf_target.z), false);
             break;
         }
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             const Vector3f &angle_bf_target = _params.neutral_angles.get();
             send_target_angles(ToRad(angle_bf_target.y), ToRad(angle_bf_target.z), false);
             break;
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 send_target_angles(mavt_target.angle_rad.pitch, mavt_target.angle_rad.yaw, mavt_target.angle_rad.yaw_is_ef);
@@ -95,7 +95,7 @@ void AP_Mount_Siyi::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's rc inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -107,7 +107,7 @@ void AP_Mount_Siyi::update()
         }
 
         // point mount to a GPS point given by the mission planner
-        case MAV_MOUNT_MODE_GPS_POINT: {
+        case AGPILOT_MOUNT_MODE_GPS_POINT: {
             MountTarget angle_target_rad {};
             if (get_angle_target_to_roi(angle_target_rad)) {
                 send_target_angles(angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -115,7 +115,7 @@ void AP_Mount_Siyi::update()
             break;
         }
 
-        case MAV_MOUNT_MODE_HOME_LOCATION: {
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION: {
             MountTarget angle_target_rad {};
             if (get_angle_target_to_home(angle_target_rad)) {
                 send_target_angles(angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -123,7 +123,7 @@ void AP_Mount_Siyi::update()
             break;
         }
 
-        case MAV_MOUNT_MODE_SYSID_TARGET:{
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET:{
             MountTarget angle_target_rad {};
             if (get_angle_target_to_sysid(angle_target_rad)) {
                 send_target_angles(angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -314,7 +314,7 @@ void AP_Mount_Siyi::process_packet()
               (unsigned)_msg_buff[_msg_buff_data_start+0]);     // firmware revision
 
         // display gimbal info to user
-        gcs().send_text(MAV_SEVERITY_INFO, "Mount: Siyi fw:%u.%u.%u",
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Mount: Siyi fw:%u.%u.%u",
                 (unsigned)_msg_buff[_msg_buff_data_start+6],    // firmware major version
                 (unsigned)_msg_buff[_msg_buff_data_start+5],    // firmware minor version
                 (unsigned)_msg_buff[_msg_buff_data_start+4]);   // firmware revision
@@ -398,7 +398,7 @@ void AP_Mount_Siyi::process_packet()
         // update recording state and warn user of mismatch
         const bool recording = _msg_buff[_msg_buff_data_start+3] > 0;
         if (recording != _last_record_video) {
-            gcs().send_text(MAV_SEVERITY_INFO, "Siyi: recording %s", recording ? "ON" : "OFF");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Siyi: recording %s", recording ? "ON" : "OFF");
         }
         _last_record_video = recording;
         debug("GimConf hdr:%u rec:%u foll:%u", (unsigned)_msg_buff[_msg_buff_data_start+1],
@@ -421,7 +421,7 @@ void AP_Mount_Siyi::process_packet()
             debug("FnFeedB success");
             break;
         case FunctionFeedbackInfo::FAILED_TO_TAKE_PHOTO:
-            gcs().send_text(MAV_SEVERITY_ERROR, "%s failed to take picture", err_prefix);
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s failed to take picture", err_prefix);
             break;
         case FunctionFeedbackInfo::HDR_ON:
             debug("HDR on");
@@ -430,7 +430,7 @@ void AP_Mount_Siyi::process_packet()
             debug("HDR off");
             break;
         case FunctionFeedbackInfo::FAILED_TO_RECORD_VIDEO:
-            gcs().send_text(MAV_SEVERITY_ERROR, "%s failed to record video", err_prefix);
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s failed to record video", err_prefix);
             break;
         default:
             debug("FnFeedB unexpected val:%u", (unsigned)func_feedback_info);

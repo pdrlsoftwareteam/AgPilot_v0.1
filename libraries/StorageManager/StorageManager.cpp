@@ -25,7 +25,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Filesystem/AP_Filesystem.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "StorageManager.h"
 
@@ -437,9 +437,9 @@ void StorageAccess::flush_file(void)
         }
     }
     if (io_fail && !StorageManager::last_io_failed) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Mission storage failed");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Mission storage failed");
     } else if (!io_fail && StorageManager::last_io_failed) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Mission storage OK");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Mission storage OK");
     }
     StorageManager::last_io_failed = io_fail;
     if (io_fail) {

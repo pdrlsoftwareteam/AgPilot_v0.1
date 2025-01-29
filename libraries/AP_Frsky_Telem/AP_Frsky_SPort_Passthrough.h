@@ -7,14 +7,14 @@
 #include <AP_RCTelemetry/AP_RCTelemetry.h>
 
 #include "AP_Frsky_SPortParser.h"
-#include "AP_Frsky_MAVlite.h"
+#include "AP_Frsky_AGPILOTlite.h"
 
 #include "AP_Frsky_Telem.h"
 
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-#include "AP_Frsky_MAVlite_SPortToMAVlite.h"
-#include "AP_Frsky_MAVlite_MAVliteToSPort.h"
-#include "AP_Frsky_MAVliteMsgHandler.h"
+#include "AP_Frsky_AGPILOTlite_SPortToAGPILOTlite.h"
+#include "AP_Frsky_AGPILOTlite_AGPILOTliteToSPort.h"
+#include "AP_Frsky_AGPILOTliteMsgHandler.h"
 
 #define SPORT_TX_PACKET_DUPLICATES          1   // number of duplicates packets we send (fport only)
 #endif
@@ -53,7 +53,7 @@ public:
     bool set_telem_data(const uint8_t frame, const uint16_t appid, const uint32_t data) override;
 #endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
 
-    void queue_text_message(MAV_SEVERITY severity, const char *text) override
+    void queue_text_message(AGPILOT_SEVERITY severity, const char *text) override
     {
         AP_RCTelemetry::queue_message(severity, text);
     }
@@ -73,7 +73,7 @@ public:
         RPM =           11, // 0x500A rpm sensors 1 and 2
         UDATA =         12, // user data
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-        MAV =           13,  // mavlite
+        AGPILOT =           13,  // mavlite
 #endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
         TERRAIN =       14, // 0x500B terrain data
         WIND =          15, // 0x500C wind data
@@ -146,8 +146,8 @@ private:
     } _SPort_bidir;
 
     AP_Frsky_SPortParser _sport_handler;
-    AP_Frsky_MAVlite_SPortToMAVlite sport_to_mavlite;
-    AP_Frsky_MAVlite_MAVliteToSPort mavlite_to_sport;
+    AP_Frsky_AGPILOTlite_SPortToAGPILOTlite sport_to_mavlite;
+    AP_Frsky_AGPILOTlite_AGPILOTliteToSPort mavlite_to_sport;
 
     void set_sensor_id(AP_Int8 idx, uint8_t &sensor);
     // tx/rx sport packet processing
@@ -157,8 +157,8 @@ private:
 
     // create an object to handle incoming mavlite messages; a
     // callback method is provided to allow the handler to send responses
-    bool send_message(const AP_Frsky_MAVlite_Message &txmsg);
-    AP_Frsky_MAVliteMsgHandler mavlite{FUNCTOR_BIND_MEMBER(&AP_Frsky_SPort_Passthrough::send_message, bool, const AP_Frsky_MAVlite_Message &)};
+    bool send_message(const AP_Frsky_AGPILOTlite_Message &txmsg);
+    AP_Frsky_AGPILOTliteMsgHandler mavlite{FUNCTOR_BIND_MEMBER(&AP_Frsky_SPort_Passthrough::send_message, bool, const AP_Frsky_AGPILOTlite_Message &)};
 #endif
 
     void send_sport_frame(uint8_t frame, uint16_t appid, uint32_t data);

@@ -1,19 +1,19 @@
 #pragma once
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
-class GCS_MAVLINK_Copter : public GCS_MAVLINK
+class GCS_AGPILOTLINK_Copter : public GCS_AGPILOTLINK
 {
 
 public:
 
-    using GCS_MAVLINK::GCS_MAVLINK;
+    using GCS_AGPILOTLINK::GCS_AGPILOTLINK;
 
 protected:
 
     uint32_t telem_delay() const override;
 
-    MAV_RESULT handle_flight_termination(const mavlink_command_long_t &packet) override;
+    AGPILOT_RESULT handle_flight_termination(const mavlink_command_long_t &packet) override;
 
     uint8_t sysid_my_gcs() const override;
     bool sysid_enforce() const override;
@@ -21,21 +21,21 @@ protected:
     bool params_ready() const override;
     void send_banner() override;
 
-    MAV_RESULT _handle_command_preflight_calibration(const mavlink_command_long_t &packet, const mavlink_message_t &msg) override;
+    AGPILOT_RESULT _handle_command_preflight_calibration(const mavlink_command_long_t &packet, const mavlink_message_t &msg) override;
 
     void send_attitude_target() override;
     void send_position_target_global_int() override;
     void send_position_target_local_ned() override;
 
-    MAV_RESULT handle_command_do_set_roi(const Location &roi_loc) override;
-    MAV_RESULT handle_preflight_reboot(const mavlink_command_long_t &packet, const mavlink_message_t &msg) override;
+    AGPILOT_RESULT handle_command_do_set_roi(const Location &roi_loc) override;
+    AGPILOT_RESULT handle_preflight_reboot(const mavlink_command_long_t &packet, const mavlink_message_t &msg) override;
 #if HAL_MOUNT_ENABLED
-    MAV_RESULT handle_command_mount(const mavlink_command_long_t &packet) override;
+    AGPILOT_RESULT handle_command_mount(const mavlink_command_long_t &packet) override;
 #endif
-    MAV_RESULT handle_command_int_packet(const mavlink_command_int_t &packet) override;
-    MAV_RESULT handle_command_long_packet(const mavlink_command_long_t &packet) override;
-    MAV_RESULT handle_command_int_do_reposition(const mavlink_command_int_t &packet);
-    MAV_RESULT handle_command_pause_continue(const mavlink_command_int_t &packet);
+    AGPILOT_RESULT handle_command_int_packet(const mavlink_command_int_t &packet) override;
+    AGPILOT_RESULT handle_command_long_packet(const mavlink_command_long_t &packet) override;
+    AGPILOT_RESULT handle_command_int_do_reposition(const mavlink_command_int_t &packet);
+    AGPILOT_RESULT handle_command_pause_continue(const mavlink_command_int_t &packet);
 
 #if HAL_MOUNT_ENABLED
     void handle_mount_message(const mavlink_message_t &msg) override;
@@ -48,8 +48,8 @@ protected:
     void send_nav_controller_output() const override;
     uint64_t capabilities() const override;
 
-    virtual MAV_VTOL_STATE vtol_state() const override { return MAV_VTOL_STATE_MC; };
-    virtual MAV_LANDED_STATE landed_state() const override;
+    virtual AGPILOT_VTOL_STATE vtol_state() const override { return AGPILOT_VTOL_STATE_MC; };
+    virtual AGPILOT_LANDED_STATE landed_state() const override;
 
     void handle_manual_control_axes(const mavlink_manual_control_t &packet, const uint32_t tnow) override;
 
@@ -63,8 +63,8 @@ private:
     void packetReceived(const mavlink_status_t &status,
                         const mavlink_message_t &msg) override;
 
-    MAV_MODE base_mode() const override;
-    MAV_STATE vehicle_system_status() const override;
+    AGPILOT_MODE base_mode() const override;
+    AGPILOT_STATE vehicle_system_status() const override;
 
     float vfr_hud_airspeed() const override;
     int16_t vfr_hud_throttle() const override;

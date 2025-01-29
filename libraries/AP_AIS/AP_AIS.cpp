@@ -29,8 +29,8 @@
 
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 const AP_Param::GroupInfo AP_AIS::var_info[] = {
 

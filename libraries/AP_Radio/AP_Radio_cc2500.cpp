@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <StorageManager/StorageManager.h>
 #include <AP_Notify/AP_Notify.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Math/crc.h>
 #include <AP_Param/AP_Param.h>
 
@@ -29,7 +29,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-#define Debug(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(MAV_SEVERITY_INFO, fmt, ##args); }} while (0)
+#define Debug(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ##args); }} while (0)
 
 // object instance for trampoline
 AP_Radio_cc2500 *AP_Radio_cc2500::radio_singleton;

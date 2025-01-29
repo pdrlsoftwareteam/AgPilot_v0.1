@@ -75,7 +75,7 @@ private:
     } integer_configs[6] {
         { "FRQ", &config.frq },
         { "AUT", &config.aut },
-        { "MAVG", &config.mavg },
+        { "AGPILOTG", &config.mavg },
         { "MEDF", &config.medf },
         { "AVG", &config.avg },
         { "AUV", &config.auv },

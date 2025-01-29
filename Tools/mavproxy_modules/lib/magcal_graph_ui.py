@@ -18,8 +18,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from pymavlink.mavutil import mavlink
 
-from MAVProxy.modules.lib import wx_processguard
-from MAVProxy.modules.lib.wx_loader import wx
+from AGPILOTProxy.modules.lib import wx_processguard
+from AGPILOTProxy.modules.lib.wx_loader import wx
 
 import geodesic_grid as grid
 

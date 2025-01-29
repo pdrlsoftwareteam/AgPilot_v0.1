@@ -40,7 +40,7 @@ public:
 
     enum class Method {
         RUDDER = 0,
-        MAVLINK = 1,
+        AGPILOTLINK = 1,
         AUXSWITCH = 2,
         MOTORTEST = 3,
         SCRIPTING = 4,

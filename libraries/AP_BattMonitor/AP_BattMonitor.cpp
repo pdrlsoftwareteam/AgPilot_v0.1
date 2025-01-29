@@ -30,7 +30,7 @@
 
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Notify/AP_Notify.h>
 
 extern const AP_HAL::HAL& hal;
@@ -621,7 +621,7 @@ void AP_BattMonitor::check_failsafes(void)
                     break;
             }
 
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Battery %d is %s %.2fV used %.0f mAh", i + 1, type_str,
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Battery %d is %s %.2fV used %.0f mAh", i + 1, type_str,
                             (double)voltage(i), (double)state[i].consumed_mah);
             _has_triggered_failsafe = true;
 #ifndef HAL_BUILD_AP_PERIPH
@@ -748,7 +748,7 @@ bool AP_BattMonitor::get_cycle_count(uint8_t instance, uint16_t &cycles) const
 
 bool AP_BattMonitor::arming_checks(size_t buflen, char *buffer) const
 {
-    char temp_buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
+    char temp_buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
 
     for (uint8_t i = 0; i < _num_instances; i++) {
         if (drivers[i] != nullptr && !(drivers[i]->arming_checks(temp_buffer, sizeof(temp_buffer)))) {
@@ -773,10 +773,10 @@ void AP_BattMonitor::checkPoweringOff(void)
             // Send a Mavlink broadcast announcing the shutdown
 #if HAL_GCS_ENABLED
             mavlink_command_long_t cmd_msg{};
-            cmd_msg.command = MAV_CMD_POWER_OFF_INITIATED;
+            cmd_msg.command = AGPILOT_CMD_POWER_OFF_INITIATED;
             cmd_msg.param1 = i+1;
-            GCS_MAVLINK::send_to_components(MAVLINK_MSG_ID_COMMAND_LONG, (char*)&cmd_msg, sizeof(cmd_msg));
-            gcs().send_text(MAV_SEVERITY_WARNING, "Vehicle %d battery %d is powering off", mavlink_system.sysid, i+1);
+            GCS_AGPILOTLINK::send_to_components(AGPILOTLINK_MSG_ID_COMMAND_LONG, (char*)&cmd_msg, sizeof(cmd_msg));
+            gcs().send_text(AGPILOT_SEVERITY_WARNING, "Vehicle %d battery %d is powering off", mavlink_system.sysid, i+1);
 #endif
 
             // only send this once
@@ -818,31 +818,31 @@ bool AP_BattMonitor::reset_remaining_mask(uint16_t battery_mask, float percentag
 }
 
 // Returns the mavlink charge state. The following mavlink charge states are not used
-// MAV_BATTERY_CHARGE_STATE_EMERGENCY , MAV_BATTERY_CHARGE_STATE_FAILED
-// MAV_BATTERY_CHARGE_STATE_UNHEALTHY, MAV_BATTERY_CHARGE_STATE_CHARGING
-MAV_BATTERY_CHARGE_STATE AP_BattMonitor::get_mavlink_charge_state(const uint8_t instance) const 
+// AGPILOT_BATTERY_CHARGE_STATE_EMERGENCY , AGPILOT_BATTERY_CHARGE_STATE_FAILED
+// AGPILOT_BATTERY_CHARGE_STATE_UNHEALTHY, AGPILOT_BATTERY_CHARGE_STATE_CHARGING
+AGPILOT_BATTERY_CHARGE_STATE AP_BattMonitor::get_mavlink_charge_state(const uint8_t instance) const 
 {
     if (instance >= _num_instances) {
-        return MAV_BATTERY_CHARGE_STATE_UNDEFINED;
+        return AGPILOT_BATTERY_CHARGE_STATE_UNDEFINED;
     }
 
     switch (state[instance].failsafe) {
 
     case Failsafe::None:
         if (get_mavlink_fault_bitmask(instance) != 0 || !healthy()) {
-            return MAV_BATTERY_CHARGE_STATE_UNHEALTHY;
+            return AGPILOT_BATTERY_CHARGE_STATE_UNHEALTHY;
         }
-        return MAV_BATTERY_CHARGE_STATE_OK;
+        return AGPILOT_BATTERY_CHARGE_STATE_OK;
 
     case Failsafe::Low:
-        return MAV_BATTERY_CHARGE_STATE_LOW;
+        return AGPILOT_BATTERY_CHARGE_STATE_LOW;
 
     case Failsafe::Critical:
-        return MAV_BATTERY_CHARGE_STATE_CRITICAL;
+        return AGPILOT_BATTERY_CHARGE_STATE_CRITICAL;
     }
 
     // Should not reach this
-    return MAV_BATTERY_CHARGE_STATE_UNDEFINED;
+    return AGPILOT_BATTERY_CHARGE_STATE_UNDEFINED;
 }
 
 // Returns mavlink fault state

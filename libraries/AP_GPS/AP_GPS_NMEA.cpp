@@ -30,7 +30,7 @@
 
 #include <AP_Common/AP_Common.h>
 #include <AP_Common/NMEA.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 #include <ctype.h>
@@ -357,7 +357,7 @@ bool AP_GPS_NMEA::_term_complete()
                 case 6: // Estimated (dead reckoning) Mode
                     state.status = AP_GPS::NO_FIX;
                     break;
-                default://to maintain compatibility with MAV_GPS_INPUT and others
+                default://to maintain compatibility with AGPILOT_GPS_INPUT and others
                     state.status = AP_GPS::GPS_OK_FIX_3D;
                     break;
                 }
@@ -475,7 +475,7 @@ bool AP_GPS_NMEA::_term_complete()
             }
             case _GPS_SENTENCE_VERSIONA: {
                 _have_unicore_versiona = true;
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,
                               "NMEA %s %s %s",
                               _versiona.type,
                               _versiona.version,

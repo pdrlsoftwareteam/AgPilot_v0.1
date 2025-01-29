@@ -3,7 +3,7 @@
 
 #include <AP_gtest.h>
 #include <AP_Common/AP_FWVersion.h>
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();

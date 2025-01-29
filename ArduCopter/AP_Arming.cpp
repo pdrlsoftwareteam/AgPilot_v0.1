@@ -571,7 +571,7 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
     if (check_enabled(ARMING_CHECK_RC)) {
         const char *rc_item = "Throttle";
         // check throttle is not too high - skips checks if arming from GCS/scripting in Guided,Guided_NoGPS or Auto 
-        if (!((method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
+        if (!((method == AP_Arming::Method::AGPILOTLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
             // above top of deadband is too always high
             if (copter.get_pilot_desired_climb_rate(copter.channel_throttle->get_control_in()) > 0.0f) {
                 check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
@@ -654,7 +654,7 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-    gcs().send_text(MAV_SEVERITY_INFO, "Arming motors");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Arming motors");
 #endif
 
     // Remember Orientation
@@ -736,7 +736,7 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
 
     // do not allow disarm via mavlink if we think we are flying:
     if (do_disarm_checks &&
-        method == AP_Arming::Method::MAVLINK &&
+        method == AP_Arming::Method::AGPILOTLINK &&
         !copter.ap.land_complete) {
         return false;
     }
@@ -746,7 +746,7 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-    gcs().send_text(MAV_SEVERITY_INFO, "Disarming motors");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Disarming motors");
 #endif
 
     auto &ahrs = AP::ahrs();

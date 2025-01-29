@@ -22,7 +22,7 @@
 #include "AP_InertialSensor_config.h"
 
 #if HAL_INS_TEMPERATURE_CAL_ENABLE
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Common/ExpandingString.h>
 #include <AP_Notify/AP_Notify.h>
@@ -350,7 +350,7 @@ void AP_InertialSensor_TCal::update_accel_learning(const Vector3f &accel, float 
     if (learn == nullptr && hal.scheduler->is_system_initialized()) {
         learn = new Learn(*this, temperature);
         if (learn) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TCAL[%u]: started calibration t=%.1fC tmax=%.1fC",
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "TCAL[%u]: started calibration t=%.1fC tmax=%.1fC",
                           instance()+1,
                           temperature, learn->start_tmax);
             AP_Notify::events.initiated_temp_cal = 1;
@@ -396,12 +396,12 @@ void AP_InertialSensor_TCal::Learn::reset(float temperature)
 void AP_InertialSensor_TCal::Learn::finish_calibration(float temperature)
 {
     if (!save_calibration(temperature)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TCAL[%u]: failed fit", instance()+1);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "TCAL[%u]: failed fit", instance()+1);
         AP_Notify::events.temp_cal_failed = 1;
         tcal.enable.set_and_save_ifchanged(int8_t(AP_InertialSensor_TCal::Enable::Disabled));
         return;
     }
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TCAL[%u]: completed calibration tmin=%.1f tmax=%.1f",
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "TCAL[%u]: completed calibration tmin=%.1f tmax=%.1f",
                   instance()+1,
                   tcal.temp_min.get(), tcal.temp_max.get());
     tcal.enable.set_and_save_ifchanged(int8_t(AP_InertialSensor_TCal::Enable::Enabled));

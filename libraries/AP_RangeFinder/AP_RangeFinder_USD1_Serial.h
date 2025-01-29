@@ -22,8 +22,8 @@ public:
 
 protected:
 
-    MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
-        return MAV_DISTANCE_SENSOR_RADAR;
+    AGPILOT_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
+        return AGPILOT_DISTANCE_SENSOR_RADAR;
     }
 
     // baudrate used during object construction:

@@ -20,7 +20,7 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 extern const AP_HAL::HAL& hal;
@@ -289,7 +289,7 @@ void AP_Follow::handle_msg(const mavlink_message_t &msg)
     bool updated = false;
 
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: {
+    case AGPILOTLINK_MSG_ID_GLOBAL_POSITION_INT: {
         // decode message
         mavlink_global_position_int_t packet;
         mavlink_msg_global_position_int_decode(&msg, &packet);
@@ -329,7 +329,7 @@ void AP_Follow::handle_msg(const mavlink_message_t &msg)
         updated = true;
         break;
     }
-    case MAVLINK_MSG_ID_FOLLOW_TARGET: {
+    case AGPILOTLINK_MSG_ID_FOLLOW_TARGET: {
         // decode message
         mavlink_follow_target_t packet;
         mavlink_msg_follow_target_decode(&msg, &packet);
@@ -443,13 +443,13 @@ void AP_Follow::init_offsets_if_required(const Vector3f &dist_vec_ned)
     if ((_offset_type == AP_FOLLOW_OFFSET_TYPE_RELATIVE) && get_target_heading_deg(target_heading_deg)) {
         // rotate offsets from north facing to vehicle's perspective
         _offset.set(rotate_vector(-dist_vec_ned, -target_heading_deg));
-        gcs().send_text(MAV_SEVERITY_INFO, "Relative follow offset loaded");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Relative follow offset loaded");
     } else {
         // initialise offset in NED frame
         _offset.set(-dist_vec_ned);
         // ensure offset_type used matches frame of offsets saved
         _offset_type.set(AP_FOLLOW_OFFSET_TYPE_NED);
-        gcs().send_text(MAV_SEVERITY_INFO, "N-E-D follow offset loaded");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "N-E-D follow offset loaded");
     }
 }
 

@@ -44,7 +44,7 @@ private:
 
     // we share channels with the ArduPilot binary!
     // Beware: the mavlink rangefinder shares this channel.
-    const mavlink_channel_t mavlink_ch = (mavlink_channel_t)(MAVLINK_COMM_0+5);
+    const mavlink_channel_t mavlink_ch = (mavlink_channel_t)(AGPILOTLINK_COMM_0+5);
 
     uint64_t last_observation_usec; // time last observation was sent
     uint64_t time_offset_us;        // simulated timeoffset between external system and autopilot
@@ -79,8 +79,8 @@ private:
     uint32_t last_heartbeat_ms;
 
     // position delta message 
-    Quaternion _attitude_prev; // Rotation to previous MAV_FRAME_BODY_FRD from MAV_FRAME_LOCAL_NED
-    Vector3d _position_prev;  // previous position from origin (m) MAV_FRAME_LOCAL_NED
+    Quaternion _attitude_prev; // Rotation to previous AGPILOT_FRAME_BODY_FRD from AGPILOT_FRAME_LOCAL_NED
+    Vector3d _position_prev;  // previous position from origin (m) AGPILOT_FRAME_LOCAL_NED
 };
 
 }

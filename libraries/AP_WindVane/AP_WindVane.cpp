@@ -23,7 +23,7 @@
 #include "AP_WindVane_SITL.h"
 #include "AP_WindVane_NMEA.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Logger/AP_Logger.h>
@@ -275,11 +275,11 @@ void AP_WindVane::update()
         } else if (_calibration == 2 && have_speed) {
             _speed_driver->calibrate();
         } else if (_calibration != 0) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "WindVane: driver not found");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "WindVane: driver not found");
             _calibration.set_and_save(0);
         }
     } else if (_calibration != 0) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "WindVane: disarm for cal");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "WindVane: disarm for cal");
         _calibration.set_and_save(0);
     }
 
@@ -416,7 +416,7 @@ void AP_WindVane::send_wind(mavlink_channel_t chan) const
         0);
 
     // send apparent wind using named floats
-    // TODO: create a dedicated MAVLink message
+    // TODO: create a dedicated AGPILOTLink message
     gcs().send_named_float("AppWndSpd", get_apparent_wind_speed());
     gcs().send_named_float("AppWndDir", degrees(get_apparent_wind_direction_rad()));
 

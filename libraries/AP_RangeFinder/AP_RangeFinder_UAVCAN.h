@@ -26,7 +26,7 @@ public:
     static void handle_measurement(AP_UAVCAN* ap_uavcan, uint8_t node_id, const MeasurementCb &cb);
 
 protected:
-    virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
+    virtual AGPILOT_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
         return _sensor_type;
     }
 private:
@@ -37,6 +37,6 @@ private:
     AP_UAVCAN* _ap_uavcan;
     uint8_t _node_id;
     bool new_data;
-    MAV_DISTANCE_SENSOR _sensor_type;
+    AGPILOT_DISTANCE_SENSOR _sensor_type;
 };
 #endif  // AP_RANGEFINDER_UAVCAN_ENABLED

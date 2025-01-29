@@ -47,15 +47,15 @@ function install_pymavlink() {
 
 function install_mavproxy() {
     if [ $mavproxy_installed -eq 0 ]; then
-        echo "Installing MAVProxy"
+        echo "Installing AGPILOTProxy"
         pushd /tmp
-          git clone https://github.com/ardupilot/MAVProxy --depth 1
-          pushd MAVProxy
+          git clone https://github.com/ardupilot/AGPILOTProxy --depth 1
+          pushd AGPILOTProxy
             python setup.py build install --user --force
           popd
         popd
         mavproxy_installed=1
-        # now uninstall the version of pymavlink pulled in by MAVProxy deps:
+        # now uninstall the version of pymavlink pulled in by AGPILOTProxy deps:
         python -m pip uninstall -y pymavlink
     fi
 }

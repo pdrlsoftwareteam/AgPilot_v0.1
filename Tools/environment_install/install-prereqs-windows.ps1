@@ -4,8 +4,8 @@ Import-Module BitsTransfer
 
 Write-Output "Starting Downloads"
 
-Write-Output "Downloading MAVProxy (1/7)"
-Start-BitsTransfer -Source "https://firmware.ardupilot.org/Tools/MAVProxy/MAVProxySetup-latest.exe" -Destination "$PSScriptRoot\MAVProxySetup-latest.exe"
+Write-Output "Downloading AGPILOTProxy (1/7)"
+Start-BitsTransfer -Source "https://firmware.ardupilot.org/Tools/AGPILOTProxy/AGPILOTProxySetup-latest.exe" -Destination "$PSScriptRoot\AGPILOTProxySetup-latest.exe"
 
 Write-Output "Downloading Cygwin x64 (2/7)"
 Start-BitsTransfer -Source "https://cygwin.com/setup-x86_64.exe" -Destination "$PSScriptRoot\setup-x86_64.exe"
@@ -24,8 +24,8 @@ Start-Process -wait -FilePath "C:\cygwin64\bin\bash" -ArgumentList "--login -i -
 Write-Output "Installing ARM GCC Compiler 10-2020-Q4-Major (6/7)"
 & $PSScriptRoot\gcc-arm-none-eabi-10-2020-q4-major-win32.exe /S /P /R
 
-Write-Output "Installing MAVProxy (7/7)"
-& $PSScriptRoot\MAVProxySetup-latest.exe /SILENT | Out-Null
+Write-Output "Installing AGPILOTProxy (7/7)"
+& $PSScriptRoot\AGPILOTProxySetup-latest.exe /SILENT | Out-Null
 
 Write-Host "Finished. Press any key to continue ..."
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

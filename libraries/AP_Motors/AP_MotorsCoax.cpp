@@ -16,7 +16,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include "AP_MotorsCoax.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 extern const AP_HAL::HAL& hal;
@@ -38,7 +38,7 @@ void AP_MotorsCoax::init(motor_frame_class frame_class, motor_frame_type frame_t
         SRV_Channels::set_angle(SRV_Channels::get_motor_function(i), AP_MOTORS_COAX_SERVO_INPUT_RANGE);
     }
 
-    _mav_type = MAV_TYPE_COAXIAL;
+    _mav_type = AGPILOT_TYPE_COAXIAL;
 
     // record successful initialisation if what we setup was the desired frame_class
     set_initialised_ok(frame_class == MOTOR_FRAME_COAX);

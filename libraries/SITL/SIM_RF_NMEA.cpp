@@ -18,7 +18,7 @@
 
 #include "SIM_RF_NMEA.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <stdio.h>
 #include <string.h>

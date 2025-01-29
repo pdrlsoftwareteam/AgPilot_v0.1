@@ -30,7 +30,7 @@
 #include <dronecan/remoteid/System.hpp>
 #include <dronecan/remoteid/ArmStatus.hpp>
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 static uavcan::Publisher<dronecan::remoteid::Location>* dc_location[HAL_MAX_CAN_PROTOCOL_DRIVERS];
 static uavcan::Publisher<dronecan::remoteid::BasicID>* dc_basic_id[HAL_MAX_CAN_PROTOCOL_DRIVERS];
@@ -99,7 +99,7 @@ void AP_OpenDroneID::dronecan_init(AP_UAVCAN *uavcan)
 
 alloc_failed:
     dronecan_init_failed |= driver_mask;
-    GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "OpenDroneID DroneCAN alloc failed");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "OpenDroneID DroneCAN alloc failed");
 }
 
 /*
@@ -241,7 +241,7 @@ static void handle_arm_status(AP_UAVCAN* ap_uavcan, uint8_t node_id, const ArmSt
     AP::opendroneid().set_arm_status(status);
 
     // Push DroneCAN Arm Message to GCS
-    gcs().send_to_active_channels(MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS,(const char*)&status);
+    gcs().send_to_active_channels(AGPILOTLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS,(const char*)&status);
 }
 
 // copy arm status for DroneCAN

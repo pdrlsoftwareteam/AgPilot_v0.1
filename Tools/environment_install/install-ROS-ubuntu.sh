@@ -182,7 +182,7 @@ done
 # sudo apt install -y ros-${ROS_VERSION}-robot-upstart
 # sudo apt install -y ros-${ROS_VERSION}-navigation
 
-# Install MAVROS and the geographic libs
+# Install AGPILOTROS and the geographic libs
 sudo apt install -y ros-${ROS_VERSION}-mavros
 
 wget  https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh

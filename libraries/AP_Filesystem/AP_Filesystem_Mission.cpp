@@ -25,8 +25,8 @@
 #include <AP_Mission/AP_Mission.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_Rally/AP_Rally.h>
-#include <GCS_MAVLink/MissionItemProtocol_Rally.h>
-#include <GCS_MAVLink/MissionItemProtocol_Fence.h>
+#include <GCS_AGPILOTLink/MissionItemProtocol_Rally.h>
+#include <GCS_AGPILOTLink/MissionItemProtocol_Fence.h>
 
 extern const AP_HAL::HAL& hal;
 extern int errno;
@@ -35,7 +35,7 @@ extern int errno;
 
 int AP_Filesystem_Mission::open(const char *fname, int flags, bool allow_absolute_paths)
 {
-    enum MAV_MISSION_TYPE mtype;
+    enum AGPILOT_MISSION_TYPE mtype;
 
     if (!check_file_name(fname, mtype)) {
         errno = ENOENT;
@@ -102,7 +102,7 @@ int AP_Filesystem_Mission::close(int fd)
   packed format:
     file header:
       uint16_t magic = 0x671b
-      uint16_t data_type MAV_MISSION_TYPE_*
+      uint16_t data_type AGPILOT_MISSION_TYPE_*
       uint32_t total_items
 
     per-entry is mavlink packed item
@@ -148,7 +148,7 @@ int32_t AP_Filesystem_Mission::read(int fd, void *buf, uint32_t count)
 
     uint32_t data_ofs = r.file_ofs - sizeof(struct header);
     mavlink_mission_item_int_t item {};
-    const uint8_t item_size = MAVLINK_MSG_ID_MISSION_ITEM_INT_LEN;
+    const uint8_t item_size = AGPILOTLINK_MSG_ID_MISSION_ITEM_INT_LEN;
     uint32_t item_ofs = data_ofs % item_size;
     uint32_t total = 0;
 
@@ -195,7 +195,7 @@ int32_t AP_Filesystem_Mission::lseek(int fd, int32_t offset, int seek_from)
 
 int AP_Filesystem_Mission::stat(const char *name, struct stat *stbuf)
 {
-    enum MAV_MISSION_TYPE mtype;
+    enum AGPILOT_MISSION_TYPE mtype;
     if (!check_file_name(name, mtype)) {
         errno = ENOENT;
         return -1;
@@ -209,21 +209,21 @@ int AP_Filesystem_Mission::stat(const char *name, struct stat *stbuf)
 /*
   check for the right file name
  */
-bool AP_Filesystem_Mission::check_file_name(const char *name, enum MAV_MISSION_TYPE &mtype)
+bool AP_Filesystem_Mission::check_file_name(const char *name, enum AGPILOT_MISSION_TYPE &mtype)
 {
     if (strcmp(name, "mission.dat") == 0) {
-        mtype = MAV_MISSION_TYPE_MISSION;
+        mtype = AGPILOT_MISSION_TYPE_MISSION;
         return true;
     }
 #if AP_FENCE_ENABLED
     if (strcmp(name, "fence.dat") == 0) {
-        mtype = MAV_MISSION_TYPE_FENCE;
+        mtype = AGPILOT_MISSION_TYPE_FENCE;
         return true;
     }
 #endif
 #if HAL_RALLY_ENABLED
     if (strcmp(name, "rally.dat") == 0) {
-        mtype = MAV_MISSION_TYPE_RALLY;
+        mtype = AGPILOT_MISSION_TYPE_RALLY;
         return true;
     }
 #endif
@@ -233,10 +233,10 @@ bool AP_Filesystem_Mission::check_file_name(const char *name, enum MAV_MISSION_T
 /*
   get one item
  */
-bool AP_Filesystem_Mission::get_item(uint32_t idx, enum MAV_MISSION_TYPE mtype, mavlink_mission_item_int_t &item) const
+bool AP_Filesystem_Mission::get_item(uint32_t idx, enum AGPILOT_MISSION_TYPE mtype, mavlink_mission_item_int_t &item) const
 {
     switch (mtype) {
-    case MAV_MISSION_TYPE_MISSION: {
+    case AGPILOT_MISSION_TYPE_MISSION: {
         auto *mission = AP::mission();
         if (!mission) {
             return false;
@@ -244,11 +244,11 @@ bool AP_Filesystem_Mission::get_item(uint32_t idx, enum MAV_MISSION_TYPE mtype, 
         return mission->get_item(idx, item);
     }
 #if AP_FENCE_ENABLED
-    case MAV_MISSION_TYPE_FENCE:
+    case AGPILOT_MISSION_TYPE_FENCE:
         return MissionItemProtocol_Fence::get_item_as_mission_item(idx, item);
 #endif
 #if HAL_RALLY_ENABLED
-    case MAV_MISSION_TYPE_RALLY:
+    case AGPILOT_MISSION_TYPE_RALLY:
         return MissionItemProtocol_Rally::get_item_as_mission_item(idx, item);
 #endif
     default:
@@ -258,10 +258,10 @@ bool AP_Filesystem_Mission::get_item(uint32_t idx, enum MAV_MISSION_TYPE mtype, 
 }
 
 // get number of items
-uint32_t AP_Filesystem_Mission::get_num_items(enum MAV_MISSION_TYPE mtype) const
+uint32_t AP_Filesystem_Mission::get_num_items(enum AGPILOT_MISSION_TYPE mtype) const
 {
     switch (mtype) {
-    case MAV_MISSION_TYPE_MISSION: {
+    case AGPILOT_MISSION_TYPE_MISSION: {
         auto *mission = AP::mission();
         if (!mission) {
             return 0;
@@ -269,7 +269,7 @@ uint32_t AP_Filesystem_Mission::get_num_items(enum MAV_MISSION_TYPE mtype) const
         return mission->num_commands();
     }
         
-    case MAV_MISSION_TYPE_FENCE: {
+    case AGPILOT_MISSION_TYPE_FENCE: {
 #if AP_FENCE_ENABLED
         auto *fence = AP::fence();
         if (fence == nullptr) {
@@ -282,7 +282,7 @@ uint32_t AP_Filesystem_Mission::get_num_items(enum MAV_MISSION_TYPE mtype) const
     }
 
 #if HAL_RALLY_ENABLED
-    case MAV_MISSION_TYPE_RALLY: {
+    case AGPILOT_MISSION_TYPE_RALLY: {
         auto *rally = AP::rally();
         if (rally == nullptr) {
             return 0;
@@ -317,7 +317,7 @@ int32_t AP_Filesystem_Mission::write(int fd, const void *buf, uint32_t count)
         // pre-expand the buffer to the full size when we get the header
         memcpy(&hdr, buf, sizeof(hdr));
         if (hdr.num_items < 0xFFFF) {
-            const uint32_t flen = sizeof(hdr) + hdr.num_items * MAVLINK_MSG_ID_MISSION_ITEM_INT_LEN;
+            const uint32_t flen = sizeof(hdr) + hdr.num_items * AGPILOTLINK_MSG_ID_MISSION_ITEM_INT_LEN;
             if (flen > r.writebuf->get_length()) {
                 if (!r.writebuf->append(nullptr, flen - r.writebuf->get_length())) {
                     // not enough memory
@@ -361,7 +361,7 @@ bool AP_Filesystem_Mission::finish_upload(const rfile &r)
     if (flen < sizeof(hdr)) {
         return false;
     }
-    const uint8_t item_size = MAVLINK_MSG_ID_MISSION_ITEM_INT_LEN;
+    const uint8_t item_size = AGPILOTLINK_MSG_ID_MISSION_ITEM_INT_LEN;
     const uint32_t nitems = (flen - sizeof(hdr)) / item_size;
 
     memcpy(&hdr, b, sizeof(hdr));
@@ -393,11 +393,11 @@ bool AP_Filesystem_Mission::finish_upload(const rfile &r)
         mavlink_mission_item_int_t m {};
         AP_Mission::Mission_Command cmd;
         memcpy(&m, &b[sizeof(hdr)+i*item_size], item_size);
-        const MAV_MISSION_RESULT res = AP_Mission::mavlink_int_to_mission_cmd(m, cmd);
-        if (res != MAV_MISSION_ACCEPTED) {
+        const AGPILOT_MISSION_RESULT res = AP_Mission::mavlink_int_to_mission_cmd(m, cmd);
+        if (res != AGPILOT_MISSION_ACCEPTED) {
             return false;
         }
-        if (cmd.id == MAV_CMD_DO_JUMP &&
+        if (cmd.id == AGPILOT_CMD_DO_JUMP &&
             (cmd.content.jump.target >= nitems || cmd.content.jump.target == 0)) {
             return false;
         }

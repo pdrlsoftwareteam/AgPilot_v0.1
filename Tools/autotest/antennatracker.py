@@ -122,7 +122,7 @@ class AutoTestTracker(AutoTest):
         # magically changes to SERVOTEST (3)
         for value in 1900, 1200:
             channel = 1
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_SERVO,
                          channel,
                          value,
                          0,
@@ -134,7 +134,7 @@ class AutoTestTracker(AutoTest):
             self.wait_servo_channel_value(channel, value)
         for value in 1300, 1670:
             channel = 2
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_SERVO,
                          channel,
                          value,
                          0,

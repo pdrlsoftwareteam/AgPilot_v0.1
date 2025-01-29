@@ -1,6 +1,6 @@
 #include "AP_Mission.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Camera/AP_Camera.h>
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_Parachute/AP_Parachute.h>
@@ -43,12 +43,12 @@ bool AP_Mission::start_command_do_gripper(const AP_Mission::Mission_Command& cmd
     case GRIPPER_ACTION_RELEASE:
         gripper->release();
         // Log_Write_Event(DATA_GRIPPER_RELEASE);
-        gcs().send_text(MAV_SEVERITY_INFO, "Gripper Released");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Gripper Released");
         return true;
     case GRIPPER_ACTION_GRAB:
         gripper->grab();
         // Log_Write_Event(DATA_GRIPPER_GRAB);
-        gcs().send_text(MAV_SEVERITY_INFO, "Gripper Grabbed");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Gripper Grabbed");
         return true;
     default:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -67,10 +67,10 @@ bool AP_Mission::start_command_do_servorelayevents(const AP_Mission::Mission_Com
     }
 
     switch (cmd.id) {
-    case MAV_CMD_DO_SET_SERVO:
+    case AGPILOT_CMD_DO_SET_SERVO:
         return sre->do_set_servo(cmd.content.servo.channel, cmd.content.servo.pwm);
     
-	case MAV_CMD_DO_SET_RELAY:
+	case AGPILOT_CMD_DO_SET_RELAY:
         return sre->do_set_relay(cmd.content.relay.num, cmd.content.relay.state);
 
     default:
@@ -91,7 +91,7 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
 
     switch (cmd.id) {
 
-    case MAV_CMD_DO_DIGICAM_CONFIGURE:                  // Mission command to configure an on-board camera controller system. |Modes: P, TV, AV, M, Etc| Shutter speed: Divisor number for one second| Aperture: F stop number| ISO number e.g. 80, 100, 200, Etc| Exposure type enumerator| Command Identity| Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)|
+    case AGPILOT_CMD_DO_DIGICAM_CONFIGURE:                  // Mission command to configure an on-board camera controller system. |Modes: P, TV, AV, M, Etc| Shutter speed: Divisor number for one second| Aperture: F stop number| ISO number e.g. 80, 100, 200, Etc| Exposure type enumerator| Command Identity| Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)|
         camera->configure(
             cmd.content.digicam_configure.shooting_mode,
             cmd.content.digicam_configure.shutter_speed,
@@ -102,7 +102,7 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
             cmd.content.digicam_configure.engine_cutoff_time);
         return true;
 
-    case MAV_CMD_DO_DIGICAM_CONTROL:                    // Mission command to control an on-board camera controller system. |Session control e.g. show/hide lens| Zoom's absolute position| Zooming step value to offset zoom from the current position| Focus Locking, Unlocking or Re-locking| Shooting Command| Command Identity| Empty|
+    case AGPILOT_CMD_DO_DIGICAM_CONTROL:                    // Mission command to control an on-board camera controller system. |Session control e.g. show/hide lens| Zoom's absolute position| Zooming step value to offset zoom from the current position| Focus Locking, Unlocking or Re-locking| Shooting Command| Command Identity| Empty|
         camera->control(
             cmd.content.digicam_control.session,
             cmd.content.digicam_control.zoom_pos,
@@ -112,21 +112,21 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
             cmd.content.digicam_control.cmd_id);
         return true;
 
-    case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
+    case AGPILOT_CMD_DO_SET_CAM_TRIGG_DIST:
         camera->set_trigger_distance(cmd.content.cam_trigg_dist.meters);
         if (cmd.content.cam_trigg_dist.trigger == 1) {
             camera->take_picture();
         }
         return true;
 
-    case MAV_CMD_SET_CAMERA_ZOOM:
+    case AGPILOT_CMD_SET_CAMERA_ZOOM:
         if (cmd.content.set_camera_zoom.zoom_type == ZOOM_TYPE_CONTINUOUS) {
             camera->set_zoom_step(cmd.content.set_camera_zoom.zoom_value);
             return true;
         }
         return false;
 
-    case MAV_CMD_SET_CAMERA_FOCUS:
+    case AGPILOT_CMD_SET_CAMERA_FOCUS:
         // accept any of the auto focus types
         if ((cmd.content.set_camera_focus.focus_type == FOCUS_TYPE_AUTO) ||
             (cmd.content.set_camera_focus.focus_type == FOCUS_TYPE_AUTO_SINGLE) ||
@@ -141,7 +141,7 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
         }
         return false;
 
-    case MAV_CMD_IMAGE_START_CAPTURE:
+    case AGPILOT_CMD_IMAGE_START_CAPTURE:
         camera->take_picture();
         return true;
 
@@ -186,7 +186,7 @@ bool AP_Mission::start_command_parachute(const AP_Mission::Mission_Command& cmd)
 bool AP_Mission::command_do_set_repeat_dist(const AP_Mission::Mission_Command& cmd)
 {
     _repeat_dist = cmd.p1;
-    gcs().send_text(MAV_SEVERITY_INFO, "Resume repeat dist set to %u m",_repeat_dist);
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Resume repeat dist set to %u m",_repeat_dist);
     return true;
 }
 
@@ -242,12 +242,12 @@ bool AP_Mission::start_command_do_gimbal_manager_pitchyaw(const AP_Mission::Miss
 
     // check flags for change to RETRACT
     if ((cmd.content.gimbal_manager_pitchyaw.flags & GIMBAL_MANAGER_FLAGS_RETRACT) > 0) {
-        mount->set_mode(gimbal_instance, MAV_MOUNT_MODE_RETRACT);
+        mount->set_mode(gimbal_instance, AGPILOT_MOUNT_MODE_RETRACT);
         return true;
     }
     // check flags for change to NEUTRAL
     if ((cmd.content.gimbal_manager_pitchyaw.flags & GIMBAL_MANAGER_FLAGS_NEUTRAL) > 0) {
-        mount->set_mode(gimbal_instance, MAV_MOUNT_MODE_NEUTRAL);
+        mount->set_mode(gimbal_instance, AGPILOT_MOUNT_MODE_NEUTRAL);
         return true;
     }
 

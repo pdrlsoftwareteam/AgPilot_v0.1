@@ -37,7 +37,7 @@ note: for Rolling Circle, the time it takes to make the circle is 360/yawrate. Y
 ## Loading the script
 
 Put the sport_aerobatics.lua script on your microSD card in the
-APM/SCRIPTS directory. You can use MAVFtp to do this.
+APM/SCRIPTS directory. You can use AGPILOTFtp to do this.
 
 Then set
 

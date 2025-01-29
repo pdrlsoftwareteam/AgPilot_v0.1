@@ -5,7 +5,7 @@
 #if AP_SIM_ENABLED
 
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Common/Location.h>

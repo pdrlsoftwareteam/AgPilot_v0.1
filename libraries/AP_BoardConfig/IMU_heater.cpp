@@ -20,7 +20,7 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_IOMCU/AP_IOMCU.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "AP_BoardConfig.h"
 
 #if HAL_HAVE_IMU_HEATER
@@ -108,7 +108,7 @@ void AP_BoardConfig::set_imu_temp(float current)
 #endif // HAL_LOGGING_ENABLED
 
 #if 0
-    gcs().send_text(MAV_SEVERITY_INFO, "Heater: Out=%.1f Temp=%.1f",
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Heater: Out=%.1f Temp=%.1f",
                     double(heater.output),
                     double(avg));
 #endif

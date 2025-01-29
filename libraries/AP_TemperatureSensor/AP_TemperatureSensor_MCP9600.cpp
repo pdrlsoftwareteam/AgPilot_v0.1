@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <AP_HAL/I2CDevice.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL &hal;
 

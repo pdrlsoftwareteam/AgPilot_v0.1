@@ -93,8 +93,8 @@
  # define RANGEFINDER_GLITCH_NUM_SAMPLES  3   // number of rangefinder glitches in a row to take new reading
 #endif
 
-#ifndef MAV_SYSTEM_ID
- # define MAV_SYSTEM_ID          1
+#ifndef AGPILOT_SYSTEM_ID
+ # define AGPILOT_SYSTEM_ID          1
 #endif
 
 // prearm GPS hdop check

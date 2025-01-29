@@ -257,9 +257,9 @@ uint64_t Util::get_hw_rtc() const
 
 #if !defined(HAL_NO_FLASH_SUPPORT) && !defined(HAL_NO_ROMFS_SUPPORT)
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #if HAL_GCS_ENABLED
-#define Debug(fmt, args ...)  do { gcs().send_text(MAV_SEVERITY_INFO, fmt, ## args); } while (0)
+#define Debug(fmt, args ...)  do { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ## args); } while (0)
 #endif // HAL_GCS_ENABLED
 
 #ifndef Debug
@@ -654,7 +654,7 @@ void Util::apply_persistent_params(void) const
     }
     if (count) {
         AP_Param::invalidate_count();
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Loaded %u persistent parameters (%u errors)",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Loaded %u persistent parameters (%u errors)",
                       unsigned(count), unsigned(errors));
     }
 }
@@ -795,7 +795,7 @@ size_t Util::last_crash_dump_size() const
         return 0;
     }
     if (size == 0xFFFFFFFF) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Crash Dump incomplete, dumping what we got!");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Crash Dump incomplete, dumping what we got!");
         size = stm32_crash_dump_max_size();
     }
     return size;

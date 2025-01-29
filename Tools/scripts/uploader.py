@@ -262,8 +262,8 @@ class uploader(object):
                  source_component=None,
                  no_extf=False,
                  force_erase=False):
-        self.MAVLINK_REBOOT_ID1 = bytearray(b'\xfe\x21\x72\xff\x00\x4c\x00\x00\x40\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf6\x00\x01\x00\x00\x53\x6b')  # NOQA
-        self.MAVLINK_REBOOT_ID0 = bytearray(b'\xfe\x21\x45\xff\x00\x4c\x00\x00\x40\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf6\x00\x00\x00\x00\xcc\x37')  # NOQA
+        self.AGPILOTLINK_REBOOT_ID1 = bytearray(b'\xfe\x21\x72\xff\x00\x4c\x00\x00\x40\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf6\x00\x01\x00\x00\x53\x6b')  # NOQA
+        self.AGPILOTLINK_REBOOT_ID0 = bytearray(b'\xfe\x21\x45\xff\x00\x4c\x00\x00\x40\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf6\x00\x00\x00\x00\xcc\x37')  # NOQA
         if target_component is None:
             target_component = 1
         if source_system is None:
@@ -285,10 +285,10 @@ class uploader(object):
         # generate mavlink reboot message:
         if target_system is not None:
             from pymavlink import mavutil
-            m = mavutil.mavlink.MAVLink_command_long_message(
+            m = mavutil.mavlink.AGPILOTLink_command_long_message(
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
+                mavutil.mavlink.AGPILOT_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
                 1, # confirmation
                 3, # remain in bootloader
                 0,
@@ -297,11 +297,11 @@ class uploader(object):
                 0,
                 0,
                 0)
-            mav = mavutil.mavlink.MAVLink(self,
+            mav = mavutil.mavlink.AGPILOTLink(self,
                                           srcSystem=source_system,
                                           srcComponent=source_component)
-            self.MAVLINK_REBOOT_ID1 = m.pack(mav)
-            self.MAVLINK_REBOOT_ID0 = None
+            self.AGPILOTLINK_REBOOT_ID1 = m.pack(mav)
+            self.AGPILOTLINK_REBOOT_ID0 = None
 
     def close(self):
         if self.port is not None:
@@ -960,12 +960,12 @@ class uploader(object):
         print("If the board does not respond, unplug and re-plug the USB connector.", file=sys.stderr)
 
         try:
-            # try MAVLINK command first
+            # try AGPILOTLINK command first
             self.port.flush()
-            if self.MAVLINK_REBOOT_ID1 is not None:
-                self.__send(self.MAVLINK_REBOOT_ID1)
-            if self.MAVLINK_REBOOT_ID0 is not None:
-                self.__send(self.MAVLINK_REBOOT_ID0)
+            if self.AGPILOTLINK_REBOOT_ID1 is not None:
+                self.__send(self.AGPILOTLINK_REBOOT_ID1)
+            if self.AGPILOTLINK_REBOOT_ID0 is not None:
+                self.__send(self.AGPILOTLINK_REBOOT_ID0)
             # then try reboot via NSH
             self.__send(uploader.NSH_INIT)
             self.__send(uploader.NSH_REBOOT_BL)

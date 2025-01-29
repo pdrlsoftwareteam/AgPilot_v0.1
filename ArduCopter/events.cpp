@@ -84,15 +84,15 @@ void Copter::failsafe_radio_off_event()
     // no need to do anything except log the error as resolved
     // user can now override roll, pitch, yaw and throttle and even use flight mode switch to restore previous flight mode
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_RADIO, LogErrorCode::FAILSAFE_RESOLVED);
-    gcs().send_text(MAV_SEVERITY_WARNING, "Radio Failsafe Cleared");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "Radio Failsafe Cleared");
 }
 
 void Copter::announce_failsafe(const char *type, const char *action_undertaken)
 {
     if (action_undertaken != nullptr) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "%s Failsafe - %s", type, action_undertaken);
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "%s Failsafe - %s", type, action_undertaken);
     } else {
-        gcs().send_text(MAV_SEVERITY_WARNING, "%s Failsafe", type);
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "%s Failsafe", type);
     }
 }
 
@@ -232,7 +232,7 @@ void Copter::failsafe_gcs_on_event(void)
 // failsafe_gcs_off_event - actions to take when GCS contact is restored
 void Copter::failsafe_gcs_off_event(void)
 {
-    gcs().send_text(MAV_SEVERITY_WARNING, "GCS Failsafe Cleared");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "GCS Failsafe Cleared");
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_GCS, LogErrorCode::FAILSAFE_RESOLVED);
 }
 
@@ -278,7 +278,7 @@ void Copter::failsafe_terrain_set_status(bool data_ok)
 void Copter::failsafe_terrain_on_event()
 {
     failsafe.terrain = true;
-    gcs().send_text(MAV_SEVERITY_CRITICAL,"Failsafe: Terrain data missing");
+    gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"Failsafe: Terrain data missing");
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_TERRAIN, LogErrorCode::FAILSAFE_OCCURRED);
 
     if (should_disarm_on_failsafe()) {
@@ -294,7 +294,7 @@ void Copter::failsafe_terrain_on_event()
 
 void Copter::failsafe_obstacle_on_event()
 {
-    gcs().send_text(MAV_SEVERITY_WARNING,"Warning: Obstacle ahead");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING,"Warning: Obstacle ahead");
     AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILSAFE_OCCURRED);
 
 #if MODE_RTL_ENABLED == ENABLED
@@ -318,10 +318,10 @@ void Copter::gpsglitch_check()
         ap.gps_glitching = gps_glitching;
         if (gps_glitching) {
             AP::logger().Write_Error(LogErrorSubsystem::GPS, LogErrorCode::GPS_GLITCH);
-            gcs().send_text(MAV_SEVERITY_CRITICAL,"GPS Glitch or Compass error");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"GPS Glitch or Compass error");
         } else {
             AP::logger().Write_Error(LogErrorSubsystem::GPS, LogErrorCode::ERROR_RESOLVED);
-            gcs().send_text(MAV_SEVERITY_CRITICAL,"Glitch cleared");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"Glitch cleared");
         }
     }
 }
@@ -341,11 +341,11 @@ void Copter::failsafe_deadreckon_check()
         dead_reckoning.active = ekf_dead_reckoning;
         if (dead_reckoning.active) {
             dead_reckoning.start_ms = now_ms;
-            gcs().send_text(MAV_SEVERITY_CRITICAL,"%s started", dr_prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"%s started", dr_prefix_str);
         } else {
             dead_reckoning.start_ms = 0;
             dead_reckoning.timeout = false;
-            gcs().send_text(MAV_SEVERITY_CRITICAL,"%s stopped", dr_prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"%s stopped", dr_prefix_str);
         }
     }
 
@@ -354,7 +354,7 @@ void Copter::failsafe_deadreckon_check()
         const uint32_t dr_timeout_ms = uint32_t(constrain_float(g2.failsafe_dr_timeout * 1000.0f, 0.0f, UINT32_MAX));
         if (now_ms - dead_reckoning.start_ms > dr_timeout_ms) {
             dead_reckoning.timeout = true;
-            gcs().send_text(MAV_SEVERITY_CRITICAL,"%s timeout", dr_prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL,"%s timeout", dr_prefix_str);
         }
     }
 
@@ -406,7 +406,7 @@ void Copter::set_mode_SmartRTL_or_land_with_pause(ModeReason reason)
 {
     // attempt to switch to SMART_RTL, if this failed then switch to Land
     if (!set_mode(Mode::Number::SMART_RTL, reason)) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Using Land Mode");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "SmartRTL Unavailable, Using Land Mode");
         set_mode_land_with_pause(reason);
     } else {
         AP_Notify::events.failsafe_mode_change = 1;
@@ -420,7 +420,7 @@ void Copter::set_mode_SmartRTL_or_RTL(ModeReason reason)
     // attempt to switch to SmartRTL, if this failed then attempt to RTL
     // if that fails, then land
     if (!set_mode(Mode::Number::SMART_RTL, reason)) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Trying RTL Mode");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "SmartRTL Unavailable, Trying RTL Mode");
         set_mode_RTL_or_land_with_pause(reason);
     } else {
         AP_Notify::events.failsafe_mode_change = 1;
@@ -438,7 +438,7 @@ void Copter::set_mode_auto_do_land_start_or_RTL(ModeReason reason)
     }
 #endif
 
-    gcs().send_text(MAV_SEVERITY_WARNING, "Trying RTL Mode");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "Trying RTL Mode");
     set_mode_RTL_or_land_with_pause(reason);
 }
 
@@ -453,7 +453,7 @@ void Copter::set_mode_brake_or_land_with_pause(ModeReason reason)
     }
 #endif
 
-    gcs().send_text(MAV_SEVERITY_WARNING, "Trying Land Mode");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "Trying Land Mode");
     set_mode_land_with_pause(reason);
 }
 
@@ -468,7 +468,7 @@ void Copter::set_mode_loiter_or_RTL(ModeReason reason)
     }
 #endif
 
-    gcs().send_text(MAV_SEVERITY_WARNING, "Trying RTL Mode");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "Trying RTL Mode");
     set_mode_RTL_or_land_with_pause(reason);
 }
 

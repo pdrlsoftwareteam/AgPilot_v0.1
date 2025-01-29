@@ -12,7 +12,7 @@
 
 #include "AP_Logger.h"
 #include "AP_Logger_File.h"
-#include "AP_Logger_MAVLink.h"
+#include "AP_Logger_AGPILOTLink.h"
 #include "LoggerMessageWriter.h"
 
 extern const AP_HAL::HAL& hal;
@@ -267,11 +267,11 @@ void AP_Logger::Write_RSSI()
 void AP_Logger::Write_Command(const mavlink_command_int_t &packet,
                               uint8_t source_system,
                               uint8_t source_component,
-                              const MAV_RESULT result,
+                              const AGPILOT_RESULT result,
                               bool was_command_long)
 {
-    const struct log_MAVLink_Command pkt{
-        LOG_PACKET_HEADER_INIT(LOG_MAVLINK_COMMAND_MSG),
+    const struct log_AGPILOTLink_Command pkt{
+        LOG_PACKET_HEADER_INIT(LOG_AGPILOTLINK_COMMAND_MSG),
         time_us         : AP_HAL::micros64(),
         target_system   : packet.target_system,
         target_component: packet.target_component,

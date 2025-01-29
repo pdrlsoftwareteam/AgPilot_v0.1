@@ -64,7 +64,7 @@ the engine.
 
 This driver should be loaded by placing the lua script in the
 APM/SCRIPTS directory on the microSD card, which can be done either
-directly or via MAVFTP. The following key parameters should be set:
+directly or via AGPILOTFTP. The following key parameters should be set:
 
  - SCR_ENABLE should be set to 1
  - EFI_TYPE should be set to 7
@@ -80,7 +80,7 @@ value of EFI_SP_START_FN) to enable starter control. When that switch
 goes high the engine will be started. When it goes low the engine will
 be stopped.
 
-The GCS will receive EFI_STATUS MAVLink messages which includes RPM,
+The GCS will receive EFI_STATUS AGPILOTLink messages which includes RPM,
 cylinder head temperature, exhaust gas temperature, injection timing,
 engine load, fuel consumption rate, throttle position atmospheric
 pressure and ignition voltage.

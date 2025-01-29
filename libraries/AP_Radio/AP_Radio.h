@@ -19,7 +19,7 @@
  */
 
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 class AP_Radio_backend;
 

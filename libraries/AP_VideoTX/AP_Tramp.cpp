@@ -17,7 +17,7 @@
 
 #include "AP_Tramp.h"
 #include <AP_Math/crc.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 

@@ -249,7 +249,7 @@ void Shared_DMA::dma_info(ExpandingString &str)
     }
 
     // a header to allow for machine parsers to determine format
-    str.printf("DMAV1\n");
+    str.printf("DAGPILOT1\n");
 
     for (uint8_t i = 0; i < SHARED_DMA_MAX_STREAM_ID; i++) {
         // ignore locks not in use

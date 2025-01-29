@@ -21,17 +21,17 @@
 
 #include "onvifhelpers.h"
 // For ChibiOS we will use HW RND # generator
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL &hal;
 
 #if 0
-#define DEBUG_PRINT(fmt,args...) do {GCS_SEND_TEXT(MAV_SEVERITY_INFO ,"AP_ONVIF:" fmt "\n", ## args); } while(0)
+#define DEBUG_PRINT(fmt,args...) do {GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO ,"AP_ONVIF:" fmt "\n", ## args); } while(0)
 #else
 #define DEBUG_PRINT(fmt,args...)
 #endif
 
-#define ERROR_PRINT(fmt,args...) do {GCS_SEND_TEXT(MAV_SEVERITY_ERROR , "AP_ONVIF:" fmt "\n", ## args); } while(0)
+#define ERROR_PRINT(fmt,args...) do {GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR , "AP_ONVIF:" fmt "\n", ## args); } while(0)
 
 const char *wsse_PasswordDigestURI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
 const char *wsse_Base64BinaryURI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";

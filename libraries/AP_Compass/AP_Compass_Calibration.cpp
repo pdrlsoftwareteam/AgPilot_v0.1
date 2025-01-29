@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_GPS/AP_GPS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_InternalError/AP_InternalError.h>
 
@@ -57,7 +57,7 @@ bool Compass::_start_calibration(uint8_t i, bool retry, float delay)
 
 #if COMPASS_MAX_INSTANCES > 1
     if (_priority_did_list[prio] != _priority_did_stored_list[prio]) {
-        gcs().send_text(MAV_SEVERITY_ERROR, "Compass cal requires reboot after priority change");
+        gcs().send_text(AGPILOT_SEVERITY_ERROR, "Compass cal requires reboot after priority change");
         return false;
     }
 #endif
@@ -65,14 +65,14 @@ bool Compass::_start_calibration(uint8_t i, bool retry, float delay)
     if (_calibrator[prio] == nullptr) {
         _calibrator[prio] = new CompassCalibrator();
         if (_calibrator[prio] == nullptr) {
-            gcs().send_text(MAV_SEVERITY_ERROR, "Compass cal object not initialised");
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "Compass cal object not initialised");
             return false;
         }
     }
 
     if (_options.get() & uint16_t(Option::CAL_REQUIRE_GPS)) {
         if (AP::gps().status() < AP_GPS::GPS_OK_FIX_2D) {
-            gcs().send_text(MAV_SEVERITY_ERROR, "Compass cal requires GPS lock");
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "Compass cal requires GPS lock");
             return false;
         }
     }
@@ -98,7 +98,7 @@ bool Compass::_start_calibration(uint8_t i, bool retry, float delay)
     if (!_cal_thread_started) {
         _cal_requires_reboot = true;
         if (!hal.scheduler->thread_create(FUNCTOR_BIND(this, &Compass::_update_calibration_trampoline, void), "compasscal", 2048, AP_HAL::Scheduler::PRIORITY_IO, 0)) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "CompassCalibrator: Cannot start compass thread.");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "CompassCalibrator: Cannot start compass thread.");
             return false;
         }
         _cal_thread_started = true;
@@ -240,7 +240,7 @@ bool Compass::_accept_calibration_mask(uint8_t mask)
     return success;
 }
 
-bool Compass::send_mag_cal_progress(const GCS_MAVLINK& link)
+bool Compass::send_mag_cal_progress(const GCS_AGPILOTLINK& link)
 {
     const mavlink_channel_t chan = link.get_chan();
 
@@ -279,7 +279,7 @@ bool Compass::send_mag_cal_progress(const GCS_MAVLINK& link)
     return true;
 }
 
-bool Compass::send_mag_cal_report(const GCS_MAVLINK& link)
+bool Compass::send_mag_cal_report(const GCS_AGPILOTLINK& link)
 {
     const mavlink_channel_t chan = link.get_chan();
 
@@ -371,20 +371,20 @@ uint8_t Compass::_get_cal_mask()
 /*
   handle an incoming MAG_CAL command
  */
-MAV_RESULT Compass::handle_mag_cal_command(const mavlink_command_long_t &packet)
+AGPILOT_RESULT Compass::handle_mag_cal_command(const mavlink_command_long_t &packet)
 {
-    MAV_RESULT result = MAV_RESULT_FAILED;
+    AGPILOT_RESULT result = AGPILOT_RESULT_FAILED;
 
     switch (packet.command) {
-    case MAV_CMD_DO_START_MAG_CAL: {
-        result = MAV_RESULT_ACCEPTED;
+    case AGPILOT_CMD_DO_START_MAG_CAL: {
+        result = AGPILOT_RESULT_ACCEPTED;
         if (hal.util->get_soft_armed()) {
-            gcs().send_text(MAV_SEVERITY_NOTICE, "Disarm to allow compass calibration");
-            result = MAV_RESULT_FAILED;
+            gcs().send_text(AGPILOT_SEVERITY_NOTICE, "Disarm to allow compass calibration");
+            result = AGPILOT_RESULT_FAILED;
             break;
         }
         if (packet.param1 < 0 || packet.param1 > 255) {
-            result = MAV_RESULT_FAILED;
+            result = AGPILOT_RESULT_FAILED;
             break;
         }
 
@@ -397,21 +397,21 @@ MAV_RESULT Compass::handle_mag_cal_command(const mavlink_command_long_t &packet)
         if (mag_mask == 0) { // 0 means all
             _reset_compass_id();
             if (!start_calibration_all(retry, autosave, delay, autoreboot)) {
-                result = MAV_RESULT_FAILED;
+                result = AGPILOT_RESULT_FAILED;
             }
         } else {
             if (!_start_calibration_mask(mag_mask, retry, autosave, delay, autoreboot)) {
-                result = MAV_RESULT_FAILED;
+                result = AGPILOT_RESULT_FAILED;
             }
         }
 
         break;
     }
 
-    case MAV_CMD_DO_ACCEPT_MAG_CAL: {
-        result = MAV_RESULT_ACCEPTED;
+    case AGPILOT_CMD_DO_ACCEPT_MAG_CAL: {
+        result = AGPILOT_RESULT_ACCEPTED;
         if (packet.param1 < 0 || packet.param1 > 255) {
-            result = MAV_RESULT_FAILED;
+            result = AGPILOT_RESULT_FAILED;
             break;
         }
 
@@ -422,15 +422,15 @@ MAV_RESULT Compass::handle_mag_cal_command(const mavlink_command_long_t &packet)
         }
 
         if (!_accept_calibration_mask(mag_mask)) {
-            result = MAV_RESULT_FAILED;
+            result = AGPILOT_RESULT_FAILED;
         }
         break;
     }
 
-    case MAV_CMD_DO_CANCEL_MAG_CAL: {
-        result = MAV_RESULT_ACCEPTED;
+    case AGPILOT_CMD_DO_CANCEL_MAG_CAL: {
+        result = AGPILOT_RESULT_ACCEPTED;
         if (packet.param1 < 0 || packet.param1 > 255) {
-            result = MAV_RESULT_FAILED;
+            result = AGPILOT_RESULT_FAILED;
             break;
         }
         
@@ -499,7 +499,7 @@ bool Compass::get_uncorrected_field(uint8_t instance, Vector3f &field) const
 
   This assumes that the compass is correctly scaled in milliGauss
 */
-MAV_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
+AGPILOT_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
                                       float lat_deg, float lon_deg, bool force_use)
 {
     _reset_compass_id();
@@ -508,8 +508,8 @@ MAV_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
         // get AHRS position. If unavailable then try GPS location
         if (!AP::ahrs().get_location(loc)) {
             if (AP::gps().status() < AP_GPS::GPS_OK_FIX_3D) {
-                gcs().send_text(MAV_SEVERITY_ERROR, "Mag: no position available");
-                return MAV_RESULT_FAILED;
+                gcs().send_text(AGPILOT_SEVERITY_ERROR, "Mag: no position available");
+                return AGPILOT_RESULT_FAILED;
             }
             loc = AP::gps().location();
         }
@@ -522,8 +522,8 @@ MAV_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
     float declination;
     float inclination;
     if (!AP_Declination::get_mag_field_ef(lat_deg, lon_deg, intensity, declination, inclination)) {
-        gcs().send_text(MAV_SEVERITY_ERROR, "Mag: WMM table error");
-        return MAV_RESULT_FAILED;
+        gcs().send_text(AGPILOT_SEVERITY_ERROR, "Mag: WMM table error");
+        return AGPILOT_RESULT_FAILED;
     }
 
     // create a field vector and rotate to the required orientation
@@ -547,14 +547,14 @@ MAV_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
             continue;
         }
         if (!healthy(i)) {
-            gcs().send_text(MAV_SEVERITY_ERROR, "Mag[%u]: unhealthy\n", i);
-            return MAV_RESULT_FAILED;
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "Mag[%u]: unhealthy\n", i);
+            return AGPILOT_RESULT_FAILED;
         }
 
         Vector3f measurement;
         if (!get_uncorrected_field(i, measurement)) {
-            gcs().send_text(MAV_SEVERITY_ERROR, "Mag[%u]: bad uncorrected field", i);
-            return MAV_RESULT_FAILED;
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "Mag[%u]: bad uncorrected field", i);
+            return AGPILOT_RESULT_FAILED;
         }
 
         Vector3f offsets = field - measurement;
@@ -567,7 +567,7 @@ MAV_RESULT Compass::mag_cal_fixed_yaw(float yaw_deg, uint8_t compass_mask,
 #endif
     }
 
-    return MAV_RESULT_ACCEPTED;
+    return AGPILOT_RESULT_ACCEPTED;
 }
 
 

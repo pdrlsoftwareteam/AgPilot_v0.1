@@ -27,7 +27,7 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Common/Location.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define ADSB_MAX_INSTANCES             1   // Maximum number of ADSB sensor instances available on this platform
 
@@ -41,7 +41,7 @@ class AP_ADSB_Backend;
 class AP_ADSB {
 public:
     friend class AP_ADSB_Backend;
-    friend class AP_ADSB_uAvionix_MAVLink;
+    friend class AP_ADSB_uAvionix_AGPILOTLink;
     friend class AP_ADSB_uAvionix_UCP;
     friend class AP_ADSB_Sagetech;
     friend class AP_ADSB_Sagetech_MXS;
@@ -60,7 +60,7 @@ public:
     // ADSB driver types
     enum class Type {
         None                = 0,
-        uAvionix_MAVLink    = 1,
+        uAvionix_AGPILOTLink    = 1,
         Sagetech            = 2,
         uAvionix_UCP        = 3,
         Sagetech_MXS        = 4,
@@ -226,8 +226,8 @@ private:
         float       furthest_vehicle_distance;
 
         // streamrate stuff
-        uint32_t    send_start_ms[MAVLINK_COMM_NUM_BUFFERS];
-        uint16_t    send_index[MAVLINK_COMM_NUM_BUFFERS];
+        uint32_t    send_start_ms[AGPILOTLINK_COMM_NUM_BUFFERS];
+        uint16_t    send_index[AGPILOTLINK_COMM_NUM_BUFFERS];
     } in_state;
 
     // ADSB-OUT state. Maintains export data
@@ -245,7 +245,7 @@ private:
             int32_t     ICAO_id;
             AP_Int32    ICAO_id_param;
             int32_t     ICAO_id_param_prev = -1; // assume we never send
-            char        callsign[MAVLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN]; //Vehicle identifier (8 characters, null terminated, valid characters are A-Z, 0-9, " " only).
+            char        callsign[AGPILOTLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN]; //Vehicle identifier (8 characters, null terminated, valid characters are A-Z, 0-9, " " only).
             AP_Int8     emitterType;
             AP_Int8     lengthWidth;  // Aircraft length and width encoding (table 2-35 of DO-282B)
             AP_Int8     gpsOffsetLat;

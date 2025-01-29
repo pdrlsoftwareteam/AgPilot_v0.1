@@ -18,7 +18,7 @@
 #include "AP_ADSB_Sagetech.h"
 
 #if HAL_ADSB_SAGETECH_ENABLED
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_HAL/utility/sparse-endian.h>
@@ -190,7 +190,7 @@ void AP_ADSB_Sagetech::handle_ack(const Packet_XP &msg)
     if (prev_transponder_mode != last_ack_transponder_mode) {
         static const char *mode_names[] = {"OFF", "STBY", "ON", "ON-ALT"};
         if (last_ack_transponder_mode < ARRAY_SIZE(mode_names)) {
-            gcs().send_text(MAV_SEVERITY_INFO, "ADSB: RF Mode: %s", mode_names[last_ack_transponder_mode]);
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "ADSB: RF Mode: %s", mode_names[last_ack_transponder_mode]);
         }
     }
 }

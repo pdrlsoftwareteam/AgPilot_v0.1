@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_HAL_Empty/AP_HAL_Empty.h>
 #include <AP_Arming/AP_Arming.h>
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Logger/AP_Logger.h>
@@ -43,7 +43,7 @@ const struct LogStructure log_structure[] = {
     LOG_COMMON_STRUCTURES
 };
 
-const AP_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
+const AP_Param::GroupInfo GCS_AGPILOTLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 

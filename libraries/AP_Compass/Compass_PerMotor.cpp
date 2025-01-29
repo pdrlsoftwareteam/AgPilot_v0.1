@@ -3,7 +3,7 @@
  */
 
 #include "AP_Compass.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 extern const AP_HAL::HAL &hal;

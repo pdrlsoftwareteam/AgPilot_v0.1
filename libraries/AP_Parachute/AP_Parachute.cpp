@@ -9,7 +9,7 @@
 #include <AP_Notify/AP_Notify.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -103,7 +103,7 @@ void AP_Parachute::release()
         return;
     }
 
-    gcs().send_text(MAV_SEVERITY_INFO,"Parachute: Released");
+    gcs().send_text(AGPILOT_SEVERITY_INFO,"Parachute: Released");
     AP::logger().Write_Event(LogEvent::PARACHUTE_RELEASED);
 
     // set release time to current system time

@@ -20,7 +20,7 @@
 #if !APM_BUILD_TYPE(APM_BUILD_Rover)
 #include <AP_Motors/AP_Motors_Class.h>
 #endif
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_InertialSensor_BMI160.h"
 #include "AP_InertialSensor_BMI270.h"
@@ -723,7 +723,7 @@ AP_InertialSensor *AP_InertialSensor::get_singleton()
 bool AP_InertialSensor::register_gyro(uint8_t &instance, uint16_t raw_sample_rate_hz, uint32_t id)
 {
     if (_gyro_count == INS_MAX_INSTANCES) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to register gyro id %u", unsigned(id));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to register gyro id %u", unsigned(id));
         return false;
     }
 
@@ -759,7 +759,7 @@ bool AP_InertialSensor::register_gyro(uint8_t &instance, uint16_t raw_sample_rat
 bool AP_InertialSensor::register_accel(uint8_t &instance, uint16_t raw_sample_rate_hz, uint32_t id)
 {
     if (_accel_count == INS_MAX_INSTANCES) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to register accel id %u", unsigned(id));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to register accel id %u", unsigned(id));
         return false;
     }
 
@@ -848,7 +848,7 @@ bool AP_InertialSensor::set_gyro_window_size(uint16_t size) {
     for (uint8_t i = 0; i < INS_MAX_INSTANCES; i++) {
         for (uint8_t j = 0; j < XYZ_AXIS_COUNT; j++) {
             if (!_gyro_window[i][j].set_size(size)) {
-                GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to allocate window for INS");
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to allocate window for INS");
                 // clean up whatever we have currently allocated
                 for (uint8_t ii = 0; ii <= i; ii++) {
                     for (uint8_t jj = 0; jj < j; jj++) {
@@ -1264,7 +1264,7 @@ AP_InertialSensor::detect_backends(void)
         ADD_BACKEND(AP_InertialSensor_NONE::detect(*this, INS_NONE_SENSOR_A));
         #else
         DEV_PRINTF("INS: unable to initialise driver\n");
-        GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "INS: unable to initialise driver");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_DEBUG, "INS: unable to initialise driver");
         AP_BoardConfig::config_error("INS: unable to initialise driver");
         #endif
     }
@@ -1306,7 +1306,7 @@ bool AP_InertialSensor::_calculate_trim(const Vector3f &accel_sample, Vector3f &
             // user is trying to calibrate view
             rotation = view->get_rotation();
             if (!is_zero(view->get_pitch_trim())) {
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Cannot calibrate with Q_TRIM_PITCH set");
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Cannot calibrate with Q_TRIM_PITCH set");
                 return false;
             }
         }
@@ -1326,20 +1326,20 @@ bool AP_InertialSensor::_calculate_trim(const Vector3f &accel_sample, Vector3f &
         break;
     }
     default:
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "unsupported trim rotation");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "unsupported trim rotation");
         return false;
     }
     if (fabsf(newtrim.x) <= radians(HAL_INS_TRIM_LIMIT_DEG) &&
         fabsf(newtrim.y) <= radians(HAL_INS_TRIM_LIMIT_DEG) &&
         fabsf(newtrim.z) <= radians(HAL_INS_TRIM_LIMIT_DEG)) {
         trim = newtrim;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Trim OK: roll=%.2f pitch=%.2f yaw=%.2f",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Trim OK: roll=%.2f pitch=%.2f yaw=%.2f",
                         (double)degrees(trim.x),
                         (double)degrees(trim.y),
                         (double)degrees(trim.z));
         return true;
     }
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "trim over maximum of 10 degrees");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "trim over maximum of 10 degrees");
     return false;
 }
 
@@ -1815,7 +1815,7 @@ void AP_InertialSensor::update(void)
         AP_Notify::flags.temp_cal_running = false;
         AP_Notify::events.temp_cal_saved = 1;
         tcal_learning = false;
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TCAL finished all IMUs");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "TCAL finished all IMUs");
     }
 #endif
 }
@@ -2336,7 +2336,7 @@ bool AP_InertialSensor::get_primary_accel_cal_sample_avg(uint8_t sample_num, Vec
   perform a simple 1D accel calibration, returning mavlink result code
  */
 #if HAL_GCS_ENABLED
-MAV_RESULT AP_InertialSensor::simple_accel_cal()
+AGPILOT_RESULT AP_InertialSensor::simple_accel_cal()
 {
     uint8_t num_accels = MIN(get_accel_count(), INS_MAX_INSTANCES);
     Vector3f last_average[INS_MAX_INSTANCES];
@@ -2349,7 +2349,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal()
     
     // exit immediately if calibration is already in progress
     if (calibrating()) {
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     }
 
     EXPECT_DELAY_MS(20000);
@@ -2439,19 +2439,19 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal()
         }
     }
 
-    MAV_RESULT result = MAV_RESULT_ACCEPTED;
+    AGPILOT_RESULT result = AGPILOT_RESULT_ACCEPTED;
 
     // see if we've passed
     for (uint8_t k=0; k<num_accels; k++) {
         if (!converged[k]) {
-            result = MAV_RESULT_FAILED;
+            result = AGPILOT_RESULT_FAILED;
         }
     }
 
     // restore orientation
     _board_orientation = saved_orientation;
 
-    if (result == MAV_RESULT_ACCEPTED) {
+    if (result == AGPILOT_RESULT_ACCEPTED) {
         DEV_PRINTF("\nPASSED\n");
         for (uint8_t k=0; k<num_accels; k++) {
             // remove rotated gravity

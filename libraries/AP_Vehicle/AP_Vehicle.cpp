@@ -11,7 +11,7 @@
 #include <AP_Motors/AP_Motors.h>
 #include <AR_Motors/AP_MotorsUGV.h>
 #include <AP_CheckFirmware/AP_CheckFirmware.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <AP_HAL_ChibiOS/sdcard.h>
 #include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
@@ -216,7 +216,7 @@ void AP_Vehicle::setup()
     } 
 #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
     else {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"No airspeed sensor present or enabled");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING,"No airspeed sensor present or enabled");
     }
 #endif
 #endif  // AP_AIRSPEED_ENABLED
@@ -299,7 +299,7 @@ void AP_Vehicle::setup()
     // initialisation
     AP_Param::invalidate_count();
 
-    gcs().send_text(MAV_SEVERITY_INFO, "ArduPilot Ready");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "ArduPilot Ready");
 }
 
 void AP_Vehicle::loop()
@@ -321,13 +321,13 @@ void AP_Vehicle::loop()
         // send RC output mode info if available
         char banner_msg[50];
         if (hal.rcout->get_output_mode_banner(banner_msg, sizeof(banner_msg))) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s", banner_msg);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s", banner_msg);
         }
     }
     const uint32_t new_internal_errors = AP::internalerror().errors();
     if(_last_internal_errors != new_internal_errors) {
         AP::logger().Write_Error(LogErrorSubsystem::INTERNAL_ERROR, LogErrorCode::INTERNAL_ERRORS_DETECTED);
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Internal Errors 0x%x", (unsigned)new_internal_errors);
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Internal Errors 0x%x", (unsigned)new_internal_errors);
         _last_internal_errors = new_internal_errors;
     }
 }
@@ -429,9 +429,9 @@ void AP_Vehicle::get_common_scheduler_tasks(const AP_Scheduler::Task*& tasks, ui
 }
 
 /*
- *  a delay() callback that processes MAVLink packets. We set this as the
+ *  a delay() callback that processes AGPILOTLink packets. We set this as the
  *  callback in long running library initialisation routines to allow
- *  MAVLink to process packets while waiting for the initialisation to
+ *  AGPILOTLink to process packets while waiting for the initialisation to
  *  complete
  */
 void AP_Vehicle::scheduler_delay_callback()
@@ -463,9 +463,9 @@ void AP_Vehicle::scheduler_delay_callback()
     if (tnow - last_5s > 5000) {
         last_5s = tnow;
         if (AP_BoardConfig::in_config_error()) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "Config Error: fix problem then reboot");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Config Error: fix problem then reboot");
         } else {
-            gcs().send_text(MAV_SEVERITY_INFO, "Initialising ArduPilot");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Initialising ArduPilot");
         }
     }
 
@@ -479,7 +479,7 @@ void AP_Vehicle::send_watchdog_reset_statustext()
         return;
     }
     const AP_HAL::Util::PersistentData &pd = hal.util->last_persistent_data;
-    gcs().send_text(MAV_SEVERITY_CRITICAL,
+    gcs().send_text(AGPILOT_SEVERITY_CRITICAL,
                     "WDG: T%d SL%u FL%u FT%u FA%x FTP%u FLR%x FICSR%u MM%u MC%u IE%u IEC%u TN:%.4s",
                     pd.scheduler_task,
                     pd.semaphore_line,
@@ -648,7 +648,7 @@ void AP_Vehicle::update_dynamic_notch_at_specified_rate()
 
 void AP_Vehicle::notify_no_such_mode(uint8_t mode_number)
 {
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"No such mode %u", mode_number);
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING,"No such mode %u", mode_number);
     AP::logger().Write_Error(LogErrorSubsystem::FLIGHT_MODE, LogErrorCode(mode_number));
 }
 
@@ -770,7 +770,7 @@ void AP_Vehicle::one_Hz_update(void)
     if (one_Hz_counter % 10U == 0) {
 #if defined(BOARD_CHECK_F427_USE_1M) && (BOARD_FLASH_SIZE>1024)
         if (!hal.util->get_soft_armed() && check_limit_flash_1M()) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, BOARD_CHECK_F427_USE_1M);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, BOARD_CHECK_F427_USE_1M);
         }
 #endif
     }
@@ -781,7 +781,7 @@ void AP_Vehicle::one_Hz_update(void)
     if (one_Hz_counter % 30U == 0) {
 #if defined(BOARD_CHECK_F427_USE_1M) && (BOARD_FLASH_SIZE<=1024)
         if (!hal.util->get_soft_armed() && !check_limit_flash_1M()) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, BOARD_CHECK_F427_USE_2M);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, BOARD_CHECK_F427_USE_2M);
         }
 #endif
     }
@@ -805,7 +805,7 @@ void AP_Vehicle::check_motor_noise()
         float energy = gyro_fft.has_noise_at_frequency_hz(esc_data[i]);
         energy = esc_noise[i].apply(energy, 0.2f);
         if (energy > 40.0f && AP_HAL::millis() - last_motor_noise_ms > 5000) {
-            gcs().send_text(MAV_SEVERITY_WARNING, "Noise %.fdB on motor %u at %.fHz", energy, i+1, esc_data[i]);
+            gcs().send_text(AGPILOT_SEVERITY_WARNING, "Noise %.fdB on motor %u at %.fHz", energy, i+1, esc_data[i]);
             output_error = true;
         }
     }

@@ -22,7 +22,7 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define OA_DIJKSTRA_EXPANDING_ARRAY_ELEMENTS_PER_CHUNK  32      // expanding arrays for fence points and paths to destination will grow in increments of 20 elements
 #define OA_DIJKSTRA_POLYGON_SHORTPATH_NOTSET_IDX        255     // index use to indicate we do not have a tentative short path for a node
@@ -247,7 +247,7 @@ void AP_OADijkstra::report_error(AP_OADijkstra_Error error_id)
     if ((error_id != AP_OADijkstra_Error::DIJKSTRA_ERROR_NONE) &&
         ((error_id != _error_last_id) || ((now_ms - _error_last_report_ms) > OA_DIJKSTRA_ERROR_REPORTING_INTERVAL_MS))) {
         const char* error_msg = get_error_msg(error_id);
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Dijkstra: %s", error_msg);
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Dijkstra: %s", error_msg);
         _error_last_id = error_id;
         _error_last_report_ms = now_ms;
     }

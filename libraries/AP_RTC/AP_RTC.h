@@ -20,7 +20,7 @@ public:
     // and used in the parameters!
     enum source_type : uint8_t {
         SOURCE_GPS = 0,
-        SOURCE_MAVLINK_SYSTEM_TIME = 1,
+        SOURCE_AGPILOTLINK_SYSTEM_TIME = 1,
         SOURCE_HW = 2,
         SOURCE_NONE,
     };

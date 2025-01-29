@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 
 #include "AP_NavEKF2_core.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <new>
@@ -663,7 +663,7 @@ bool NavEKF2::InitialiseFilter(void)
             initFailure = InitFailures::NO_MEM;
             core_malloc_failed = true;
             num_cores = 0;
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "NavEKF2: not enough memory available");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "NavEKF2: not enough memory available");
             return false;
         }
 
@@ -673,7 +673,7 @@ bool NavEKF2::InitialiseFilter(void)
             initFailure = InitFailures::NO_MEM;
             core_malloc_failed = true;
             num_cores = 0;
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "NavEKF2: memory allocation failed");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "NavEKF2: memory allocation failed");
             return false;
         }
 
@@ -691,7 +691,7 @@ bool NavEKF2::InitialiseFilter(void)
                     hal.util->free_type(core, sizeof(NavEKF2_core)*num_cores, AP_HAL::Util::MEM_FAST);
                     core = nullptr;
                     initFailure = InitFailures::NO_SETUP;
-                    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "NavEKF2: core %d setup failed", num_cores);
+                    GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "NavEKF2: core %d setup failed", num_cores);
                     return false;
                 }
                 num_cores++;
@@ -858,7 +858,7 @@ void NavEKF2::checkLaneSwitch(void)
         updateLaneSwitchPosDownResetData(newPrimaryIndex, primary);
         primary = newPrimaryIndex;
         lastLaneSwitch_ms = now;
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "NavEKF2: lane switch %u", primary);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "NavEKF2: lane switch %u", primary);
     }
 }
 
@@ -1108,7 +1108,7 @@ bool NavEKF2::setOriginLLH(const Location &loc)
         // or if the EKF origin has already been set.
         // This is to prevent accidental setting of EKF origin with an
         // invalid position or height or causing upsets from a shifting origin.
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF2 refusing set origin");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "EKF2 refusing set origin");
         return false;
     }
     bool ret = false;
@@ -1277,7 +1277,7 @@ void  NavEKF2::getFilterGpsStatus(nav_gps_status &status) const
 }
 
 // send an EKF_STATUS_REPORT message to GCS
-void NavEKF2::send_status_report(GCS_MAVLINK &link) const
+void NavEKF2::send_status_report(GCS_AGPILOTLINK &link) const
 {
     if (core) {
         core[primary].send_status_report(link);

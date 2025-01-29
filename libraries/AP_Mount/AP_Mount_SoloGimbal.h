@@ -1,5 +1,5 @@
 /*
-  MAVLink enabled mount backend class
+  AGPILOTLink enabled mount backend class
  */
 #pragma once
 
@@ -10,7 +10,7 @@
 #if HAL_SOLO_GIMBAL_ENABLED
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <RC_Channel/RC_Channel.h>
 #include "SoloGimbal.h"
 

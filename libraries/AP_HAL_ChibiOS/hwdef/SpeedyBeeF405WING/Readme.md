@@ -43,7 +43,7 @@ receive pin for UARTn. The Tn pin is the transmit pin for UARTn.
  - SERIAL3 -> UART3 (GPS) (TX DMA capable)
  - SERIAL4 -> UART4 (User) (TX DMA capable)
  - SERIAL5 -> UART5 (User, available on DJI air unit connector) (TX DMA capable)
- - SERIAL6 -> UART6 (tied to internal wireless module, MAVLink2 telem) 
+ - SERIAL6 -> UART6 (tied to internal wireless module, AGPILOTLink2 telem) 
 
 
 ## RC Input

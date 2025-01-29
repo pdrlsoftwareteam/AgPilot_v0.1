@@ -34,7 +34,7 @@ public:
     float get_current_length() const override { return line_length; }
 
     // send status to ground station
-    void send_status(const GCS_MAVLINK &channel) override;
+    void send_status(const GCS_AGPILOTLINK &channel) override;
 
     // write log
     void write_log() override;

@@ -23,7 +23,7 @@
 #include <AP_HAL/Semaphores.h>
 #include <AP_HAL/Scheduler.h>
 #include <AP_Filesystem/AP_Filesystem.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <utility>
 
@@ -168,7 +168,7 @@ bool AP_OSD_MAX7456::update_font()
     const uint8_t *font_data = fd->data;
     uint32_t font_size = fd->length;
     if (font_size != NVM_RAM_SIZE * 256) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "AP_OSD: bad font size %u\n", unsigned(font_size));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "AP_OSD: bad font size %u\n", unsigned(font_size));
         delete fd;
         return false;
     }

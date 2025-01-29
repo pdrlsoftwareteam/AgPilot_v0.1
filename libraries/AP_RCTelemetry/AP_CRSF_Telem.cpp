@@ -19,7 +19,7 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_GPS/AP_GPS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_RCProtocol/AP_RCProtocol_CRSF.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_AHRS/AP_AHRS.h>
@@ -107,7 +107,7 @@ void AP_CRSF_Telem::setup_custom_telemetry()
     // check if passthru already assigned
     const int8_t frsky_port = AP::serialmanager().find_portnum(AP_SerialManager::SerialProtocol_FrSky_SPort_Passthrough,0);
     if (frsky_port != -1) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "%s: passthrough telemetry conflict on SERIAL%d", get_protocol_string(), frsky_port);
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "%s: passthrough telemetry conflict on SERIAL%d", get_protocol_string(), frsky_port);
        _custom_telem.init_done = true;
        return;
     }
@@ -136,7 +136,7 @@ void AP_CRSF_Telem::setup_custom_telemetry()
     // setup custom telemetry for current rf_mode
     update_custom_telemetry_rates(_telem_rf_mode);
 
-    gcs().send_text(MAV_SEVERITY_DEBUG,"%s: custom telem init done, fw %d.%02d", get_protocol_string(), _crsf_version.major, _crsf_version.minor);
+    gcs().send_text(AGPILOT_SEVERITY_DEBUG,"%s: custom telem init done, fw %d.%02d", get_protocol_string(), _crsf_version.major, _crsf_version.minor);
 
     _custom_telem.init_done = true;
 }
@@ -195,13 +195,13 @@ bool AP_CRSF_Telem::process_rf_mode_changes()
 
     // warn the user if their setup is sub-optimal
     if (_telem_bootstrap_msg_pending && !uart->is_dma_enabled()) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "%s: running on non-DMA serial port", get_protocol_string());
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "%s: running on non-DMA serial port", get_protocol_string());
     }
     // note if option was set to show LQ in place of RSSI
     bool current_lq_as_rssi_active = bool(rc().use_crsf_lq_as_rssi());
     if(_telem_bootstrap_msg_pending || _noted_lq_as_rssi_active != current_lq_as_rssi_active){
         _noted_lq_as_rssi_active = current_lq_as_rssi_active;
-        gcs().send_text(MAV_SEVERITY_INFO, "%s: RSSI now displays %s", get_protocol_string(), current_lq_as_rssi_active ? " as LQ" : "normally");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "%s: RSSI now displays %s", get_protocol_string(), current_lq_as_rssi_active ? " as LQ" : "normally");
     }
     _telem_bootstrap_msg_pending = false;
 
@@ -209,7 +209,7 @@ bool AP_CRSF_Telem::process_rf_mode_changes()
     if ((now - _telem_last_report_ms > 5000)) {
         // report an RF mode change or a change in telemetry rate if we haven't done so in the last 5s
         if (!rc().suppress_crsf_message() && (_telem_rf_mode != current_rf_mode || abs(int16_t(_telem_last_avg_rate) - int16_t(_scheduler.avg_packet_rate)) > 25)) {
-            gcs().send_text(MAV_SEVERITY_INFO, "%s: Link rate %dHz, Telemetry rate %dHz",
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s: Link rate %dHz, Telemetry rate %dHz",
                 get_protocol_string(), crsf->get_link_rate(_crsf_version.protocol), get_telemetry_rate());
         }
         // tune the scheduler based on telemetry speed high/low transitions
@@ -298,7 +298,7 @@ uint16_t AP_CRSF_Telem::get_telemetry_rate() const
     return crsf->get_link_rate(_crsf_version.protocol) - get_avg_packet_rate();
 }
 
-void AP_CRSF_Telem::queue_message(MAV_SEVERITY severity, const char *text)
+void AP_CRSF_Telem::queue_message(AGPILOT_SEVERITY severity, const char *text)
 {
     // no need to queue status text messages when crossfire
     // custom telemetry is not enabled
@@ -464,10 +464,10 @@ void AP_CRSF_Telem::process_packet(uint8_t idx)
                 _crsf_version.minor = 0;
                 _crsf_version.major = 0;
                 disable_scheduler_entry(VERSION_PING);
-                gcs().send_text(MAV_SEVERITY_DEBUG,"%s: RX device ping failed", get_protocol_string());
+                gcs().send_text(AGPILOT_SEVERITY_DEBUG,"%s: RX device ping failed", get_protocol_string());
             } else {
                 calc_device_ping(AP_RCProtocol_CRSF::CRSF_ADDRESS_CRSF_RECEIVER);
-                gcs().send_text(MAV_SEVERITY_DEBUG,"%s: requesting RX device info", get_protocol_string());
+                gcs().send_text(AGPILOT_SEVERITY_DEBUG,"%s: requesting RX device info", get_protocol_string());
             }
             break;
         case DEVICE_PING:
@@ -1391,7 +1391,7 @@ void AP_CRSF_Telem::calc_status_text()
             // keep only warning/error/critical/alert/emergency status text messages
             bool got_message = false;
             while (_statustext.queue.pop(_statustext.next)) {
-                if (_statustext.next.severity <= MAV_SEVERITY_WARNING) {
+                if (_statustext.next.severity <= AGPILOT_SEVERITY_WARNING) {
                     got_message = true;
                     break;
                 }

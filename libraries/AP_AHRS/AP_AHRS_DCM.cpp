@@ -22,7 +22,7 @@
  */
 #include "AP_AHRS.h"
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_Compass/AP_Compass.h>
@@ -62,7 +62,7 @@ void AP_AHRS::load_watchdog_home()
         _home.set_alt_cm(pd.home_alt_cm, Location::AltFrame::ABSOLUTE);
         _home_is_set = true;
         _home_locked = true;
-        gcs().send_text(MAV_SEVERITY_INFO, "Restored watchdog home");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Restored watchdog home");
     }
 }
 
@@ -185,7 +185,7 @@ AP_AHRS_DCM::reset(bool recover_eulers)
         pitch = pd.pitch_rad;
         yaw = pd.yaw_rad;
         _dcm_matrix.from_euler(roll, pitch, yaw);
-        gcs().send_text(MAV_SEVERITY_INFO, "Restored watchdog attitude %.0f %.0f %.0f",
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Restored watchdog attitude %.0f %.0f %.0f",
                         degrees(roll), degrees(pitch), degrees(yaw));
     } else if (recover_eulers && !isnan(roll) && !isnan(pitch) && !isnan(yaw)) {
         _dcm_matrix.from_euler(roll, pitch, yaw);
@@ -1251,7 +1251,7 @@ bool AP_AHRS_DCM::get_relative_position_D_origin(float &posD) const
     return true;
 }
 
-void AP_AHRS_DCM::send_ekf_status_report(GCS_MAVLINK &link) const
+void AP_AHRS_DCM::send_ekf_status_report(GCS_AGPILOTLINK &link) const
 {
 }
 

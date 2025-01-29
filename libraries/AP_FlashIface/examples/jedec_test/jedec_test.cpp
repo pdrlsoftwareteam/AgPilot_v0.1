@@ -15,7 +15,7 @@ void loop()
 
 #else
 
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_FlashIface/AP_FlashIface.h>
@@ -38,7 +38,7 @@ GCS_Dummy _gcs;
 #define DELAY_MICROS(x)         do { hal.scheduler->delay_microseconds(x); } while(0)
 #endif
 
-const AP_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
+const AP_Param::GroupInfo GCS_AGPILOTLINK_Parameters::var_info[] = {
         AP_GROUPEND
 };
 

@@ -10,9 +10,9 @@ void Copter::avoidance_adsb_update(void)
 
 #include <stdio.h>
 
-MAV_COLLISION_ACTION AP_Avoidance_Copter::handle_avoidance(const AP_Avoidance::Obstacle *obstacle, MAV_COLLISION_ACTION requested_action)
+AGPILOT_COLLISION_ACTION AP_Avoidance_Copter::handle_avoidance(const AP_Avoidance::Obstacle *obstacle, AGPILOT_COLLISION_ACTION requested_action)
 {
-    MAV_COLLISION_ACTION actual_action = requested_action;
+    AGPILOT_COLLISION_ACTION actual_action = requested_action;
     bool failsafe_state_change = false;
 
     // check for changes in failsafe
@@ -25,60 +25,60 @@ MAV_COLLISION_ACTION AP_Avoidance_Copter::handle_avoidance(const AP_Avoidance::O
 
     // take no action in some flight modes
     if (copter.flightmode->mode_number() == Mode::Number::LAND) {
-        actual_action = MAV_COLLISION_ACTION_NONE;
+        actual_action = AGPILOT_COLLISION_ACTION_NONE;
     }
 
     // if landed and we will take some kind of action, just disarm
-    if ((actual_action > MAV_COLLISION_ACTION_REPORT) && copter.should_disarm_on_failsafe()) {
+    if ((actual_action > AGPILOT_COLLISION_ACTION_REPORT) && copter.should_disarm_on_failsafe()) {
         copter.arming.disarm(AP_Arming::Method::ADSBCOLLISIONACTION);
-        actual_action = MAV_COLLISION_ACTION_NONE;
+        actual_action = AGPILOT_COLLISION_ACTION_NONE;
     } else {
 
         // take action based on requested action
         switch (actual_action) {
 
-            case MAV_COLLISION_ACTION_RTL:
+            case AGPILOT_COLLISION_ACTION_RTL:
                 // attempt to switch to RTL, if this fails (i.e. flying in manual mode with bad position) do nothing
                 if (failsafe_state_change) {
                     if (!copter.set_mode(Mode::Number::RTL, ModeReason::AVOIDANCE)) {
-                        actual_action = MAV_COLLISION_ACTION_NONE;
+                        actual_action = AGPILOT_COLLISION_ACTION_NONE;
                     }
                 }
                 break;
 
-            case MAV_COLLISION_ACTION_HOVER:
+            case AGPILOT_COLLISION_ACTION_HOVER:
                 // attempt to switch to Loiter, if this fails (i.e. flying in manual mode with bad position) do nothing
                 if (failsafe_state_change) {
                     if (!copter.set_mode(Mode::Number::LOITER, ModeReason::AVOIDANCE)) {
-                        actual_action = MAV_COLLISION_ACTION_NONE;
+                        actual_action = AGPILOT_COLLISION_ACTION_NONE;
                     }
                 }
                 break;
 
-            case MAV_COLLISION_ACTION_ASCEND_OR_DESCEND:
+            case AGPILOT_COLLISION_ACTION_ASCEND_OR_DESCEND:
                 // climb or descend to avoid obstacle
                 if (!handle_avoidance_vertical(obstacle, failsafe_state_change)) {
-                    actual_action = MAV_COLLISION_ACTION_NONE;
+                    actual_action = AGPILOT_COLLISION_ACTION_NONE;
                 }
                 break;
 
-            case MAV_COLLISION_ACTION_MOVE_HORIZONTALLY:
+            case AGPILOT_COLLISION_ACTION_MOVE_HORIZONTALLY:
                 // move horizontally to avoid obstacle
                 if (!handle_avoidance_horizontal(obstacle, failsafe_state_change)) {
-                    actual_action = MAV_COLLISION_ACTION_NONE;
+                    actual_action = AGPILOT_COLLISION_ACTION_NONE;
                 }
                 break;
 
-            case MAV_COLLISION_ACTION_MOVE_PERPENDICULAR:
+            case AGPILOT_COLLISION_ACTION_MOVE_PERPENDICULAR:
                 if (!handle_avoidance_perpendicular(obstacle, failsafe_state_change)) {
-                    actual_action = MAV_COLLISION_ACTION_NONE;
+                    actual_action = AGPILOT_COLLISION_ACTION_NONE;
                 }
                 break;
 
             // unsupported actions and those that require no response
-            case MAV_COLLISION_ACTION_NONE:
+            case AGPILOT_COLLISION_ACTION_NONE:
                 return actual_action;
-            case MAV_COLLISION_ACTION_REPORT:
+            case AGPILOT_COLLISION_ACTION_REPORT:
             default:
                 break;
         }

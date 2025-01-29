@@ -52,7 +52,7 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_InternalError',
     'AP_Logger',
     'Filter',
-    'GCS_MAVLink',
+    'GCS_AGPILOTLink',
     'RC_Channel',
     'SRV_Channel',
     'StorageManager',

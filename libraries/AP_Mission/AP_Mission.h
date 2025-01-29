@@ -1,5 +1,5 @@
 /// @file    AP_Mission.h
-/// @brief   Handles the MAVLINK command mission stack.  Reads and writes mission to storage.
+/// @brief   Handles the AGPILOTLINK command mission stack.  Reads and writes mission to storage.
 
 /*
  *   The AP_Mission library:
@@ -14,7 +14,7 @@
 
 #include "AP_Mission_config.h"
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_Common/Location.h>
@@ -257,7 +257,7 @@ public:
         int16_t climb_rate;
     };
 
-    // MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW support
+    // AGPILOT_CMD_DO_GIMBAL_MANAGER_PITCHYAW support
     struct PACKED gimbal_manager_pitchyaw_Command {
         int8_t pitch_angle_deg;
         int16_t yaw_angle_deg;
@@ -267,31 +267,31 @@ public:
         uint8_t gimbal_id;
     };
 
-    // MAV_CMD_IMAGE_START_CAPTURE support
+    // AGPILOT_CMD_IMAGE_START_CAPTURE support
     struct PACKED image_start_capture_Command {
         float interval_s;
         uint16_t total_num_images;
         uint16_t start_seq_number;
     };
 
-    // MAV_CMD_SET_CAMERA_ZOOM support
+    // AGPILOT_CMD_SET_CAMERA_ZOOM support
     struct PACKED set_camera_zoom_Command {
         uint8_t zoom_type;
         float zoom_value;
     };
 
-    // MAV_CMD_SET_CAMERA_FOCUS support
+    // AGPILOT_CMD_SET_CAMERA_FOCUS support
     struct PACKED set_camera_focus_Command {
         uint8_t focus_type;
         float focus_value;
     };
 
-    // MAV_CMD_VIDEO_START_CAPTURE support
+    // AGPILOT_CMD_VIDEO_START_CAPTURE support
     struct PACKED video_start_capture_Command {
         uint8_t video_stream_id;
     };
 
-    // MAV_CMD_VIDEO_STOP_CAPTURE support
+    // AGPILOT_CMD_VIDEO_STOP_CAPTURE support
     struct PACKED video_stop_capture_Command {
         uint8_t video_stream_id;
     };
@@ -374,22 +374,22 @@ public:
         // nav attitude time
         nav_attitude_time_Command nav_attitude_time;
 
-        // MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW
+        // AGPILOT_CMD_DO_GIMBAL_MANAGER_PITCHYAW
         gimbal_manager_pitchyaw_Command gimbal_manager_pitchyaw;
 
-        // MAV_CMD_IMAGE_START_CAPTURE support
+        // AGPILOT_CMD_IMAGE_START_CAPTURE support
         image_start_capture_Command image_start_capture;
 
-        // MAV_CMD_SET_CAMERA_ZOOM support
+        // AGPILOT_CMD_SET_CAMERA_ZOOM support
         set_camera_zoom_Command set_camera_zoom;
 
-        // MAV_CMD_SET_CAMERA_FOCUS support
+        // AGPILOT_CMD_SET_CAMERA_FOCUS support
         set_camera_focus_Command set_camera_focus;
 
-        // MAV_CMD_VIDEO_START_CAPTURE support
+        // AGPILOT_CMD_VIDEO_START_CAPTURE support
         video_start_capture_Command video_start_capture;
 
-        // MAV_CMD_VIDEO_STOP_CAPTURE support
+        // AGPILOT_CMD_VIDEO_STOP_CAPTURE support
         video_stop_capture_Command video_stop_capture;
 
         // location
@@ -545,7 +545,7 @@ public:
 
     /// get_current_nav_index - returns the current "navigation" command index
     /// Note that this will return 0 if there is no command. This is
-    /// used in MAVLink reporting of the mission command
+    /// used in AGPILOTLink reporting of the mission command
     uint16_t get_current_nav_index() const
     {
         return _nav_cmd.index==AP_MISSION_CMD_INDEX_NONE?0:_nav_cmd.index;
@@ -623,18 +623,18 @@ public:
     ///     home is taken directly from ahrs
     void write_home_to_storage();
 
-    static MAV_MISSION_RESULT convert_MISSION_ITEM_to_MISSION_ITEM_INT(const mavlink_mission_item_t &mission_item,
+    static AGPILOT_MISSION_RESULT convert_MISSION_ITEM_to_MISSION_ITEM_INT(const mavlink_mission_item_t &mission_item,
             mavlink_mission_item_int_t &mission_item_int) WARN_IF_UNUSED;
-    static MAV_MISSION_RESULT convert_MISSION_ITEM_INT_to_MISSION_ITEM(const mavlink_mission_item_int_t &mission_item_int,
+    static AGPILOT_MISSION_RESULT convert_MISSION_ITEM_INT_to_MISSION_ITEM(const mavlink_mission_item_int_t &mission_item_int,
             mavlink_mission_item_t &mission_item) WARN_IF_UNUSED;
 
     // mavlink_int_to_mission_cmd - converts mavlink message to an AP_Mission::Mission_Command object which can be stored to eeprom
-    //  return MAV_MISSION_ACCEPTED on success, MAV_MISSION_RESULT error on failure
-    static MAV_MISSION_RESULT mavlink_int_to_mission_cmd(const mavlink_mission_item_int_t& packet, AP_Mission::Mission_Command& cmd);
+    //  return AGPILOT_MISSION_ACCEPTED on success, AGPILOT_MISSION_RESULT error on failure
+    static AGPILOT_MISSION_RESULT mavlink_int_to_mission_cmd(const mavlink_mission_item_int_t& packet, AP_Mission::Mission_Command& cmd);
 
     // mavlink_cmd_long_to_mission_cmd - converts a mavlink cmd long to an AP_Mission::Mission_Command object which can be stored to eeprom
-    // return MAV_MISSION_ACCEPTED on success, MAV_MISSION_RESULT error on failure
-    static MAV_MISSION_RESULT mavlink_cmd_long_to_mission_cmd(const mavlink_command_long_t& packet, AP_Mission::Mission_Command& cmd);
+    // return AGPILOT_MISSION_ACCEPTED on success, AGPILOT_MISSION_RESULT error on failure
+    static AGPILOT_MISSION_RESULT mavlink_cmd_long_to_mission_cmd(const mavlink_command_long_t& packet, AP_Mission::Mission_Command& cmd);
 
     // mission_cmd_to_mavlink_int - converts an AP_Mission::Mission_Command object to a mavlink message which can be sent to the GCS
     //  return true on success, false on failure
@@ -687,7 +687,7 @@ public:
     }
 
     // returns true if the mission contains the requested items
-    bool contains_item(MAV_CMD command) const;
+    bool contains_item(AGPILOT_CMD command) const;
 
     // returns true if the mission has a terrain relative mission item
     bool contains_terrain_alt_items(void);
@@ -812,7 +812,7 @@ private:
     /// command list will be cleared if they do not match
     void check_eeprom_version();
 
-    // check if command is a landing type command.  Asside the obvious, MAV_CMD_DO_PARACHUTE is considered a type of landing
+    // check if command is a landing type command.  Asside the obvious, AGPILOT_CMD_DO_PARACHUTE is considered a type of landing
     bool is_landing_type_cmd(uint16_t id) const;
 
     // check if command is a takeoff type command.
@@ -830,7 +830,7 @@ private:
     void on_mission_timestamp_change();
 
     /// sanity checks that the masked fields are not NaN's or infinite
-    static MAV_MISSION_RESULT sanity_check_params(const mavlink_mission_item_int_t& packet);
+    static AGPILOT_MISSION_RESULT sanity_check_params(const mavlink_mission_item_int_t& packet);
 
     /// check if the next nav command is a takeoff, skipping delays
     bool is_takeoff_next(uint16_t start_index);
@@ -847,7 +847,7 @@ private:
 
     // internal variables
     bool                    _force_resume;  // when set true it forces mission to resume irrespective of MIS_RESTART param.
-    uint16_t                _repeat_dist; // Distance to repeat on mission resume (m), can be set with MAV_CMD_DO_SET_RESUME_REPEAT_DIST
+    uint16_t                _repeat_dist; // Distance to repeat on mission resume (m), can be set with AGPILOT_CMD_DO_SET_RESUME_REPEAT_DIST
     struct Mission_Command  _nav_cmd;   // current "navigation" command.  It's position in the command list is held in _nav_cmd.index
     struct Mission_Command  _do_cmd;    // current "do" command.  It's position in the command list is held in _do_cmd.index
     struct Mission_Command  _resume_cmd;  // virtual wp command that is used to resume mission if the mission needs to be rewound on resume.

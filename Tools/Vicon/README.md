@@ -1,4 +1,4 @@
-# Vicon MAVLink Gateway
+# Vicon AGPILOTLink Gateway
 
 This script produces GLOBAL_VISION_POSITION_ESTIMATE, GPS_INPUT and
 GPS_GLOBAL_ORIGIN messages based on data from a Vicon indoor

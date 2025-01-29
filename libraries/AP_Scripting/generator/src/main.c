@@ -1812,7 +1812,7 @@ void emit_userdata_method(const struct userdata *data, const struct method *meth
   if (method->deprecate != NULL) {
     fprintf(source, "    static bool warned = false;\n");
     fprintf(source, "    if (!warned) {\n");
-    fprintf(source, "        lua_scripts::set_and_print_new_error_message(MAV_SEVERITY_WARNING, \"%s:%s %s\");\n", data->rename, method->rename ? method->rename : method->name, method->deprecate);
+    fprintf(source, "        lua_scripts::set_and_print_new_error_message(AGPILOT_SEVERITY_WARNING, \"%s:%s %s\");\n", data->rename, method->rename ? method->rename : method->name, method->deprecate);
     fprintf(source, "        warned = true;\n");
     fprintf(source, "    }\n\n");
   }

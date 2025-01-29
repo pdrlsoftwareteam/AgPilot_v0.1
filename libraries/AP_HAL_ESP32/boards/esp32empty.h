@@ -31,14 +31,14 @@
 //default protocols:		ardupilot/libraries/AP_SerialManager/AP_SerialManager.cpp
 //ESP32 serials:		AP_HAL_ESP32/HAL_ESP32_Class.cpp
 
-//#define HAL_SERIAL0_PROTOCOL				SerialProtocol_MAVLink2			//A	UART0: Always: Console, MAVLink2
+//#define HAL_SERIAL0_PROTOCOL				SerialProtocol_AGPILOTLink2			//A	UART0: Always: Console, AGPILOTLink2
 //#define HAL_SERIAL0_BAUD				AP_SERIALMANAGER_CONSOLE_BAUD/1000	//115200
 
-//#define HAL_SERIAL1_PROTOCOL				SerialProtocol_MAVLink2			//C	WiFi:  TCP, UDP, or disable (depends on HAL_ESP32_WIFI)
-//#define HAL_SERIAL1_BAUD				AP_SERIALMANAGER_MAVLINK_BAUD/1000	//57600
+//#define HAL_SERIAL1_PROTOCOL				SerialProtocol_AGPILOTLink2			//C	WiFi:  TCP, UDP, or disable (depends on HAL_ESP32_WIFI)
+//#define HAL_SERIAL1_BAUD				AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000	//57600
 
-#define HAL_SERIAL2_PROTOCOL				SerialProtocol_MAVLink2			//D	UART2: Always: MAVLink2 on ESP32
-//#define HAL_SERIAL2_BAUD				AP_SERIALMANAGER_MAVLINK_BAUD/1000	//57600
+#define HAL_SERIAL2_PROTOCOL				SerialProtocol_AGPILOTLink2			//D	UART2: Always: AGPILOTLink2 on ESP32
+//#define HAL_SERIAL2_BAUD				AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000	//57600
 
 #define HAL_SERIAL3_PROTOCOL				SerialProtocol_GPS			//B	UART1: GPS1
 //#define HAL_SERIAL4_BAUD				AP_SERIALMANAGER_GPS_BAUD/1000		//38400, Can not define default baudrate here (by config only)
@@ -121,7 +121,7 @@
 
 #define HAL_LOGGING_FILESYSTEM_ENABLED			0
 #define HAL_LOGGING_DATAFLASH_ENABLED			0
-#define HAL_LOGGING_MAVLINK_ENABLED			0
+#define HAL_LOGGING_AGPILOTLINK_ENABLED			0
 
 #define HAL_BOARD_LOG_DIRECTORY				"/SDCARD/APM/LOGS"
 #define HAL_BOARD_STORAGE_DIRECTORY			"/SDCARD/APM/STORAGE"

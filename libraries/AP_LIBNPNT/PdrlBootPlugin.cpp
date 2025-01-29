@@ -7,7 +7,7 @@
 
 #include "PdrlBootPlugin.h"
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
 
@@ -126,7 +126,7 @@ void PdrlBootPlugin::handleChecksumStatus()
 			if(isCodeChecksumMatch() == false)
 			{
 				char logBuff[150] = "Code checksum failed:";
-			//		gcs().send_text(MAV_SEVERITY_ERROR, "%s", logBuff);
+			//		gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", logBuff);
 				char *hexVal = nullptr;
 				for(int i = 0; i < 32 ; i++)
 				{
@@ -137,15 +137,15 @@ void PdrlBootPlugin::handleChecksumStatus()
 				strcat(logBuff,"\n");
 				checksum_config_error(logBuff);
 				char* cptr = logBuff;
-				for(int i = 0 ; i < (int)(strlen(logBuff)/MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN)+1 ; i++)
+				for(int i = 0 ; i < (int)(strlen(logBuff)/AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN)+1 ; i++)
 				{
-					gcs().send_text(MAV_SEVERITY_ERROR, "%s", cptr+(i*MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN));
+					gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", cptr+(i*AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN));
 				}
 			}
 			if(isDataChecksumMatch() == false)
 			{
 				char logBuff[150] = "Data checksum failed:";
-			//		gcs().send_text(MAV_SEVERITY_ERROR, "%s", logBuff);
+			//		gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", logBuff);
 				char *hexVal = nullptr;
 
 				for(int i = 0; i < 32 ; i++)
@@ -157,14 +157,14 @@ void PdrlBootPlugin::handleChecksumStatus()
 				strcat(logBuff,"\n");
 				checksum_config_error(logBuff);
 				char* cptr = logBuff;
-				for(int i = 0 ; i < (int)(strlen(logBuff)/MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN)+1 ; i++)
+				for(int i = 0 ; i < (int)(strlen(logBuff)/AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN)+1 ; i++)
 				{
-					gcs().send_text(MAV_SEVERITY_ERROR, "%s", cptr+(i*MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN));
+					gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", cptr+(i*AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN));
 				}
 			}
 			if((isCodeChecksumMatch() == false) || (isDataChecksumMatch() == false))
 			{
-				gcs().send_text(MAV_SEVERITY_ERROR, "%s", "Firmware checksum verification failed");
+				gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", "Firmware checksum verification failed");
 			}
 		}
 		hal.scheduler->delay(5);
@@ -176,7 +176,7 @@ void PdrlBootPlugin::handleChecksumStatus()
 //		uint32_t now = AP_HAL::millis();
 //		if (now - last_print_ms >= 3000) {
 //			last_print_ms = now;
-//			gcs().send_text(MAV_SEVERITY_ERROR, "%s", "Firmware checksum verification failed");
+//			gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", "Firmware checksum verification failed");
 //		}
 //		hal.scheduler->delay(5);
 //	}

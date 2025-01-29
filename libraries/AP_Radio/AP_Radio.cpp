@@ -263,7 +263,7 @@ void AP_Radio::play_tune(const char *tune_str)
     pkt.len = len;
     pkt.type = 43;
     memcpy(&pkt.data[0], tune_str, len);
-    handle_data_packet(MAVLINK_COMM_0, pkt);
+    handle_data_packet(AGPILOTLINK_COMM_0, pkt);
 }
 
 // update status, should be called from main thread

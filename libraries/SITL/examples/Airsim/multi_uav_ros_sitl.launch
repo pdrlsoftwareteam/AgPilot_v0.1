@@ -2,10 +2,10 @@
 <launch>
     <!-- UAV0 -->
     <group ns="uav0">
-        <!-- MAVROS and vehicle configs -->
+        <!-- AGPILOTROS and vehicle configs -->
         <arg name="ID" value="1"/>
         <arg name="fcu_url" default="udp://:14550@localhost:14555"/>
-        <!-- MAVROS -->
+        <!-- AGPILOTROS -->
         <include file="$(find mavros)/launch/apm.launch">
             <arg name="fcu_url" value="$(arg fcu_url)"/>
             <arg name="gcs_url" value=""/>
@@ -15,10 +15,10 @@
     </group>
     <!-- UAV1 -->
     <group ns="uav1">
-        <!-- MAVROS and vehicle configs -->
+        <!-- AGPILOTROS and vehicle configs -->
         <arg name="ID" value="2"/>
         <arg name="fcu_url" default="udp://:14560@localhost:14565"/>
-        <!-- MAVROS -->
+        <!-- AGPILOTROS -->
         <include file="$(find mavros)/launch/apm.launch">
             <arg name="fcu_url" value="$(arg fcu_url)"/>
             <arg name="gcs_url" value=""/>

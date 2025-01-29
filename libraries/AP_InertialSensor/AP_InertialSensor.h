@@ -282,7 +282,7 @@ public:
 
     // simple accel calibration
 #if HAL_GCS_ENABLED
-    MAV_RESULT simple_accel_cal();
+    AGPILOT_RESULT simple_accel_cal();
 #endif
 
     bool accel_cal_requires_reboot() const { return _accel_cal_requires_reboot; }

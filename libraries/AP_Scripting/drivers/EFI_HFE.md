@@ -45,7 +45,7 @@ here.
 
 This driver should be loaded by placing the lua script in the
 APM/SCRIPTS directory on the microSD card, which can be done either
-directly or via MAVFTP. The following key parameters should be set:
+directly or via AGPILOTFTP. The following key parameters should be set:
 
  - SCR_ENABLE should be set to 1
  - EFI_TYPE should be set to 7
@@ -59,7 +59,7 @@ according to the parameter list above.
 
 The ICE start channel will be monitored for starter control.
 
-The GCS will receive EFI_STATUS MAVLink messages which includes RPM,
+The GCS will receive EFI_STATUS AGPILOTLink messages which includes RPM,
 cylinder head temperature, injection timing, engine load, fuel
 consumption rate, throttle position atmospheric pressure and ECU
 voltage.

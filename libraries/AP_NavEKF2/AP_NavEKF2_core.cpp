@@ -2,7 +2,7 @@
 
 #include "AP_NavEKF2.h"
 #include "AP_NavEKF2_core.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -94,14 +94,14 @@ bool NavEKF2_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     if ((yawEstimator == nullptr) && (frontend->_gsfRunMask & (1U<<core_index))) {
         // check if there is enough memory to create the EKF-GSF object
         if (dal.available_memory() < sizeof(EKFGSF_yaw) + 1024) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF2 IMU%u GSF: not enough memory",(unsigned)imu_index);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF2 IMU%u GSF: not enough memory",(unsigned)imu_index);
             return false;
         }
 
         // try to instantiate
         yawEstimator = new EKFGSF_yaw();
         if (yawEstimator == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF2 IMU%uGSF: allocation failed",(unsigned)imu_index);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF2 IMU%uGSF: allocation failed",(unsigned)imu_index);
             return false;
         }
     }
@@ -624,7 +624,7 @@ void NavEKF2_core::UpdateFilter(bool predict)
         dal.millis() - last_filter_ok_ms > 5000 &&
         !dal.get_armed()) {
         // we've been unhealthy for 5 seconds after being healthy, reset the filter
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF2 IMU%u forced reset",(unsigned)imu_index);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "EKF2 IMU%u forced reset",(unsigned)imu_index);
         last_filter_ok_ms = 0;
         statesInitialised = false;
         InitialiseFilterBootstrap();

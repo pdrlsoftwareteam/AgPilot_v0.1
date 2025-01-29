@@ -5,11 +5,11 @@ ArduPilot access to both local filesystems on the flight controller
 and a set of virtual filesystem abstractions.
 
 This document is primarily intended to document the VFS interfaces
-available to ground station authors via the MAVLink FTP transport.
+available to ground station authors via the AGPILOTLink FTP transport.
 
-## MAVLink FTP
+## AGPILOTLink FTP
 
-ArduPilot implements the FILE_TRANSFER_PROTOCOL MAVLink message to
+ArduPilot implements the FILE_TRANSFER_PROTOCOL AGPILOTLink message to
 allow for remote file operations. This protocol allows a GCS to
 transfer files to and from a flight controller. It also allows the GCS
 to access some special purpose VFS interfaces for efficient access to
@@ -79,7 +79,7 @@ parameter. The format is:
 
 There may be any number of leading zero pad bytes before the start of
 the parameter block. The pad bytes are added to ensure that a
-parameter value does not cross a MAVLink FTP block boundary. This
+parameter value does not cross a AGPILOTLink FTP block boundary. This
 padding prevents a re-fetch of a missing block from potentially
 leading to a corrupt value.
 
@@ -104,7 +104,7 @@ that means to download 10 parameters starting with parameter number
 ### Parameter Client Examples
 
 The script Tools/scripts/param_unpack.py can be used to unpack a
-param.pck file. Additionally the MAVProxy mavproxy_param.py module
+param.pck file. Additionally the AGPILOTProxy mavproxy_param.py module
 implements parameter download via ftp.
 
 ## The @SYS VFS

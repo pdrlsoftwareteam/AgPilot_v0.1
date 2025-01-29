@@ -19,7 +19,7 @@
 #include "SIM_Parachute.h"
 #include "AP_HAL/AP_HAL.h"
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 using namespace SITL;
 
@@ -54,7 +54,7 @@ void Parachute::update(const struct sitl_input &input)
     if (pwm >= 1250) {
         if (!deployed_ms) {
             deployed_ms = AP_HAL::millis();
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "BANG!  Parachute deployed");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "BANG!  Parachute deployed");
         }
     }
     last_update_us = now;

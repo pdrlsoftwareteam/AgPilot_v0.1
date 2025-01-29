@@ -203,8 +203,8 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 
                 // if the mission is empty save a takeoff command
                 if (copter.mode_auto.mission.num_commands() == 0) {
-                    // set our location ID to 16, MAV_CMD_NAV_WAYPOINT
-                    cmd.id = MAV_CMD_NAV_TAKEOFF;
+                    // set our location ID to 16, AGPILOT_CMD_NAV_WAYPOINT
+                    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
                     cmd.content.location.alt = MAX(copter.current_loc.alt,100);
 
                     // use the current altitude for the target alt for takeoff.
@@ -220,10 +220,10 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 
                 // if throttle is above zero, create waypoint command
                 if (copter.channel_throttle->get_control_in() > 0) {
-                    cmd.id = MAV_CMD_NAV_WAYPOINT;
+                    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
                 } else {
                     // with zero throttle, create LAND command
-                    cmd.id = MAV_CMD_NAV_LAND;
+                    cmd.id = AGPILOT_CMD_NAV_LAND;
                 }
 
                 // save command
@@ -401,12 +401,12 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
                 case AuxSwitchPos::HIGH:
                     copter.standby_active = true;
                     AP::logger().Write_Event(LogEvent::STANDBY_ENABLE);
-                    gcs().send_text(MAV_SEVERITY_INFO, "Stand By Enabled");
+                    gcs().send_text(AGPILOT_SEVERITY_INFO, "Stand By Enabled");
                     break;
                 default:
                     copter.standby_active = false;
                     AP::logger().Write_Event(LogEvent::STANDBY_DISABLE);
-                    gcs().send_text(MAV_SEVERITY_INFO, "Stand By Disabled");
+                    gcs().send_text(AGPILOT_SEVERITY_INFO, "Stand By Disabled");
                     break;
                 }
             break;
@@ -458,7 +458,7 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
         case AUX_FUNC::SIMPLE_HEADING_RESET:
             if (ch_flag == AuxSwitchPos::HIGH) {
                 copter.init_simple_bearing();
-                gcs().send_text(MAV_SEVERITY_INFO, "Simple heading reset");
+                gcs().send_text(AGPILOT_SEVERITY_INFO, "Simple heading reset");
             }
             break;
 
@@ -519,7 +519,7 @@ void Copter::save_trim()
     float pitch_trim = ToRad((float)channel_pitch->get_control_in()/100.0f);
     ahrs.add_trim(roll_trim, pitch_trim);
     AP::logger().Write_Event(LogEvent::SAVE_TRIM);
-    gcs().send_text(MAV_SEVERITY_INFO, "Trim saved");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Trim saved");
 }
 
 // auto_trim - slightly adjusts the ahrs.roll_trim and ahrs.pitch_trim towards the current stick positions
@@ -528,7 +528,7 @@ void Copter::auto_trim_cancel()
 {
     auto_trim_counter = 0;
     AP_Notify::flags.save_trim = false;
-    gcs().send_text(MAV_SEVERITY_INFO, "AutoTrim cancelled");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "AutoTrim cancelled");
 }
 
 void Copter::auto_trim()
@@ -572,7 +572,7 @@ void Copter::auto_trim()
         // on last iteration restore leds and accel gains to normal
         if (auto_trim_counter == 0) {
             AP_Notify::flags.save_trim = false;
-            gcs().send_text(MAV_SEVERITY_INFO, "AutoTrim: Trims saved");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "AutoTrim: Trims saved");
         }
     }
 }

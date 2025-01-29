@@ -7,7 +7,7 @@
 
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Baro/AP_Baro.h>
 
 #include "AP_Airspeed.h"
@@ -144,7 +144,7 @@ void AP_Airspeed::update_calibration(uint8_t i, const Vector3f &vground, int16_t
             param[i].ratio.save();
             state[i].last_saved_ratio = param[i].ratio;
             state[i].counter = 0;
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Airspeed %u ratio reset: %f", i , static_cast<double> (param[i].ratio));
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Airspeed %u ratio reset: %f", i , static_cast<double> (param[i].ratio));
         }
     } else {
         state[i].counter++;
@@ -181,7 +181,7 @@ void AP_Airspeed::send_airspeed_calibration(const Vector3f &vground)
         Pby: state[primary].calibration.P.b.y,
         Pcz: state[primary].calibration.P.c.z
     };
-    gcs().send_to_active_channels(MAVLINK_MSG_ID_AIRSPEED_AUTOCAL,
+    gcs().send_to_active_channels(AGPILOTLINK_MSG_ID_AIRSPEED_AUTOCAL,
                                   (const char *)&packet);
 #endif // AP_AIRSPEED_AUTOCAL_ENABLE
 }

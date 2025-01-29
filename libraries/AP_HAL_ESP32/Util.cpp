@@ -198,8 +198,8 @@ uint64_t Util::get_hw_rtc() const
 #if defined(HAL_NO_GCS) || defined(HAL_BOOTLOADER_BUILD)
 #define Debug(fmt, args ...)  do { hal.console->printf(fmt, ## args); } while (0)
 #else
-#include <GCS_MAVLink/GCS.h>
-#define Debug(fmt, args ...)  do { gcs().send_text(MAV_SEVERITY_INFO, fmt, ## args); } while (0)
+#include <GCS_AGPILOTLink/GCS.h>
+#define Debug(fmt, args ...)  do { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ## args); } while (0)
 #endif
 
 Util::FlashBootloader Util::flash_bootloader()

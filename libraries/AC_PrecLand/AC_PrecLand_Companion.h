@@ -5,7 +5,7 @@
 
 /*
  * AC_PrecLand_Companion - implements precision landing using target vectors provided
- *                         by a companion computer (i.e. Odroid) communicating via MAVLink
+ *                         by a companion computer (i.e. Odroid) communicating via AGPILOTLink
  *                         The companion computer must provide "Line-Of-Sight" measurements
  *                         in the form of LANDING_TARGET mavlink messages.
  */

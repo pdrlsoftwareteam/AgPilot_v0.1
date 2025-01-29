@@ -7,7 +7,7 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
@@ -169,7 +169,7 @@ void AP_LandingGear::deploy()
     // send message only if output has been configured
     if (!_deployed &&
         SRV_Channels::function_assigned(SRV_Channel::k_landing_gear_control)) {
-        gcs().send_text(MAV_SEVERITY_INFO, "LandingGear: DEPLOY");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "LandingGear: DEPLOY");
     }
 
     // set deployed flag
@@ -195,7 +195,7 @@ void AP_LandingGear::retract()
 
     // send message only if output has been configured
     if (SRV_Channels::function_assigned(SRV_Channel::k_landing_gear_control)) {
-        gcs().send_text(MAV_SEVERITY_INFO, "LandingGear: RETRACT");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "LandingGear: RETRACT");
     }
 }
 

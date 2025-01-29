@@ -35,7 +35,7 @@ public:
     // notify user of a non-fatal startup error related to allocation failures.
     static void allocation_error(const char *reason, ...) FMT_PRINTF(1, 2) NORETURN;
 
-    // permit other libraries (in particular, GCS_MAVLink) to detect
+    // permit other libraries (in particular, GCS_AGPILOTLink) to detect
     // that we're never going to boot properly:
     static bool in_config_error(void) { return _in_error_loop; }
 

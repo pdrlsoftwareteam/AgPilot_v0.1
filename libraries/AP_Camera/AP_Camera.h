@@ -9,7 +9,7 @@
 #include <AP_Common/Location.h>
 #include <AP_Logger/LogStructure.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_Camera_Params.h"
 #include "AP_Mount/AP_Mount_config.h"
 
@@ -32,7 +32,7 @@ class AP_Camera {
     friend class AP_Camera_Relay;
     friend class AP_Camera_SoloGimbal;
     friend class AP_Camera_Mount;
-    friend class AP_Camera_MAVLink;
+    friend class AP_Camera_AGPILOTLink;
 
 public:
 
@@ -60,8 +60,8 @@ public:
 #if AP_CAMERA_MOUNT_ENABLED
         MOUNT = 4,          // Mount library implements camera
 #endif
-#if AP_CAMERA_MAVLINK_ENABLED
-        MAVLINK = 5,        // MAVLink enabled camera
+#if AP_CAMERA_AGPILOTLINK_ENABLED
+        AGPILOTLINK = 5,        // AGPILOTLink enabled camera
 #endif
     };
 
@@ -71,9 +71,9 @@ public:
     // update - to be called periodically at 50Hz
     void update();
 
-    // MAVLink methods
+    // AGPILOTLink methods
     void handle_message(mavlink_channel_t chan, const mavlink_message_t &msg);
-    MAV_RESULT handle_command_long(const mavlink_command_long_t &packet);
+    AGPILOT_RESULT handle_command_long(const mavlink_command_long_t &packet);
     void send_feedback(mavlink_channel_t chan) const;
 
     // configure camera

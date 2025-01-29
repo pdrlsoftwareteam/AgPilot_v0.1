@@ -4,7 +4,7 @@
 
 #if AP_FRSKY_TELEM_ENABLED
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 class AP_Frsky_Backend
 {
@@ -47,7 +47,7 @@ public:
     }
 #endif
 
-    virtual void queue_text_message(MAV_SEVERITY severity, const char *text) { }
+    virtual void queue_text_message(AGPILOT_SEVERITY severity, const char *text) { }
 
 protected:
 

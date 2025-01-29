@@ -19,7 +19,7 @@ See the accompanying rover-quiktune.md file for instructions on how to use
 --]]
 
 -- global definitions
-local MAV_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
+local AGPILOT_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
 
 local PARAM_TABLE_KEY = 15
 local PARAM_TABLE_PREFIX = "RTUN_"
@@ -250,7 +250,7 @@ function save_all_params()
       param_changed[pname] = false
     end
   end
-  gcs:send_text(MAV_SEVERITY.NOTICE, "RTun: tuning gains saved")
+  gcs:send_text(AGPILOT_SEVERITY.NOTICE, "RTun: tuning gains saved")
 end
 
 -- setup filter frequencies
@@ -281,7 +281,7 @@ function setup_gcs_pid_mask(axis)
   elseif axis == "ATC_SPEED" then
     GCS_PID_MASK:set(2)
   else
-    gcs:send_text(MAV_SEVERITY.CRITICAL, string.format("RTun: setup_gcs_pid_mask received unhandled aixs %s", axis))
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, string.format("RTun: setup_gcs_pid_mask received unhandled aixs %s", axis))
   end
   gcs_pid_mask_done[axis] = true
 end
@@ -317,7 +317,7 @@ function get_slew_rate(axis)
   if axis == "ATC_SPEED" then
     return speed_srate
   end
-  gcs:send_text(MAV_SEVERITY.CRITICAL, string.format("RTUN: get_slew_rate unsupported axis:%s", axis))
+  gcs:send_text(AGPILOT_SEVERITY.CRITICAL, string.format("RTUN: get_slew_rate unsupported axis:%s", axis))
   return 0.0
 end
 
@@ -328,7 +328,7 @@ function advance_axis(axis)
   axes_done[axis] = true
   -- check for tune completion
   if prev_axis ~= nil and get_current_axis() == nil then
-    gcs:send_text(MAV_SEVERITY.NOTICE, string.format("RTun: Tuning DONE"))
+    gcs:send_text(AGPILOT_SEVERITY.NOTICE, string.format("RTun: Tuning DONE"))
     tune_done_time = now_sec
   end
   last_axis_change = now_sec
@@ -342,7 +342,7 @@ function adjust_gain(pname, value)
   param_changed[pname] = true
   P:set(value)
   write_log(pname)
-  gcs:send_text(MAV_SEVERITY.INFO, string.format("RTun: adjusted %s %.3f -> %.3f", pname, old_value, value))
+  gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("RTun: adjusted %s %.3f -> %.3f", pname, old_value, value))
 end
 
 -- log parameter, current gain and current slew rate
@@ -389,14 +389,14 @@ function update_steering_ff(ff_pname)
     ff_turn_rate_sum = ff_turn_rate_sum + math.abs(turn_rate_rads)
     ff_turn_rate_count = ff_turn_rate_count + 1
     if (update_user) then
-      gcs:send_text(MAV_SEVERITY.INFO, string.format("RTun: %s %.0f%% complete", ff_pname, complete_pct))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("RTun: %s %.0f%% complete", ff_pname, complete_pct))
     end
   else
     if update_user then
       if not steering_ok then
-        gcs:send_text(MAV_SEVERITY.WARNING, string.format("RTun: increase steering (%d%% < %d%%)", math.floor(steering_out * 100), math.floor(STR_RAT_FF_STEERING_MIN * 100)))
+        gcs:send_text(AGPILOT_SEVERITY.WARNING, string.format("RTun: increase steering (%d%% < %d%%)", math.floor(steering_out * 100), math.floor(STR_RAT_FF_STEERING_MIN * 100)))
       elseif not turnrate_ok then
-        gcs:send_text(MAV_SEVERITY.WARNING, string.format("RTun: increase turn rate (%d deg/s < %d)", math.floor(math.deg(math.abs(turn_rate_rads))), math.floor(math.deg(STR_RAT_FF_TURNRATE_MIN))))
+        gcs:send_text(AGPILOT_SEVERITY.WARNING, string.format("RTun: increase turn rate (%d deg/s < %d)", math.floor(math.deg(math.abs(turn_rate_rads))), math.floor(math.deg(STR_RAT_FF_TURNRATE_MIN))))
       end
     end
   end
@@ -461,14 +461,14 @@ function update_speed_ff(ff_pname)
     ff_speed_sum = ff_speed_sum + speed
     ff_speed_count = ff_speed_count + 1
     if (update_user) then
-      gcs:send_text(MAV_SEVERITY.INFO, string.format("RTun: %s %.0f%% complete", ff_pname, complete_pct))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("RTun: %s %.0f%% complete", ff_pname, complete_pct))
     end
   else
     if update_user then
       if not throttle_ok then
-        gcs:send_text(MAV_SEVERITY.WARNING, string.format("RTun: increase throttle (%d < %d)", math.floor(throttle_out * 100), math.floor(SPEED_FF_THROTTLE_MIN * 100)))
+        gcs:send_text(AGPILOT_SEVERITY.WARNING, string.format("RTun: increase throttle (%d < %d)", math.floor(throttle_out * 100), math.floor(SPEED_FF_THROTTLE_MIN * 100)))
       elseif not speed_ok then
-        gcs:send_text(MAV_SEVERITY.WARNING, string.format("RTun: increase speed (%3.1f < %3.1f)", speed, SPEED_FF_SPEED_MIN))
+        gcs:send_text(AGPILOT_SEVERITY.WARNING, string.format("RTun: increase speed (%3.1f < %3.1f)", speed, SPEED_FF_SPEED_MIN))
       end
     end
   end
@@ -508,7 +508,7 @@ init_params_tables()
 reset_axes_done()
 get_all_params()
 save_gcs_pid_mask()
-gcs:send_text(MAV_SEVERITY.INFO, "Rover quiktune loaded")
+gcs:send_text(AGPILOT_SEVERITY.INFO, "Rover quiktune loaded")
 
 -- main update function
 local last_warning = get_time()
@@ -533,7 +533,7 @@ function update()
 
   -- check switch position (0:low is stop, 1:middle is tune, 2:high is save gains
   if sw_pos == 1 and (not arming:is_armed() or (throttle_out <= 0)) and get_time() > last_warning + 5 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "RTun: must be armed and moving to tune")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "RTun: must be armed and moving to tune")
     last_warning = get_time()
     return
   end
@@ -543,7 +543,7 @@ function update()
       need_restore = false
       restore_all_params()
       restore_gcs_pid_mask()
-      gcs:send_text(MAV_SEVERITY.CRITICAL, "RTun: gains reverted")
+      gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "RTun: gains reverted")
     end
     reset_axes_done()
     return
@@ -596,7 +596,7 @@ function update()
 
   -- check filters have been set for this axis
   if not filters_done[axis] then
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("RTun: starting %s tune", axis))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("RTun: starting %s tune", axis))
     setup_filters(axis)
   end
 
@@ -615,11 +615,11 @@ function update()
   elseif axis == "ATC_SPEED" then
     ff_done = update_speed_ff(pname)
   else
-    gcs:send_text(MAV_SEVERITY.CRITICAL, string.format("RTun: unsupported FF tuning %s", pname))
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, string.format("RTun: unsupported FF tuning %s", pname))
     ff_done = true
   end
   if ff_done then
-    gcs:send_text(MAV_SEVERITY.NOTICE, string.format("RTun: %s tuning done", pname))
+    gcs:send_text(AGPILOT_SEVERITY.NOTICE, string.format("RTun: %s tuning done", pname))
     advance_axis(axis)
   end
 end
@@ -630,7 +630,7 @@ end
 function protected_wrapper()
   local success, err = pcall(update)
   if not success then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "RTun: Internal Error: " .. err)
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "RTun: Internal Error: " .. err)
     -- when we fault we run the update function again after 1s, slowing it
     -- down a bit so we don't flood the console with errors
     --return protected_wrapper, 1000

@@ -72,7 +72,7 @@ private:
     Vector3f true_gyro_bias;
 
     // reporting variables. gimbal pushes these to vehicle code over
-    // MAVLink at approx 100Hz
+    // AGPILOTLink at approx 100Hz
 
     // reporting period in ms
     const float reporting_period_ms;

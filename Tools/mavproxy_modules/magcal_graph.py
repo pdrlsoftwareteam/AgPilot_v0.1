@@ -23,7 +23,7 @@ The plot shown by this module isn't very helpful to the end user, but it might
 help developers during development of internal calibration support in ground
 control stations.
 '''
-from MAVProxy.modules.lib import mp_module, mp_util
+from AGPILOTProxy.modules.lib import mp_module, mp_util
 import multiprocessing
 
 class MagcalGraph():
@@ -57,8 +57,8 @@ class MagcalGraph():
     def ui_task(self):
         mp_util.child_close_fds()
 
-        from MAVProxy.modules.lib import wx_processguard
-        from MAVProxy.modules.lib.wx_loader import wx
+        from AGPILOTProxy.modules.lib import wx_processguard
+        from AGPILOTProxy.modules.lib.wx_loader import wx
         from lib.magcal_graph_ui import MagcalFrame
 
         app = wx.App(False)

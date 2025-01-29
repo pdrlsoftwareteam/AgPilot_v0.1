@@ -21,7 +21,7 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_Proximity_Params.h"
 #include "AP_Proximity_Boundary_3D.h"
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -48,7 +48,7 @@ public:
     enum class Type {
         None    = 0,
         // 1 was SF40C_v09
-        MAV     = 2,
+        AGPILOT     = 2,
         TRTOWER = 3,
         RangeFinder = 4,
         RPLidarA2 = 5,

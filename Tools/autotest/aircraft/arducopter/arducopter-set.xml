@@ -42,7 +42,7 @@ Arducotper UAV Model
       <line>Stall speed (Vs): ? mph</line>
     </help>
     <startup>
-      <splash-title>Arducopter UAV DIY Drones/ OPENMAV</splash-title>
+      <splash-title>Arducopter UAV DIY Drones/ OPENAGPILOT</splash-title>
       <splash-texture>Aircraft/arducopter/arducopter.jpg</splash-texture>
     </startup>
   </sim>

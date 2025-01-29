@@ -53,10 +53,10 @@ public:
     virtual bool get_attitude_quaternion(Quaternion& att_quat) = 0;
 
     // get mount's mode
-    enum MAV_MOUNT_MODE get_mode() const { return _mode; }
+    enum AGPILOT_MOUNT_MODE get_mode() const { return _mode; }
 
     // set mount's mode
-    void set_mode(enum MAV_MOUNT_MODE mode) { _mode = mode; }
+    void set_mode(enum AGPILOT_MOUNT_MODE mode) { _mode = mode; }
 
     // set yaw_lock.  If true, the gimbal's yaw target is maintained in earth-frame meaning it will lock onto an earth-frame heading (e.g. North)
     // If false (aka "follow") the gimbal's yaw is maintained in body-frame meaning it will rotate with the vehicle
@@ -76,8 +76,8 @@ public:
     // set_sys_target - sets system that mount should attempt to point towards
     void set_target_sysid(uint8_t sysid);
 
-    // handle do_mount_control command.  Returns MAV_RESULT_ACCEPTED on success
-    MAV_RESULT handle_command_do_mount_control(const mavlink_command_long_t &packet);
+    // handle do_mount_control command.  Returns AGPILOT_RESULT_ACCEPTED on success
+    AGPILOT_RESULT handle_command_do_mount_control(const mavlink_command_long_t &packet);
     
     // process MOUNT_CONFIGURE messages received from GCS. deprecated.
     void handle_mount_configure(const mavlink_mount_configure_t &msg);
@@ -202,12 +202,12 @@ protected:
     AP_Mount_Params &_params; // parameters for this backend
     uint8_t     _instance;  // this instance's number
 
-    MAV_MOUNT_MODE  _mode;          // current mode (see MAV_MOUNT_MODE enum)
+    AGPILOT_MOUNT_MODE  _mode;          // current mode (see AGPILOT_MOUNT_MODE enum)
     bool _yaw_lock;                 // True if the gimbal's yaw target is maintained in earth-frame, if false (aka "follow") it is maintained in body-frame
 
-    // structure for MAVLink Targeting angle and rate targets
+    // structure for AGPILOTLink Targeting angle and rate targets
     struct {
-        MountTargetType target_type;// MAVLink targeting mode's current target type (e.g. angle or rate)
+        MountTargetType target_type;// AGPILOTLink targeting mode's current target type (e.g. angle or rate)
         MountTarget angle_rad;      // angle target in radians
         MountTarget rate_rads;      // rate target in rad/s
     } mavt_target;

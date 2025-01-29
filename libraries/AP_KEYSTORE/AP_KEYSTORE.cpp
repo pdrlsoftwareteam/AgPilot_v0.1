@@ -6,7 +6,7 @@
  */
 #include "AP_KEYSTORE.h"
 #include <AP_LIBNPNT/AP_LIBNPNT.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_PDRL_Commander/AP_PDRL_Commander_Logger.h>
 //#include "stm32_util.h"
 
@@ -120,19 +120,19 @@ bool AP_KEYSTORE::verifyFirmwareSignature(uint8_t* firmwareSignature, uint8_t* f
 
 	if( ( err = mbedtls_pk_parse_public_key( &pk,(const unsigned char*)pdrlPublicKey,strlen((char*)pdrlPublicKey)+1) ) != 0 )
 	{
-		gcs().send_text(MAV_SEVERITY_ERROR, "%s", "Firmware signature: verify failed");
+		gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", "Firmware signature: verify failed");
 		mbedtls_pk_free(&pk);
 		return false;
 	}
 
 	if( ( err = mbedtls_pk_verify( &pk, MBEDTLS_MD_SHA256, firmwareHash,32, firmwareSignature, 256 ) ) != 0 )
 	{
-		gcs().send_text(MAV_SEVERITY_ERROR, "%s", "Firmware signature: verify failed");
+		gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", "Firmware signature: verify failed");
 		mbedtls_pk_free(&pk);
 		return false;
 	}
 
-	gcs().send_text(MAV_SEVERITY_ERROR, "%s", "Firmware signature: verify success");
+	gcs().send_text(AGPILOT_SEVERITY_ERROR, "%s", "Firmware signature: verify success");
 	mbedtls_pk_free(&pk);
 	return true	;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <stdint.h>
 #include "PosVelEKF.h"
 #include <AP_HAL/utility/RingBuffer.h>

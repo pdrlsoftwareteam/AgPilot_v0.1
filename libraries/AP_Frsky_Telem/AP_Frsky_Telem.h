@@ -47,7 +47,7 @@ public:
     static bool set_telem_data(const uint8_t frame,const uint16_t appid, const uint32_t data);
 #endif
 
-    void queue_message(MAV_SEVERITY severity, const char *text) {
+    void queue_message(AGPILOT_SEVERITY severity, const char *text) {
         if (_backend == nullptr) {
             return;
         }

@@ -22,7 +22,7 @@
 
 #include <AP_Vehicle/AP_Vehicle.h>
 
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_Filesystem/posix_compat.h>
 #include <AP_AdvancedFailsafe/AP_AdvancedFailsafe.h>
@@ -95,7 +95,7 @@ void ReplayVehicle::load_parameters(void)
     AP_Param::load_all();
 }
 
-const struct AP_Param::GroupInfo        GCS_MAVLINK_Parameters::var_info[] = {
+const struct AP_Param::GroupInfo        GCS_AGPILOTLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 GCS_Dummy _gcs;

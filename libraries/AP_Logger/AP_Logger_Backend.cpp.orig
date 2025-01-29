@@ -109,7 +109,7 @@ bool AP_Logger_Backend::allow_start_ekf() const
 }
 
 // this method can be overridden to do extra things with your buffer.
-// for example, in AP_Logger_MAVLink we may push messages into the UART.
+// for example, in AP_Logger_AGPILOTLink we may push messages into the UART.
 void AP_Logger_Backend::push_log_blocks() {
     WriteMoreStartupMessages();
 }

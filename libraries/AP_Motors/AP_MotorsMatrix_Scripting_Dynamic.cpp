@@ -17,7 +17,7 @@
 // This allows motor roll, pitch, yaw and throttle factors to be changed in flight, allowing vehicle geometry to be changed
 
 #include "AP_MotorsMatrix_Scripting_Dynamic.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/AP_HAL.h>
 
 extern const AP_HAL::HAL& hal;
@@ -80,31 +80,31 @@ bool AP_MotorsMatrix_Scripting_Dynamic::init(uint8_t expected_num_motors)
     set_initialised_ok(expected_num_motors == num_motors);
 
     if (!initialised_ok()) {
-        _mav_type = MAV_TYPE_GENERIC;
+        _mav_type = AGPILOT_TYPE_GENERIC;
         return false;
     }
 
     switch (num_motors) {
         case 3:
-            _mav_type = MAV_TYPE_TRICOPTER;
+            _mav_type = AGPILOT_TYPE_TRICOPTER;
             break;
         case 4:
-            _mav_type = MAV_TYPE_QUADROTOR;
+            _mav_type = AGPILOT_TYPE_QUADROTOR;
             break;
         case 6:
-            _mav_type = MAV_TYPE_HEXAROTOR;
+            _mav_type = AGPILOT_TYPE_HEXAROTOR;
             break;
         case 8:
-            _mav_type = MAV_TYPE_OCTOROTOR;
+            _mav_type = AGPILOT_TYPE_OCTOROTOR;
             break;
         case 10:
-            _mav_type = MAV_TYPE_DECAROTOR;
+            _mav_type = AGPILOT_TYPE_DECAROTOR;
             break;
         case 12:
-            _mav_type = MAV_TYPE_DODECAROTOR;
+            _mav_type = AGPILOT_TYPE_DODECAROTOR;
             break;
         default:
-            _mav_type = MAV_TYPE_GENERIC;
+            _mav_type = AGPILOT_TYPE_GENERIC;
     }
 
     set_update_rate(_speed_hz);

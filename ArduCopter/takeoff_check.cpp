@@ -53,9 +53,9 @@ void Copter::takeoff_check()
         takeoff_check_warning_ms = now_ms;
         const char* prefix_str = "Takeoff blocked:";
         if (!telem_active) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "%s waiting for ESC RPM", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "%s waiting for ESC RPM", prefix_str);
         } else if (!rpm_adequate) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "%s ESC RPM too low", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "%s ESC RPM too low", prefix_str);
         }
     }
 #endif

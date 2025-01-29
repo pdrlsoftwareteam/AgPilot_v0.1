@@ -8,7 +8,7 @@
 #include "AC_CustomControl_Backend.h"
 // #include "AC_CustomControl_Empty.h"
 #include "AC_CustomControl_PID.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // table of user settable parameters
 const AP_Param::GroupInfo AC_CustomControl::var_info[] = {
@@ -123,30 +123,30 @@ void AC_CustomControl::set_custom_controller(bool enabled)
 
     // don't allow accidental main controller reset without active custom controller
     if (_controller_type == CustomControlType::CONT_NONE) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is not enabled");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Custom controller is not enabled");
         return;
     }
 
     // controller type is out of range
     if (_controller_type > CUSTOMCONTROL_MAX_TYPES) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller type is out of range");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Custom controller type is out of range");
         return;
     }
 
     // backend is not created
     if (_backend == nullptr) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Reboot to enable selected custom controller");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Reboot to enable selected custom controller");
         return;
     }
 
     if (_custom_controller_mask == 0 && enabled) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Axis mask is not set");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Axis mask is not set");
         return;
     }
 
     // reset main controller
     if (!enabled) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is OFF");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Custom controller is OFF");
         // don't reset if the empty backend is selected
         if (_controller_type > CustomControlType::CONT_EMPTY) {
             reset_main_att_controller();
@@ -156,7 +156,7 @@ void AC_CustomControl::set_custom_controller(bool enabled)
     if (enabled && _controller_type > CustomControlType::CONT_NONE) {
         // reset custom controller filter, integrator etc.
         _backend->reset();
-        gcs().send_text(MAV_SEVERITY_INFO, "Custom controller is ON");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Custom controller is ON");
     }
 
     _custom_controller_active = enabled;

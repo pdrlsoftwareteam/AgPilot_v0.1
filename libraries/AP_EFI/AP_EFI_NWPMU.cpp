@@ -22,7 +22,7 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_EFI_NWPMU.h"
 
@@ -107,7 +107,7 @@ void AP_EFI_NWPMU::handle_frame(AP_HAL::CANFrame &frame)
         struct ecu_6 data;
         memcpy(&data, frame.data, sizeof(data));
         if (!_emitted_version && (AP_HAL::millis() > 10000)) { // don't emit a version early in the boot process
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "NWPMU Version: %d.%d.%d",
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "NWPMU Version: %d.%d.%d",
                             data.firmware_major,
                             data.firmware_minor,
                             data.firmware_build);

@@ -26,9 +26,9 @@
 #include <AP_Param/AP_Param.h>
 #include "AP_SLCANIface.h"
 #include "AP_CANDriver.h"
-#include <GCS_MAVLink/GCS_config.h>
+#include <GCS_AGPILOTLink/GCS_config.h>
 #if HAL_GCS_ENABLED
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_HAL/utility/RingBuffer.h>
 #endif
 
@@ -197,7 +197,7 @@ private:
         uint16_t *filter_ids;
     } can_forward;
 
-    // buffer for MAVCAN frames
+    // buffer for AGPILOTCAN frames
     struct BufferFrame {
         uint8_t bus;
         AP_HAL::CANFrame frame;

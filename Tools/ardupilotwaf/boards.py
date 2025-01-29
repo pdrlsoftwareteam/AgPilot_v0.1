@@ -765,7 +765,7 @@ class sitl_periph_gps(sitl):
             APJ_BOARD_ID = 100,
             HAL_GCS_ENABLED = 0,
             HAL_LOGGING_ENABLED = 0,
-            HAL_LOGGING_MAVLINK_ENABLED = 0,
+            HAL_LOGGING_AGPILOTLINK_ENABLED = 0,
             AP_MISSION_ENABLED = 0,
             HAL_RALLY_ENABLED = 0,
             AP_SCHEDULER_ENABLED = 0,

@@ -18,7 +18,7 @@
 #if HAL_VISUALODOM_ENABLED
 
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL &hal;
 

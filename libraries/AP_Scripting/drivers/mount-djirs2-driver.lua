@@ -80,7 +80,7 @@ local SET_ATTITUDE_INTERVAL_MS = 100    -- set attitude at 10hz
 local MOUNT_INSTANCE = 0                -- always control the first mount/gimbal
 local SEND_FRAMEID = 0x223              -- send CAN messages with this frame id
 local RECEIVE_FRAMEID = 0x222           -- receive CAN messages with this frame id
-local MAV_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
+local AGPILOT_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
 
 -- parameters
 local PARAM_TABLE_KEY = 38
@@ -309,35 +309,35 @@ end
 function init()
   -- check parameter settings
   if CAN_D1_PROTOCOL:get() ~= 10 and CAN_D2_PROTOCOL:get() ~= 10 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=10")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=10")
     do return end
   end
   if CAN_D1_PROTOCOL:get() == 10 and CAN_D2_PROTOCOL:get() == 10 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=0")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=0")
     do return end
   end
   if CAN_D1_PROTOCOL:get() == 10 then
     if CAN_P1_DRIVER:get() <= 0 then
-      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_P1_DRIVER=1")
+      gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_P1_DRIVER=1")
       do return end
     end
     if CAN_P1_BITRATE:get() ~= 1000000 then
-      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_P1_BITRATE=1000000")
+      gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_P1_BITRATE=1000000")
       do return end
     end
   end
   if CAN_D2_PROTOCOL:get() == 10 then
     if CAN_P2_DRIVER:get() <= 0 then
-      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_P2_DRIVER=2")
+      gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_P2_DRIVER=2")
       do return end
     end
     if CAN_P2_BITRATE:get() ~= 1000000 then
-      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_P2_BITRATE=1000000")
+      gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set CAN_P2_BITRATE=1000000")
       do return end
     end
   end
   if MNT1_TYPE:get() ~= 9 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set MNT1_TYPE=9")   
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: set MNT1_TYPE=9")   
     do return end
   end
 
@@ -345,9 +345,9 @@ function init()
   driver = CAN:get_device(25)
   if driver then
     initialised = true
-    gcs:send_text(MAV_SEVERITY.INFO, "DJIR: mount driver started")   
+    gcs:send_text(AGPILOT_SEVERITY.INFO, "DJIR: mount driver started")   
   else
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")   
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")   
   end
 end
 
@@ -356,7 +356,7 @@ end
 function send_msg(serial_msg)
 
   if not serial_msg then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: cannot send invalid message")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: cannot send invalid message")
     do return false end
   end
 
@@ -403,11 +403,11 @@ end
 function update_msg_seq_and_crc(serial_msg)
   -- sanity checks
   if not serial_msg then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: update_msg_seq_and_crc null arg")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: update_msg_seq_and_crc null arg")
     do return end
   end
   if #serial_msg < SERIAL_PACKET_LENGTH_MIN then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: update_msg_seq_and_crc message too short")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "DJIR: update_msg_seq_and_crc message too short")
     do return end
   end
 
@@ -623,7 +623,7 @@ function parse_byte(b)
         local received_crc16 = uint16_value(parse_buff[12], parse_buff[11])
         if (expected_crc16 ~= received_crc16) then
           if DJIR_DEBUG:get() > 0 then
-            gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: crc16 exp:%x got:%x", expected_crc16, received_crc16))
+            gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: crc16 exp:%x got:%x", expected_crc16, received_crc16))
           end
           bytes_error = bytes_error + 1
           parse_state = PARSE_STATE_WAITING_FOR_HEADER
@@ -635,7 +635,7 @@ function parse_byte(b)
         local received_crc32 = uint32_value(parse_buff[parse_length], parse_buff[parse_length-1], parse_buff[parse_length-2], parse_buff[parse_length-3])
         if (expected_crc32 ~= received_crc32) then
           if DJIR_DEBUG:get() > 0 then
-            gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: crc32 exp:%x got:%x", expected_crc32, received_crc32))
+            gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: crc32 exp:%x got:%x", expected_crc32, received_crc32))
           end
           bytes_error = bytes_error + 1
           parse_state = PARSE_STATE_WAITING_FOR_HEADER
@@ -649,7 +649,7 @@ function parse_byte(b)
         if cmd_type_reply then
 
           if expected_reply == REPLY_TYPE.NONE then
-            gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: unexpected reply len:%d", parse_length))
+            gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: unexpected reply len:%d", parse_length))
           end
 
           -- parse attitude reply message
@@ -661,7 +661,7 @@ function parse_byte(b)
               local pitch_deg = int16_value(parse_buff[20],parse_buff[19]) * 0.1
               mount:set_attitude_euler(MOUNT_INSTANCE, roll_deg, pitch_deg, yaw_deg)
               if DJIR_DEBUG:get() > 1 then
-                gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: roll:%4.1f pitch:%4.1f yaw:%4.1f", roll_deg, pitch_deg, yaw_deg))
+                gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: roll:%4.1f pitch:%4.1f yaw:%4.1f", roll_deg, pitch_deg, yaw_deg))
               end
             else
               execute_fails = execute_fails + 1
@@ -688,7 +688,7 @@ function parse_byte(b)
           expected_reply = REPLY_TYPE.NONE
         else
           -- not attempting to parse
-          gcs:send_text(MAV_SEVERITY.INFO, "DJIR: skipped reply:" .. tostring(cmd_type_reply) .. "len:" .. tostring(parse_length))
+          gcs:send_text(AGPILOT_SEVERITY.INFO, "DJIR: skipped reply:" .. tostring(cmd_type_reply) .. "len:" .. tostring(parse_length))
         end
 
        parse_state = PARSE_STATE_WAITING_FOR_HEADER
@@ -715,7 +715,7 @@ function update()
   -- report parsing status
   if (DJIR_DEBUG:get() > 0) and ((now_ms - last_print_ms) > 5000) then
     last_print_ms = now_ms
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: r:%u w:%u fail:%u,%u perr:%u to:%u ign:%u", bytes_read, bytes_written, write_fails, execute_fails, bytes_error, reply_timeouts, msg_ignored))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: r:%u w:%u fail:%u,%u perr:%u to:%u ign:%u", bytes_read, bytes_written, write_fails, execute_fails, bytes_error, reply_timeouts, msg_ignored))
   end
 
   -- do not send any messages until CAN traffic has been seen
@@ -727,7 +727,7 @@ function update()
   if (expected_reply ~= REPLY_TYPE.NONE) then
     if ((now_ms - expected_reply_ms) > REPLY_TIMEOUT_MS) then
       if DJIR_DEBUG:get() > 0 then
-        gcs:send_text(MAV_SEVERITY.INFO, string.format("DJIR: timeout expecting %d", expected_reply))
+        gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("DJIR: timeout expecting %d", expected_reply))
       end
       expected_reply = REPLY_TYPE.NONE
       reply_timeouts = reply_timeouts + 1

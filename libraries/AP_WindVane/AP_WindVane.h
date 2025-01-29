@@ -16,7 +16,7 @@
 
 #include <AP_Param/AP_Param.h>
 #include <Filter/Filter.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #ifndef WINDVANE_DEFAULT_PIN
 #define WINDVANE_DEFAULT_PIN -1                     // default wind vane sensor analog pin

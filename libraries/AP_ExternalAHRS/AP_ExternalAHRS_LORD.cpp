@@ -22,7 +22,7 @@
 #include <AP_Compass/AP_Compass.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
@@ -80,7 +80,7 @@ AP_ExternalAHRS_LORD::AP_ExternalAHRS_LORD(AP_ExternalAHRS *_frontend,
     port_num = sm.find_portnum(AP_SerialManager::SerialProtocol_AHRS, 0);
 
     if (!uart) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "ExternalAHRS no UART");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "ExternalAHRS no UART");
         return;
     }
 
@@ -89,7 +89,7 @@ AP_ExternalAHRS_LORD::AP_ExternalAHRS_LORD(AP_ExternalAHRS *_frontend,
     }
 
     hal.scheduler->delay(5000);
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "LORD ExternalAHRS initialised");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "LORD ExternalAHRS initialised");
 }
 
 void AP_ExternalAHRS_LORD::update_thread(void)
@@ -499,7 +499,7 @@ void AP_ExternalAHRS_LORD::get_filter_status(nav_filter_status &status) const
     }
 }
 
-void AP_ExternalAHRS_LORD::send_status_report(GCS_MAVLINK &link) const
+void AP_ExternalAHRS_LORD::send_status_report(GCS_AGPILOTLINK &link) const
 {
     // prepare flags
     uint16_t flags = 0;

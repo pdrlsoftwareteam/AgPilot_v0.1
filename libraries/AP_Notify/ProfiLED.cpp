@@ -19,7 +19,7 @@
 
 #include "SRV_Channel/SRV_Channel.h"
 #include <utility>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // This limit is from the dshot driver rc out groups limit, we need at least one channel for clock
 #define AP_NOTIFY_ProfiLED_MAX_INSTANCES        3
@@ -87,7 +87,7 @@ bool ProfiLED_SPI::init()
     WITH_SEMAPHORE(_dev->get_semaphore());
     _dev->register_periodic_callback(10000, FUNCTOR_BIND_MEMBER(&ProfiLED_SPI::_timer, void));
     _need_update = true;
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Initialised ProfiLED over SPIs");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Initialised ProfiLED over SPIs");
     return true;
 }
 

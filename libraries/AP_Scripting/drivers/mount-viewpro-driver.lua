@@ -49,7 +49,7 @@ local VIEP_ZOOM_SPEED = Parameter("VIEP_ZOOM_SPEED")    -- zoom speed from 0 (sl
 
 -- global definitions
 local CAM_SELECT_RC_OPTION = 300        -- rc channel option used to control which camera/video is used. RCx_OPTION = 300 (scripting1)
-local MAV_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
+local AGPILOT_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
 local INIT_INTERVAL_MS = 3000           -- attempt to initialise the gimbal at this interval
 local UPDATE_INTERVAL_MS = 100          -- update at 10hz
 local MOUNT_INSTANCE = 0                -- always control the first mount/gimbal
@@ -169,19 +169,19 @@ end
 function init()
   -- check mount parameter
   if MNT1_TYPE:get() ~= 9 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "ViewPro: set MNT1_TYPE=9")
+    gcs:send_text(AGPILOT_SEVERITY.CRITICAL, "ViewPro: set MNT1_TYPE=9")
     do return end
   end
 
   -- find and init first instance of SERIALx_PROTOCOL = 28 (Scripting)
   uart = serial:find_serial(0)
   if uart == nil then
-    gcs:send_text(3, "ViewPro: no SERIALx_PROTOCOL = 28") -- MAV_SEVERITY_ERR
+    gcs:send_text(3, "ViewPro: no SERIALx_PROTOCOL = 28") -- AGPILOT_SEVERITY_ERR
   else
     uart:begin(115200)
     uart:set_flow_control(0)
     initialised = true
-    gcs:send_text(MAV_SEVERITY.INFO, "ViewPro: started")
+    gcs:send_text(AGPILOT_SEVERITY.INFO, "ViewPro: started")
   end
 end
 
@@ -219,7 +219,7 @@ function parse_byte(b)
     if VIEP_DEBUG:get() > 1 then
       debug_buff[#debug_buff+1] = b
       if #debug_buff >= 10 then
-        gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: %x %x %x %x %x %x %x %x %x %x", debug_buff[1], debug_buff[2], debug_buff[3], debug_buff[4], debug_buff[5], debug_buff[6], debug_buff[7], debug_buff[8], debug_buff[9], debug_buff[10]))
+        gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: %x %x %x %x %x %x %x %x %x %x", debug_buff[1], debug_buff[2], debug_buff[3], debug_buff[4], debug_buff[5], debug_buff[6], debug_buff[7], debug_buff[8], debug_buff[9], debug_buff[10]))
         debug_buff = {}
       end
     end
@@ -270,7 +270,7 @@ function parse_byte(b)
         parse_state = PARSE_STATE_WAITING_FOR_HEADER1
         bytes_error = bytes_error + 1
         if VIEP_DEBUG:get() > 0 then
-          gcs:send_text(MAV_SEVERITY.ERROR, string.format("ViewPro: invalid len:%d", parse_length))
+          gcs:send_text(AGPILOT_SEVERITY.ERROR, string.format("ViewPro: invalid len:%d", parse_length))
         end
       end
       do return end
@@ -307,21 +307,21 @@ function parse_byte(b)
             mount:set_attitude_euler(MOUNT_INSTANCE, roll_deg, pitch_deg, yaw_deg)
 
             if VIEP_DEBUG:get() > 0 then
-              gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: r:%f p:%f y:%f ss:%x", roll_deg, pitch_deg, yaw_deg, servo_status))
+              gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: r:%f p:%f y:%f ss:%x", roll_deg, pitch_deg, yaw_deg, servo_status))
             end
           end
 
           if not processed then
             msg_ignored = msg_ignored + 1
             if VIEP_DEBUG:get() > 0 then
-              gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: ignored frameid:%x", parse_frameid))
+              gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: ignored frameid:%x", parse_frameid))
             end
           end
         else
           -- crc mismatch
           bytes_error = bytes_error + 1
           if VIEP_DEBUG:get() > 0 then
-            gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: crc exp:%x got:%x", parse_expected_crc, b))
+            gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: crc exp:%x got:%x", parse_expected_crc, b))
           end
         end
         parse_state = PARSE_STATE_WAITING_FOR_HEADER1
@@ -338,7 +338,7 @@ end
 -- write a byte to the uart and update the checksum
 function write_byte(b, checksum)
   if b == nil or checksum == nil then
-    gcs:send_text(3, "ViewPro: failed to write byte") -- MAV_SEVERITY_ERR
+    gcs:send_text(3, "ViewPro: failed to write byte") -- AGPILOT_SEVERITY_ERR
     return
   end
   local byte_to_write = b & 0xFF
@@ -428,8 +428,8 @@ function send_camera_control(camera_choice, cam_command)
   local data_bytes = video_choose | zoom_speed | operation_cmd
 
   -- debug
-  --gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: camcmd:%x msb:%x lsb:%x", cam_command, highbyte(cmd_shifted), lowbyte(cmd_shifted)))
-  gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: cam choice:%x", video_choose))
+  --gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: camcmd:%x msb:%x lsb:%x", cam_command, highbyte(cmd_shifted), lowbyte(cmd_shifted)))
+  gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: cam choice:%x", video_choose))
 
   write_byte(HEADER1, 0)
   write_byte(HEADER2, 0)
@@ -472,7 +472,7 @@ function check_camera_state()
     cam_pic_count = pic_count
     send_camera_control(cam_choice, CAM_COMMAND_TAKE_PICTURE)
     if VIEP_DEBUG:get() > 0 then
-      gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: took pic %u", pic_count))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: took pic %u", pic_count))
     end
   end
 
@@ -485,7 +485,7 @@ function check_camera_state()
       send_camera_control(cam_choice, CAM_COMMAND_STOP_RECORD)
     end
     if VIEP_DEBUG:get() > 0 then
-      gcs:send_text(MAV_SEVERITY.INFO, "ViewPro: rec video:" .. tostring(cam_rec_video))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, "ViewPro: rec video:" .. tostring(cam_rec_video))
     end
   end
     
@@ -501,7 +501,7 @@ function check_camera_state()
       send_camera_control(cam_choice, CAM_COMMAND_ZOOM_IN)
     end
     if VIEP_DEBUG:get() > 0 then
-      gcs:send_text(MAV_SEVERITY.INFO, "ViewPro: zoom:" .. tostring(cam_zoom_step))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, "ViewPro: zoom:" .. tostring(cam_zoom_step))
     end
   end
 
@@ -519,7 +519,7 @@ function check_camera_state()
       send_camera_control(cam_choice, CAM_COMMAND_FOCUS_PLUS)
     end
     if VIEP_DEBUG:get() > 0 then
-      gcs:send_text(MAV_SEVERITY.INFO, "ViewPro: focus:" .. tostring(cam_focus_step))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, "ViewPro: focus:" .. tostring(cam_focus_step))
     end
   end
 
@@ -530,7 +530,7 @@ function check_camera_state()
       send_camera_control(cam_choice, CAM_COMMAND_AUTO_FOCUS)
     end
     if VIEP_DEBUG:get() > 0 then
-      gcs:send_text(MAV_SEVERITY.INFO, "ViewPro: auto focus:" .. tostring(cam_autofocus))
+      gcs:send_text(AGPILOT_SEVERITY.INFO, "ViewPro: auto focus:" .. tostring(cam_autofocus))
     end
   end
 end
@@ -550,7 +550,7 @@ function update()
   -- status reporting
   if (VIEP_DEBUG:get() > 0) and (now_ms - last_print_ms > 5000) then
     last_print_ms = now_ms
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("ViewPro: r:%u w:%u err:%u ign:%u", bytes_read, bytes_written, bytes_error, msg_ignored))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("ViewPro: r:%u w:%u err:%u ign:%u", bytes_read, bytes_written, bytes_error, msg_ignored))
   end
 
   -- consume incoming bytes

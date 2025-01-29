@@ -33,7 +33,7 @@
 #include "AP_RangeFinder.h"
 #include "AP_RangeFinder_Params.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -104,7 +104,7 @@ void AP_RangeFinder_HC_SR04::update(void)
             state.distance_m = 0.0f;
         }
     } else {
-        // gcs().send_text(MAV_SEVERITY_WARNING, "Pong!");
+        // gcs().send_text(AGPILOT_SEVERITY_WARNING, "Pong!");
         // a new reading - convert time to distance
         state.distance_m = (value_us * (1.0/58.0f)) * 0.01f;  // 58 is from datasheet, mult for performance
 
@@ -134,7 +134,7 @@ void AP_RangeFinder_HC_SR04::update(void)
     // consider sending new ping
     if (now - last_ping_ms > 67) { // read ~@15Hz - recommended 60ms delay from datasheet
         last_ping_ms = now;
-        // gcs().send_text(MAV_SEVERITY_INFO, "Ping!");
+        // gcs().send_text(AGPILOT_SEVERITY_INFO, "Ping!");
         // raise stop pin for n-microseconds
         hal.gpio->pinMode(trigger_pin, HAL_GPIO_OUTPUT);
         hal.gpio->write(trigger_pin, 1);

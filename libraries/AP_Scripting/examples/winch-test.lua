@@ -39,7 +39,7 @@ function update()
   -- check if servo output is used (as an input)
   if winch_srv_src_fn:get() > 0 then
     if not SRV_Channels:find_channel(winch_srv_src_fn:get()) then
-      gcs:send_text(3, string.format("Winch: SERVOx_FUNCTION = %d not found", winch_srv_src_fn:get()))    -- MAV_SEVERITY_ERROR
+      gcs:send_text(3, string.format("Winch: SERVOx_FUNCTION = %d not found", winch_srv_src_fn:get()))    -- AGPILOT_SEVERITY_ERROR
       return update, 10000  -- check again in 10 seconds
     end
     local output_pwm = SRV_Channels:get_output_pwm(winch_srv_src_fn:get())
@@ -56,7 +56,7 @@ function update()
     -- find RC channel used to control winch
     local rc_switch_ch = rc:find_channel_for_option(300) --scripting ch 1
     if (rc_switch_ch == nil) then
-      gcs:send_text(3, "Winch: RCx_OPTION = 300 not set")    -- MAV_SEVERITY_ERROR
+      gcs:send_text(3, "Winch: RCx_OPTION = 300 not set")    -- AGPILOT_SEVERITY_ERROR
       return update, 10000  -- check again in 10 seconds
     end
 

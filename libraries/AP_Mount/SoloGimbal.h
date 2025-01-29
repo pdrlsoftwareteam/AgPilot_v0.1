@@ -12,7 +12,7 @@
 #include "SoloGimbalEKF.h"
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_AccelCal/AP_AccelCal.h>
 
 #include "SoloGimbal_Parameters.h"
@@ -117,7 +117,7 @@ private:
 
     float _vehicle_yaw_rate_ef_filt;
 
-    static const uint8_t _compid = MAV_COMP_ID_GIMBAL;
+    static const uint8_t _compid = AGPILOT_COMP_ID_GIMBAL;
 
     // joint angle filter states
     Vector3f _vehicle_delta_angles;

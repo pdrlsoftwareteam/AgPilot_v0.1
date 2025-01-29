@@ -593,7 +593,7 @@ void Morse::report_FPS(void)
 
 
 /*
-  send a report to the vehicle control code over MAVLink
+  send a report to the vehicle control code over AGPILOTLink
 */
 void Morse::send_report(void)
 {
@@ -609,7 +609,7 @@ void Morse::send_report(void)
 
     // this is usually loopback
     if (!mavlink.connected && mav_socket.connect(mavlink_loopback_address, mavlink_loopback_port)) {
-        ::printf("Morse MAVLink loopback connected to %s:%u\n", mavlink_loopback_address, (unsigned)mavlink_loopback_port);
+        ::printf("Morse AGPILOTLink loopback connected to %s:%u\n", mavlink_loopback_address, (unsigned)mavlink_loopback_port);
         mavlink.connected = true;
     }
     if (!mavlink.connected) {
@@ -626,13 +626,13 @@ void Morse::send_report(void)
         // the simulated rangefinder has an imposed 18m limit in
         // e.g. rover_scanner.py
         packet.max_distance = 5000;
-        packet.sensor_type = MAV_DISTANCE_SENSOR_LASER;
+        packet.sensor_type = AGPILOT_DISTANCE_SENSOR_LASER;
         packet.increment = 0; // use increment_f
 
         packet.angle_offset = 180;
         packet.increment_f = (-5);  // NOTE! This is negative because the distances[] arc is counter-clockwise
 
-        for (uint8_t i=0; i<MAVLINK_MSG_OBSTACLE_DISTANCE_FIELD_DISTANCES_LEN; i++) {
+        for (uint8_t i=0; i<AGPILOTLINK_MSG_OBSTACLE_DISTANCE_FIELD_DISTANCES_LEN; i++) {
 
             if (i >= scanner.points.length) {
                 packet.distances[i] = 65535;
@@ -656,7 +656,7 @@ void Morse::send_report(void)
         }
 
         mavlink_message_t msg;
-        mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
         uint8_t saved_seq = chan0_status->current_tx_seq;
         chan0_status->current_tx_seq = mavlink.seq;
         uint16_t len = mavlink_msg_obstacle_distance_encode(

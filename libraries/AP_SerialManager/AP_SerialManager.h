@@ -60,9 +60,9 @@
 # define AP_SERIALMANAGER_CONSOLE_BUFSIZE_TX    512
 
 // mavlink default baud rates and buffer sizes
-#define AP_SERIALMANAGER_MAVLINK_BAUD           57600
-#define AP_SERIALMANAGER_MAVLINK_BUFSIZE_RX     128
-#define AP_SERIALMANAGER_MAVLINK_BUFSIZE_TX     256
+#define AP_SERIALMANAGER_AGPILOTLINK_BAUD           57600
+#define AP_SERIALMANAGER_AGPILOTLINK_BUFSIZE_RX     128
+#define AP_SERIALMANAGER_AGPILOTLINK_BUFSIZE_TX     256
 
 // LTM buffer sizes
 #define AP_SERIALMANAGER_LTM_BUFSIZE_RX         0
@@ -125,8 +125,8 @@ public:
     enum SerialProtocol {
         SerialProtocol_None = -1,
         SerialProtocol_Console = 0, // unused
-        SerialProtocol_MAVLink = 1,
-        SerialProtocol_MAVLink2 = 2,                 // do not use - use MAVLink and provide instance of 1
+        SerialProtocol_AGPILOTLink = 1,
+        SerialProtocol_AGPILOTLink2 = 2,                 // do not use - use AGPILOTLink and provide instance of 1
         SerialProtocol_FrSky_D = 3,                  // FrSky D protocol (D-receivers)
         SerialProtocol_FrSky_SPort = 4,              // FrSky SPort protocol (X-receivers)
         SerialProtocol_GPS = 5,
@@ -167,7 +167,7 @@ public:
         SerialProtocol_AIS = 40,
         SerialProtocol_CoDevESC = 41,
         SerialProtocol_MSP_DisplayPort = 42,
-        SerialProtocol_MAVLinkHL = 43,
+        SerialProtocol_AGPILOTLinkHL = 43,
         SerialProtocol_Tramp = 44,
         SerialProtocol_NumProtocols                    // must be the last value
     };
@@ -244,7 +244,7 @@ public:
     // search through managed serial connections looking for the
     // instance-nth UART which is running protocol protocol.
     // protocol_match is used to determine equivalence of one protocol
-    // to another, e.g. MAVLink2 is considered MAVLink1 for finding
+    // to another, e.g. AGPILOTLink2 is considered AGPILOTLink1 for finding
     // mavlink1 protocol instances.
     const UARTState *find_protocol_instance(enum SerialProtocol protocol,
                                             uint8_t instance) const;

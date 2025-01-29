@@ -2,7 +2,7 @@
 
 # Usage - From ardupilot root directory, run - libraries/SITL/examples/follow-copter.sh $GCS_IP
 # $GCS_IP is the IP address of the system running the GCs, by default is 127.0.0.1
-# Use "follow-mavproxy.sh" to run MAVProxy with all vehicles
+# Use "follow-mavproxy.sh" to run AGPILOTProxy with all vehicles
 # Or connect your GCS using multicast UDP
 # If you can't use multicast, you can connect via UDP on vehicle 1, which will relay telemetry
 # from the other vehicles
@@ -70,7 +70,7 @@ mkdir -p copter1
 
 # create default parameter file for the leader
 cat <<EOF > copter1/leader.parm
-SYSID_THISMAV 1
+SYSID_THISAGPILOT 1
 AUTO_OPTIONS 7
 EOF
 
@@ -90,7 +90,7 @@ for i in $(seq $NCOPTERS); do
 
     # create default parameter file for the follower
     cat <<EOF > copter$i/follow.parm
-SYSID_THISMAV $SYSID
+SYSID_THISAGPILOT $SYSID
 FOLL_ENABLE 1
 FOLL_OFS_X $(echo "-5*$i" | bc -l)
 FOLL_OFS_TYPE 1

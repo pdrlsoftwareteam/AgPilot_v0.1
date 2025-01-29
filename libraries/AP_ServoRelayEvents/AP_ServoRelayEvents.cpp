@@ -13,7 +13,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- *   AP_ServoRelayEvents - handle servo and relay MAVLink events
+ *   AP_ServoRelayEvents - handle servo and relay AGPILOTLink events
  */
 
 
@@ -22,7 +22,7 @@
 #include "AP_ServoRelayEvents.h"
 #include <RC_Channel/RC_Channel.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -42,7 +42,7 @@ bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint16_t pwm)
     case SRV_Channel::k_rcin1 ... SRV_Channel::k_rcin16: // rc pass-thru
         break;
     default:
-        gcs().send_text(MAV_SEVERITY_INFO, "ServoRelayEvent: Channel %d is already in use", _channel);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "ServoRelayEvent: Channel %d is already in use", _channel);
         return false;
     }
     if (type == EVENT_TYPE_SERVO && 
@@ -97,7 +97,7 @@ bool AP_ServoRelayEvents::do_repeat_servo(uint8_t _channel, uint16_t _servo_valu
     case SRV_Channel::k_rcin1 ... SRV_Channel::k_rcin16: // rc pass-thru
         break;
     default:
-        gcs().send_text(MAV_SEVERITY_INFO, "ServoRelayEvent: Channel %d is already in use", _channel);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "ServoRelayEvent: Channel %d is already in use", _channel);
         return false;
     }
     channel = _channel;
@@ -131,7 +131,7 @@ bool AP_ServoRelayEvents::do_repeat_relay(uint8_t relay_num, int16_t _repeat, ui
 
 
 /*
-  update state for MAV_CMD_DO_REPEAT_SERVO and MAV_CMD_DO_REPEAT_RELAY
+  update state for AGPILOT_CMD_DO_REPEAT_SERVO and AGPILOT_CMD_DO_REPEAT_RELAY
 */
 void AP_ServoRelayEvents::update_events(void)
 {

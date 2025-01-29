@@ -19,7 +19,7 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_FETtecOneWire.h"
 #if AP_FETTEC_ONEWIRE_ENABLED
@@ -102,9 +102,9 @@ void AP_FETtecOneWire::init_uart()
     if (_uart->get_options() & _uart->OPTION_HDPLEX) { //Half-Duplex is enabled
         _use_hdplex = true;
         uart_baud = HALF_DUPLEX_BAUDRATE;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "FTW using Half-Duplex");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "FTW using Half-Duplex");
     } else {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "FTW using Full-Duplex");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "FTW using Full-Duplex");
     }
 #endif
 
@@ -155,7 +155,7 @@ void AP_FETtecOneWire::init()
     }
     _invalid_mask = false;  // mask is good
 
-    gcs().send_text(MAV_SEVERITY_INFO, "FETtec: allocated %u motors", _esc_count);
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "FETtec: allocated %u motors", _esc_count);
 
     // We expect to be able to send a fast-throttle command in each loop.
     // 8  bits - OneWire Header
@@ -784,8 +784,8 @@ void AP_FETtecOneWire::update()
                 continue;
             }
             _running_mask &= ~(1U << esc.servo_ofs);
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "No telem from esc id=%u. Resetting it.", esc.id);
-            //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "unknown %u, invalid %u, too short %u, unexpected: %u, crc_err %u", _unknown_esc_message, _message_invalid_in_state_count, _period_too_short, esc.unexpected_telem, crc_rec_err_cnt);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "No telem from esc id=%u. Resetting it.", esc.id);
+            //GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "unknown %u, invalid %u, too short %u, unexpected: %u, crc_err %u", _unknown_esc_message, _message_invalid_in_state_count, _period_too_short, esc.unexpected_telem, crc_rec_err_cnt);
             esc.set_state(ESCState::WANT_SEND_OK_TO_GET_RUNNING_SW_TYPE);
             esc.telem_requested = false;
         }

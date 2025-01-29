@@ -5,7 +5,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_CANManager/AP_CANManager.h>
 #include <AP_UAVCAN/AP_UAVCAN.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <uavcan/equipment/range_sensor/Measurement.hpp>
 
@@ -77,7 +77,7 @@ AP_RangeFinder_UAVCAN* AP_RangeFinder_UAVCAN::get_uavcan_backend(AP_UAVCAN* ap_u
                 if (driver == nullptr) {
                     break;
                 }
-                gcs().send_text(MAV_SEVERITY_INFO, "RangeFinder[%u]: added UAVCAN node %u addr %u",
+                gcs().send_text(AGPILOT_SEVERITY_INFO, "RangeFinder[%u]: added UAVCAN node %u addr %u",
                                 unsigned(i), unsigned(node_id), unsigned(address));
                 //Assign node id and respective uavcan driver, for identification
                 if (driver->_ap_uavcan == nullptr) {
@@ -152,22 +152,22 @@ void AP_RangeFinder_UAVCAN::handle_measurement(AP_UAVCAN* ap_uavcan, uint8_t nod
     switch (cb.msg->sensor_type) {
         case uavcan::equipment::range_sensor::Measurement::SENSOR_TYPE_SONAR:
         {
-            driver->_sensor_type = MAV_DISTANCE_SENSOR_ULTRASOUND;
+            driver->_sensor_type = AGPILOT_DISTANCE_SENSOR_ULTRASOUND;
             break;
         }
         case uavcan::equipment::range_sensor::Measurement::SENSOR_TYPE_LIDAR:
         {
-            driver->_sensor_type = MAV_DISTANCE_SENSOR_LASER;
+            driver->_sensor_type = AGPILOT_DISTANCE_SENSOR_LASER;
             break;
         }
         case uavcan::equipment::range_sensor::Measurement::SENSOR_TYPE_RADAR:
         {
-            driver->_sensor_type = MAV_DISTANCE_SENSOR_RADAR;
+            driver->_sensor_type = AGPILOT_DISTANCE_SENSOR_RADAR;
             break;
         }
         default:
         {
-            driver->_sensor_type = MAV_DISTANCE_SENSOR_UNKNOWN;
+            driver->_sensor_type = AGPILOT_DISTANCE_SENSOR_UNKNOWN;
             break;
         }
     }

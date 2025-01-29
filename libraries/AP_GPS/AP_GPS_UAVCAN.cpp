@@ -23,7 +23,7 @@
 
 #include <AP_CANManager/AP_CANManager.h>
 #include <AP_UAVCAN/AP_UAVCAN.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <AP_Logger/AP_Logger.h>
 
@@ -202,7 +202,7 @@ AP_GPS_Backend* AP_GPS_UAVCAN::probe(AP_GPS &_gps, AP_GPS::GPS_State &_state)
                 }
             }
             if (bad_override_config) {
-                GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Same Node Id %lu set for multiple GPS", (unsigned long int)_gps._override_node_id[i].get());
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Same Node Id %lu set for multiple GPS", (unsigned long int)_gps._override_node_id[i].get());
                 last_match = i;
             }
 
@@ -266,7 +266,7 @@ AP_GPS_Backend* AP_GPS_UAVCAN::probe(AP_GPS &_gps, AP_GPS::GPS_State &_state)
         if (backend->role == AP_GPS::GPS_ROLE_MB_BASE) {
             backend->rtcm3_parser = new RTCM3_Parser;
             if (backend->rtcm3_parser == nullptr) {
-                GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "UAVCAN%u-%u: failed RTCMv3 parser allocation", _detected_modules[found_match].ap_uavcan->get_driver_index()+1, _detected_modules[found_match].node_id);
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "UAVCAN%u-%u: failed RTCMv3 parser allocation", _detected_modules[found_match].ap_uavcan->get_driver_index()+1, _detected_modules[found_match].node_id);
             }
         }
 #endif // GPS_MOVING_BASELINE
@@ -595,7 +595,7 @@ void AP_GPS_UAVCAN::handle_moving_baseline_msg(const MovingBaselineDataCb &cb, u
 {
     WITH_SEMAPHORE(sem);
     if (role != AP_GPS::GPS_ROLE_MB_BASE) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Incorrect Role set for UAVCAN GPS, %d should be Base", node_id);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Incorrect Role set for UAVCAN GPS, %d should be Base", node_id);
         return;
     }
 
@@ -813,7 +813,7 @@ bool AP_GPS_UAVCAN::is_configured(void) const
 }
 
 /*
-  handle RTCM data from MAVLink GPS_RTCM_DATA, forwarding it over MAVLink
+  handle RTCM data from AGPILOTLink GPS_RTCM_DATA, forwarding it over AGPILOTLink
  */
 void AP_GPS_UAVCAN::inject_data(const uint8_t *data, uint16_t len)
 {

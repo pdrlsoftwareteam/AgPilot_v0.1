@@ -1,7 +1,7 @@
 #include "PerfInfo.h"
 
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_InternalError/AP_InternalError.h>
 #include "AP_Scheduler.h"
 
@@ -196,7 +196,7 @@ float AP::PerfInfo::get_filtered_loop_rate_hz() const
 
 void AP::PerfInfo::update_logging() const
 {
-    gcs().send_text(MAV_SEVERITY_INFO,
+    gcs().send_text(AGPILOT_SEVERITY_INFO,
                     "PERF: %u/%u [%lu:%lu] F=%uHz sd=%lu Ex=%lu",
                     (unsigned)get_num_long_running(),
                     (unsigned)get_num_loops(),

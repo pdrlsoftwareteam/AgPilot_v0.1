@@ -24,17 +24,17 @@ _sim_vehicle() {
     '--lldb-stopped[use ldb for debugging ardupilot (no auto-start)]' \
     '(-d --delay-start=)'{-d,--delay-start=}'[delay start of mavproxy by this number of seconds]:int:' \
     '(-B --breakpoint=)'{-B,--breakpoint=}'[add a breakpoint at given location in debugger]:LOCATION:' \
-    '(-M --mavlink-gimbal)'{-M,--mavlink-gimbal}'[enable MAVLink gimbal]' \
+    '(-M --mavlink-gimbal)'{-M,--mavlink-gimbal}'[enable AGPILOTLink gimbal]' \
     '(-L --location=)'{-L,--location=}'[use start location from Tools/autotest/locations.txt]:LOCATION:' \
     '(-l --custom-location=)'{-l,--custom-location=}'[set custom start location (lat,lon,alt,heading)]:LOCATION:' \
     '(-S --speedup=)'{-S,--speedup=}'[set simulation speedup (1 for wall clock time)]:SPEEDUP:' \
     '(-t --tracker-location=)'{-t,--tracker-location=}'[set antenna tracker start location]:TRACKER_LOCATION:' \
     '(-w --wipe-eeprom)'{-w,--wipe-eeprom}'[wipe EEPROM and reload parameters]' \
-    '(-m --mavproxy-args=)'{-m,--mavproxy-args=}'[additional arguments to pass to mavproxy.py]:MAVPROXY_ARGS:' \
+    '(-m --mavproxy-args=)'{-m,--mavproxy-args=}'[additional arguments to pass to mavproxy.py]:AGPILOTPROXY_ARGS:' \
     '--strace[strace the ArduPilot binary]' \
     '--model=[Override simulation model to use]:MODEL:' \
     '--use-dir=[Store SITL state and output in named directory]:DIR:' \
-    '--no-mavproxy[Do notlaunch MAVProxy]' \
+    '--no-mavproxy[Do notlaunch AGPILOTProxy]' \
     '--fresh-params[Generate and use local parameter help XML]' \
     '--mcast[Use multicasting at default 239.255.145.50:14550]' \
     '--osd[Enable SITL OSD]' \

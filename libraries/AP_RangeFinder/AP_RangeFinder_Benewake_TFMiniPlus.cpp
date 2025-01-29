@@ -20,7 +20,7 @@
 
 #include <utility>
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/AP_HAL.h>
 
 extern const AP_HAL::HAL& hal;
@@ -104,7 +104,7 @@ bool AP_RangeFinder_Benewake_TFMiniPlus::init()
     }
 
     if (val[5] * 10000 + val[4] * 100 + val[3] < 20003) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "TFMini: FW ver %u.%u.%u (need>=2.0.3)",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "TFMini: FW ver %u.%u.%u (need>=2.0.3)",
                             (unsigned)val[5],(unsigned)val[4],(unsigned)val[3]);
         goto fail;
     }

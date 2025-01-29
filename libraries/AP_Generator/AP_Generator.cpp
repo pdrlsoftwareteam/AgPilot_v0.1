@@ -21,7 +21,7 @@
 #include "AP_Generator_IE_2400.h"
 #include "AP_Generator_RichenPower.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 const AP_Param::GroupInfo AP_Generator::var_info[] = {
 
@@ -107,7 +107,7 @@ enum AP_Generator::Type AP_Generator::type() const
 }
 
 // Pass through to backend
-void AP_Generator::send_generator_status(const GCS_MAVLINK &channel)
+void AP_Generator::send_generator_status(const GCS_AGPILOTLINK &channel)
 {
     if (_driver_ptr == nullptr) {
         return;

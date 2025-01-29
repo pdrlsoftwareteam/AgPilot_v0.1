@@ -84,8 +84,8 @@ void AP_Mount::init()
             _num_instances++;
 #endif
 
-#if HAL_MOUNT_STORM32MAVLINK_ENABLED
-        // check for SToRM32 mounts using MAVLink protocol
+#if HAL_MOUNT_STORM32AGPILOTLINK_ENABLED
+        // check for SToRM32 mounts using AGPILOTLink protocol
         } else if (mount_type == Mount_Type_SToRM32) {
             _backends[instance] = new AP_Mount_SToRM32(*this, _params[instance], instance);
             _num_instances++;
@@ -191,11 +191,11 @@ bool AP_Mount::has_pan_control(uint8_t instance) const
 }
 
 // get_mode - returns current mode of mount (i.e. Retracted, Neutral, RC_Targeting, GPS Point)
-MAV_MOUNT_MODE AP_Mount::get_mode(uint8_t instance) const
+AGPILOT_MOUNT_MODE AP_Mount::get_mode(uint8_t instance) const
 {
     const auto *backend = get_instance(instance);
     if (backend == nullptr) {
-        return MAV_MOUNT_MODE_RETRACT;
+        return AGPILOT_MOUNT_MODE_RETRACT;
     }
 
     // ask backend its mode
@@ -210,11 +210,11 @@ void AP_Mount::set_mode_to_default(uint8_t instance)
     if (backend == nullptr) {
         return;
     }
-    backend->set_mode((enum MAV_MOUNT_MODE)_params[instance].default_mode.get());
+    backend->set_mode((enum AGPILOT_MOUNT_MODE)_params[instance].default_mode.get());
 }
 
 // set_mode - sets mount's mode
-void AP_Mount::set_mode(uint8_t instance, enum MAV_MOUNT_MODE mode)
+void AP_Mount::set_mode(uint8_t instance, enum AGPILOT_MOUNT_MODE mode)
 {
     auto *backend = get_instance(instance);
     if (backend == nullptr) {
@@ -264,30 +264,30 @@ void AP_Mount::set_rate_target(uint8_t instance, float roll_degs, float pitch_de
     backend->set_rate_target(roll_degs, pitch_degs, yaw_degs, yaw_lock);
 }
 
-MAV_RESULT AP_Mount::handle_command_do_mount_configure(const mavlink_command_long_t &packet)
+AGPILOT_RESULT AP_Mount::handle_command_do_mount_configure(const mavlink_command_long_t &packet)
 {
     auto *backend = get_primary();
     if (backend == nullptr) {
-        return MAV_RESULT_FAILED;
+        return AGPILOT_RESULT_FAILED;
     }
 
-    backend->set_mode((MAV_MOUNT_MODE)packet.param1);
+    backend->set_mode((AGPILOT_MOUNT_MODE)packet.param1);
 
-    return MAV_RESULT_ACCEPTED;
+    return AGPILOT_RESULT_ACCEPTED;
 }
 
 
-MAV_RESULT AP_Mount::handle_command_do_mount_control(const mavlink_command_long_t &packet)
+AGPILOT_RESULT AP_Mount::handle_command_do_mount_control(const mavlink_command_long_t &packet)
 {
     auto *backend = get_primary();
     if (backend == nullptr) {
-        return MAV_RESULT_FAILED;
+        return AGPILOT_RESULT_FAILED;
     }
 
     return backend->handle_command_do_mount_control(packet);
 }
 
-MAV_RESULT AP_Mount::handle_command_do_gimbal_manager_pitchyaw(const mavlink_command_long_t &packet)
+AGPILOT_RESULT AP_Mount::handle_command_do_gimbal_manager_pitchyaw(const mavlink_command_long_t &packet)
 {
     AP_Mount_Backend *backend;
 
@@ -301,19 +301,19 @@ MAV_RESULT AP_Mount::handle_command_do_gimbal_manager_pitchyaw(const mavlink_com
     }
 
     if (backend == nullptr) {
-        return MAV_RESULT_FAILED;
+        return AGPILOT_RESULT_FAILED;
     }
 
     // check flags for change to RETRACT
     uint32_t flags = (uint32_t)packet.param5;
     if ((flags & GIMBAL_MANAGER_FLAGS_RETRACT) > 0) {
-        backend->set_mode(MAV_MOUNT_MODE_RETRACT);
-        return MAV_RESULT_ACCEPTED;
+        backend->set_mode(AGPILOT_MOUNT_MODE_RETRACT);
+        return AGPILOT_RESULT_ACCEPTED;
     }
     // check flags for change to NEUTRAL
     if ((flags & GIMBAL_MANAGER_FLAGS_NEUTRAL) > 0) {
-        backend->set_mode(MAV_MOUNT_MODE_NEUTRAL);
-        return MAV_RESULT_ACCEPTED;
+        backend->set_mode(AGPILOT_MOUNT_MODE_NEUTRAL);
+        return AGPILOT_RESULT_ACCEPTED;
     }
 
     // param1 : pitch_angle (in degrees)
@@ -322,7 +322,7 @@ MAV_RESULT AP_Mount::handle_command_do_gimbal_manager_pitchyaw(const mavlink_com
     const float yaw_angle_deg = packet.param2;
     if (!isnan(pitch_angle_deg) && !isnan(yaw_angle_deg)) {
         backend->set_angle_target(0, pitch_angle_deg, yaw_angle_deg, flags & GIMBAL_MANAGER_FLAGS_YAW_LOCK);
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
     }
 
     // param3 : pitch_rate (in deg/s)
@@ -331,24 +331,24 @@ MAV_RESULT AP_Mount::handle_command_do_gimbal_manager_pitchyaw(const mavlink_com
     const float yaw_rate_degs = packet.param4;
     if (!isnan(pitch_rate_degs) && !isnan(yaw_rate_degs)) {
         backend->set_rate_target(0, pitch_rate_degs, yaw_rate_degs, flags & GIMBAL_MANAGER_FLAGS_YAW_LOCK);
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
     }
 
-    return MAV_RESULT_FAILED;
+    return AGPILOT_RESULT_FAILED;
 }
 
 
-MAV_RESULT AP_Mount::handle_command_long(const mavlink_command_long_t &packet)
+AGPILOT_RESULT AP_Mount::handle_command_long(const mavlink_command_long_t &packet)
 {
     switch (packet.command) {
-    case MAV_CMD_DO_MOUNT_CONFIGURE:
+    case AGPILOT_CMD_DO_MOUNT_CONFIGURE:
         return handle_command_do_mount_configure(packet);
-    case MAV_CMD_DO_MOUNT_CONTROL:
+    case AGPILOT_CMD_DO_MOUNT_CONTROL:
         return handle_command_do_mount_control(packet);
-    case MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW:
+    case AGPILOT_CMD_DO_GIMBAL_MANAGER_PITCHYAW:
         return handle_command_do_gimbal_manager_pitchyaw(packet);
     default:
-        return MAV_RESULT_UNSUPPORTED;
+        return AGPILOT_RESULT_UNSUPPORTED;
     }
 }
 
@@ -612,22 +612,22 @@ void AP_Mount::handle_gimbal_report(mavlink_channel_t chan, const mavlink_messag
 void AP_Mount::handle_message(mavlink_channel_t chan, const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_GIMBAL_REPORT:
+    case AGPILOTLINK_MSG_ID_GIMBAL_REPORT:
         handle_gimbal_report(chan, msg);
         break;
-    case MAVLINK_MSG_ID_MOUNT_CONFIGURE:
+    case AGPILOTLINK_MSG_ID_MOUNT_CONFIGURE:
         handle_mount_configure(msg);
         break;
-    case MAVLINK_MSG_ID_MOUNT_CONTROL:
+    case AGPILOTLINK_MSG_ID_MOUNT_CONTROL:
         handle_mount_control(msg);
         break;
-    case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+    case AGPILOTLINK_MSG_ID_GLOBAL_POSITION_INT:
         handle_global_position_int(msg);
         break;
-    case MAVLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION:
+    case AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION:
         handle_gimbal_device_information(msg);
         break;
-    case MAVLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS:
+    case AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS:
         handle_gimbal_device_attitude_status(msg);
         break;
     default:

@@ -24,7 +24,7 @@
 #include "UARTDevice.h"
 #include "UDPDevice.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #if HAL_GCS_ENABLED
 #include <AP_HAL/utility/packetise.h>
 #endif
@@ -395,7 +395,7 @@ bool UARTDriver::_write_pending_bytes(void)
 
 #if HAL_GCS_ENABLED
     if (_packetise && n > 0) {
-        // send on MAVLink packet boundaries if possible
+        // send on AGPILOTLink packet boundaries if possible
         n = mavlink_packetise(_writebuf, n);
     }
 #endif

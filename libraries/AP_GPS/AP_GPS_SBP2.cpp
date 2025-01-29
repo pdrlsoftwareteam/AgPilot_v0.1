@@ -24,8 +24,8 @@
 #include "AP_GPS.h"
 #include "AP_GPS_SBP2.h"
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if AP_GPS_SBP2_ENABLED
 
@@ -54,7 +54,7 @@ do {                                            \
 #if SBP_INFOREPORTING
  # define Info(fmt, args ...)                                               \
 do {                                                                        \
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, fmt "\n", ## args); \
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, fmt "\n", ## args); \
 } while(0) 
 #else
  # define Info(fmt, args ...)

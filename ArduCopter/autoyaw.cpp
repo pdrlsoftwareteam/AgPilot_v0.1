@@ -157,7 +157,7 @@ void Mode::AutoYaw::set_roi(const Location &roi_location)
         auto_yaw.set_mode_to_default(false);
 #if HAL_MOUNT_ENABLED
         // switch off the camera tracking if enabled
-        if (copter.camera_mount.get_mode() == MAV_MOUNT_MODE_GPS_POINT) {
+        if (copter.camera_mount.get_mode() == AGPILOT_MOUNT_MODE_GPS_POINT) {
             copter.camera_mount.set_mode_to_default();
         }
 #endif  // HAL_MOUNT_ENABLED
@@ -172,7 +172,7 @@ void Mode::AutoYaw::set_roi(const Location &roi_location)
         // send the command to the camera mount
         copter.camera_mount.set_roi_target(roi_location);
 
-        // TO-DO: expand handling of the do_nav_roi to support all modes of the MAVLink.  Currently we only handle mode 4 (see below)
+        // TO-DO: expand handling of the do_nav_roi to support all modes of the AGPILOTLink.  Currently we only handle mode 4 (see below)
         //      0: do nothing
         //      1: point at next waypoint
         //      2: point at a waypoint taken from WP# parameter (2nd parameter?)

@@ -5,7 +5,7 @@
 
 #include "AP_Mount_Backend.h"
 
-#if HAL_MOUNT_STORM32MAVLINK_ENABLED
+#if HAL_MOUNT_STORM32AGPILOTLINK_ENABLED
 
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
@@ -33,7 +33,7 @@ protected:
 
 private:
 
-    // search for gimbal in GCS_MAVLink routing table
+    // search for gimbal in GCS_AGPILOTLink routing table
     void find_gimbal();
 
     // send_do_mount_control with latest angle targets
@@ -43,8 +43,8 @@ private:
     bool _initialised;              // true once the driver has been initialised
     uint8_t _sysid;                 // sysid of gimbal
     uint8_t _compid;                // component id of gimbal
-    mavlink_channel_t _chan = MAVLINK_COMM_0;        // mavlink channel used to communicate with gimbal
+    mavlink_channel_t _chan = AGPILOTLINK_COMM_0;        // mavlink channel used to communicate with gimbal
     uint32_t _last_send;            // system time of last do_mount_control sent to gimbal
     MountTarget _angle_rad;         // latest angle target
 };
-#endif // HAL_MOUNT_STORM32MAVLINK_ENABLED
+#endif // HAL_MOUNT_STORM32AGPILOTLINK_ENABLED

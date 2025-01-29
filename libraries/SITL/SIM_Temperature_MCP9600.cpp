@@ -2,7 +2,7 @@
 
 using namespace SITL;
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <signal.h>
 
 void MCP9600::init()

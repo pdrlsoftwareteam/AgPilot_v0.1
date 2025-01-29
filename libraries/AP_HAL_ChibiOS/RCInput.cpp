@@ -30,7 +30,7 @@ extern AP_IOMCU iomcu;
 #include <AP_Math/AP_Math.h>
 
 #ifndef HAL_NO_UARTDRIVER
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #endif
 
 #define SIG_DETECT_TIMEOUT_US 500000
@@ -237,7 +237,7 @@ void RCInput::_timer_tick(void)
     if (rc_protocol && (rc_protocol != last_protocol || source != last_source)) {
         last_protocol = rc_protocol;
         last_source = source;
-        GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "RCInput: decoding %s(%u)", last_protocol, unsigned(source));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_DEBUG, "RCInput: decoding %s(%u)", last_protocol, unsigned(source));
     }
 #endif
 

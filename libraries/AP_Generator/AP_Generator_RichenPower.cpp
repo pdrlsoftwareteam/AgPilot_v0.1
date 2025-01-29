@@ -20,7 +20,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 #include <AP_HAL/utility/sparse-endian.h>
@@ -121,7 +121,7 @@ bool AP_Generator_RichenPower::get_reading()
     const uint8_t minor = (version % 100) / 10;
     const uint8_t point = version % 10;
     if (!protocol_information_anounced) {
-        gcs().send_text(MAV_SEVERITY_INFO, "RichenPower: protocol %u.%u.%u", major, minor, point);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "RichenPower: protocol %u.%u.%u", major, minor, point);
         protocol_information_anounced = true;
     }
 
@@ -208,7 +208,7 @@ void AP_Generator_RichenPower::check_maintenance_required()
 
         if (last_reading.errors & (1U<<uint16_t(Errors::MaintenanceRequired))) {
             if (now - last_maintenance_warning_ms > 60000) {
-                gcs().send_text(MAV_SEVERITY_NOTICE, "Generator: requires maintenance");
+                gcs().send_text(AGPILOT_SEVERITY_NOTICE, "Generator: requires maintenance");
                 last_maintenance_warning_ms = now;
             }
         }
@@ -261,7 +261,7 @@ void AP_Generator_RichenPower::update_runstate()
     // because the vehicle is crashed.
     if (AP::vehicle()->is_crashed()) {
         if (!vehicle_was_crashed) {
-            gcs().send_text(MAV_SEVERITY_INFO, "Crash; stopping generator");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Crash; stopping generator");
             pilot_desired_runstate = RunState::STOP;
             vehicle_was_crashed = true;
         }
@@ -427,7 +427,7 @@ bool AP_Generator_RichenPower::healthy() const
 }
 
 //send mavlink generator status
-void AP_Generator_RichenPower::send_generator_status(const GCS_MAVLINK &channel)
+void AP_Generator_RichenPower::send_generator_status(const GCS_AGPILOTLINK &channel)
 {
     if (last_reading_ms == 0) {
         // nothing to report
@@ -436,48 +436,48 @@ void AP_Generator_RichenPower::send_generator_status(const GCS_MAVLINK &channel)
 
     uint64_t status = 0;
     if (last_reading.rpm == 0) {
-        status |= MAV_GENERATOR_STATUS_FLAG_OFF;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_OFF;
     } else {
         switch (last_reading.mode) {
         case Mode::OFF:
-            status |= MAV_GENERATOR_STATUS_FLAG_OFF;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_OFF;
             break;
         case Mode::IDLE:
             if (pilot_desired_runstate == RunState::RUN) {
-                status |= MAV_GENERATOR_STATUS_FLAG_WARMING_UP;
+                status |= AGPILOT_GENERATOR_STATUS_FLAG_WARMING_UP;
             } else {
-                status |= MAV_GENERATOR_STATUS_FLAG_IDLE;
+                status |= AGPILOT_GENERATOR_STATUS_FLAG_IDLE;
             }
             break;
         case Mode::RUN:
-            status |= MAV_GENERATOR_STATUS_FLAG_GENERATING;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_GENERATING;
             break;
         case Mode::CHARGE:
-            status |= MAV_GENERATOR_STATUS_FLAG_GENERATING;
-            status |= MAV_GENERATOR_STATUS_FLAG_CHARGING;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_GENERATING;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_CHARGING;
             break;
         case Mode::BALANCE:
-            status |= MAV_GENERATOR_STATUS_FLAG_GENERATING;
-            status |= MAV_GENERATOR_STATUS_FLAG_CHARGING;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_GENERATING;
+            status |= AGPILOT_GENERATOR_STATUS_FLAG_CHARGING;
             break;
         }
     }
 
     if (last_reading.errors & (uint8_t)Errors::Overload) {
-        status |= MAV_GENERATOR_STATUS_FLAG_OVERCURRENT_FAULT;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_OVERCURRENT_FAULT;
     }
     if (last_reading.errors & (uint8_t)Errors::LowVoltageOutput) {
-        status |= MAV_GENERATOR_STATUS_FLAG_REDUCED_POWER;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_REDUCED_POWER;
     }
 
     if (last_reading.errors & (uint8_t)Errors::MaintenanceRequired) {
-        status |= MAV_GENERATOR_STATUS_FLAG_MAINTENANCE_REQUIRED;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_MAINTENANCE_REQUIRED;
     }
     if (last_reading.errors & (uint8_t)Errors::StartDisabled) {
-        status |= MAV_GENERATOR_STATUS_FLAG_START_INHIBITED;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_START_INHIBITED;
     }
     if (last_reading.errors & (uint8_t)Errors::LowBatteryVoltage) {
-        status |= MAV_GENERATOR_STATUS_FLAG_BATTERY_UNDERVOLT_FAULT;
+        status |= AGPILOT_GENERATOR_STATUS_FLAG_BATTERY_UNDERVOLT_FAULT;
     }
 
     mavlink_msg_generator_status_send(

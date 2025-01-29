@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Framework to start a simulated vehicle and connect it to MAVProxy.
+Framework to start a simulated vehicle and connect it to AGPILOTProxy.
 
 Peter Barker, April 2016
 based on sim_vehicle.sh by Andrew Tridgell, October 2011
@@ -296,7 +296,7 @@ def kill_tasks():
             'Rover.elf',
             'AntennaTracker.elf',
             'JSBSIm.exe',
-            'MAVProxy.exe',
+            'AGPILOTProxy.exe',
             'runsim.py',
             'AntennaTracker.elf',
             'scrimmage',
@@ -513,7 +513,7 @@ def find_geocoder_location(locname):
         return None
     lat = j.lat
     lon = j.lng
-    from MAVProxy.modules.mavproxy_map import srtm
+    from AGPILOTProxy.modules.mavproxy_map import srtm
     downloader = srtm.SRTMDownloader()
     downloader.loadFileList()
     start = time.time()
@@ -929,7 +929,7 @@ def start_mavproxy(opts, stuff):
         cmd.extend(['--cmd', extra_cmd])
 
     # add Tools/mavproxy_modules to PYTHONPATH in autotest so we can
-    # find random MAVProxy helper modules like sitl_calibration
+    # find random AGPILOTProxy helper modules like sitl_calibration
     local_mp_modules_dir = os.path.abspath(
         os.path.join(__file__, '..', '..', 'mavproxy_modules'))
     env = dict(os.environ)
@@ -939,7 +939,7 @@ def start_mavproxy(opts, stuff):
         env['PYTHONPATH'] += os.path.pathsep + old
 
     run_cmd_blocking("Run MavProxy", cmd, env=env)
-    progress("MAVProxy exited")
+    progress("AGPILOTProxy exited")
 
 
 vehicle_options_string = '|'.join(vinfo.options.keys())
@@ -1142,7 +1142,7 @@ group_sim.add_option("--disable-breakpoints",
 group_sim.add_option("-M", "--mavlink-gimbal",
                      action='store_true',
                      default=False,
-                     help="enable MAVLink gimbal")
+                     help="enable AGPILOTLink gimbal")
 group_sim.add_option("-L", "--location", type='string',
                      default=None,
                      help="use start location from "
@@ -1187,7 +1187,7 @@ group_sim.add_option("", "--use-dir",
 group_sim.add_option("", "--no-mavproxy",
                      action='store_true',
                      default=False,
-                     help="Don't launch MAVProxy")
+                     help="Don't launch AGPILOTProxy")
 group_sim.add_option("", "--fresh-params",
                      action='store_true',
                      dest='fresh_params',
@@ -1259,7 +1259,7 @@ group_sim.add_option("", "--start-time",
 group_sim.add_option("", "--sysid",
                      type='int',
                      default=None,
-                     help="Set SYSID_THISMAV")
+                     help="Set SYSID_THISAGPILOT")
 group_sim.add_option("--postype-single",
                      action='store_true',
                      help="force single precision postype_t")
@@ -1276,7 +1276,7 @@ group_sim.add_option("", "--slave",
 group_sim.add_option("", "--auto-sysid",
                      default=False,
                      action='store_true',
-                     help="Set SYSID_THISMAV based upon instance number")
+                     help="Set SYSID_THISAGPILOT based upon instance number")
 group_sim.add_option("", "--sim-address",
                      type=str,
                      default="127.0.0.1",
@@ -1287,7 +1287,7 @@ parser.add_option_group(group_sim)
 # special-cased parameters for mavproxy, because some people's fingers
 # have long memories, and they don't want to use -C :-)
 group = optparse.OptionGroup(parser,
-                             "Compatibility MAVProxy options "
+                             "Compatibility AGPILOTProxy options "
                              "(consider using --mavproxy-args instead)")
 group.add_option("", "--out",
                  default=[],

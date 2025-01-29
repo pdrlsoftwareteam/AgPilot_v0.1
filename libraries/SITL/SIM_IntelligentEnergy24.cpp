@@ -23,7 +23,7 @@
 
 #include <errno.h>
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -64,7 +64,7 @@ void IntelligentEnergy24::update(const struct sitl_input &input)
     if (!enabled.get()) {
         return;
     }
-    // gcs().send_text(MAV_SEVERITY_INFO, "fuelcell update");
+    // gcs().send_text(AGPILOT_SEVERITY_INFO, "fuelcell update");
     update_send();
 }
 

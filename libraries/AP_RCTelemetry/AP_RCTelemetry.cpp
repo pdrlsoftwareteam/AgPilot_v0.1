@@ -21,7 +21,7 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Common/AP_FWVersion.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 #include <math.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -40,15 +40,15 @@ extern const AP_HAL::HAL& hal;
 bool AP_RCTelemetry::init(void)
 {
 #if !APM_BUILD_TYPE(APM_BUILD_UNKNOWN)
-    // make telemetry available to GCS_MAVLINK (used to queue statustext messages from GCS_MAVLINK)
+    // make telemetry available to GCS_AGPILOTLINK (used to queue statustext messages from GCS_AGPILOTLINK)
     // add firmware and frame info to message queue
     const char* _frame_string = gcs().frame_string();
     if (_frame_string == nullptr) {
-        queue_message(MAV_SEVERITY_INFO, AP::fwversion().fw_string);
+        queue_message(AGPILOT_SEVERITY_INFO, AP::fwversion().fw_string);
     } else {
-        char firmware_buf[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char firmware_buf[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         snprintf(firmware_buf, sizeof(firmware_buf), "%s %s", AP::fwversion().fw_string, _frame_string);
-        queue_message(MAV_SEVERITY_INFO, firmware_buf);
+        queue_message(AGPILOT_SEVERITY_INFO, firmware_buf);
     }
 #endif
     setup_wfq_scheduler();
@@ -171,7 +171,7 @@ bool AP_RCTelemetry::process_scheduler_entry(const uint8_t slot )
 /*
  * add message to message cue for transmission through link
  */
-void AP_RCTelemetry::queue_message(MAV_SEVERITY severity, const char *text)
+void AP_RCTelemetry::queue_message(AGPILOT_SEVERITY severity, const char *text)
 {
     mavlink_statustext_t statustext{};
 
@@ -196,41 +196,41 @@ void AP_RCTelemetry::check_sensor_status_flags(void)
 
     if ((now - check_sensor_status_timer) >= 5000) { // prevent repeating any system_status messages unless 5 seconds have passed
         // only one error is reported at a time (in order of preference). Same setup and displayed messages as Mission Planner.
-        if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_GPS) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad GPS Health");
+        if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_GPS) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad GPS Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_3D_GYRO) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad Gyro Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_3D_GYRO) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad Gyro Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_3D_ACCEL) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad Accel Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_3D_ACCEL) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad Accel Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_3D_MAG) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad Compass Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_3D_MAG) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad Compass Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad Baro Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad Baro Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_LASER_POSITION) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad LiDAR Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad LiDAR Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad OptFlow Health");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_OPTICAL_FLOW) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad OptFlow Health");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_TERRAIN) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad or No Terrain Data");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_TERRAIN) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad or No Terrain Data");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_GEOFENCE) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Geofence Breach");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_GEOFENCE) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Geofence Breach");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_AHRS) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad AHRS");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_AHRS) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad AHRS");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_SENSOR_RC_RECEIVER) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "No RC Receiver");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_SENSOR_RC_RECEIVER) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "No RC Receiver");
             check_sensor_status_timer = now;
-        } else if ((_sensor_status_flags & MAV_SYS_STATUS_LOGGING) > 0) {
-            queue_message(MAV_SEVERITY_CRITICAL, "Bad Logging");
+        } else if ((_sensor_status_flags & AGPILOT_SYS_STATUS_LOGGING) > 0) {
+            queue_message(AGPILOT_SEVERITY_CRITICAL, "Bad Logging");
             check_sensor_status_timer = now;
         }
     }
@@ -255,23 +255,23 @@ void AP_RCTelemetry::check_ekf_status(void)
         if ((now - check_ekf_status_timer) >= 10000) { // prevent repeating any ekf_status message unless 10 seconds have passed
             // multiple errors can be reported at a time. Same setup as Mission Planner.
             if (velVar >= 0.8f) {
-                queue_message(MAV_SEVERITY_CRITICAL, "Error velocity variance");
+                queue_message(AGPILOT_SEVERITY_CRITICAL, "Error velocity variance");
                 check_ekf_status_timer = now;
             }
             if (posVar >= 0.8f) {
-                queue_message(MAV_SEVERITY_CRITICAL, "Error pos horiz variance");
+                queue_message(AGPILOT_SEVERITY_CRITICAL, "Error pos horiz variance");
                 check_ekf_status_timer = now;
             }
             if (hgtVar >= 0.8f) {
-                queue_message(MAV_SEVERITY_CRITICAL, "Error pos vert variance");
+                queue_message(AGPILOT_SEVERITY_CRITICAL, "Error pos vert variance");
                 check_ekf_status_timer = now;
             }
             if (magVar.length() >= 0.8f) {
-                queue_message(MAV_SEVERITY_CRITICAL, "Error compass variance");
+                queue_message(AGPILOT_SEVERITY_CRITICAL, "Error compass variance");
                 check_ekf_status_timer = now;
             }
             if (tasVar >= 0.8f) {
-                queue_message(MAV_SEVERITY_CRITICAL, "Error terrain alt variance");
+                queue_message(AGPILOT_SEVERITY_CRITICAL, "Error terrain alt variance");
                 check_ekf_status_timer = now;
             }
         }

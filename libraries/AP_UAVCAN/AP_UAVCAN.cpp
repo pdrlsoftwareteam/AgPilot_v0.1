@@ -20,7 +20,7 @@
 
 #if HAL_ENABLE_LIBUAVCAN_DRIVERS
 #include "AP_UAVCAN.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_CANManager/AP_CANManager.h>
@@ -1464,7 +1464,7 @@ void AP_UAVCAN::handle_debug(AP_UAVCAN* ap_uavcan, uint8_t node_id, const DebugC
     const auto &msg = *cb.msg;
     if (AP::can().get_log_level() != AP_CANManager::LOG_NONE) {
         // log to onboard log and mavlink
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "CAN[%u] %s", node_id, msg.text.c_str());
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "CAN[%u] %s", node_id, msg.text.c_str());
     } else {
         // only log to onboard log
         AP::logger().Write_MessageF("CAN[%u] %s", node_id, msg.text.c_str());

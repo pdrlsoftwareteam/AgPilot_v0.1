@@ -20,8 +20,8 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -48,7 +48,7 @@ const AP_Param::GroupInfo AP_Terrain::var_info[] = {
 
     // @Param: SPACING
     // @DisplayName: Terrain grid spacing
-    // @Description: Distance between terrain grid points in meters. This controls the horizontal resolution of the terrain data that is stored on te SD card and requested from the ground station. If your GCS is using the ArduPilot SRTM database like Mission Planner or MAVProxy, then a resolution of 100 meters is appropriate. Grid spacings lower than 100 meters waste SD card space if the GCS cannot provide that resolution. The grid spacing also controls how much data is kept in memory during flight. A larger grid spacing will allow for a larger amount of data in memory. A grid spacing of 100 meters results in the vehicle keeping 12 grid squares in memory with each grid square having a size of 2.7 kilometers by 3.2 kilometers. Any additional grid squares are stored on the SD once they are fetched from the GCS and will be loaded as needed.
+    // @Description: Distance between terrain grid points in meters. This controls the horizontal resolution of the terrain data that is stored on te SD card and requested from the ground station. If your GCS is using the ArduPilot SRTM database like Mission Planner or AGPILOTProxy, then a resolution of 100 meters is appropriate. Grid spacings lower than 100 meters waste SD card space if the GCS cannot provide that resolution. The grid spacing also controls how much data is kept in memory during flight. A larger grid spacing will allow for a larger amount of data in memory. A grid spacing of 100 meters results in the vehicle keeping 12 grid squares in memory with each grid square having a size of 2.7 kilometers by 3.2 kilometers. Any additional grid squares are stored on the SD once they are fetched from the GCS and will be loaded as needed.
     // @Units: m
     // @Increment: 1
     // @User: Advanced
@@ -319,7 +319,7 @@ float AP_Terrain::lookahead(float bearing, float distance, float climb_ratio)
 
 /*
   1hz update function. This is here to ensure progress is made on disk
-  IO even if no MAVLink send_request() operations are called for a
+  IO even if no AGPILOTLink send_request() operations are called for a
   while.
  */
 void AP_Terrain::update(void)
@@ -457,7 +457,7 @@ bool AP_Terrain::allocate(void)
     }
     cache = (struct grid_cache *)calloc(TERRAIN_GRID_BLOCK_CACHE_SIZE, sizeof(cache[0]));
     if (cache == nullptr) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Terrain: Allocation failed");
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Terrain: Allocation failed");
         memory_alloc_failed = true;
         return false;
     }
@@ -530,7 +530,7 @@ void AP_Terrain::update_reference_offset(void)
     float adjustment = alt_cm*0.01 - height;
     reference_offset = constrain_float(adjustment, -offset_max, offset_max);
     if (fabsf(adjustment) > offset_max.get()+0.5) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Terrain: clamping offset %.0f to %.0f",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Terrain: clamping offset %.0f to %.0f",
                       adjustment, reference_offset);
     }
     have_reference_offset = true;

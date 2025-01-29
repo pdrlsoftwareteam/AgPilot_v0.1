@@ -31,9 +31,9 @@ AP_RangeFinder_Backend::AP_RangeFinder_Backend(RangeFinder::RangeFinder_State &_
     _backend_type = type();
 }
 
-MAV_DISTANCE_SENSOR AP_RangeFinder_Backend::get_mav_distance_sensor_type() const {
+AGPILOT_DISTANCE_SENSOR AP_RangeFinder_Backend::get_mav_distance_sensor_type() const {
     if (type() == RangeFinder::Type::NONE) {
-        return MAV_DISTANCE_SENSOR_UNKNOWN;
+        return AGPILOT_DISTANCE_SENSOR_UNKNOWN;
     }
     return _get_mav_distance_sensor_type();
 }

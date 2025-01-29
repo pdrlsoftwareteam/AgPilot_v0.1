@@ -25,7 +25,7 @@
 #include <StorageManager/StorageManager.h>
 #include <AP_Math/AP_Math.h>
 #include <uavcan/protocol/dynamic_node_id/Allocation.hpp>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include "AP_UAVCAN_Clock.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
@@ -311,7 +311,7 @@ bool AP_UAVCAN_DNA_Server::init()
         reset();
     }
     if (_ap_uavcan->check_and_reset_option(AP_UAVCAN::Options::DNA_CLEAR_DATABASE)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "UC DNA database reset");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "UC DNA database reset");
         reset();
     }
     // Making sure that the server is started with the same node ID
@@ -670,7 +670,7 @@ void AP_UAVCAN_DNA_Server::handleAllocation(uint8_t node_id, const AllocationCb 
                     msg.node_id = resp_node_id;
                 }
             } else {
-                GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "UC Node Alloc Failed!");
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "UC Node Alloc Failed!");
             }
         } else {
             msg.node_id = resp_node_id;

@@ -57,7 +57,7 @@ public:
     bool idle(void);
     bool run(void);
 
-    void send_generator_status(const class GCS_MAVLINK &channel);
+    void send_generator_status(const class GCS_AGPILOTLINK &channel);
 
     // Parameter block
     static const struct AP_Param::GroupInfo var_info[];

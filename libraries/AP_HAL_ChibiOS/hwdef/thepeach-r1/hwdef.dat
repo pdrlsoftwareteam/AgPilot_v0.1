@@ -106,7 +106,7 @@ PA14 JTCK-SWCLK SWD
 
 # This defines the PWM pin for the buzzer (if there is one). It is
 # also mapped to a GPIO output so you can play with the buzzer via
-# MAVLink relay commands if you want to.
+# AGPILOTLink relay commands if you want to.
 
 # PWM output for buzzer
 PA15 TIM2_CH1 TIM2 GPIO(77) ALARM

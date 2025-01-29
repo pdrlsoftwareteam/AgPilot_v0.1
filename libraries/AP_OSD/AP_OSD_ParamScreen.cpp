@@ -30,7 +30,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Arming/AP_Arming.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -631,7 +631,7 @@ void AP_OSD_ParamScreen::save_parameters()
 
 // handle OSD configuration messages
 #if HAL_GCS_ENABLED
-void AP_OSD_ParamScreen::handle_write_msg(const mavlink_osd_param_config_t& packet, const class GCS_MAVLINK& link)
+void AP_OSD_ParamScreen::handle_write_msg(const mavlink_osd_param_config_t& packet, const class GCS_AGPILOTLINK& link)
 {
     // request out of range - return an error
     if (packet.osd_index < 1 || packet.osd_index > AP_OSD_ParamScreen::NUM_PARAMS) {
@@ -644,7 +644,7 @@ void AP_OSD_ParamScreen::handle_write_msg(const mavlink_osd_param_config_t& pack
 }
 
 // handle OSD show configuration messages
-void AP_OSD_ParamScreen::handle_read_msg(const mavlink_osd_param_show_config_t& packet, const class GCS_MAVLINK& link)
+void AP_OSD_ParamScreen::handle_read_msg(const mavlink_osd_param_show_config_t& packet, const class GCS_AGPILOTLINK& link)
 {
     // request out of range - return an error
     if (packet.osd_index < 1 || packet.osd_index > AP_OSD_ParamScreen::NUM_PARAMS) {

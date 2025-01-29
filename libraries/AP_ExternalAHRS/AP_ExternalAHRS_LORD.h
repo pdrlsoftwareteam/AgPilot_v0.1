@@ -24,7 +24,7 @@
 
 #if HAL_EXTERNAL_AHRS_LORD_ENABLED
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 class AP_ExternalAHRS_LORD: public AP_ExternalAHRS_backend
 {
@@ -43,7 +43,7 @@ public:
     bool initialised(void) const override;
     bool pre_arm_check(char *failure_msg, uint8_t failure_msg_len) const override;
     void get_filter_status(nav_filter_status &status) const override;
-    void send_status_report(class GCS_MAVLINK &link) const override;
+    void send_status_report(class GCS_AGPILOTLINK &link) const override;
 
     // check for new data
     void update() override {

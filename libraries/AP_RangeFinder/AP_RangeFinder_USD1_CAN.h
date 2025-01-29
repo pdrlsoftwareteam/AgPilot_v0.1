@@ -16,8 +16,8 @@ public:
     void update() override;
     
 protected:
-    virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
-        return MAV_DISTANCE_SENSOR_RADAR;
+    virtual AGPILOT_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
+        return AGPILOT_DISTANCE_SENSOR_RADAR;
     }
 public:
     float _distance_sum;

@@ -18,7 +18,7 @@
 
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_HAL/I2CDevice.h>
@@ -47,7 +47,7 @@ public:
 
     static const struct AP_Param::GroupInfo var_info[];
 
-    MAV_RESULT handle_command_int_packet(const mavlink_command_int_t &packet);
+    AGPILOT_RESULT handle_command_int_packet(const mavlink_command_int_t &packet);
 
     void handle_mission_command(const class AP_Mission::Mission_Command& cmd);
 

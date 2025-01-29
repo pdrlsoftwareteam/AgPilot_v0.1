@@ -26,7 +26,7 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_Common/Location.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_Mount_Params.h"
 
 // maximum number of mounts
@@ -44,7 +44,7 @@ class AP_Mount_Siyi;
 class AP_Mount_Scripting;
 
 /*
-  This is a workaround to allow the MAVLink backend access to the
+  This is a workaround to allow the AGPILOTLink backend access to the
   SmallEKF. It would be nice to find a neater solution to this
  */
 
@@ -78,9 +78,9 @@ public:
         Mount_Type_Servo = 1,           /// servo controlled mount
         Mount_Type_SoloGimbal = 2,      /// Solo's gimbal
         Mount_Type_Alexmos = 3,         /// Alexmos mount
-        Mount_Type_SToRM32 = 4,         /// SToRM32 mount using MAVLink protocol
+        Mount_Type_SToRM32 = 4,         /// SToRM32 mount using AGPILOTLink protocol
         Mount_Type_SToRM32_serial = 5,  /// SToRM32 mount using custom serial protocol
-        Mount_Type_Gremsy = 6,          /// Gremsy gimbal using MAVLink v2 Gimbal protocol
+        Mount_Type_Gremsy = 6,          /// Gremsy gimbal using AGPILOTLink v2 Gimbal protocol
         Mount_Type_BrushlessPWM = 7,    /// Brushless (stabilized) gimbal using PWM protocol
         Mount_Type_Siyi = 8,            /// Siyi gimbal using custom serial protocol
         Mount_Type_Scripting = 9,       /// Scripting gimbal driver
@@ -107,13 +107,13 @@ public:
     bool has_pan_control(uint8_t instance) const;
 
     // get_mode - returns current mode of mount (i.e. Retracted, Neutral, RC_Targeting, GPS Point)
-    enum MAV_MOUNT_MODE get_mode() const { return get_mode(_primary); }
-    enum MAV_MOUNT_MODE get_mode(uint8_t instance) const;
+    enum AGPILOT_MOUNT_MODE get_mode() const { return get_mode(_primary); }
+    enum AGPILOT_MOUNT_MODE get_mode(uint8_t instance) const;
 
     // set_mode - sets mount's mode
     //  returns true if mode is successfully set
-    void set_mode(enum MAV_MOUNT_MODE mode) { return set_mode(_primary, mode); }
-    void set_mode(uint8_t instance, enum MAV_MOUNT_MODE mode);
+    void set_mode(enum AGPILOT_MOUNT_MODE mode) { return set_mode(_primary, mode); }
+    void set_mode(uint8_t instance, enum AGPILOT_MOUNT_MODE mode);
 
     // set_mode_to_default - restores the mode to it's default mode held in the MNTx_DEFLT_MODE parameter
     //      this operation requires 60us on a Pixhawk/PX4
@@ -144,7 +144,7 @@ public:
     void set_target_sysid(uint8_t instance, uint8_t sysid);
 
     // mavlink message handling:
-    MAV_RESULT handle_command_long(const mavlink_command_long_t &packet);
+    AGPILOT_RESULT handle_command_long(const mavlink_command_long_t &packet);
     void handle_param_value(const mavlink_message_t &msg);
     void handle_message(mavlink_channel_t chan, const mavlink_message_t &msg);
 
@@ -212,9 +212,9 @@ private:
     void handle_mount_configure(const mavlink_message_t &msg);
     void handle_mount_control(const mavlink_message_t &msg);
 
-    MAV_RESULT handle_command_do_mount_configure(const mavlink_command_long_t &packet);
-    MAV_RESULT handle_command_do_mount_control(const mavlink_command_long_t &packet);
-    MAV_RESULT handle_command_do_gimbal_manager_pitchyaw(const mavlink_command_long_t &packet);
+    AGPILOT_RESULT handle_command_do_mount_configure(const mavlink_command_long_t &packet);
+    AGPILOT_RESULT handle_command_do_mount_control(const mavlink_command_long_t &packet);
+    AGPILOT_RESULT handle_command_do_gimbal_manager_pitchyaw(const mavlink_command_long_t &packet);
     void handle_global_position_int(const mavlink_message_t &msg);
     void handle_gimbal_device_information(const mavlink_message_t &msg);
     void handle_gimbal_device_attitude_status(const mavlink_message_t &msg);

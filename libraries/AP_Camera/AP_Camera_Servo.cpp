@@ -62,7 +62,7 @@ void AP_Camera_Servo::configure(float shooting_mode, float shutter_speed, float 
         SRV_Channels::set_output_pwm(SRV_Channel::k_cam_shutter_speed, (uint16_t)shutter_speed);
     }
 
-    // Use the shooting mode PWM value for the BMMCC as the focus control - no need to modify or create a new MAVlink message type.
+    // Use the shooting mode PWM value for the BMMCC as the focus control - no need to modify or create a new AGPILOTlink message type.
     if (shooting_mode > 0) {
         SRV_Channels::set_output_pwm(SRV_Channel::k_cam_focus, (uint16_t)shooting_mode);
     }

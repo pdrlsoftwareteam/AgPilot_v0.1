@@ -144,12 +144,12 @@ fi
 BASE_PKGS="build-essential ccache g++ gawk git make wget"
 if [ ${RELEASE_CODENAME} == 'bionic' ]; then
     # use fixed version for package that drop python2 support
-    PYTHON_PKGS="future lxml pymavlink MAVProxy pexpect flake8==3.7.9 requests==2.27.1 monotonic==1.6 geocoder empy==3.3.4 configparser==4.0.2 click==7.1.2 decorator==4.4.2 dronecan"
+    PYTHON_PKGS="future lxml pymavlink AGPILOTProxy pexpect flake8==3.7.9 requests==2.27.1 monotonic==1.6 geocoder empy==3.3.4 configparser==4.0.2 click==7.1.2 decorator==4.4.2 dronecan"
 else
-    PYTHON_PKGS="future lxml pymavlink MAVProxy pexpect flake8 geocoder empy==3.3.4 dronecan"
+    PYTHON_PKGS="future lxml pymavlink AGPILOTProxy pexpect flake8 geocoder empy==3.3.4 dronecan"
 fi
 
-# add some Python packages required for commonly-used MAVProxy modules and hex file generation:
+# add some Python packages required for commonly-used AGPILOTProxy modules and hex file generation:
 if [[ $SKIP_AP_EXT_ENV -ne 1 ]]; then
     if [ ${RELEASE_CODENAME} == 'bionic' ]; then
         PYTHON_PKGS="$PYTHON_PKGS pygame==2.0.3 intelhex"
@@ -160,7 +160,7 @@ fi
 ARM_LINUX_PKGS="g++-arm-linux-gnueabihf $INSTALL_PKG_CONFIG"
 # python-wxgtk packages are added to SITL_PKGS below
 SITL_PKGS="libtool libxml2-dev libxslt1-dev ${PYTHON_V}-dev ${PYTHON_V}-pip ${PYTHON_V}-setuptools ${PYTHON_V}-numpy ${PYTHON_V}-pyparsing ${PYTHON_V}-psutil"
-# add some packages required for commonly-used MAVProxy modules:
+# add some packages required for commonly-used AGPILOTProxy modules:
 if [[ $SKIP_AP_GRAPHIC_ENV -ne 1 ]]; then
   SITL_PKGS="$SITL_PKGS xterm ${PYTHON_V}-matplotlib ${PYTHON_V}-serial ${PYTHON_V}-scipy ${PYTHON_V}-opencv libcsfml-dev libcsfml-audio${SITLCFML_VERSION} libcsfml-dev libcsfml-graphics${SITLCFML_VERSION} libcsfml-network${SITLCFML_VERSION} libcsfml-system${SITLCFML_VERSION} libcsfml-window${SITLCFML_VERSION} libsfml-audio${SITLFML_VERSION} libsfml-dev libsfml-graphics${SITLFML_VERSION} libsfml-network${SITLFML_VERSION} libsfml-system${SITLFML_VERSION} libsfml-window${SITLFML_VERSION} ${PYTHON_V}-yaml"
 fi
@@ -248,7 +248,7 @@ else
   SITL_PKGS+=" python-argparse"
 fi
 
-# Check for graphical package for MAVProxy
+# Check for graphical package for AGPILOTProxy
 if [[ $SKIP_AP_GRAPHIC_ENV -ne 1 ]]; then
   if [ ${RELEASE_CODENAME} == 'bullseye' ]; then
     SITL_PKGS+=" libjpeg62-turbo-dev"

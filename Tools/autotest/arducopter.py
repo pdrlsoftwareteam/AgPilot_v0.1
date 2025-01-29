@@ -23,7 +23,7 @@ from pysim import vehicleinfo
 from common import AutoTest
 from common import NotAchievedException, AutoTestTimeoutException, PreconditionFailedException
 from common import Test
-from common import MAV_POS_TARGET_TYPE_MASK
+from common import AGPILOT_POS_TARGET_TYPE_MASK
 
 from pymavlink.rotmat import Vector3
 
@@ -125,7 +125,7 @@ class AutoTestCopter(AutoTest):
 
     def user_takeoff(self, alt_min=30, timeout=30, max_err=5):
         '''takeoff using mavlink takeoff command'''
-        self.run_cmd(mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF,
                      0, # param1
                      0, # param2
                      0, # param3
@@ -692,7 +692,7 @@ class AutoTestCopter(AutoTest):
         self.set_parameter("SIM_RC_FAIL", 1)
         self.wait_mode("RTL")
         self.wait_rtl_complete()
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         self.set_parameter("SIM_RC_FAIL", 0)
         self.end_subtest("Completed Radio failsafe RTL in mission without option to continue")
 
@@ -969,19 +969,19 @@ class AutoTestCopter(AutoTest):
         self.start_subtest("Batt failsafe disabled test")
         self.takeoffAndMoveAway()
         m = self.mav.recv_match(type='BATTERY_STATUS', blocking=True, timeout=1)
-        if m.charge_state != mavutil.mavlink.MAV_BATTERY_CHARGE_STATE_OK:
+        if m.charge_state != mavutil.mavlink.AGPILOT_BATTERY_CHARGE_STATE_OK:
             raise NotAchievedException("Expected state ok")
         self.set_parameter('SIM_BATT_VOLTAGE', 11.4)
         self.wait_statustext("Battery 1 is low", timeout=60)
         m = self.mav.recv_match(type='BATTERY_STATUS', blocking=True, timeout=1)
-        if m.charge_state != mavutil.mavlink.MAV_BATTERY_CHARGE_STATE_LOW:
+        if m.charge_state != mavutil.mavlink.AGPILOT_BATTERY_CHARGE_STATE_LOW:
             raise NotAchievedException("Expected state low")
         self.delay_sim_time(5)
         self.wait_mode("ALT_HOLD")
         self.set_parameter('SIM_BATT_VOLTAGE', 10.0)
         self.wait_statustext("Battery 1 is critical", timeout=60)
         m = self.mav.recv_match(type='BATTERY_STATUS', blocking=True, timeout=1)
-        if m.charge_state != mavutil.mavlink.MAV_BATTERY_CHARGE_STATE_CRITICAL:
+        if m.charge_state != mavutil.mavlink.AGPILOT_BATTERY_CHARGE_STATE_CRITICAL:
             raise NotAchievedException("Expected state critical")
         self.delay_sim_time(5)
         self.wait_mode("ALT_HOLD")
@@ -1130,7 +1130,7 @@ class AutoTestCopter(AutoTest):
         self.context_collect('STATUSTEXT')
         self.arm_vehicle()
         if user_takeoff:
-            self.run_cmd(mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 10)
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 10)
         else:
             self.set_rc(3, 1700)
         # we may never see ourselves as armed in a heartbeat
@@ -1602,7 +1602,7 @@ class AutoTestCopter(AutoTest):
         """Ensures we can initiate and complete an RTL while the fence is
         enabled.
         """
-        fence_bit = mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE
+        fence_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE
 
         self.progress("Test Landing while fence floor enabled")
         self.set_parameters({
@@ -2061,7 +2061,7 @@ class AutoTestCopter(AutoTest):
         '''Fly Flip Mode'''
         ex = None
         try:
-            self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 100)
+            self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_ATTITUDE, 100)
 
             self.takeoff(20)
             self.hover()
@@ -2096,7 +2096,7 @@ class AutoTestCopter(AutoTest):
         except Exception as e:
             self.print_exception_caught(e)
             ex = e
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 0)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_ATTITUDE, 0)
         if ex is not None:
             raise ex
 
@@ -2115,7 +2115,7 @@ class AutoTestCopter(AutoTest):
     def OpticalFlow(self):
         '''test optical flow works'''
 
-        self.assert_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW, False, False, False, verbose=True)
+        self.assert_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_OPTICAL_FLOW, False, False, False, verbose=True)
 
         self.start_subtest("Make sure no crash if no rangefinder")
         self.set_parameter("SIM_FLOW_ENABLE", 1)
@@ -2125,7 +2125,7 @@ class AutoTestCopter(AutoTest):
 
         self.reboot_sitl()
 
-        self.wait_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW, True, True, True, verbose=True)
+        self.wait_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_OPTICAL_FLOW, True, True, True, verbose=True)
 
         self.change_mode('LOITER')
         self.delay_sim_time(5)
@@ -2641,7 +2641,7 @@ class AutoTestCopter(AutoTest):
                     raise NotAchievedException("Failed ordering for requested CASE:", case)
             if len(case[4]):
                 self.context_collect('STATUSTEXT')
-                self.run_cmd(mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+                self.run_cmd(mavutil.mavlink.AGPILOT_CMD_COMPONENT_ARM_DISARM,
                              1,  # ARM
                              0,
                              0,
@@ -2650,7 +2650,7 @@ class AutoTestCopter(AutoTest):
                              0,
                              0,
                              timeout=10,
-                             want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+                             want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
                 self.wait_statustext(case[4], check_context=True)
                 self.context_stop_collecting('STATUSTEXT')
         self.progress("############################### All GPS Order Cases Tests Passed")
@@ -2660,7 +2660,7 @@ class AutoTestCopter(AutoTest):
         self.start_sup_program(instance=0, args="-M")
         self.delay_sim_time(2)
         self.context_collect('STATUSTEXT')
-        self.run_cmd(mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_COMPONENT_ARM_DISARM,
                      1,  # ARM
                      0,
                      0,
@@ -2669,7 +2669,7 @@ class AutoTestCopter(AutoTest):
                      0,
                      0,
                      timeout=10,
-                     want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+                     want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
         self.wait_statustext(".*Node .* unhealthy", check_context=True, regex=True)
         self.stop_sup_program(instance=0)
         self.start_sup_program(instance=0)
@@ -3139,9 +3139,9 @@ class AutoTestCopter(AutoTest):
         Seeks to show bugs in mission state machine'''
 
         self.upload_simple_relhome_mission([
-            (mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 20),
-            (mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 20, 0, 20),
-            (mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0),
+            (mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF, 0, 0, 20),
+            (mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 20, 0, 20),
+            (mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0),
         ])
 
         num_wp = self.get_mission_count()
@@ -3345,7 +3345,7 @@ class AutoTestCopter(AutoTest):
                                     blocking=True,
                                     timeout=10)
             flags = m.onboard_control_sensors_enabled
-            if not flags & mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION:
+            if not flags & mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION:
                 raise NotAchievedException("Laser not enabled in SYS_STATUS")
             self.progress("Disabling laser using switch")
             self.set_rc(9, 1000)
@@ -3355,7 +3355,7 @@ class AutoTestCopter(AutoTest):
                                     blocking=True,
                                     timeout=10)
             flags = m.onboard_control_sensors_enabled
-            if flags & mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION:
+            if flags & mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION:
                 raise NotAchievedException("Laser enabled in SYS_STATUS")
 
             self.progress("Re-enabling rangefinder")
@@ -3365,7 +3365,7 @@ class AutoTestCopter(AutoTest):
                                     blocking=True,
                                     timeout=10)
             flags = m.onboard_control_sensors_enabled
-            if not flags & mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION:
+            if not flags & mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION:
                 raise NotAchievedException("Laser not enabled in SYS_STATUS")
 
             self.takeoff(10, mode="LOITER")
@@ -3408,12 +3408,12 @@ class AutoTestCopter(AutoTest):
 
         # 100 waypoints in a line, 10m apart in a northerly direction
         #        for i in range(1, 100):
-        #            items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, i*10, 0, alt))
+        #            items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, i*10, 0, alt))
 
         # 1 waypoint a long way away
-        items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 2000, 0, alt),)
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 2000, 0, alt),)
 
-        items.append((mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
 
         self.upload_simple_relhome_mission(items)
 
@@ -3434,9 +3434,9 @@ class AutoTestCopter(AutoTest):
         items = []
 
         # 1 waypoint a long way up
-        items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 20000),)
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 0, 0, 20000),)
 
-        items.append((mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
 
         self.upload_simple_relhome_mission(items)
 
@@ -3459,9 +3459,9 @@ class AutoTestCopter(AutoTest):
         items = []
 
         # 1 waypoint a long way back down
-        items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 10),)
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 0, 0, 10),)
 
-        items.append((mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
 
         self.upload_simple_relhome_mission(items)
 
@@ -3620,7 +3620,7 @@ class AutoTestCopter(AutoTest):
 
         self.progress("Test triggering with mavlink message")
         self.takeoff(20)
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      2, # release
                      0,
                      0,
@@ -3645,7 +3645,7 @@ class AutoTestCopter(AutoTest):
 
         self.progress("Test mavlink triggering")
         self.takeoff(20)
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      mavutil.mavlink.PARACHUTE_DISABLE, # param1
                      0, # param2
                      0, # param3
@@ -3661,7 +3661,7 @@ class AutoTestCopter(AutoTest):
             ok = True
         if not ok:
             raise NotAchievedException("Disabled parachute fired")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      mavutil.mavlink.PARACHUTE_ENABLE, # param1
                      0, # param2
                      0, # param3
@@ -3684,7 +3684,7 @@ class AutoTestCopter(AutoTest):
 
         # parachute should not fire if you go from disabled to release:
         self.takeoff(20)
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      mavutil.mavlink.PARACHUTE_RELEASE,
                      0, # param2
                      0, # param3
@@ -3702,7 +3702,7 @@ class AutoTestCopter(AutoTest):
             raise NotAchievedException("Parachute fired when going straight from disabled to release")
 
         # now enable then release parachute:
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      mavutil.mavlink.PARACHUTE_ENABLE, # param1
                      0, # param2
                      0, # param3
@@ -3711,7 +3711,7 @@ class AutoTestCopter(AutoTest):
                      0, # param6
                      0 # param7
                      )
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_PARACHUTE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_PARACHUTE,
                      mavutil.mavlink.PARACHUTE_RELEASE,
                      0, # param2
                      0, # param3
@@ -3766,7 +3766,7 @@ class AutoTestCopter(AutoTest):
         # default frame is "+" - start motor of 2 is "B", which is
         # motor 1... see
         # https://ardupilot.org/copter/docs/connect-escs-and-motors.html
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_MOTOR_TEST,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_MOTOR_TEST,
                      2, # start motor
                      mavutil.mavlink.MOTOR_TEST_THROTTLE_PWM,
                      pwm_in, # pwm-to-output
@@ -3787,7 +3787,7 @@ class AutoTestCopter(AutoTest):
         # min/max are used.
         expected_pwm = 1000 + (self.get_parameter("RC3_MAX") - self.get_parameter("RC3_MIN")) * percentage/100.0
         self.progress("expected pwm=%f" % expected_pwm)
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_MOTOR_TEST,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_MOTOR_TEST,
                      2, # start motor
                      mavutil.mavlink.MOTOR_TEST_THROTTLE_PERCENT,
                      percentage, # pwm-to-output
@@ -3951,8 +3951,8 @@ class AutoTestCopter(AutoTest):
         return (hours, mins, secs, 0)
 
     def reset_delay_item(self, seq, seconds_in_future):
-        frame = mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT
-        command = mavutil.mavlink.MAV_CMD_NAV_DELAY
+        frame = mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT
+        command = mavutil.mavlink.AGPILOT_CMD_NAV_DELAY
         # retrieve mission item and check it:
         tried_set = False
         hours = None
@@ -4289,8 +4289,8 @@ class AutoTestCopter(AutoTest):
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_BODY_NED,
-            MAV_POS_TARGET_TYPE_MASK.POS_ONLY | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-x-y-z
+            mavutil.mavlink.AGPILOT_FRAME_BODY_NED,
+            AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-x-y-z
             0, # x
             0, # y
             0, # z
@@ -4320,8 +4320,8 @@ class AutoTestCopter(AutoTest):
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            MAV_POS_TARGET_TYPE_MASK.POS_ONLY, # mask specifying use-only-lat-lon-alt
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY, # mask specifying use-only-lat-lon-alt
             lat, # lat
             lon, # lon
             alt, # alt
@@ -4348,7 +4348,7 @@ class AutoTestCopter(AutoTest):
                 break
 
     def fly_guided_move_local(self, x, y, z_up, timeout=100):
-        """move the vehicle using MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED"""
+        """move the vehicle using AGPILOTLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED"""
         startpos = self.mav.recv_match(type='LOCAL_POSITION_NED', blocking=True)
         self.progress("startpos=%s" % str(startpos))
 
@@ -4358,8 +4358,8 @@ class AutoTestCopter(AutoTest):
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-            MAV_POS_TARGET_TYPE_MASK.POS_ONLY | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-x-y-z
+            mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
+            AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-x-y-z
             x, # x
             y, # y
             -z_up,# z
@@ -4383,18 +4383,18 @@ class AutoTestCopter(AutoTest):
         # set POSITION_TARGET_LOCAL_NED message rate using SET_MESSAGE_INTERVAL
         self.progress("Setting local target in NED: (%f, %f, %f)" % (x, y, -z_up))
         self.progress("Setting rate to 1 Hz")
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 1)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 1)
 
         # mask specifying use only xyz
-        target_typemask = MAV_POS_TARGET_TYPE_MASK.POS_ONLY
+        target_typemask = AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY
 
         # set position target
         self.mav.mav.set_position_target_local_ned_send(
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-            target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE,
+            mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
+            target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE,
             x, # x
             y, # y
             -z_up, # z
@@ -4410,9 +4410,9 @@ class AutoTestCopter(AutoTest):
         m = self.mav.recv_match(type='POSITION_TARGET_LOCAL_NED', blocking=True, timeout=2)
         self.progress("Received local target: %s" % str(m))
 
-        if not (m.type_mask == (target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE) or m.type_mask == target_typemask):
+        if not (m.type_mask == (target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE) or m.type_mask == target_typemask):
             raise NotAchievedException("Did not receive proper mask: expected=%u or %u, got=%u" %
-                                       ((target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE), target_typemask, m.type_mask))
+                                       ((target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE), target_typemask, m.type_mask))
 
         if x - m.x > 0.1:
             raise NotAchievedException("Did not receive proper target position x: wanted=%f got=%f" % (x, m.x))
@@ -4427,12 +4427,12 @@ class AutoTestCopter(AutoTest):
         " Check local target velocity being received by vehicle "
         self.progress("Setting local NED velocity target: (%f, %f, %f)" % (vx, vy, -vz_up))
         self.progress("Setting POSITION_TARGET_LOCAL_NED message rate to 10Hz")
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 10)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 10)
 
         # mask specifying use only vx,vy,vz & accel. Even though we don't test acceltargets below currently
         #  a velocity only mask returns a velocity & accel mask
-        target_typemask = (MAV_POS_TARGET_TYPE_MASK.POS_IGNORE |
-                           MAV_POS_TARGET_TYPE_MASK.YAW_IGNORE | MAV_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
+        target_typemask = (AGPILOT_POS_TARGET_TYPE_MASK.POS_IGNORE |
+                           AGPILOT_POS_TARGET_TYPE_MASK.YAW_IGNORE | AGPILOT_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
 
         # Drain old messages and ignore the ramp-up to the required target velocity
         tstart = self.get_sim_time()
@@ -4442,8 +4442,8 @@ class AutoTestCopter(AutoTest):
                 0, # timestamp
                 1, # target system_id
                 1, # target component id
-                mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-                target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE,
+                mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
+                target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE,
                 0, # x
                 0, # y
                 0, # z
@@ -4461,9 +4461,9 @@ class AutoTestCopter(AutoTest):
             self.progress("Received local target: %s" % str(m))
 
         # Check the last received message
-        if not (m.type_mask == (target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE) or m.type_mask == target_typemask):
+        if not (m.type_mask == (target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE) or m.type_mask == target_typemask):
             raise NotAchievedException("Did not receive proper mask: expected=%u or %u, got=%u" %
-                                       ((target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE), target_typemask, m.type_mask))
+                                       ((target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE), target_typemask, m.type_mask))
 
         if vx - m.vx > 0.1:
             raise NotAchievedException("Did not receive proper target velocity vx: wanted=%f got=%f" % (vx, m.vx))
@@ -4484,7 +4484,7 @@ class AutoTestCopter(AutoTest):
         self.progress("Setting LOCAL_POSITION_NED message rate to 10Hz")
 
         # set position local ned message stream rate
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_LOCAL_POSITION_NED, 10)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_LOCAL_POSITION_NED, 10)
 
         # wait for position local ned message
         tstart = self.get_sim_time()
@@ -4522,7 +4522,7 @@ class AutoTestCopter(AutoTest):
         self.hover()
         self.change_mode('LOITER')
         self.progress("Setting POSITION_TARGET_LOCAL_NED message rate to 10Hz")
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 10)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, 10)
 
         tstart = self.get_sim_time()
         while self.get_sim_time_cached() < tstart + 5:
@@ -4587,7 +4587,7 @@ class AutoTestCopter(AutoTest):
             self.mav.mav.landing_target_send(
                 0, # time_usec
                 1, # target_num
-                mavutil.mavlink.MAV_FRAME_GLOBAL, # frame; AP ignores
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL, # frame; AP ignores
                 angle_x, # angle x (radians)
                 angle_y, # angle y (radians)
                 distance, # distance to target
@@ -4708,7 +4708,7 @@ class AutoTestCopter(AutoTest):
 
         self.user_takeoff(alt_min=10)
 
-        self.start_subtest("yaw through absolute angles using MAV_CMD_CONDITION_YAW")
+        self.start_subtest("yaw through absolute angles using AGPILOT_CMD_CONDITION_YAW")
         self.guided_achieve_heading(45)
         self.guided_achieve_heading(135)
 
@@ -4717,7 +4717,7 @@ class AutoTestCopter(AutoTest):
         # longitude - just so that we start to really move a lot.
         self.fly_guided_move_global_relative_alt(5, 5, 10)
 
-        self.start_subtest("move the vehicle using MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED")
+        self.start_subtest("move the vehicle using AGPILOTLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED")
         self.fly_guided_stop(groundspeed_tolerance=0.1)
         self.fly_guided_move_local(5, 5, 10)
 
@@ -4796,24 +4796,24 @@ class AutoTestCopter(AutoTest):
         self.watch_altitude_maintained(altitude_min=-1, altitude_max=0.2) # should not take off in guided
         self.run_cmd_do_set_mode(
             "ACRO",
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
         self.run_cmd_do_set_mode(
             "STABILIZE",
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
         self.run_cmd_do_set_mode(
             "DRIFT",
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
         self.progress("Check setting an invalid mode")
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-            mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+            mavutil.mavlink.AGPILOT_CMD_DO_SET_MODE,
+            mavutil.mavlink.AGPILOT_MODE_FLAG_CUSTOM_MODE_ENABLED,
             126,
             0,
             0,
             0,
             0,
             0,
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED,
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED,
             timeout=1
         )
         self.set_rc(3, 1000)
@@ -4884,7 +4884,7 @@ class AutoTestCopter(AutoTest):
 
     def set_mount_mode(self, mount_mode):
         '''set mount mode'''
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_MOUNT_CONFIGURE,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_MOUNT_CONFIGURE,
                      mount_mode,
                      0, # stabilize roll (unsupported)
                      0, # stabilize pitch (unsupported)
@@ -4911,7 +4911,7 @@ class AutoTestCopter(AutoTest):
             self.assert_receive_message('GIMBAL_DEVICE_ATTITUDE_STATUS', timeout=5)
 
             # change mount to neutral mode (point forward, not stabilising)
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
 
             # test pitch is not stabilising
             mount_roll_deg, mount_pitch_deg, mount_yaw_deg = self.get_mount_roll_pitch_yaw_deg()
@@ -4941,20 +4941,20 @@ class AutoTestCopter(AutoTest):
             # center RC tilt control and change mount to RC_TARGETING mode
             self.progress("Gimbal to RC Targetting mode")
             self.set_rc(6, 1500)
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
             # pitch vehicle back and confirm gimbal is stabilising
             self.progress("Pitching vehicle")
             self.do_pitch(despitch)
             self.wait_pitch(despitch, despitch_tolerance)
-            self.test_mount_pitch(-despitch, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+            self.test_mount_pitch(-despitch, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
             # point gimbal at specified angle
             self.progress("Point gimbal using GIMBAL_MANAGER_PITCHYAW (ANGLE)")
             self.do_pitch(0)    # level vehicle
             self.wait_pitch(0, despitch_tolerance)
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_MAVLINK_TARGETING)
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW,
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING)
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_GIMBAL_MANAGER_PITCHYAW,
                          -20,   # pitch angle in degrees
                          0,     # yaw angle in degrees
                          0,     # pitch rate in degrees (NaN to ignore)
@@ -4962,12 +4962,12 @@ class AutoTestCopter(AutoTest):
                          0,     # flags (0=Body-frame, 16/GIMBAL_MANAGER_FLAGS_YAW_LOCK=Earth Frame)
                          0,     # unused
                          0)     # gimbal id
-            self.test_mount_pitch(-20, 1, mavutil.mavlink.MAV_MOUNT_MODE_MAVLINK_TARGETING)
+            self.test_mount_pitch(-20, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING)
 
             # point gimbal at specified location
             self.progress("Point gimbal at Location using MOUNT_CONTROL (GPS)")
             self.do_pitch(despitch)
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT)
 
             # Delay here to allow the attitude to command to timeout and level out the copter a bit
             self.delay_sim_time(3)
@@ -4988,7 +4988,7 @@ class AutoTestCopter(AutoTest):
                 t_alt * 100, # alt
                 0  # save position
             )
-            self.test_mount_pitch(-52, 5, mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT)
+            self.test_mount_pitch(-52, 5, mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT)
 
             # now test RC targetting
             self.progress("Testing mount RC targetting")
@@ -5006,7 +5006,7 @@ class AutoTestCopter(AutoTest):
                 0, # yaw rate   (rad/s)
                 0.5) # thrust, 0 to 1, translated to a climb/descent rate
 
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
             try:
                 self.context_push()
@@ -5028,7 +5028,7 @@ class AutoTestCopter(AutoTest):
                     12: 1500,
                     13: 1500,
                 })
-                self.test_mount_pitch(0, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(0, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 self.progress("Testing RC input down 1/4 of its range in the output, should be down 1/4 range in output")
                 rc12_in = 1400
                 rc12_min = 1100 # default
@@ -5040,9 +5040,9 @@ class AutoTestCopter(AutoTest):
                 if expected_pitch != -11.25:
                     raise NotAchievedException("Calculation wrong - defaults changed?!")
                 self.set_rc(12, rc12_in)
-                self.test_mount_pitch(-11.25, 0.01, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-11.25, 0.01, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 self.set_rc(12, 1800)
-                self.test_mount_pitch(33.75, 0.01, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(33.75, 0.01, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 self.set_rc_from_map({
                     11: 1500,
                     12: 1500,
@@ -5058,11 +5058,11 @@ class AutoTestCopter(AutoTest):
                         "MNT1_PITCH_MAX": 10,
                     })
                     self.set_rc(12, 1000)
-                    self.test_mount_pitch(-90.00, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                    self.test_mount_pitch(-90.00, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                     self.set_rc(12, 2000)
-                    self.test_mount_pitch(10.00, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                    self.test_mount_pitch(10.00, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                     self.set_rc(12, 1500)
-                    self.test_mount_pitch(-40.00, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                    self.test_mount_pitch(-40.00, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 finally:
                     self.context_pop()
 
@@ -5070,23 +5070,23 @@ class AutoTestCopter(AutoTest):
 
                 self.progress("Testing RC rate control")
                 self.set_parameter('MNT1_RC_RATE', 10)
-                self.test_mount_pitch(0, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(0, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 self.set_rc(12, 1300)
-                self.test_mount_pitch(-5, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(-10, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(-15, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(-20, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-5, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-10, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-15, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-20, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
                 self.set_rc(12, 1700)
-                self.test_mount_pitch(-15, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(-10, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(-5, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(0, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
-                self.test_mount_pitch(5, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-15, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-10, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(-5, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(0, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(5, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
                 self.progress("Reverting to angle mode")
                 self.set_parameter('MNT1_RC_RATE', 0)
                 self.set_rc(12, 1500)
-                self.test_mount_pitch(0, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+                self.test_mount_pitch(0, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
                 self.context_pop()
 
@@ -5096,7 +5096,7 @@ class AutoTestCopter(AutoTest):
                 raise e
 
             self.progress("Testing mount ROI behaviour")
-            self.test_mount_pitch(0, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+            self.test_mount_pitch(0, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
             start = self.mav.location()
             self.progress("start=%s" % str(start))
             (roi_lat, roi_lon) = mavextra.gps_offset(start.lat,
@@ -5104,8 +5104,8 @@ class AutoTestCopter(AutoTest):
                                                      10,
                                                      20)
             roi_alt = 0
-            self.progress("Using MAV_CMD_DO_SET_ROI_LOCATION")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI_LOCATION,
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI_LOCATION")
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI_LOCATION,
                          0,
                          0,
                          0,
@@ -5114,10 +5114,10 @@ class AutoTestCopter(AutoTest):
                          roi_lon,
                          roi_alt,
                          )
-            self.test_mount_pitch(-52, 5, mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT)
+            self.test_mount_pitch(-52, 5, mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT)
 
-            self.progress("Using MAV_CMD_DO_SET_ROI_NONE")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI_NONE,
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI_NONE")
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI_NONE,
                          0,
                          0,
                          0,
@@ -5126,7 +5126,7 @@ class AutoTestCopter(AutoTest):
                          0,
                          0,
                          )
-            self.test_mount_pitch(0, 1, mavutil.mavlink.MAV_MOUNT_MODE_RC_TARGETING)
+            self.test_mount_pitch(0, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_RC_TARGETING)
 
             start = self.mav.location()
             (roi_lat, roi_lon) = mavextra.gps_offset(start.lat,
@@ -5134,8 +5134,8 @@ class AutoTestCopter(AutoTest):
                                                      -100,
                                                      -200)
             roi_alt = 0
-            self.progress("Using MAV_CMD_DO_SET_ROI")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI,
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI")
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI,
                          0,
                          0,
                          0,
@@ -5144,7 +5144,7 @@ class AutoTestCopter(AutoTest):
                          roi_lon,
                          roi_alt,
                          )
-            self.test_mount_pitch(-7.5, 1, mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT)
+            self.test_mount_pitch(-7.5, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT)
 
             start = self.mav.location()
             (roi_lat, roi_lon) = mavextra.gps_offset(start.lat,
@@ -5152,9 +5152,9 @@ class AutoTestCopter(AutoTest):
                                                      -100,
                                                      -200)
             roi_alt = 0
-            self.progress("Using MAV_CMD_DO_SET_ROI (COMMAND_INT)")
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI (COMMAND_INT)")
             self.run_cmd_int(
-                mavutil.mavlink.MAV_CMD_DO_SET_ROI,
+                mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI,
                 0,
                 0,
                 0,
@@ -5162,13 +5162,13 @@ class AutoTestCopter(AutoTest):
                 int(roi_lat*1e7),
                 int(roi_lon*1e7),
                 roi_alt,
-                frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
             )
-            self.test_mount_pitch(-7.5, 1, mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT)
-            self.progress("Using MAV_CMD_DO_SET_ROI (COMMAND_INT), absolute-alt-frame")
+            self.test_mount_pitch(-7.5, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT)
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI (COMMAND_INT), absolute-alt-frame")
             # this is pointing essentially straight down
             self.run_cmd_int(
-                mavutil.mavlink.MAV_CMD_DO_SET_ROI,
+                mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI,
                 0,
                 0,
                 0,
@@ -5176,15 +5176,15 @@ class AutoTestCopter(AutoTest):
                 int(roi_lat*1e7),
                 int(roi_lon*1e7),
                 roi_alt,
-                frame=mavutil.mavlink.MAV_FRAME_GLOBAL,
+                frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
             )
-            self.test_mount_pitch(-70, 1, mavutil.mavlink.MAV_MOUNT_MODE_GPS_POINT, hold=2)
+            self.test_mount_pitch(-70, 1, mavutil.mavlink.AGPILOT_MOUNT_MODE_GPS_POINT, hold=2)
 
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
-            self.test_mount_pitch(0, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
+            self.test_mount_pitch(0, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
 
             self.progress("Testing mount roi-sysid behaviour")
-            self.test_mount_pitch(0, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
+            self.test_mount_pitch(0, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
             start = self.mav.location()
             self.progress("start=%s" % str(start))
             (roi_lat, roi_lon) = mavextra.gps_offset(start.lat,
@@ -5192,8 +5192,8 @@ class AutoTestCopter(AutoTest):
                                                      10,
                                                      20)
             roi_alt = 0
-            self.progress("Using MAV_CMD_DO_SET_ROI_SYSID")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI_SYSID,
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI_SYSID")
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI_SYSID,
                          self.mav.source_system,
                          0,
                          0,
@@ -5213,7 +5213,7 @@ class AutoTestCopter(AutoTest):
                 0, # vz
                 0 # heading
             )
-            self.test_mount_pitch(-89, 5, mavutil.mavlink.MAV_MOUNT_MODE_SYSID_TARGET, hold=2)
+            self.test_mount_pitch(-89, 5, mavutil.mavlink.AGPILOT_MOUNT_MODE_SYSID_TARGET, hold=2)
 
             self.mav.mav.global_position_int_send(
                 0, # time boot ms
@@ -5226,10 +5226,10 @@ class AutoTestCopter(AutoTest):
                 0, # vz
                 0 # heading
             )
-            self.test_mount_pitch(68, 5, mavutil.mavlink.MAV_MOUNT_MODE_SYSID_TARGET, hold=2)
+            self.test_mount_pitch(68, 5, mavutil.mavlink.AGPILOT_MOUNT_MODE_SYSID_TARGET, hold=2)
 
-            self.set_mount_mode(mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
-            self.test_mount_pitch(0, 0.1, mavutil.mavlink.MAV_MOUNT_MODE_NEUTRAL)
+            self.set_mount_mode(mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
+            self.test_mount_pitch(0, 0.1, mavutil.mavlink.AGPILOT_MOUNT_MODE_NEUTRAL)
 
         except Exception as e:
             self.print_exception_caught(e)
@@ -5272,8 +5272,8 @@ class AutoTestCopter(AutoTest):
                                                      -100,
                                                      -100)
             roi_alt = 0
-            self.progress("Using MAV_CMD_DO_SET_ROI")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI,
+            self.progress("Using AGPILOT_CMD_DO_SET_ROI")
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI,
                          0,
                          0,
                          0,
@@ -5296,8 +5296,8 @@ class AutoTestCopter(AutoTest):
                 0, # timestamp
                 1, # target system_id
                 1, # target component id
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-                MAV_POS_TARGET_TYPE_MASK.POS_ONLY | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-lat-lon-alt
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-lat-lon-alt
                 there.lat, # lat
                 there.lng, # lon
                 there.alt, # alt
@@ -5315,7 +5315,7 @@ class AutoTestCopter(AutoTest):
             bearing = self.bearing_to(there)
             self.wait_heading(bearing, timeout=600, minimum_duration=2)
 
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_ROI,
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_ROI,
                          0,
                          0,
                          0,
@@ -6328,8 +6328,8 @@ class AutoTestCopter(AutoTest):
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            MAV_POS_TARGET_TYPE_MASK.POS_ONLY | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-lat-lon-alt
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE, # mask specifying use-only-lat-lon-alt
             int(destination.lat * 1e7), # lat
             int(destination.lng * 1e7), # lon
             destination.alt, # alt
@@ -6512,7 +6512,7 @@ class AutoTestCopter(AutoTest):
         self.context_collect('STATUSTEXT')
         self.run_cmd_do_set_mode(
             "LOITER",
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
         self.wait_statustext("requires position", check_context=True)
         self.disarm_vehicle()
         self.context_pop()
@@ -6687,8 +6687,8 @@ class AutoTestCopter(AutoTest):
                               (angle, front, right))
                 self.mav.mav.obstacle_distance_3d_send(
                     int(now*1000),  # time_boot_ms
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER,
-                    mavutil.mavlink.MAV_FRAME_BODY_FRD,
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER,
+                    mavutil.mavlink.AGPILOT_FRAME_BODY_FRD,
                     65535,
                     front,  # x (m)
                     right,  # y (m)
@@ -6772,34 +6772,34 @@ class AutoTestCopter(AutoTest):
         })
         sensors = [  # tuples of name, prx_type
             ('sf45b', 8, {
-                mavutil.mavlink.MAV_SENSOR_ROTATION_NONE: 285,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_45: 256,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_90: 1131,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_135: 1283,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_180: 625,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_225: 968,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_270: 760,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_315: 762,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE: 285,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_45: 256,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_90: 1131,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_135: 1283,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_180: 625,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_225: 968,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_270: 760,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_315: 762,
             }),
             ('rplidara2', 5, {
-                mavutil.mavlink.MAV_SENSOR_ROTATION_NONE: 277,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_45: 256,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_90: 1130,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_135: 1288,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_180: 626,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_225: 970,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_270: 762,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_315: 790,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE: 277,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_45: 256,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_90: 1130,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_135: 1288,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_180: 626,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_225: 970,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_270: 762,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_315: 790,
             }),
             ('terarangertower', 3, {
-                mavutil.mavlink.MAV_SENSOR_ROTATION_NONE: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_45: 282,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_90: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_135: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_180: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_225: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_270: 450,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_315: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_45: 282,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_90: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_135: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_180: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_225: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_270: 450,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_315: 450,
             }),
         ]
 
@@ -6866,12 +6866,12 @@ class AutoTestCopter(AutoTest):
                     10, # min_distance cm
                     500, # max_distance cm
                     400, # current_distance cm
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     26, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_NONE, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE, # orientation
                     255  # covariance
                 )
-                self.send_cmd(mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+                self.send_cmd(mavutil.mavlink.AGPILOT_CMD_COMPONENT_ARM_DISARM,
                               1,  # ARM
                               0,
                               0,
@@ -6888,9 +6888,9 @@ class AutoTestCopter(AutoTest):
                     10, # min_distance cm
                     500, # max_distance cm
                     20, # current_distance cm
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_NONE, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE, # orientation
                     255  # covariance
                 )
             self.wait_speed_vector_bf(
@@ -7274,7 +7274,7 @@ class AutoTestCopter(AutoTest):
 
         self.set_message_rate_hz("GENERATOR_STATUS", 10)
 
-        self.wait_generator_speed_and_state(0, 0, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_OFF)
+        self.wait_generator_speed_and_state(0, 0, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_OFF)
 
         self.context_collect('STATUSTEXT')
         self.set_rc(9, 2000) # remember this is a switch position - run
@@ -7283,12 +7283,12 @@ class AutoTestCopter(AutoTest):
         self.wait_statustext("requested state is not RUN", timeout=200)
 
         self.set_rc(9, 1500) # remember this is a switch position - idle
-        self.wait_generator_speed_and_state(3000, 8000, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_IDLE)
+        self.wait_generator_speed_and_state(3000, 8000, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_IDLE)
 
         self.set_rc(9, 2000) # remember this is a switch position - run
-#        self.wait_generator_speed_and_state(3000, 30000, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_WARMING_UP)
+#        self.wait_generator_speed_and_state(3000, 30000, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_WARMING_UP)
 
-        self.wait_generator_speed_and_state(8000, 30000, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_GENERATING)
+        self.wait_generator_speed_and_state(8000, 30000, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_GENERATING)
 
         bs = self.mav.recv_match(
             type="BATTERY_STATUS",
@@ -7305,11 +7305,11 @@ class AutoTestCopter(AutoTest):
 
         self.progress("Moving *back* to idle")
         self.set_rc(9, 1500) # remember this is a switch position - idle
-        self.wait_generator_speed_and_state(3000, 10000, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_IDLE)
+        self.wait_generator_speed_and_state(3000, 10000, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_IDLE)
 
         self.progress("Moving *back* to run")
         self.set_rc(9, 2000) # remember this is a switch position - run
-        self.wait_generator_speed_and_state(8000, 30000, mavutil.mavlink.MAV_GENERATOR_STATUS_FLAG_GENERATING)
+        self.wait_generator_speed_and_state(8000, 30000, mavutil.mavlink.AGPILOT_GENERATOR_STATUS_FLAG_GENERATING)
 
         self.set_message_rate_hz("GENERATOR_STATUS", -1)
         self.set_parameter("LOG_DISARMED", 0)
@@ -7338,10 +7338,10 @@ class AutoTestCopter(AutoTest):
         # messages until we read things fromthe battery:
         self.delay_sim_time(30)
         original_elec_m = self.wait_message_field_values('BATTERY_STATUS', {
-            "charge_state": mavutil.mavlink.MAV_BATTERY_CHARGE_STATE_OK
+            "charge_state": mavutil.mavlink.AGPILOT_BATTERY_CHARGE_STATE_OK
         }, instance=elec_battery_instance)
         original_fuel_m = self.wait_message_field_values('BATTERY_STATUS', {
-            "charge_state": mavutil.mavlink.MAV_BATTERY_CHARGE_STATE_OK
+            "charge_state": mavutil.mavlink.AGPILOT_BATTERY_CHARGE_STATE_OK
         }, instance=fuel_battery_instance)
 
         if original_elec_m.battery_remaining < 90:
@@ -7488,8 +7488,8 @@ class AutoTestCopter(AutoTest):
         if not self.current_onboard_log_contains_message("RFND"):
             raise NotAchievedException("No RFND messages in log")
 
-    def MAVProximity(self):
-        '''Test MAVLink proximity driver'''
+    def AGPILOTProximity(self):
+        '''Test AGPILOTLink proximity driver'''
         self.start_subtest("Test mavlink proximity sensor using DISTANCE_SENSOR messages")  # noqa
         self.context_push()
         ex = None
@@ -7499,7 +7499,7 @@ class AutoTestCopter(AutoTest):
             self.reboot_sitl()
 
             self.progress("Should be unhealthy while we don't send messages")
-            self.assert_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_PROXIMITY, True, True, False)
+            self.assert_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_PROXIMITY, True, True, False)
 
             self.progress("Should be healthy while we're sending good messages")
             tstart = self.get_sim_time()
@@ -7511,35 +7511,35 @@ class AutoTestCopter(AutoTest):
                     10, # min_distance cm
                     50, # max_distance cm
                     20, # current_distance cm
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_NONE, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE, # orientation
                     255  # covariance
                 )
-                if self.sensor_has_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_PROXIMITY, True, True, True):
+                if self.sensor_has_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_PROXIMITY, True, True, True):
                     self.progress("Sensor has good state")
                     break
                 self.delay_sim_time(0.1)
 
             self.progress("Should be unhealthy again if we stop sending messages")
             self.delay_sim_time(1)
-            self.assert_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_PROXIMITY, True, True, False)
+            self.assert_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_PROXIMITY, True, True, False)
 
             # now make sure we get echoed back the same sorts of things we send:
             # distances are in cm
             distance_map = {
-                mavutil.mavlink.MAV_SENSOR_ROTATION_NONE: 30,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_45: 35,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_90: 20,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_135: 15,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_180: 70,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_225: 80,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_270: 10,
-                mavutil.mavlink.MAV_SENSOR_ROTATION_YAW_315: 90,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_NONE: 30,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_45: 35,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_90: 20,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_135: 15,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_180: 70,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_225: 80,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_270: 10,
+                mavutil.mavlink.AGPILOT_SENSOR_ROTATION_YAW_315: 90,
             }
 
             wanted_distances = copy.copy(distance_map)
-            sensor_enum = mavutil.mavlink.enums["MAV_SENSOR_ORIENTATION"]
+            sensor_enum = mavutil.mavlink.enums["AGPILOT_SENSOR_ORIENTATION"]
 
             def my_message_hook(mav, m):
                 if m.get_type() != 'DISTANCE_SENSOR':
@@ -7572,7 +7572,7 @@ class AutoTestCopter(AutoTest):
                         10, # min_distance cm
                         90, # max_distance cm
                         dist, # current_distance cm
-                        mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                        mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                         21, # id
                         orient, # orientation
                         255  # covariance
@@ -7606,7 +7606,7 @@ class AutoTestCopter(AutoTest):
             self.set_parameter("RNGFND1_MAX_CM", 32767)
 
             self.progress("Should be unhealthy while we don't send messages")
-            self.assert_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION, True, True, False)
+            self.assert_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION, True, True, False)
 
             self.progress("Should be healthy while we're sending good messages")
             tstart = self.get_sim_time()
@@ -7618,25 +7618,25 @@ class AutoTestCopter(AutoTest):
                     10, # min_distance
                     50, # max_distance
                     20, # current_distance
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_PITCH_270, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_PITCH_270, # orientation
                     255 # covariance
                 )
-                if self.sensor_has_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION, True, True, True):
+                if self.sensor_has_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION, True, True, True):
                     self.progress("Sensor has good state")
                     break
                 self.delay_sim_time(0.1)
 
             self.progress("Should be unhealthy again if we stop sending messages")
             self.delay_sim_time(1)
-            self.assert_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION, True, True, False)
+            self.assert_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION, True, True, False)
 
             self.progress("Landing gear should deploy with current_distance below min_distance")
             self.change_mode('STABILIZE')
             timeout = 60
             tstart = self.get_sim_time()
-            while not self.sensor_has_state(mavutil.mavlink.MAV_SYS_STATUS_PREARM_CHECK, True, True, True):
+            while not self.sensor_has_state(mavutil.mavlink.AGPILOT_SYS_STATUS_PREARM_CHECK, True, True, True):
                 if self.get_sim_time() - tstart > timeout:
                     raise NotAchievedException("Failed to become armable after %f seconds" % timeout)
                 self.mav.mav.distance_sensor_send(
@@ -7644,9 +7644,9 @@ class AutoTestCopter(AutoTest):
                     100, # min_distance (cm)
                     2500, # max_distance (cm)
                     200, # current_distance (cm)
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_PITCH_270, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_PITCH_270, # orientation
                     255  # covariance
                 )
             self.arm_vehicle()
@@ -7654,7 +7654,7 @@ class AutoTestCopter(AutoTest):
 #            self.send_debug_trap()
 
             self.run_cmd(
-                mavutil.mavlink.MAV_CMD_AIRFRAME_CONFIGURATION,
+                mavutil.mavlink.AGPILOT_CMD_AIRFRAME_CONFIGURATION,
                 0,
                 0,  # deploy
                 0,
@@ -7674,9 +7674,9 @@ class AutoTestCopter(AutoTest):
                     100, # min_distance (cm)
                     6000, # max_distance (cm)
                     1500, # current_distance (cm)
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_PITCH_270, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_PITCH_270, # orientation
                     255  # covariance
                 )
                 self.delay_sim_time(0.1)
@@ -7696,9 +7696,9 @@ class AutoTestCopter(AutoTest):
                     300, # min_distance
                     500, # max_distance
                     250, # current_distance
-                    mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER, # type
+                    mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER, # type
                     21, # id
-                    mavutil.mavlink.MAV_SENSOR_ROTATION_PITCH_270, # orientation
+                    mavutil.mavlink.AGPILOT_SENSOR_ROTATION_PITCH_270, # orientation
                     255 # covariance
                 )
                 try:
@@ -7960,7 +7960,7 @@ class AutoTestCopter(AutoTest):
 
         self.wait_rangefinder_distance(90, 100)
 
-        rf_bit = mavutil.mavlink.MAV_SYS_STATUS_SENSOR_LASER_POSITION
+        rf_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_LASER_POSITION
 
         self.assert_sensor_state(rf_bit, present=True, enabled=True, healthy=True)
         self.assert_distance_sensor_quality(100)
@@ -8165,7 +8165,7 @@ class AutoTestCopter(AutoTest):
         })
         self.reboot_sitl()
 
-        self.wait_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_LOGGING, True, True, True)
+        self.wait_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_LOGGING, True, True, True)
 
         current_log_filepath = self.current_onboard_log_filepath()
         self.progress("Current log path: %s" % str(current_log_filepath))
@@ -8420,7 +8420,7 @@ class AutoTestCopter(AutoTest):
 
             # other tests may have explicitly set rates, so wipe parameters:
             def custom_stream_rate_setter():
-                for stream in mavutil.mavlink.MAV_DATA_STREAM_EXTRA3, mavutil.mavlink.MAV_DATA_STREAM_RC_CHANNELS:
+                for stream in mavutil.mavlink.AGPILOT_DATA_STREAM_EXTRA3, mavutil.mavlink.AGPILOT_DATA_STREAM_RC_CHANNELS:
                     self.set_streamrate(5, stream=stream)
 
             self.customise_SITL_commandline(
@@ -8691,7 +8691,7 @@ class AutoTestCopter(AutoTest):
             raise NotAchievedException("Was expecting takeoff for longer than expected; got=%f want<=%f" %
                                        (duration, want_lt))
 
-    def MAV_CMD_CONDITION_YAW_absolute(self):
+    def AGPILOT_CMD_CONDITION_YAW_absolute(self):
         self.start_subtest("absolute")
         self.takeoff(20, mode='GUIDED')
 
@@ -8701,7 +8701,7 @@ class AutoTestCopter(AutoTest):
         self.progress("Ensuring initial heading is steady")
         target = initial_heading
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_CONDITION_YAW,
+            mavutil.mavlink.AGPILOT_CMD_CONDITION_YAW,
             target,  # target angle
             10,  # degrees/second
             1,  # -1 is counter-clockwise, 1 clockwise
@@ -8725,7 +8725,7 @@ class AutoTestCopter(AutoTest):
         target = initial_heading + 60
         part_way_target = initial_heading + 10
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_CONDITION_YAW,
+            mavutil.mavlink.AGPILOT_CMD_CONDITION_YAW,
             target,  # target angle
             degsecond,  # degrees/second
             1,  # -1 is counter-clockwise, 1 clockwise
@@ -8741,7 +8741,7 @@ class AutoTestCopter(AutoTest):
         target = initial_heading
         part_way_target = initial_heading + 30
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_CONDITION_YAW,
+            mavutil.mavlink.AGPILOT_CMD_CONDITION_YAW,
             target,  # target angle
             degsecond,  # degrees/second
             -1,  # -1 is counter-clockwise, 1 clockwise
@@ -8755,13 +8755,13 @@ class AutoTestCopter(AutoTest):
 
         self.do_RTL()
 
-    def MAV_CMD_CONDITION_YAW_relative(self):
+    def AGPILOT_CMD_CONDITION_YAW_relative(self):
         pass
 
-    def MAV_CMD_CONDITION_YAW(self):
-        '''Test response to MAV_CMD_CONDITION_YAW'''
-        self.MAV_CMD_CONDITION_YAW_absolute()
-        self.MAV_CMD_CONDITION_YAW_relative()
+    def AGPILOT_CMD_CONDITION_YAW(self):
+        '''Test response to AGPILOT_CMD_CONDITION_YAW'''
+        self.AGPILOT_CMD_CONDITION_YAW_absolute()
+        self.AGPILOT_CMD_CONDITION_YAW_relative()
 
     def GroundEffectCompensation_touchDownExpected(self):
         '''Test EKF's handling of touchdown-expected'''
@@ -8789,13 +8789,13 @@ class AutoTestCopter(AutoTest):
         alt = 20
         loc.alt = alt
         items = [
-            (mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, alt)
+            (mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF, 0, 0, alt)
         ]
 
         for (ofs_n, ofs_e) in (20, 20), (20, -20), (-20, -20), (-20, 20), (20, 20):
-            items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, ofs_n, ofs_e, alt))
+            items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, ofs_n, ofs_e, alt))
 
-        items.append((mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0))
 
         self.upload_simple_relhome_mission(items)
 
@@ -8889,7 +8889,7 @@ class AutoTestCopter(AutoTest):
         self.context_pop()
 
     def PAUSE_CONTINUE(self):
-        '''Test MAV_CMD_DO_PAUSE_CONTINUE in AUTO mode'''
+        '''Test AGPILOT_CMD_DO_PAUSE_CONTINUE in AUTO mode'''
         self.load_mission(filename="copter_mission.txt", strict=False)
         self.set_parameter(name="AUTO_OPTIONS", value=3)
         self.change_mode(mode="AUTO")
@@ -8917,7 +8917,7 @@ class AutoTestCopter(AutoTest):
         self.wait_disarmed(timeout=500)
 
     def PAUSE_CONTINUE_GUIDED(self):
-        '''Test MAV_CMD_DO_PAUSE_CONTINUE in GUIDED mode'''
+        '''Test AGPILOT_CMD_DO_PAUSE_CONTINUE in GUIDED mode'''
         self.start_subtest("Started test for Pause/Continue in GUIDED mode with LOCATION!")
         self.change_mode(mode="GUIDED")
         self.wait_ready_to_arm()
@@ -8927,13 +8927,13 @@ class AutoTestCopter(AutoTest):
 
         # send vehicle to global position target
         location = self.home_relative_loc_ne(n=300, e=0)
-        target_typemask = MAV_POS_TARGET_TYPE_MASK.POS_ONLY
+        target_typemask = AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY
         self.mav.mav.set_position_target_global_int_send(
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # relative altitude frame
-            target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE, # target typemask as pos only
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT, # relative altitude frame
+            target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE, # target typemask as pos only
             int(location.lat * 1e7), # lat
             int(location.lng * 1e7), # lon
             30, # alt
@@ -8962,8 +8962,8 @@ class AutoTestCopter(AutoTest):
             0, # system time in milliseconds
             1, # target system
             1, # target component
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # coordinate frame MAV_FRAME_BODY_NED
-            MAV_POS_TARGET_TYPE_MASK.POS_ONLY, # type mask (pos only)
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT, # coordinate frame AGPILOT_FRAME_BODY_NED
+            AGPILOT_POS_TARGET_TYPE_MASK.POS_ONLY, # type mask (pos only)
             int(location.lat*1e7), # position x
             int(location.lng*1e7), # position y
             30, # position z
@@ -9002,14 +9002,14 @@ class AutoTestCopter(AutoTest):
 
         # give acceleration command
         ax, ay, az_up = (1, 1, 0)
-        target_typemask = (MAV_POS_TARGET_TYPE_MASK.POS_IGNORE | MAV_POS_TARGET_TYPE_MASK.VEL_IGNORE |
-                           MAV_POS_TARGET_TYPE_MASK.YAW_IGNORE | MAV_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
+        target_typemask = (AGPILOT_POS_TARGET_TYPE_MASK.POS_IGNORE | AGPILOT_POS_TARGET_TYPE_MASK.VEL_IGNORE |
+                           AGPILOT_POS_TARGET_TYPE_MASK.YAW_IGNORE | AGPILOT_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
         self.mav.mav.set_position_target_local_ned_send(
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-            target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE,
+            mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
+            target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE,
             0, # x
             0, # y
             0, # z
@@ -9038,13 +9038,13 @@ class AutoTestCopter(AutoTest):
 
         # give posvelaccel command
         x, y, z_up = (-300, 0, 30)
-        target_typemask = (MAV_POS_TARGET_TYPE_MASK.YAW_IGNORE | MAV_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
+        target_typemask = (AGPILOT_POS_TARGET_TYPE_MASK.YAW_IGNORE | AGPILOT_POS_TARGET_TYPE_MASK.YAW_RATE_IGNORE)
         self.mav.mav.set_position_target_local_ned_send(
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-            target_typemask | MAV_POS_TARGET_TYPE_MASK.LAST_BYTE,
+            mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
+            target_typemask | AGPILOT_POS_TARGET_TYPE_MASK.LAST_BYTE,
             x, # x
             y, # y
             -z_up, # z
@@ -9163,27 +9163,27 @@ class AutoTestCopter(AutoTest):
         self.change_mode('AUTO')
         self.wait_disarmed()
 
-    def MAVLandedStateTakeoff(self):
+    def AGPILOTLandedStateTakeoff(self):
         '''check EXTENDED_SYS_STATE message'''
         ex = None
         try:
-            self.set_message_rate_hz(id=mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, rate_hz=1)
-            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                         landed_state=mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND, timeout=10)
+            self.set_message_rate_hz(id=mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, rate_hz=1)
+            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                         landed_state=mavutil.mavlink.AGPILOT_LANDED_STATE_ON_GROUND, timeout=10)
             self.load_mission(filename="copter_mission.txt")
             self.set_parameter(name="AUTO_OPTIONS", value=3)
             self.change_mode(mode="AUTO")
             self.wait_ready_to_arm()
             self.arm_vehicle()
-            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                         landed_state=mavutil.mavlink.MAV_LANDED_STATE_TAKEOFF, timeout=30)
-            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.MAV_VTOL_STATE_MC,
-                                         landed_state=mavutil.mavlink.MAV_LANDED_STATE_IN_AIR, timeout=60)
+            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                         landed_state=mavutil.mavlink.AGPILOT_LANDED_STATE_TAKEOFF, timeout=30)
+            self.wait_extended_sys_state(vtol_state=mavutil.mavlink.AGPILOT_VTOL_STATE_MC,
+                                         landed_state=mavutil.mavlink.AGPILOT_LANDED_STATE_IN_AIR, timeout=60)
             self.land_and_disarm()
         except Exception as e:
             self.print_exception_caught(e)
             ex = e
-        self.set_message_rate_hz(mavutil.mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE, -1)
+        self.set_message_rate_hz(mavutil.mavlink.AGPILOTLINK_MSG_ID_EXTENDED_SYS_STATE, -1)
         if ex is not None:
             raise ex
 
@@ -9379,8 +9379,8 @@ class AutoTestCopter(AutoTest):
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -9390,10 +9390,10 @@ class AutoTestCopter(AutoTest):
                 int(rally_loc.lat * 1e7), # latitude
                 int(rally_loc.lng * 1e7), # longitude
                 rally_alt, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
         ]
         self.upload_using_mission_protocol(
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
             items
         )
         self.set_parameters({
@@ -9407,7 +9407,7 @@ class AutoTestCopter(AutoTest):
         self.wait_altitude(20, 25, relative=True)
         self.change_mode('LOITER')
         self.progress("Flying home")
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.change_mode('RTL')
         self.wait_disarmed()
         self.assert_at_home()
@@ -9538,7 +9538,7 @@ class AutoTestCopter(AutoTest):
 
         self.start_subtest("Checking mavlink commands")
         self.progress("Starting Sprayer")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SPRAYER,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SPRAYER,
                      1,  # p1
                      0,  # p2
                      0,  # p3
@@ -9556,7 +9556,7 @@ class AutoTestCopter(AutoTest):
         )
 
         self.start_subtest("Stopping Sprayer")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SPRAYER,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SPRAYER,
                      0,  # p1
                      0,  # p2
                      0,  # p3
@@ -9581,7 +9581,7 @@ class AutoTestCopter(AutoTest):
              self.NavDelayAbsTime,
              self.NavDelay,
              self.GuidedSubModeChange,
-             self.MAV_CMD_CONDITION_YAW,
+             self.AGPILOT_CMD_CONDITION_YAW,
              self.LoiterToAlt,
              self.PayLoadPlaceMission,
              self.PrecisionLoiterCompanion,
@@ -9688,14 +9688,14 @@ class AutoTestCopter(AutoTest):
              self.RangeFinderDrivers,
              self.RangeFinderDriversMaxAlt,
              self.MaxBotixI2CXL,
-             self.MAVProximity,
+             self.AGPILOTProximity,
              self.ParameterValidation,
              self.AltTypes,
              self.PAUSE_CONTINUE,
              self.PAUSE_CONTINUE_GUIDED,
              self.RichenPower,
              self.IE24,
-             self.MAVLandedStateTakeoff,
+             self.AGPILOTLandedStateTakeoff,
              self.Weathervane,
         ])
         return ret

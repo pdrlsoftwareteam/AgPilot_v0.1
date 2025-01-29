@@ -1,6 +1,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AP_BattMonitor_XKC_Y25_NPN.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 /*
   "battery" monitor for liquid fuel flow systems that give a pulse on
@@ -80,9 +80,9 @@ void AP_BattMonitor_XKC_Y25_NPN::read()
         		    			{
         							pre_Status = get_Status;
         							if(get_Status)
-        								gcs().send_text(MAV_SEVERITY_INFO,"Tank Empty");
+        								gcs().send_text(AGPILOT_SEVERITY_INFO,"Tank Empty");
         							else
-        								gcs().send_text(MAV_SEVERITY_INFO,"Tank Full");
+        								gcs().send_text(AGPILOT_SEVERITY_INFO,"Tank Full");
         		    			}
         		    		}
     _state.last_time_micros = now_us;

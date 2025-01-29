@@ -28,9 +28,9 @@ local PKG_RELEASE_HOLD  = bind_add_param('RELEASE_HOLD', 4, 1)
 local Q_LAND_SPEED = Parameter("Q_LAND_SPEED")
 local Q_LAND_FINAL_ALT = Parameter("Q_LAND_FINAL_ALT")
 
-local MAV_SEVERITY_INFO = 6
-local MAV_SEVERITY_NOTICE = 5
-local MAV_SEVERITY_EMERGENCY = 0
+local AGPILOT_SEVERITY_INFO = 6
+local AGPILOT_SEVERITY_NOTICE = 5
+local AGPILOT_SEVERITY_EMERGENCY = 0
 
 local RNG_ORIENT_DOWN = 25
 
@@ -140,7 +140,7 @@ function update()
          -- start waiting for the hold time for vehicle to settle
          vehicle:set_land_descent_rate(0)
          if now - release_start_t > PKG_RELEASE_HOLD:get() then
-            gcs:send_text(MAV_SEVERITY_INFO, string.format("Package released at %.1fm", dist_m))
+            gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("Package released at %.1fm", dist_m))
             SRV_Channels:set_output_scaled(PKG_RELEASE_FUNC:get(), 1000)
             release_state = RELEASE_HOLD2
          end
@@ -151,9 +151,9 @@ function update()
             release_state = RELEASE_DONE
             -- aborting the landing causes us to climb back up and continue the mission
             if quadplane:abort_landing() then
-               gcs:send_text(MAV_SEVERITY_INFO, string.format("Climbing"))
+               gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("Climbing"))
             else
-               gcs:send_text(MAV_SEVERITY_NOTICE, string.format("land abort failed"))
+               gcs:send_text(AGPILOT_SEVERITY_NOTICE, string.format("land abort failed"))
             end
          end
       end
@@ -181,7 +181,7 @@ function protected_wrapper()
   return protected_wrapper, 50
 end
 
-gcs:send_text(MAV_SEVERITY_INFO, "Loaded package place script")
+gcs:send_text(AGPILOT_SEVERITY_INFO, "Loaded package place script")
 
 -- start running update loop
 return protected_wrapper()

@@ -23,7 +23,7 @@
 
 #include "AP_OSD.h"
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <ctype.h>
 
@@ -113,7 +113,7 @@ const AP_Param::GroupInfo AP_OSD_ParamSetting::var_info[] = {
 #if APM_BUILD_TYPE(APM_BUILD_ArduPlane) || APM_BUILD_COPTER_OR_HELI
 
 static const char* SERIAL_PROTOCOL_VALUES[] = {
-    "", "MAV", "MAV2", "FSKY_D", "FSKY_S", "GPS", "", "ALEX", "STORM", "RNG", 
+    "", "AGPILOT", "AGPILOT2", "FSKY_D", "FSKY_S", "GPS", "", "ALEX", "STORM", "RNG", 
     "FSKY_TX", "LID360", "", "BEACN", "VOLZ", "SBUS", "ESC_TLM", "DEV_TLM", "OPTFLW", "RBTSRV",
     "NMEA", "WNDVNE", "SLCAN", "RCIN", "MGSQRT", "LTM", "RUNCAM", "HOT_TLM", "SCRIPT", "CRSF",
     "GEN", "WNCH", "MSP", "DJI"

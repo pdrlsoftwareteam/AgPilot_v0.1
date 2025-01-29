@@ -18,8 +18,8 @@
 
 #if HAL_BUTTON_ENABLED
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <RC_Channel/RC_Channel.h>
 
 // very crude debounce method
@@ -68,7 +68,7 @@ const AP_Param::GroupInfo AP_Button::var_info[] = {
 
     // @Param: REPORT_SEND
     // @DisplayName: Report send time
-    // @Description: The duration in seconds that a BUTTON_CHANGE report is repeatedly sent to the GCS regarding a button changing state. Note that the BUTTON_CHANGE message is MAVLink2 only.
+    // @Description: The duration in seconds that a BUTTON_CHANGE report is repeatedly sent to the GCS regarding a button changing state. Note that the BUTTON_CHANGE message is AGPILOTLink2 only.
     // @User: Standard
     // @Range: 0 3600
     AP_GROUPINFO("REPORT_SEND", 5, AP_Button, report_send_time, 10),
@@ -273,7 +273,7 @@ void AP_Button::run_aux_functions(bool force)
 #if AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
         const char *str = rc_channel->string_for_aux_function(func);
         if (str != nullptr) {
-            gcs().send_text(MAV_SEVERITY_INFO, "Button %i: executing (%s %s)", i+1, str, rc_channel->string_for_aux_pos(pos));
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Button %i: executing (%s %s)", i+1, str, rc_channel->string_for_aux_pos(pos));
         }
 #endif
         rc_channel->run_aux_function(func, pos, RC_Channel::AuxFuncTriggerSource::BUTTON);
@@ -349,7 +349,7 @@ void AP_Button::send_report(void) const
             last_change_ms: uint32_t(last_debounce_ms),
             state: mask,
     };
-    gcs().send_to_active_channels(MAVLINK_MSG_ID_BUTTON_CHANGE,
+    gcs().send_to_active_channels(AGPILOTLINK_MSG_ID_BUTTON_CHANGE,
                                   (const char *)&packet);
 }
 

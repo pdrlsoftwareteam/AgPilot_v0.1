@@ -6,9 +6,9 @@
 #include <AP_HAL/AP_HAL_Boards.h>
 #include <AP_OpenDroneID/AP_OpenDroneID_config.h>
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS_config.h>
+#include <GCS_AGPILOTLink/GCS_config.h>
 #if HAL_GCS_ENABLED
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #endif
 
 #ifndef AP_CHECK_FIRMWARE_ENABLED

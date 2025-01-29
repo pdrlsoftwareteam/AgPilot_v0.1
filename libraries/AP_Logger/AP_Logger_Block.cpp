@@ -9,7 +9,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <stdio.h>
 #include <AP_RTC/AP_RTC.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 const extern AP_HAL::HAL& hal;
 
@@ -279,7 +279,7 @@ void AP_Logger_Block::EraseAll()
 
     // push out the message before stopping logging
     if (!erase_started) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Chip erase started");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Chip erase started");
     }
 
     WITH_SEMAPHORE(sem);
@@ -319,7 +319,7 @@ void AP_Logger_Block::periodic_1Hz()
         if (warning_decimation_counter == 0 && _initialised) {
             // we don't print this error unless we did initialise. When _initialised is set to true
             // we register the IO timer callback
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "AP_Logger: IO thread died");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "AP_Logger: IO thread died");
         }
         if (warning_decimation_counter++ > 57) {
             warning_decimation_counter = 0;
@@ -327,7 +327,7 @@ void AP_Logger_Block::periodic_1Hz()
         _initialised = false;
     } else if (chip_full) {
         if (warning_decimation_counter == 0) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Chip full, logging stopped");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Chip full, logging stopped");
         }
         if (warning_decimation_counter++ > 57) {
             warning_decimation_counter = 0;
@@ -347,11 +347,11 @@ void AP_Logger_Block::periodic_10Hz(const uint32_t now)
     // don't print status messages in io thread, do it here
     switch (status_msg) {
     case StatusMessage::ERASE_COMPLETE:
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Chip erase complete");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Chip erase complete");
         status_msg = StatusMessage::NONE;
         break;
     case StatusMessage::RECOVERY_COMPLETE:
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Log recovery complete");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Log recovery complete");
         status_msg = StatusMessage::NONE;
         break;
     case StatusMessage::NONE:
@@ -769,7 +769,7 @@ uint32_t AP_Logger_Block::find_last_page_of_log(uint16_t log_number)
         return bottom;
     }
 
-    GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "No last page of log %d at top=%X or bot=%X", int(log_number), unsigned(top), unsigned(bottom));
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "No last page of log %d at top=%X or bot=%X", int(log_number), unsigned(top), unsigned(bottom));
     return 0;
 }
 

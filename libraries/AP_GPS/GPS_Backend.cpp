@@ -28,7 +28,7 @@
  # define Debug(fmt, args ...)
 #endif
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if AP_GPS_DEBUG_LOGGING_ENABLED
 #include <AP_Filesystem/AP_Filesystem.h>
@@ -177,15 +177,15 @@ void AP_GPS_Backend::_detection_message(char *buffer, const uint8_t buflen) cons
 
 void AP_GPS_Backend::broadcast_gps_type() const
 {
-    char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
     _detection_message(buffer, sizeof(buffer));
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s", buffer);
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s", buffer);
 }
 
 void AP_GPS_Backend::Write_AP_Logger_Log_Startup_messages() const
 {
 #if HAL_LOGGING_ENABLED
-    char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
     _detection_message(buffer, sizeof(buffer));
     AP::logger().Write_Message(buffer);
 #endif

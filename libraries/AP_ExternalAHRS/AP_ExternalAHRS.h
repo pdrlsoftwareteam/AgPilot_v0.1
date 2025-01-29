@@ -99,7 +99,7 @@ public:
     void get_filter_status(nav_filter_status &status) const;
     Vector3f get_gyro(void);
     Vector3f get_accel(void);
-    void send_status_report(class GCS_MAVLINK &link) const;
+    void send_status_report(class GCS_AGPILOTLINK &link) const;
 
     // update backend
     void update();

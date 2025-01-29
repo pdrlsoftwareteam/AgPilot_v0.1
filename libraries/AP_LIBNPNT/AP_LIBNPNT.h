@@ -21,7 +21,7 @@
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_RTC/AP_RTC.h>
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_KEYSTORE/AP_KEYSTORE.h>
 #include <AP_KEYSTORE/x509_crt.h>

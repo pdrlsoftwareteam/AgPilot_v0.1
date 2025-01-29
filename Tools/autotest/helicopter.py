@@ -417,8 +417,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             3, # p1
@@ -428,7 +428,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(1.0000 * 1e7), # latitude
             int(2.0000 * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def mission_item_takeoff(self, target_system, target_component):
         '''returns a mission_item_int which can be used as takeoff in a mission'''
@@ -436,8 +436,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             1, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF,
             0, # current
             0, # autocontinue
             0, # p1
@@ -447,7 +447,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(1.0000 * 1e7), # latitude
             int(1.0000 * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def mission_item_rtl(self, target_system, target_component):
         '''returns a mission_item_int which can be used as takeoff in a mission'''
@@ -455,8 +455,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             1, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH,
             0, # current
             0, # autocontinue
             0, # p1
@@ -466,7 +466,7 @@ class AutoTestHelicopter(AutoTestCopter):
             0, # latitude
             0, # longitude
             0.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def scurve_nasty_mission(self, target_system=1, target_component=1):
         '''returns a mission which attempts to give the SCurve library
@@ -481,8 +481,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             2, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             3, # p1
@@ -492,7 +492,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(wp2_loc.lat * 1e7), # latitude
             int(wp2_loc.lng * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
         wp5_loc = self.mav.location()
         wp5_offset_n = -20
@@ -503,8 +503,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             5, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            mavutil.mavlink.MAV_CMD_NAV_SPLINE_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_SPLINE_WAYPOINT,
             0, # current
             0, # autocontinue
             3, # p1
@@ -514,7 +514,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(wp5_loc.lat * 1e7), # latitude
             int(wp5_loc.lng * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
         ret = copy.copy([
             # slot 0 is home
@@ -551,8 +551,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             2, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             3, # p1
@@ -562,7 +562,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(wp2_loc.lat * 1e7), # latitude
             int(wp2_loc.lng * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         wp3 = copy.copy(wp2)
         wp3.alt = 40
         wp4 = copy.copy(wp2)
@@ -577,8 +577,8 @@ class AutoTestHelicopter(AutoTestCopter):
             target_system,
             target_component,
             5, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            mavutil.mavlink.MAV_CMD_NAV_SPLINE_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_SPLINE_WAYPOINT,
             0, # current
             0, # autocontinue
             3, # p1
@@ -588,7 +588,7 @@ class AutoTestHelicopter(AutoTestCopter):
             int(wp5_loc.lat * 1e7), # latitude
             int(wp5_loc.lng * 1e7), # longitude
             31.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         wp6 = copy.copy(wp5)
         wp6.alt = 41
         wp7 = copy.copy(wp5)

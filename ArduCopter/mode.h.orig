@@ -80,7 +80,7 @@ public:
     virtual uint32_t wp_distance() const { return 0; }
     virtual float crosstrack_error() const { return 0.0f;}
 
-    // functions to support MAV_CMD_DO_CHANGE_SPEED
+    // functions to support AGPILOT_CMD_DO_CHANGE_SPEED
     virtual bool set_speed_xy(float speed_xy_cms) {return false;}
     virtual bool set_speed_up(float speed_xy_cms) {return false;}
     virtual bool set_speed_down(float speed_xy_cms) {return false;}
@@ -408,7 +408,7 @@ public:
 
     void payload_place_start();
 
-    // for GCS_MAVLink to call:
+    // for GCS_AGPILOTLink to call:
     bool do_guided(const AP_Mission::Mission_Command& cmd);
 
     // Go straight to landing sequence via DO_LAND_START, if succeeds pretend to be Auto RTL mode

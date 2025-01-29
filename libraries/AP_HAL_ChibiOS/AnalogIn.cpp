@@ -29,9 +29,9 @@ extern AP_IOMCU iomcu;
 
 #include "hwdef/common/stm32_util.h"
 
-// MAVLink is included as we send a mavlink message as part of debug,
-// and also use the MAV_POWER flags below in update_power_flags
-#include <GCS_MAVLink/GCS_MAVLink.h>
+// AGPILOTLink is included as we send a mavlink message as part of debug,
+// and also use the AGPILOT_POWER flags below in update_power_flags
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define ANLOGIN_DEBUGGING 0
 
@@ -547,11 +547,11 @@ void AnalogIn::update_power_flags(void)
     */
 #if defined(HAL_GPIO_PIN_VDD_BRICK_VALID)
     if (palReadLine(HAL_GPIO_PIN_VDD_BRICK_VALID) == 1) {
-        flags |= MAV_POWER_STATUS_BRICK_VALID;
+        flags |= AGPILOT_POWER_STATUS_BRICK_VALID;
     }
 #elif defined(HAL_GPIO_PIN_VDD_BRICK_nVALID)
     if (palReadLine(HAL_GPIO_PIN_VDD_BRICK_nVALID) == 0) {
-        flags |= MAV_POWER_STATUS_BRICK_VALID;
+        flags |= AGPILOT_POWER_STATUS_BRICK_VALID;
     }
 #endif
 
@@ -559,17 +559,17 @@ void AnalogIn::update_power_flags(void)
       secondary "brick" power supply valid pin. This is servo rail
       power valid on some boards. Some boards have this active high,
       some active low. Use nVALID for active low, VALID for active
-      high. This maps to the MAV_POWER_STATUS_SERVO_VALID in mavlink
+      high. This maps to the AGPILOT_POWER_STATUS_SERVO_VALID in mavlink
       (as this was first added for older boards that used servo rail
       for backup power)
     */
 #if defined(HAL_GPIO_PIN_VDD_BRICK2_VALID)
     if (palReadLine(HAL_GPIO_PIN_VDD_BRICK_VALID) == 1) {
-        flags |= MAV_POWER_STATUS_SERVO_VALID;
+        flags |= AGPILOT_POWER_STATUS_SERVO_VALID;
     }
 #elif defined(HAL_GPIO_PIN_VDD_BRICK2_nVALID)
     if (palReadLine(HAL_GPIO_PIN_VDD_BRICK2_nVALID) == 0) {
-        flags |= MAV_POWER_STATUS_SERVO_VALID;
+        flags |= AGPILOT_POWER_STATUS_SERVO_VALID;
     }
 #endif
 
@@ -580,15 +580,15 @@ void AnalogIn::update_power_flags(void)
      */
 #if defined(HAL_GPIO_PIN_VBUS_VALID)
     if (palReadLine(HAL_GPIO_PIN_VBUS_VALID) == 1) {
-        flags |= MAV_POWER_STATUS_USB_CONNECTED;
+        flags |= AGPILOT_POWER_STATUS_USB_CONNECTED;
     }
 #elif defined(HAL_GPIO_PIN_VBUS_nVALID)
     if (palReadLine(HAL_GPIO_PIN_VBUS_nVALID) == 0) {
-        flags |= MAV_POWER_STATUS_USB_CONNECTED;
+        flags |= AGPILOT_POWER_STATUS_USB_CONNECTED;
     }
 #elif defined(HAL_GPIO_PIN_VBUS)
     if (palReadLine(HAL_GPIO_PIN_VBUS) == 1) {
-        flags |= MAV_POWER_STATUS_USB_CONNECTED;
+        flags |= AGPILOT_POWER_STATUS_USB_CONNECTED;
     }
 #endif
 
@@ -597,11 +597,11 @@ void AnalogIn::update_power_flags(void)
      */
 #if defined(HAL_GPIO_PIN_VDD_5V_HIPOWER_OC)
     if (palReadLine(HAL_GPIO_PIN_VDD_5V_HIPOWER_OC) == 1) {
-        flags |= MAV_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT;
+        flags |= AGPILOT_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT;
     }
 #elif defined(HAL_GPIO_PIN_VDD_5V_HIPOWER_nOC)
     if (palReadLine(HAL_GPIO_PIN_VDD_5V_HIPOWER_nOC) == 0) {
-        flags |= MAV_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT;
+        flags |= AGPILOT_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT;
     }
 #endif
 
@@ -610,11 +610,11 @@ void AnalogIn::update_power_flags(void)
      */
 #if defined(HAL_GPIO_PIN_VDD_5V_PERIPH_OC)
     if (palReadLine(HAL_GPIO_PIN_VDD_5V_PERIPH_OC) == 1) {
-        flags |= MAV_POWER_STATUS_PERIPH_OVERCURRENT;
+        flags |= AGPILOT_POWER_STATUS_PERIPH_OVERCURRENT;
     }
 #elif defined(HAL_GPIO_PIN_VDD_5V_PERIPH_nOC)
     if (palReadLine(HAL_GPIO_PIN_VDD_5V_PERIPH_nOC) == 0) {
-        flags |= MAV_POWER_STATUS_PERIPH_OVERCURRENT;
+        flags |= AGPILOT_POWER_STATUS_PERIPH_OVERCURRENT;
     }
 #endif
 
@@ -641,7 +641,7 @@ void AnalogIn::update_power_flags(void)
         }
         if (hal.util->get_soft_armed()) {
             // the power status has changed while armed
-            flags |= MAV_POWER_STATUS_CHANGED;
+            flags |= AGPILOT_POWER_STATUS_CHANGED;
         }
         return;
     }
@@ -651,7 +651,7 @@ void AnalogIn::update_power_flags(void)
         _power_flags != flags &&
         hal.util->get_soft_armed()) {
         // the power status has changed while armed
-        flags |= MAV_POWER_STATUS_CHANGED;
+        flags |= AGPILOT_POWER_STATUS_CHANGED;
     }
     _accumulated_power_flags |= flags;
     _power_flags = flags;

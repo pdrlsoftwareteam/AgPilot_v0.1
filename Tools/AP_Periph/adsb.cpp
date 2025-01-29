@@ -67,14 +67,14 @@ void AP_Periph_FW::adsb_update(void)
         return;
     }
 
-    // look for incoming MAVLink ADSB_VEHICLE packets
+    // look for incoming AGPILOTLink ADSB_VEHICLE packets
     const uint16_t nbytes = uart->available();
     for (uint16_t i=0; i<nbytes; i++) {
         const uint8_t c = (uint8_t)uart->read();
 
         // Try to get a new message
-        if (mavlink_parse_char(MAVLINK_COMM_0, c, &adsb.msg, &adsb.status)) {
-            if (adsb.msg.msgid == MAVLINK_MSG_ID_ADSB_VEHICLE) {
+        if (mavlink_parse_char(AGPILOTLINK_COMM_0, c, &adsb.msg, &adsb.status)) {
+            if (adsb.msg.msgid == AGPILOTLINK_MSG_ID_ADSB_VEHICLE) {
                 // decode and send as UAVCAN TrafficReport
                 static mavlink_adsb_vehicle_t msg;
                 mavlink_msg_adsb_vehicle_decode(&adsb.msg, &msg);

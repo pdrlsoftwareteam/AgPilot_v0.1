@@ -40,9 +40,9 @@ local VERBOSE_MODE = 1 -- 0 to suppress all GCS messages,
 local MSG_NORMAL   = 1
 local MSG_DEBUG    = 2
 
--- MAVLink values
-local MAV_SEVERITY_WARNING = 4
-local MAV_SEVERITY_INFO    = 6
+-- AGPILOTLink values
+local AGPILOT_SEVERITY_WARNING = 4
+local AGPILOT_SEVERITY_INFO    = 6
 
 -- mathematical/physical constants
 local G          = -9.81 -- m/s/s
@@ -71,7 +71,7 @@ local function gcs_msg(msg_type, severity, txt)
     -- allow just a string to be passed for simple/routine messages
         txt      = msg_type
         msg_type = MSG_NORMAL
-        severity = MAV_SEVERITY_INFO
+        severity = AGPILOT_SEVERITY_INFO
     end
     if type(severity) == 'string' then
     -- allow just severity and string to be passed for normal messages
@@ -114,7 +114,7 @@ function standby()
         -- if ROUGH_SPEED param not set or invalid, use half of WP_SPEED
         if wp_speed_rough == 0 or wp_speed_rough > wp_speed_normal then
             wp_speed_rough = wp_speed_normal / 2
-            gcs_msg(MAV_SEVERITY_WARNING, 'ROUGH_SPEED invalid, using half WP_SPEED')
+            gcs_msg(AGPILOT_SEVERITY_WARNING, 'ROUGH_SPEED invalid, using half WP_SPEED')
         end
 
         last_g_z = 0
@@ -124,7 +124,7 @@ function standby()
 end
 
 function initiate_rough_speed()
-    gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Slowing for rough terrain')
+    gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Slowing for rough terrain')
     vehicle:set_desired_speed(wp_speed_rough)
     last_g_z   = 0
     timeout_ms = millis() + rough_terrain_timeout_ms
@@ -134,7 +134,7 @@ function initiate_rough_speed()
 end
 
 function initiate_normal_speed()
-    gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Resuming normal speed')
+    gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Resuming normal speed')
     vehicle:set_desired_speed(wp_speed_normal)
     last_g_z = 0
     return do_normal_speed, RUN_INTERVAL_MS
@@ -153,12 +153,12 @@ function do_normal_speed()
     last_g_z = g_z
 
     if impulse_g_z > impulse_gz_threshold then  -- slow down
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_INFO, string.format('Impulse - %.2f Gz', impulse_g_z))
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_INFO, string.format('Impulse - %.2f Gz', impulse_g_z))
         return initiate_rough_speed, RUN_INTERVAL_MS
     end
 
     if gyro_rate > gyro_rate_threshold then  -- slow down
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_INFO, string.format('Transient - %.2f deg/s', gyro_rate))
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_INFO, string.format('Transient - %.2f deg/s', gyro_rate))
         return initiate_rough_speed, RUN_INTERVAL_MS
     end
 
@@ -183,21 +183,21 @@ function do_rough_speed()
     local now = millis()
 
     if impulse_g_z > impulse_gz_threshold * impulse_gain then  -- stay slow
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_INFO, string.format('Timer reset - %.2fGz', impulse_g_z))
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_INFO, string.format('Timer reset - %.2fGz', impulse_g_z))
         max_g_z = 0
         timeout_ms = now + rough_terrain_timeout_ms
         return do_rough_speed, RUN_INTERVAL_MS
     end
 
     if gyro_rate > gyro_rate_threshold * gyro_gain then  -- stay slow
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_INFO, string.format('Timer reset - %.2f deg/s', gyro_rate))
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_INFO, string.format('Timer reset - %.2f deg/s', gyro_rate))
         max_gyro_rate = 0
         timeout_ms = now + rough_terrain_timeout_ms
         return do_rough_speed, RUN_INTERVAL_MS
     end
 
     if now > timeout_ms then  -- no longer in rough terrain
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_INFO, string.format('Max - %.2fGz ... %.2f deg/s', max_g_z, max_gyro_rate))
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_INFO, string.format('Max - %.2fGz ... %.2f deg/s', max_g_z, max_gyro_rate))
         return initiate_normal_speed, RUN_INTERVAL_MS
     end
 

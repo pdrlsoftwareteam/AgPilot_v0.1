@@ -14,7 +14,7 @@
 */
 
 #include "AP_OpticalFlow_Calibrator.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 const uint32_t AP_OPTICALFLOW_CAL_TIMEOUT_SEC = 120;        // calibration timesout after 120 seconds
@@ -43,7 +43,7 @@ void AP_OpticalFlow_Calibrator::start()
     _cal_data[0].num_samples = 0;
     _cal_data[1].num_samples = 0;
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "FlowCal: Started");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "FlowCal: Started");
 }
 
 void AP_OpticalFlow_Calibrator::stop()
@@ -55,7 +55,7 @@ void AP_OpticalFlow_Calibrator::stop()
 
     _cal_state = CalState::NOT_STARTED;
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "FlowCal: Stopped");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "FlowCal: Stopped");
 }
 
 // update the state machine and calculate scaling
@@ -75,7 +75,7 @@ bool AP_OpticalFlow_Calibrator::update()
             // while collecting samples display percentage complete
             if (now_ms - _last_report_ms > AP_OPTICALFLOW_CAL_STATUSINTERVAL_SEC * 1000UL) {
                 _last_report_ms = now_ms;
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s x:%d%% y:%d%%",
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s x:%d%% y:%d%%",
                                 prefix_str,
                                 (int)((_cal_data[0].num_samples * 100.0 / AP_OPTICALFLOW_CAL_MAX_SAMPLES)),
                                 (int)((_cal_data[1].num_samples * 100.0 / AP_OPTICALFLOW_CAL_MAX_SAMPLES)));
@@ -84,13 +84,13 @@ bool AP_OpticalFlow_Calibrator::update()
             // advance state once sample buffers are full
             if (sample_buffers_full()) {
                 _cal_state = CalState::READY_TO_CALIBRATE;
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s samples collected", prefix_str);
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s samples collected", prefix_str);
             }
         }
 
         // check for timeout
         if (now_ms - _start_time_ms > AP_OPTICALFLOW_CAL_TIMEOUT_SEC * 1000UL) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s timeout", prefix_str);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s timeout", prefix_str);
             _cal_state = CalState::FAILED;
         }
     }
@@ -186,7 +186,7 @@ bool AP_OpticalFlow_Calibrator::calc_scalars(uint8_t axis, float& scalar, float&
     // this should never fail because this method should only be called once the sample buffer is full
     const uint8_t num_samples = _cal_data[axis].num_samples;
     if (num_samples == 0) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s failed because no samples", prefix_str);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s failed because no samples", prefix_str);
         return false;
     }
 
@@ -201,7 +201,7 @@ bool AP_OpticalFlow_Calibrator::calc_scalars(uint8_t axis, float& scalar, float&
     if (is_zero(total_abs_residual)) {
         scalar = 1.0;
         fitness = 0;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s perfect scalar%s of 1.0", prefix_str, axis_str);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s perfect scalar%s of 1.0", prefix_str, axis_str);
         return true;
     }
 
@@ -213,7 +213,7 @@ bool AP_OpticalFlow_Calibrator::calc_scalars(uint8_t axis, float& scalar, float&
         if (!calc_sample_best_scalar(samplei, sample_best_scalar)) {
             // failed to find the best scalar for a single sample
             // this should never happen because of checks when capturing samples
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s failed because of zero flow rate", prefix_str);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s failed because of zero flow rate", prefix_str);
             INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
             return false;
         }
@@ -223,18 +223,18 @@ bool AP_OpticalFlow_Calibrator::calc_scalars(uint8_t axis, float& scalar, float&
 
     // check for out of range results
     if (best_scalar_total < AP_OPTICALFLOW_CAL_SCALE_MIN) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s scalar%s:%4.3f too low (<%3.1f)", prefix_str, axis_str, (double)best_scalar_total, (double)AP_OPTICALFLOW_CAL_SCALE_MIN);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s scalar%s:%4.3f too low (<%3.1f)", prefix_str, axis_str, (double)best_scalar_total, (double)AP_OPTICALFLOW_CAL_SCALE_MIN);
         return false;
     }
     if (best_scalar_total > AP_OPTICALFLOW_CAL_SCALE_MAX) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s scalar%s:%4.3f too high (>%3.1f)", prefix_str, axis_str, (double)best_scalar_total, (double)AP_OPTICALFLOW_CAL_SCALE_MAX);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s scalar%s:%4.3f too high (>%3.1f)", prefix_str, axis_str, (double)best_scalar_total, (double)AP_OPTICALFLOW_CAL_SCALE_MAX);
         return false;
     }
 
     // check for poor fitness
     float fitness_new = calc_mean_squared_residuals(axis, best_scalar_total);
     if (fitness_new > AP_OPTICALFLOW_CAL_FITNESS_THRESH) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s scalar%s:%4.3f fit:%4.3f too high (>%3.1f)", prefix_str, axis_str, (double)scalar, (double)fitness_new, (double)AP_OPTICALFLOW_CAL_FITNESS_THRESH);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s scalar%s:%4.3f fit:%4.3f too high (>%3.1f)", prefix_str, axis_str, (double)scalar, (double)fitness_new, (double)AP_OPTICALFLOW_CAL_FITNESS_THRESH);
         return false;
     }
 
@@ -243,14 +243,14 @@ bool AP_OpticalFlow_Calibrator::calc_scalars(uint8_t axis, float& scalar, float&
     if (fitness_new <= fitness_orig) {
         scalar = best_scalar_total;
         fitness = fitness_new;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s scalar%s:%4.3f fit:%4.2f", prefix_str, axis_str, (double)scalar, (double)fitness);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s scalar%s:%4.3f fit:%4.2f", prefix_str, axis_str, (double)scalar, (double)fitness);
         return true;
     }
 
     // failed to find a better scalar than 1.0
     scalar = 1.0;
     fitness = fitness_orig;
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s no better scalar%s:%4.3f (fit:%4.3f > orig:%4.3f)", prefix_str, axis_str, (double)best_scalar_total, (double)fitness_new, (double)fitness_orig);
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "%s no better scalar%s:%4.3f (fit:%4.3f > orig:%4.3f)", prefix_str, axis_str, (double)best_scalar_total, (double)fitness_new, (double)fitness_orig);
     return false;
 }
 

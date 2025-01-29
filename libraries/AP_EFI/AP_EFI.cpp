@@ -25,7 +25,7 @@
 #include "AP_EFI_Scripting.h"
 
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if HAL_MAX_CAN_PROTOCOL_DRIVERS
 #include <AP_CANManager/AP_CANManager.h>
@@ -118,7 +118,7 @@ void AP_EFI::init(void)
 #endif
         break;
     default:
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Unknown EFI type");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Unknown EFI type");
         break;
     }
 }

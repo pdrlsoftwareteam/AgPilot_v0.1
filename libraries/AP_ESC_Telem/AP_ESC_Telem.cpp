@@ -15,7 +15,7 @@
 
 #include "AP_ESC_Telem.h"
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 #if HAL_WITH_ESC_TELEM
@@ -32,13 +32,13 @@ extern const AP_HAL::HAL& hal;
 // table of user settable parameters
 const AP_Param::GroupInfo AP_ESC_Telem::var_info[] = {
 
-    // @Param: _MAV_OFS
+    // @Param: _AGPILOT_OFS
     // @DisplayName: ESC Telemetry mavlink offset
-    // @Description: Offset to apply to ESC numbers when reporting as ESC_TELEMETRY packets over MAVLink. This allows high numbered motors to be displayed as low numbered ESCs for convenience on GCS displays. A value of 4 would send ESC on output 5 as ESC number 1 in ESC_TELEMETRY packets
+    // @Description: Offset to apply to ESC numbers when reporting as ESC_TELEMETRY packets over AGPILOTLink. This allows high numbered motors to be displayed as low numbered ESCs for convenience on GCS displays. A value of 4 would send ESC on output 5 as ESC number 1 in ESC_TELEMETRY packets
     // @Increment: 1
     // @Range: 0 31
     // @User: Standard
-    AP_GROUPINFO("_MAV_OFS", 1, AP_ESC_Telem, mavlink_offset, 0),
+    AP_GROUPINFO("_AGPILOT_OFS", 1, AP_ESC_Telem, mavlink_offset, 0),
     
     AP_GROUPEND
 };
@@ -293,7 +293,7 @@ bool AP_ESC_Telem::get_usage_seconds(uint8_t esc_index, uint32_t& usage_s) const
     return true;
 }
 
-// send ESC telemetry messages over MAVLink
+// send ESC telemetry messages over AGPILOTLink
 void AP_ESC_Telem::send_esc_telemetry_mavlink(uint8_t mav_chan)
 {
 #if HAL_GCS_ENABLED
@@ -356,14 +356,14 @@ void AP_ESC_Telem::send_esc_telemetry_mavlink(uint8_t mav_chan)
         }
 
         // make sure a msg hasn't been extended
-        static_assert(MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_5_TO_8_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_9_TO_12_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_13_TO_16_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_17_TO_20_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_21_TO_24_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_21_TO_24_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_25_TO_28_LEN &&
-                      MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == MAVLINK_MSG_ID_ESC_TELEMETRY_29_TO_32_LEN,
+        static_assert(AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_5_TO_8_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_9_TO_12_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_13_TO_16_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_17_TO_20_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_21_TO_24_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_21_TO_24_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_25_TO_28_LEN &&
+                      AGPILOTLINK_MSG_ID_ESC_TELEMETRY_1_TO_4_LEN == AGPILOTLINK_MSG_ID_ESC_TELEMETRY_29_TO_32_LEN,
                       "telem messages not compatible");
 
         const mavlink_channel_t chan = (mavlink_channel_t)mav_chan;

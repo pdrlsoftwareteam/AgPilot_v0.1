@@ -37,7 +37,7 @@ public:
     virtual bool init() override;
 
     static AP_CRSF_Telem *get_singleton(void);
-    void queue_message(MAV_SEVERITY severity, const char *text) override;
+    void queue_message(AGPILOT_SEVERITY severity, const char *text) override;
 
     static const uint8_t PASSTHROUGH_STATUS_TEXT_FRAME_MAX_SIZE = 50U;
     static const uint8_t PASSTHROUGH_MULTI_PACKET_FRAME_MAX_SIZE = 9U;

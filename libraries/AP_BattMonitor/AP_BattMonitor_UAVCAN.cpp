@@ -8,7 +8,7 @@
 
 #include <AP_CANManager/AP_CANManager.h>
 #include <AP_Common/AP_Common.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_UAVCAN/AP_UAVCAN.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
@@ -387,7 +387,7 @@ void AP_BattMonitor_UAVCAN::mppt_set_powered_state(bool power_on)
 
     _mppt.powered_state = power_on;
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Battery %u: powering %s%s", (unsigned)_instance+1, _mppt.powered_state ? "ON" : "OFF",
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Battery %u: powering %s%s", (unsigned)_instance+1, _mppt.powered_state ? "ON" : "OFF",
         (_mppt.powered_state_remote_ms == 0) ? "" : " Retry");
 
     // set up a request /w a status callback
@@ -444,7 +444,7 @@ void AP_BattMonitor_UAVCAN::mppt_report_faults(const uint8_t instance, const uin
 {
     // handle recovery
     if (fault_flags == 0) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Battery %u: OK", (unsigned)instance+1);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Battery %u: OK", (unsigned)instance+1);
         return;
     }
 
@@ -453,7 +453,7 @@ void AP_BattMonitor_UAVCAN::mppt_report_faults(const uint8_t instance, const uin
         // this loop is to generate multiple messages if there are multiple concurrent faults, but also run once if there are no faults
         if ((fault_bit & fault_flags) != 0) {
             const MPPT_FaultFlags err = (MPPT_FaultFlags)fault_bit;
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Battery %u: %s", (unsigned)instance+1, mppt_fault_string(err));
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Battery %u: %s", (unsigned)instance+1, mppt_fault_string(err));
         }
     }
 }
@@ -475,7 +475,7 @@ const char* AP_BattMonitor_UAVCAN::mppt_fault_string(const MPPT_FaultFlags fault
 }
 #endif
 
-// return mavlink fault bitmask (see MAV_BATTERY_FAULT enum)
+// return mavlink fault bitmask (see AGPILOT_BATTERY_FAULT enum)
 uint32_t AP_BattMonitor_UAVCAN::get_mavlink_fault_bitmask() const
 {
     // return immediately if not mppt or no faults
@@ -486,13 +486,13 @@ uint32_t AP_BattMonitor_UAVCAN::get_mavlink_fault_bitmask() const
     // convert mppt fault bitmask to mavlink fault bitmask
     uint32_t mav_fault_bitmask = 0;
     if ((_mppt.fault_flags & (uint8_t)MPPT_FaultFlags::OVER_VOLTAGE) || (_mppt.fault_flags & (uint8_t)MPPT_FaultFlags::UNDER_VOLTAGE)) {
-        mav_fault_bitmask |= MAV_BATTERY_FAULT_INCOMPATIBLE_VOLTAGE;
+        mav_fault_bitmask |= AGPILOT_BATTERY_FAULT_INCOMPATIBLE_VOLTAGE;
     }
     if (_mppt.fault_flags & (uint8_t)MPPT_FaultFlags::OVER_CURRENT) {
-        mav_fault_bitmask |= MAV_BATTERY_FAULT_OVER_CURRENT;
+        mav_fault_bitmask |= AGPILOT_BATTERY_FAULT_OVER_CURRENT;
     }
     if (_mppt.fault_flags & (uint8_t)MPPT_FaultFlags::OVER_TEMPERATURE) {
-        mav_fault_bitmask |= MAV_BATTERY_FAULT_OVER_TEMPERATURE;
+        mav_fault_bitmask |= AGPILOT_BATTERY_FAULT_OVER_TEMPERATURE;
     }
     return mav_fault_bitmask;
 }

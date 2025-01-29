@@ -22,7 +22,7 @@
 
 #if AP_AIRSPEED_SDP3X_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Baro/AP_Baro.h>
 
 #include <stdio.h>
@@ -131,7 +131,7 @@ bool AP_Airspeed_SDP3X::init()
             c = '3';
             break;
         }
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "SDP3%c[%u]: Found bus %u addr 0x%02x scale=%u",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "SDP3%c[%u]: Found bus %u addr 0x%02x scale=%u",
                       get_instance(),
                       c, get_bus(), addresses[i], _scale);
 #endif

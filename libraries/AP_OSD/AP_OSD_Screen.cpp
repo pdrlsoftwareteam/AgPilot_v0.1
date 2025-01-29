@@ -46,7 +46,7 @@
 #include <AP_Filesystem/AP_Filesystem.h>
 
 #include <ctype.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AC_Fence/AC_Fence.h>
 
 const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {

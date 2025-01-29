@@ -14,7 +14,7 @@
  */
 
 #include <AP_RSSI/AP_RSSI.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <RC_Channel/RC_Channel.h>
 
 #include <utility>
@@ -123,7 +123,7 @@ AP_RSSI *AP_RSSI::get_singleton()
 void AP_RSSI::init()
 {
     // a pin for reading the receiver RSSI voltage. The scaling by 0.25 
-    // is to take the 0 to 1024 range down to an 8 bit range for MAVLink    
+    // is to take the 0 to 1024 range down to an 8 bit range for AGPILOTLink    
     rssi_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
 }
 
@@ -225,7 +225,7 @@ float AP_RSSI::read_pwm_pin_rssi()
 
 float AP_RSSI::read_telemetry_radio_rssi()
 {
-    return GCS_MAVLINK::telemetry_radio_rssi();
+    return GCS_AGPILOTLINK::telemetry_radio_rssi();
 }
 
 // Scale and constrain a float rssi value to 0.0 to 1.0 range 

@@ -532,7 +532,7 @@ def start_SITL(binary,
                 cmd.extend(['--defaults', reltopdir(defaults_filepath)])
         if unhide_parameters:
             cmd.extend(['--unhide-groups'])
-        # somewhere for MAVProxy to connect to:
+        # somewhere for AGPILOTProxy to connect to:
         cmd.append('--uartC=tcp:2')
         if not enable_fgview_output:
             cmd.append("--disable-fgview")
@@ -607,21 +607,21 @@ def start_SITL(binary,
 
 def mavproxy_cmd():
     """return path to which mavproxy to use"""
-    return os.getenv('MAVPROXY_CMD', 'mavproxy.py')
+    return os.getenv('AGPILOTPROXY_CMD', 'mavproxy.py')
 
 
-def MAVProxy_version():
+def AGPILOTProxy_version():
     """return the current version of mavproxy as a tuple e.g. (1,8,8)"""
     command = "%s --version" % mavproxy_cmd()
     output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).communicate()[0]
     output = output.decode('ascii')
-    match = re.search("MAVProxy Version: ([0-9]+)[.]([0-9]+)[.]([0-9]+)", output)
+    match = re.search("AGPILOTProxy Version: ([0-9]+)[.]([0-9]+)[.]([0-9]+)", output)
     if match is None:
-        raise ValueError("Unable to determine MAVProxy version from (%s)" % output)
+        raise ValueError("Unable to determine AGPILOTProxy version from (%s)" % output)
     return int(match.group(1)), int(match.group(2)), int(match.group(3))
 
 
-def start_MAVProxy_SITL(atype,
+def start_AGPILOTProxy_SITL(atype,
                         aircraft=None,
                         setup=False,
                         master='tcp:127.0.0.1:5762',

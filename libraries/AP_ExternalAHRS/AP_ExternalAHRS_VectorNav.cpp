@@ -25,7 +25,7 @@
 #include <AP_Compass/AP_Compass.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Common/NMEA.h>
 #include <stdio.h>
@@ -173,7 +173,7 @@ AP_ExternalAHRS_VectorNav::AP_ExternalAHRS_VectorNav(AP_ExternalAHRS *_frontend,
     auto &sm = AP::serialmanager();
     uart = sm.find_serial(AP_SerialManager::SerialProtocol_AHRS, 0);
     if (!uart) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "ExternalAHRS no UART");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "ExternalAHRS no UART");
         return;
     }
     baudrate = sm.find_baudrate(AP_SerialManager::SerialProtocol_AHRS, 0);
@@ -191,7 +191,7 @@ AP_ExternalAHRS_VectorNav::AP_ExternalAHRS_VectorNav(AP_ExternalAHRS *_frontend,
     if (!hal.scheduler->thread_create(FUNCTOR_BIND_MEMBER(&AP_ExternalAHRS_VectorNav::update_thread, void), "AHRS", 2048, AP_HAL::Scheduler::PRIORITY_SPI, 0)) {
         AP_HAL::panic("Failed to start ExternalAHRS update thread");
     }
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "ExternalAHRS initialised");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "ExternalAHRS initialised");
 }
 
 /*
@@ -765,7 +765,7 @@ void AP_ExternalAHRS_VectorNav::get_filter_status(nav_filter_status &status) con
 }
 
 // send an EKF_STATUS message to GCS
-void AP_ExternalAHRS_VectorNav::send_status_report(GCS_MAVLINK &link) const
+void AP_ExternalAHRS_VectorNav::send_status_report(GCS_AGPILOTLINK &link) const
 {
     if (!last_pkt1) {
         return;

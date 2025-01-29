@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <StorageManager/StorageManager.h>
 #include <AP_Notify/AP_Notify.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 // start of 12 byte CPU ID
 #ifndef UDID_START
@@ -33,7 +33,7 @@ extern const AP_HAL::HAL& hal;
 // This is for debugging issues with frequency hopping and synchronisation.
 #define DebugPrintf(level, fmt, args...)   do { if (AP_Radio_beken::radio_singleton && ((level) <= AP_Radio_beken::radio_singleton->get_debug_level())) { printf(fmt, ##args); }} while (0)
 // Output debug information on the mavlink to the UART connected to the WiFi, wrapped in MavLink packets
-#define DebugMavlink(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(MAV_SEVERITY_INFO, fmt, ##args); }} while (0)
+#define DebugMavlink(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ##args); }} while (0)
 
 
 #if SUPPORT_BK_DEBUG_PINS

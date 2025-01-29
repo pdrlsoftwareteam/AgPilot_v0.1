@@ -27,7 +27,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 
@@ -817,7 +817,7 @@ const Location post_origin {
     Location::AltFrame::ABSOLUTE
 };
 
-/* report SITL state via MAVLink SIMSTATE*/
+/* report SITL state via AGPILOTLink SIMSTATE*/
 void SIM::simstate_send(mavlink_channel_t chan) const
 {
     float yaw;
@@ -842,7 +842,7 @@ void SIM::simstate_send(mavlink_channel_t chan) const
                               state.longitude*1.0e7);
 }
 
-/* report SITL state via MAVLink SIM_STATE */
+/* report SITL state via AGPILOTLink SIM_STATE */
 void SIM::sim_state_send(mavlink_channel_t chan) const
 {
     // convert to same conventions as DCM

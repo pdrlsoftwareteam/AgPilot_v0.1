@@ -5,7 +5,7 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_GPS/AP_GPS.h>
@@ -97,7 +97,7 @@ void loop(void)
     }
 }
 
-const struct AP_Param::GroupInfo        GCS_MAVLINK_Parameters::var_info[] = {
+const struct AP_Param::GroupInfo        GCS_AGPILOTLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 GCS_Dummy _gcs;

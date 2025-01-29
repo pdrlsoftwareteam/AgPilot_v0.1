@@ -44,6 +44,6 @@ skyviperf412_bl.bin:
 When building a ChibiOS based build, if there is a corresponding
 bootloader in Tools/bootloaders for the board then that bootloader
 will be included as a compressed file in ROMFS. You can then ask
-ArduPilot to update the bootloader using the MAVLink command
-MAV_CMD_FLASH_BOOTLOADER command using a param5 magic value of 290876
+ArduPilot to update the bootloader using the AGPILOTLink command
+AGPILOT_CMD_FLASH_BOOTLOADER command using a param5 magic value of 290876
 

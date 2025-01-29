@@ -19,7 +19,7 @@
 #include "SIM_Helicopter.h"
 
 #include <stdio.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 namespace SITL {
 

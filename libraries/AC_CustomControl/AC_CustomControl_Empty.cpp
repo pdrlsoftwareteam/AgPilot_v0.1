@@ -2,7 +2,7 @@
 
 #if CUSTOMCONTROL_EMPTY_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // table of user settable parameters
 const AP_Param::GroupInfo AC_CustomControl_Empty::var_info[] = {
@@ -57,7 +57,7 @@ Vector3f AC_CustomControl_Empty::update(void)
     // arducopter main attitude controller already runned
     // we don't need to do anything else
 
-    gcs().send_text(MAV_SEVERITY_INFO, "empty custom controller working");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "empty custom controller working");
 
     // return what arducopter main controller outputted
     return Vector3f(_motors->get_roll(), _motors->get_pitch(), _motors->get_yaw());

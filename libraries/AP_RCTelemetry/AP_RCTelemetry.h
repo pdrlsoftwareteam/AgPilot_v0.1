@@ -17,7 +17,7 @@
 #include <AP_HAL/Semaphores.h>
 #include <AP_HAL/utility/RingBuffer.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define TELEM_PAYLOAD_STATUS_CAPACITY          5 // size of the message buffer queue (max number of messages waiting to be sent)
 
@@ -34,7 +34,7 @@ public:
     CLASS_NO_COPY(AP_RCTelemetry);
 
     // add statustext message to message queue
-    virtual void queue_message(MAV_SEVERITY severity, const char *text);
+    virtual void queue_message(AGPILOT_SEVERITY severity, const char *text);
 
     // scheduler entry helpers
     void enable_scheduler_entry(const uint8_t slot) {
@@ -66,7 +66,7 @@ public:
     virtual void reset_scheduler_entry_min_periods() {}
 
     // update error mask of sensors and subsystems. The mask uses the
-    // MAV_SYS_STATUS_* values from mavlink. If a bit is set then it
+    // AGPILOT_SYS_STATUS_* values from mavlink. If a bit is set then it
     // indicates that the sensor or subsystem is present but not
     // functioning correctly
     uint32_t sensor_status_flags() const;

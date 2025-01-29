@@ -59,7 +59,7 @@
   <param name="WPNAV_SPEED_DN" value="150.0" />
   <param name="WP_YAW_BEHAVIOR" value="2.0" />
   <param name="RC11_REV" value="1.0" />
-  <param name="SYSID_THISMAV" value="1.0" />
+  <param name="SYSID_THISAGPILOT" value="1.0" />
   <param name="SR0_EXTRA1" value="10.0" />
   <param name="SR0_EXTRA2" value="10.0" />
   <param name="ACRO_BAL_PITCH" value="200.0" />

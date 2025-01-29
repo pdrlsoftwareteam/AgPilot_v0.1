@@ -20,7 +20,7 @@
 
 #if HAL_SIM_PS_LIGHTWARE_SF45B_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 #include <errno.h>
 
@@ -59,7 +59,7 @@ void PS_LightWare_SF45B::send(const char *data, uint32_t len)
 
 void PS_LightWare_SF45B::handle_message()
 {
-    // GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Got message %u", (unsigned)_msg.packed_msgstream.msg.msgid);
+    // GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Got message %u", (unsigned)_msg.packed_msgstream.msg.msgid);
     switch (MessageID(_msg.packed_msgstream.msg.msgid)) {
     case MessageID::STREAM: {
         stream = _msg.packed_msgstream.msg.stream;
@@ -129,11 +129,11 @@ void PS_LightWare_SF45B::update_input()
         const uint16_t got_checksum = UINT16_VALUE(uint8_t(_msg.buffer[want_len-1]), uint8_t(_msg.buffer[want_len-2]));
         const uint16_t calc_checksum = msg_checksum();
         if (calc_checksum == got_checksum) {
-            // GCS_SEND_TEXT(MAV_SEVERITY_INFO, "sim-SF45B: Got one (%u)!", _msg.common.msgid);
+            // GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "sim-SF45B: Got one (%u)!", _msg.common.msgid);
             // see if this was a read or a write request..
             handle_message();
         } else {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "sim-SF45B: Bad checksum");
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "sim-SF45B: Bad checksum");
         }
         // consume these bytes
         move_preamble_in_buffer(want_len-1);

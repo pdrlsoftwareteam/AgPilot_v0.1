@@ -25,7 +25,7 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define debug_can(level_debug, fmt, args...) do { AP::can().log_text(level_debug, "TestKDECAN",  fmt, ##args); } while (0)
 extern const AP_HAL::HAL& hal;
@@ -143,7 +143,7 @@ void AP_CANTester_KDECAN::loop(void)
                         && _esc_info[i].enum_timeout_ms >= AP_HAL::millis()) {
                         _esc_info[i].node_id = esc_num;
                         _max_node_id = MAX(_max_node_id, esc_num - 2 + 1);
-                        gcs().send_text(MAV_SEVERITY_ALERT, "KDECANTester: Set node ID %d for ESC %d\n", esc_num, i);
+                        gcs().send_text(AGPILOT_SEVERITY_ALERT, "KDECANTester: Set node ID %d for ESC %d\n", esc_num, i);
                     }
 
                     _esc_info[i].enum_timeout_ms = 0;
@@ -155,7 +155,7 @@ void AP_CANTester_KDECAN::loop(void)
                 }
                 case START_ENUM_OBJ_ADDR: {
                     _esc_info[i].enum_timeout_ms = AP_HAL::millis() + be16toh_ptr(&recv_frame.data[0]);
-                    gcs().send_text(MAV_SEVERITY_ALERT, "KDECANTester: Starting enumeration for ESC %d, timeout %u", i, (unsigned)_esc_info[i].enum_timeout_ms);
+                    gcs().send_text(AGPILOT_SEVERITY_ALERT, "KDECANTester: Starting enumeration for ESC %d, timeout %u", i, (unsigned)_esc_info[i].enum_timeout_ms);
                     i++;
                     continue;
                 }
@@ -193,7 +193,7 @@ void AP_CANTester_KDECAN::loop(void)
                 if (res2 == 1) {
                     i++;
                 } else {
-                    gcs().send_text(MAV_SEVERITY_ALERT, "KDECANTester: Failed to transmit frame Err: %d 0x%lx", res2, (long unsigned)res_frame.id);
+                    gcs().send_text(AGPILOT_SEVERITY_ALERT, "KDECANTester: Failed to transmit frame Err: %d 0x%lx", res2, (long unsigned)res_frame.id);
                 }
             }
         }
@@ -217,7 +217,7 @@ bool AP_CANTester_KDECAN::send_enumeration(uint8_t num)
     if (_esc_info[num].enum_timeout_ms == 0 ||
         AP_HAL::millis() > _esc_info[num].enum_timeout_ms) {
         _esc_info[num].enum_timeout_ms = 0;
-        gcs().send_text(MAV_SEVERITY_ALERT, "KDECANTester: Not running enumeration for ESC %d\n", num);
+        gcs().send_text(AGPILOT_SEVERITY_ALERT, "KDECANTester: Not running enumeration for ESC %d\n", num);
         return false;
     }
 

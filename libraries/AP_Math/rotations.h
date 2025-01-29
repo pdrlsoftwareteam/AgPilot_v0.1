@@ -71,9 +71,9 @@ enum Rotation : uint8_t {
     ROTATION_ROLL_315            = 43,
     ///////////////////////////////////////////////////////////////////////
     // Do not add more rotations without checking that there is not a conflict
-    // with the MAVLink spec. MAV_SENSOR_ORIENTATION is expected to match our
+    // with the AGPILOTLink spec. AGPILOT_SENSOR_ORIENTATION is expected to match our
     // list of rotations here. If a new rotation is added it needs to be added
-    // to the MAVLink messages as well.
+    // to the AGPILOTLink messages as well.
     ///////////////////////////////////////////////////////////////////////
     ROTATION_MAX,
     ROTATION_CUSTOM_OLD          = 100,

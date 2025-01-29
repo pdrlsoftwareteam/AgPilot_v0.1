@@ -29,7 +29,7 @@
 #include <AP_RCProtocol/AP_RCProtocol.h>
 #include "RCInput.h"
 #include "RCInput_RCProtocol.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_DISCO || \
     CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_BLUE || \

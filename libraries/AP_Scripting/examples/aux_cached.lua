@@ -6,8 +6,8 @@
 
 local RATE_HZ = 10
 
-local MAV_SEVERITY_ERROR = 3
-local MAV_SEVERITY_INFO = 6
+local AGPILOT_SEVERITY_ERROR = 3
+local AGPILOT_SEVERITY_INFO = 6
 
 local AUX_FUNCTION_NUM = 302
 
@@ -18,7 +18,7 @@ function update()
    local aux_pos = rc:get_aux_cached(AUX_FUNCTION_NUM)
    if aux_pos ~= last_aux_pos then
       last_aux_pos = aux_pos
-      gcs:send_text(MAV_SEVERITY_INFO, string.format("Aux set to %u", aux_pos))
+      gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("Aux set to %u", aux_pos))
    end
 end
 
@@ -27,7 +27,7 @@ end
 function protected_wrapper()
     local success, err = pcall(update)
     if not success then
-        gcs:send_text(MAV_SEVERITY_ERROR, "Internal Error: " .. err)
+        gcs:send_text(AGPILOT_SEVERITY_ERROR, "Internal Error: " .. err)
         -- when we fault we run the update function again after 1s, slowing it
         -- down a bit so we don't flood the console with errors
         return protected_wrapper, 1000

@@ -25,12 +25,12 @@ class POWRChange(object):
         print("%u: %s" % (time.time(), text))
 
     def bit_description(self, bit_number):
-        if 1 << bit_number not in mavutil.mavlink.enums["MAV_POWER_STATUS"]:
+        if 1 << bit_number not in mavutil.mavlink.enums["AGPILOT_POWER_STATUS"]:
             return "UNKNOWN_BIT[%u]" % bit_number
 
-        name = mavutil.mavlink.enums["MAV_POWER_STATUS"][1 << bit_number].name
+        name = mavutil.mavlink.enums["AGPILOT_POWER_STATUS"][1 << bit_number].name
         # return name with common prefix removed:
-        return name[len("MAV_POWER_STATUS_"):]
+        return name[len("AGPILOT_POWER_STATUS_"):]
 
     def run(self):
 

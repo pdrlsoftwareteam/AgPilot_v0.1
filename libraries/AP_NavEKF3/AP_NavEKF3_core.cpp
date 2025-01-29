@@ -2,7 +2,7 @@
 
 #include "AP_NavEKF3.h"
 #include "AP_NavEKF3_core.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_DAL/AP_DAL.h>
@@ -56,11 +56,11 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
             if (now - lastInitFailReport_ms > 10000) {
                 lastInitFailReport_ms = now;
                 // provide an escalating series of messages
-                MAV_SEVERITY severity = MAV_SEVERITY_INFO;
+                AGPILOT_SEVERITY severity = AGPILOT_SEVERITY_INFO;
                 if (now > 30000) {
-                    severity = MAV_SEVERITY_ERROR;
+                    severity = AGPILOT_SEVERITY_ERROR;
                 } else if (now > 15000) {
-                    severity = MAV_SEVERITY_WARNING;
+                    severity = AGPILOT_SEVERITY_WARNING;
                 }
                 GCS_SEND_TEXT(severity, "EKF3 waiting for GPS config data");
             }
@@ -167,14 +167,14 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     if ((yawEstimator == nullptr) && (frontend->_gsfRunMask & (1U<<core_index))) {
         // check if there is enough memory to create the EKF-GSF object
         if (dal.available_memory() < sizeof(EKFGSF_yaw) + 1024) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 IMU%u GSF: not enough memory",(unsigned)imu_index);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 IMU%u GSF: not enough memory",(unsigned)imu_index);
             return false;
         }
 
         // try to instantiate
         yawEstimator = new EKFGSF_yaw();
         if (yawEstimator == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "EKF3 IMU%uGSF: allocation failed",(unsigned)imu_index);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "EKF3 IMU%uGSF: allocation failed",(unsigned)imu_index);
             return false;
         }
     }
@@ -587,7 +587,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
         inactiveBias[i].accel_bias.zero();
     }
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "EKF3 IMU%u initialised",(unsigned)imu_index);
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "EKF3 IMU%u initialised",(unsigned)imu_index);
 
     // we initially return false to wait for the IMU buffer to fill
     return false;
@@ -739,7 +739,7 @@ void NavEKF3_core::UpdateFilter(bool predict)
         dal.millis() - last_filter_ok_ms > 5000 &&
         !dal.get_armed()) {
         // we've been unhealthy for 5 seconds after being healthy, reset the filter
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF3 IMU%u forced reset",(unsigned)imu_index);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "EKF3 IMU%u forced reset",(unsigned)imu_index);
         last_filter_ok_ms = 0;
         statesInitialised = false;
         InitialiseFilterBootstrap();

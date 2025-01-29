@@ -21,7 +21,7 @@
 #include <AP_CANManager/AP_CANManager.h>
 #include <AP_UAVCAN/AP_UAVCAN.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <ardupilot/equipment/proximity_sensor/Proximity.hpp>
 
@@ -105,12 +105,12 @@ AP_Proximity_DroneCAN* AP_Proximity_DroneCAN::get_uavcan_backend(AP_UAVCAN* ap_u
                 if (driver == nullptr) {
                     break;
                 }
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Prx[%u]: added DroneCAN node %u addr %u",
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Prx[%u]: added DroneCAN node %u addr %u",
                                 unsigned(i), unsigned(node_id), unsigned(address));
 
                 if (is_zero(prx->params[i].max_m) && is_zero(prx->params[i].min_m)) {
                     // GCS reporting will be incorrect if min/max are not set
-                    GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "Configure PRX%u_MIN and PRX%u_MAX",
+                    GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "Configure PRX%u_MIN and PRX%u_MAX",
                                 unsigned(i), unsigned(i));
                 }
                 //Assign node id and respective dronecan driver, for identification

@@ -13,7 +13,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_HAL_ESP32.h"
 #include "RCInput.h"
@@ -121,7 +121,7 @@ void RCInput::_timer_tick(void)
 #ifndef HAL_NO_UARTDRIVER
     if (rc_protocol && rc_protocol != last_protocol) {
         last_protocol = rc_protocol;
-        gcs().send_text(MAV_SEVERITY_DEBUG, "RCInput: decoding %s", last_protocol);
+        gcs().send_text(AGPILOT_SEVERITY_DEBUG, "RCInput: decoding %s", last_protocol);
     }
 #endif
 

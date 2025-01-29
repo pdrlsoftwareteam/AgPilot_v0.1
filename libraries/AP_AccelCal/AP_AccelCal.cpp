@@ -17,13 +17,13 @@
 
 #include <stdarg.h>
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define AP_ACCELCAL_POSITION_REQUEST_INTERVAL_MS 1000
 
 #define _printf(fmt, args ...) do {                                     \
         if (_gcs != nullptr) {                                          \
-            _gcs->send_text(MAV_SEVERITY_CRITICAL, fmt, ## args);       \
+            _gcs->send_text(AGPILOT_SEVERITY_CRITICAL, fmt, ## args);       \
         }                                                               \
     } while (0)
 
@@ -183,7 +183,7 @@ void AP_AccelCal::update()
     }
 }
 
-void AP_AccelCal::start(GCS_MAVLINK *gcs)
+void AP_AccelCal::start(GCS_AGPILOTLINK *gcs)
 {
     if (gcs == nullptr || _started) {
         return;
@@ -377,14 +377,14 @@ void AP_AccelCal::handle_command_ack(const mavlink_command_ack_t &packet)
     // fail due to other ACKs floating around the mavlink network.
     // GCSs should be moved to using the non-gcs-snoop method.  As a
     // round-up:
-    // MAVProxy: command=1-6 depending on pose, result=1
+    // AGPILOTProxy: command=1-6 depending on pose, result=1
     // QGC: command=0, result=1
     // MissionPlanner: uses new ACCELCAL_VEHICLE_POS
     if (packet.command > 6) {
         // not an acknowledgement for a vehicle position
         return;
     }
-    if (packet.result != MAV_RESULT_TEMPORARILY_REJECTED) {
+    if (packet.result != AGPILOT_RESULT_TEMPORARILY_REJECTED) {
         // not an acknowledgement for a vehicle position
         return;
     }

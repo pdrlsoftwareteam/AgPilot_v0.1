@@ -20,7 +20,7 @@
 #include <AP_HAL/AP_HAL.h>
 
 #include <AP_HAL/GPIO.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 AP_RPM_Pin::IrqState AP_RPM_Pin::irq_state[RPM_MAX_INSTANCES];
@@ -70,7 +70,7 @@ void AP_RPM_Pin::update(void)
                     AP_HAL::GPIO::INTERRUPT_RISING)) {
                 interrupt_attached = true;
             } else {
-                gcs().send_text(MAV_SEVERITY_WARNING, "RPM: Failed to attach to pin %d", last_pin);
+                gcs().send_text(AGPILOT_SEVERITY_WARNING, "RPM: Failed to attach to pin %d", last_pin);
             }
         }
     }

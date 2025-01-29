@@ -18,7 +18,7 @@
 // https://moderndevice.com/news/calibrating-rev-p-wind-sensor-new-regression/
 
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -66,7 +66,7 @@ void AP_WindVane_ModernDevice::update_speed()
 
 void AP_WindVane_ModernDevice::calibrate()
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "WindVane: rev P. zero wind voltage offset set to %.1f",double(_current_analog_voltage));
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "WindVane: rev P. zero wind voltage offset set to %.1f",double(_current_analog_voltage));
     _frontend._speed_sensor_voltage_offset.set_and_save(_current_analog_voltage);
     _frontend._calibration.set_and_save(0);
 }

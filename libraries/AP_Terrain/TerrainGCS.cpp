@@ -24,8 +24,8 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -198,9 +198,9 @@ void AP_Terrain::get_statistics(uint16_t &pending, uint16_t &loaded) const
  */
 void AP_Terrain::handle_data(mavlink_channel_t chan, const mavlink_message_t &msg)
 {
-    if (msg.msgid == MAVLINK_MSG_ID_TERRAIN_DATA) {
+    if (msg.msgid == AGPILOTLINK_MSG_ID_TERRAIN_DATA) {
         handle_terrain_data(msg);
-    } else if (msg.msgid == MAVLINK_MSG_ID_TERRAIN_CHECK) {
+    } else if (msg.msgid == AGPILOTLINK_MSG_ID_TERRAIN_CHECK) {
         handle_terrain_check(chan, msg);
     }
 }
@@ -286,13 +286,13 @@ void AP_Terrain::handle_terrain_data(const mavlink_message_t &msg)
     }
     struct grid_cache &gcache = cache[i];
     struct grid_block &grid = gcache.grid;
-    uint8_t idx_x = (packet.gridbit / TERRAIN_GRID_BLOCK_MUL_Y) * TERRAIN_GRID_MAVLINK_SIZE;
-    uint8_t idx_y = (packet.gridbit % TERRAIN_GRID_BLOCK_MUL_Y) * TERRAIN_GRID_MAVLINK_SIZE;
-    ASSERT_RANGE(idx_x,0,(TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_MAVLINK_SIZE);
-    ASSERT_RANGE(idx_y,0,(TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_MAVLINK_SIZE);
-    for (uint8_t x=0; x<TERRAIN_GRID_MAVLINK_SIZE; x++) {
-        for (uint8_t y=0; y<TERRAIN_GRID_MAVLINK_SIZE; y++) {
-            grid.height[idx_x+x][idx_y+y] = packet.data[x*TERRAIN_GRID_MAVLINK_SIZE+y];
+    uint8_t idx_x = (packet.gridbit / TERRAIN_GRID_BLOCK_MUL_Y) * TERRAIN_GRID_AGPILOTLINK_SIZE;
+    uint8_t idx_y = (packet.gridbit % TERRAIN_GRID_BLOCK_MUL_Y) * TERRAIN_GRID_AGPILOTLINK_SIZE;
+    ASSERT_RANGE(idx_x,0,(TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_AGPILOTLINK_SIZE);
+    ASSERT_RANGE(idx_y,0,(TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_AGPILOTLINK_SIZE);
+    for (uint8_t x=0; x<TERRAIN_GRID_AGPILOTLINK_SIZE; x++) {
+        for (uint8_t y=0; y<TERRAIN_GRID_AGPILOTLINK_SIZE; y++) {
+            grid.height[idx_x+x][idx_y+y] = packet.data[x*TERRAIN_GRID_AGPILOTLINK_SIZE+y];
         }
     }
     gcache.grid.bitmap |= ((uint64_t)1) << packet.gridbit;

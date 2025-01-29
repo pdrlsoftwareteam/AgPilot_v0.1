@@ -262,7 +262,7 @@ public:
     void Write_Command(const mavlink_command_int_t &packet,
                        uint8_t source_system,
                        uint8_t source_component,
-                       MAV_RESULT result,
+                       AGPILOT_RESULT result,
                        bool was_command_long=false);
     void Write_Mission_Cmd(const AP_Mission &mission,
                                const AP_Mission::Mission_Command &cmd);
@@ -297,7 +297,7 @@ public:
     void flush(void);
 #endif
 
-    void handle_mavlink_msg(class GCS_MAVLINK &, const mavlink_message_t &msg);
+    void handle_mavlink_msg(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
 
     void periodic_tasks(); // may want to split this into GCS/non-GCS duties
 
@@ -430,7 +430,7 @@ private:
     enum class Backend_Type : uint8_t {
         NONE       = 0,
         FILESYSTEM = (1<<0),
-        MAVLINK    = (1<<1),
+        AGPILOTLINK    = (1<<1),
         BLOCK      = (1<<2),
     };
 
@@ -566,7 +566,7 @@ private:
     // start page of log data
     uint32_t _log_data_page;
 
-    GCS_MAVLINK *_log_sending_link;
+    GCS_AGPILOTLINK *_log_sending_link;
     HAL_Semaphore _log_send_sem;
 
     // last time arming failed, for backends
@@ -576,12 +576,12 @@ private:
     // can be used by other subsystems to detect if they should log data
     uint8_t _log_start_count;
 
-    void handle_log_message(class GCS_MAVLINK &, const mavlink_message_t &msg);
+    void handle_log_message(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
 
-    void handle_log_request_list(class GCS_MAVLINK &, const mavlink_message_t &msg);
-    void handle_log_request_data(class GCS_MAVLINK &, const mavlink_message_t &msg);
-    void handle_log_request_erase(class GCS_MAVLINK &, const mavlink_message_t &msg);
-    void handle_log_request_end(class GCS_MAVLINK &, const mavlink_message_t &msg);
+    void handle_log_request_list(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
+    void handle_log_request_data(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
+    void handle_log_request_erase(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
+    void handle_log_request_end(class GCS_AGPILOTLINK &, const mavlink_message_t &msg);
     void handle_log_send_listing(); // handle LISTING state
     void handle_log_sending(); // handle SENDING state
     bool handle_log_send_data(); // send data chunk to client

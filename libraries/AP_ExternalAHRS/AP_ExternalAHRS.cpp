@@ -22,7 +22,7 @@
 
 #if HAL_EXTERNAL_AHRS_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL &hal;
 
@@ -97,7 +97,7 @@ void AP_ExternalAHRS::init(void)
         backend = new AP_ExternalAHRS_LORD(this, state);
         break;
     default:
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Unsupported ExternalAHRS type %u", unsigned(devtype));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Unsupported ExternalAHRS type %u", unsigned(devtype));
         break;
     }
 }
@@ -213,7 +213,7 @@ Vector3f AP_ExternalAHRS::get_accel(void)
 }
 
 // send an EKF_STATUS message to GCS
-void AP_ExternalAHRS::send_status_report(GCS_MAVLINK &link) const
+void AP_ExternalAHRS::send_status_report(GCS_AGPILOTLINK &link) const
 {
     if (backend) {
         backend->send_status_report(link);

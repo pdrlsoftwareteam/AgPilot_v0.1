@@ -25,7 +25,7 @@
 #include <SRV_Channel/SRV_Channel.h>
 #endif
 #ifndef HAL_NO_UARTDRIVER
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #endif
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Math/AP_Math.h>
@@ -580,7 +580,7 @@ void GPIO::timer_tick()
             // check. This is not really an internal error, but we use
             // INTERNAL_ERROR() to get the reporting mechanism
 #ifndef HAL_NO_UARTDRIVER
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR,"ISR flood on pin %u", _gpio_tab[i].pin_num);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR,"ISR flood on pin %u", _gpio_tab[i].pin_num);
 #endif
             INTERNAL_ERROR(AP_InternalError::error_t::gpio_isr);
         }

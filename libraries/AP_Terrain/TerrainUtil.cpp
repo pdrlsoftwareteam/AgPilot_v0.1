@@ -34,8 +34,8 @@ uint8_t AP_Terrain::grid_bitnum(uint8_t idx_x, uint8_t idx_y)
 {    
     ASSERT_RANGE(idx_x,0,27);
     ASSERT_RANGE(idx_y,0,31);
-    uint8_t subgrid_x = idx_x / TERRAIN_GRID_MAVLINK_SIZE;
-    uint8_t subgrid_y = idx_y / TERRAIN_GRID_MAVLINK_SIZE;
+    uint8_t subgrid_x = idx_x / TERRAIN_GRID_AGPILOTLINK_SIZE;
+    uint8_t subgrid_y = idx_y / TERRAIN_GRID_AGPILOTLINK_SIZE;
     ASSERT_RANGE(subgrid_x,0,TERRAIN_GRID_BLOCK_MUL_X-1);
     ASSERT_RANGE(subgrid_y,0,TERRAIN_GRID_BLOCK_MUL_Y-1);
     return subgrid_y + TERRAIN_GRID_BLOCK_MUL_Y*subgrid_x;

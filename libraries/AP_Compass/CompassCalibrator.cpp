@@ -63,7 +63,7 @@
 #include <AP_Math/AP_GeodesicGrid.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_GPS/AP_GPS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_InternalError/AP_InternalError.h>
 
 #define FIELD_RADIUS_MIN 150
@@ -237,7 +237,7 @@ void CompassCalibrator::pull_sample()
             _samples_collected++;
 //            if(_samples_collected >= 400)
 //            {
-//                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "samples are collected");
+//                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "samples are collected");
 //            }
         }
     }
@@ -312,19 +312,19 @@ void CompassCalibrator::update_completion_mask(const Vector3f& v) {
     }
     if(_x_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_x_axis_sample_count_finished)
     {
-//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "X axis samples are collected");
+//        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "X axis samples are collected");
         _x_axis_sample_count_finished = true;
     }
 
     if(_y_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_y_axis_sample_count_finished)
     {
-//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Y axis samples are collected");
+//        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Y axis samples are collected");
         _y_axis_sample_count_finished = true;
     }
 
     if(_z_axis_sample_count == MAX_SAMPLES_PER_AXIS && !_z_axis_sample_count_finished)
     {
-//        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Z axis samples are collected");
+//        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Z axis samples are collected");
         _z_axis_sample_count_finished = true;
     }
 }
@@ -1062,16 +1062,16 @@ bool CompassCalibrator::calculate_orientation(void)
         }
     }
     if (!pass) {
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "Mag(%u) bad orientation: %u/%u %.1f", _compass_idx,
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "Mag(%u) bad orientation: %u/%u %.1f", _compass_idx,
                         besti, besti2, (double)_orientation_confidence);
         (void)besti2;
     } else if (besti == _orientation) {
         // no orientation change
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Mag(%u) good orientation: %u %.1f", _compass_idx, besti, (double)_orientation_confidence);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Mag(%u) good orientation: %u %.1f", _compass_idx, besti, (double)_orientation_confidence);
     } else if (!_is_external || !_fix_orientation) {
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "Mag(%u) internal bad orientation: %u %.1f", _compass_idx, besti, (double)_orientation_confidence);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "Mag(%u) internal bad orientation: %u %.1f", _compass_idx, besti, (double)_orientation_confidence);
     } else {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Mag(%u) new orientation: %u was %u %.1f", _compass_idx, besti, _orientation, (double)_orientation_confidence);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Mag(%u) new orientation: %u was %u %.1f", _compass_idx, besti, _orientation, (double)_orientation_confidence);
     }
 
     if (!pass) {
@@ -1143,7 +1143,7 @@ bool CompassCalibrator::fix_radius(void)
 
     if (correction > COMPASS_MAX_SCALE_FACTOR || correction < COMPASS_MIN_SCALE_FACTOR) {
         // don't allow more than 30% scale factor correction
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Mag(%u) bad radius %.0f expected %.0f",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Mag(%u) bad radius %.0f expected %.0f",
                         _compass_idx,
                         _params.radius,
                         expected_radius);

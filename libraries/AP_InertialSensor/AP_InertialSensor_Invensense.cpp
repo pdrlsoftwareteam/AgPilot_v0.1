@@ -27,7 +27,7 @@
 #include <AP_Logger/AP_Logger.h>
 
 #include "AP_InertialSensor_Invensense.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -59,7 +59,7 @@ extern const AP_HAL::HAL& hal;
 #define INVENSENSE_DEBUG_REG_CHANGE 0
 
 #if INVENSENSE_DEBUG_REG_CHANGE
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #endif
 
 #include "AP_InertialSensor_Invensense_registers.h"
@@ -555,7 +555,7 @@ void AP_InertialSensor_Invensense::_check_register_change(void)
     if (!skip) {
         uint8_t v = _register_read(next_reg);
         if (v != reg_value[next_reg]) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "change[%02x] 0x%02x -> 0x%02x",
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "change[%02x] 0x%02x -> 0x%02x",
                           next_reg, reg_value[next_reg], v);
             reg_value[next_reg] = v;
         }

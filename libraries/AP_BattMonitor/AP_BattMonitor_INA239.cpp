@@ -2,7 +2,7 @@
 
 #if AP_BATTERY_INA239_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/utility/sparse-endian.h>
 
 #include "AP_BattMonitor_INA239.h"
@@ -41,7 +41,7 @@ void AP_BattMonitor_INA239::init(void)
 {
     dev = hal.spi->get_device(AP_BATTERY_INA239_SPI_DEVICE);
     if (!dev) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "device fail");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "device fail");
         return;
     }
     dev->set_read_flag(0x01);

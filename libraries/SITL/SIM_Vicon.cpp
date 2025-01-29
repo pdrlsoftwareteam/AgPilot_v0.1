@@ -50,8 +50,8 @@ void Vicon::maybe_send_heartbeat()
     mavlink_msg_heartbeat_pack(system_id,
                                component_id,
                                &msg,
-                               MAV_TYPE_GCS,
-                               MAV_AUTOPILOT_INVALID,
+                               AGPILOT_TYPE_GCS,
+                               AGPILOT_AUTOPILOT_INVALID,
                                0,
                                0,
                                0);
@@ -217,8 +217,8 @@ void Vicon::update_vicon_position_estimate(const Location &loc,
             mavlink_ch,
             &msg_buf[msg_buf_index].obs_msg,
             now_us + time_offset_us,
-            MAV_FRAME_LOCAL_FRD,
-            MAV_FRAME_BODY_FRD,
+            AGPILOT_FRAME_LOCAL_FRD,
+            AGPILOT_FRAME_BODY_FRD,
             pos_corrected.x,
             pos_corrected.y,
             pos_corrected.z,
@@ -231,18 +231,18 @@ void Vicon::update_vicon_position_estimate(const Location &loc,
             gyro.z,
             NULL, NULL,
             0,
-            MAV_ESTIMATOR_TYPE_VIO);
+            AGPILOT_ESTIMATOR_TYPE_VIO);
         msg_buf[msg_buf_index].time_send_us = time_send_us;
     }
 
     // determine time, position, and angular deltas
     uint64_t time_delta = now_us - last_observation_usec;
 
-    Quaternion attitude_curr;                   // Rotation to current MAV_FRAME_BODY_FRD from MAV_FRAME_LOCAL_NED
-    attitude_curr.from_euler(roll, pitch, yaw); // Rotation to MAV_FRAME_LOCAL_NED from current MAV_FRAME_BODY_FRD
+    Quaternion attitude_curr;                   // Rotation to current AGPILOT_FRAME_BODY_FRD from AGPILOT_FRAME_LOCAL_NED
+    attitude_curr.from_euler(roll, pitch, yaw); // Rotation to AGPILOT_FRAME_LOCAL_NED from current AGPILOT_FRAME_BODY_FRD
     attitude_curr.invert();
 
-    Quaternion attitude_curr_prev = attitude_curr * _attitude_prev.inverse(); // Get rotation to current MAV_FRAME_BODY_FRD from previous MAV_FRAME_BODY_FRD
+    Quaternion attitude_curr_prev = attitude_curr * _attitude_prev.inverse(); // Get rotation to current AGPILOT_FRAME_BODY_FRD from previous AGPILOT_FRAME_BODY_FRD
     float angle_delta[3] = {attitude_curr_prev.get_euler_roll(),
                             attitude_curr_prev.get_euler_pitch(),
                             attitude_curr_prev.get_euler_yaw()};
@@ -256,8 +256,8 @@ void Vicon::update_vicon_position_estimate(const Location &loc,
     // send vision position delta
     // time_usec: (usec) Current time stamp
     // time_delta_usec: (usec) Time since last reported camera frame
-    // angle_delta [3]: (radians) Roll, pitch, yaw angles that define rotation to current MAV_FRAME_BODY_FRD from previous MAV_FRAME_BODY_FRD
-    // delta_position [3]: (meters) Change in position: To current position from previous position rotated to current MAV_FRAME_BODY_FRD from MAV_FRAME_LOCAL_NED
+    // angle_delta [3]: (radians) Roll, pitch, yaw angles that define rotation to current AGPILOT_FRAME_BODY_FRD from previous AGPILOT_FRAME_BODY_FRD
+    // delta_position [3]: (meters) Change in position: To current position from previous position rotated to current AGPILOT_FRAME_BODY_FRD from AGPILOT_FRAME_LOCAL_NED
     // confidence: Normalized confidence level [0, 100]
     if (should_send(ViconTypeMask::VISION_POSITION_DELTA) && get_free_msg_buf_index(msg_buf_index)) {
         mavlink_msg_vision_position_delta_pack_chan(

@@ -1,7 +1,7 @@
 #include "AP_Camera_Backend.h"
 
 #if AP_CAMERA_ENABLED
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_GPS/AP_GPS.h>
 
 extern const AP_HAL::HAL& hal;

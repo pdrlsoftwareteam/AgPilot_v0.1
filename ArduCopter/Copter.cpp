@@ -724,7 +724,7 @@ void Copter::update_altitude()
 // vehicle specific waypoint info helpers
 bool Copter::get_wp_distance_m(float &distance) const
 {
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
+    // see GCS_AGPILOTLINK_Copter::send_nav_controller_output()
     distance = flightmode->wp_distance() * 0.01;
     return true;
 }
@@ -732,7 +732,7 @@ bool Copter::get_wp_distance_m(float &distance) const
 // vehicle specific waypoint info helpers
 bool Copter::get_wp_bearing_deg(float &bearing) const
 {
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
+    // see GCS_AGPILOTLINK_Copter::send_nav_controller_output()
     bearing = flightmode->wp_bearing() * 0.01;
     return true;
 }
@@ -740,7 +740,7 @@ bool Copter::get_wp_bearing_deg(float &bearing) const
 // vehicle specific waypoint info helpers
 bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 {
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
+    // see GCS_AGPILOTLINK_Copter::send_nav_controller_output()
     xtrack_error = flightmode->crosstrack_error() * 0.01;
     return true;
 }

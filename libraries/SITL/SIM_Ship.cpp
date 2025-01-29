@@ -30,7 +30,7 @@
 
 // use a spare channel for send. This is static to avoid mavlink
 // header import in SIM_Ship.h
-static const mavlink_channel_t mavlink_ch = (mavlink_channel_t)(MAVLINK_COMM_0+6);
+static const mavlink_channel_t mavlink_ch = (mavlink_channel_t)(AGPILOTLINK_COMM_0+6);
 
 using namespace SITL;
 
@@ -158,7 +158,7 @@ void ShipSim::update(void)
 }
 
 /*
-  send a report to the vehicle control code over MAVLink
+  send a report to the vehicle control code over AGPILOTLink
 */
 void ShipSim::send_report(void)
 {
@@ -175,7 +175,7 @@ void ShipSim::send_report(void)
     uint16_t len;
     uint8_t buf[300];
 
-    const uint8_t component_id = MAV_COMP_ID_USER10;
+    const uint8_t component_id = AGPILOT_COMP_ID_USER10;
 
     if (now - last_heartbeat_ms >= 1000) {
         last_heartbeat_ms = now;
@@ -183,8 +183,8 @@ void ShipSim::send_report(void)
                                         component_id,
                                         mavlink_ch,
                                         &msg,
-                                        MAV_TYPE_SURFACE_BOAT,
-                                        MAV_AUTOPILOT_INVALID,
+                                        AGPILOT_TYPE_SURFACE_BOAT,
+                                        AGPILOT_AUTOPILOT_INVALID,
                                         0,
                                         0,
                                         0);

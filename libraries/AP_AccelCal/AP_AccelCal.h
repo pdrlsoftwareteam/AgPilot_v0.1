@@ -1,7 +1,7 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL_Boards.h>
-#include <GCS_MAVLink/GCS_config.h>
+#include <GCS_AGPILOTLink/GCS_config.h>
 
 #ifndef HAL_INS_ACCELCAL_ENABLED
 #if HAL_GCS_ENABLED
@@ -11,11 +11,11 @@
 #endif
 #endif
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AccelCalibrator.h"
 
 #define AP_ACCELCAL_MAX_NUM_CLIENTS 4
-class GCS_MAVLINK;
+class GCS_AGPILOTLINK;
 class AP_AccelCal_Client;
 
 class AP_AccelCal {
@@ -27,7 +27,7 @@ public:
     { update_status(); }
 
     // start all the registered calibrations
-    void start(GCS_MAVLINK *gcs);
+    void start(GCS_AGPILOTLINK *gcs);
 
     // called on calibration cancellation
     void cancel();
@@ -52,7 +52,7 @@ public:
     bool running(void) const;
 
 private:
-    class GCS_MAVLINK *_gcs;
+    class GCS_AGPILOTLINK *_gcs;
     bool _use_gcs_snoop;
     bool _waiting_for_mavlink_ack = false;
     uint32_t _last_position_request_ms;

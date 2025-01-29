@@ -3,7 +3,7 @@
 #include "AP_NavEKF3.h"
 #include "AP_NavEKF3_core.h"
 #include <AP_DAL/AP_DAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // Check basic filter health metrics and return a consolidated health status
 bool NavEKF3_core::healthy(void) const
@@ -561,7 +561,7 @@ void  NavEKF3_core::getFilterStatus(nav_filter_status &status) const
 
 #if HAL_GCS_ENABLED
 // send an EKF_STATUS message to GCS
-void NavEKF3_core::send_status_report(GCS_MAVLINK &link) const
+void NavEKF3_core::send_status_report(GCS_AGPILOTLINK &link) const
 {
     // prepare flags
     uint16_t flags = 0;

@@ -20,7 +20,7 @@ from pymavlink import quaternion
 import random
 import time
 
-from MAVProxy.modules.lib import mp_module
+from AGPILOTProxy.modules.lib import mp_module
 
 class CalController(object):
     def __init__(self, mpstate):

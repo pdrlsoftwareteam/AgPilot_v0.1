@@ -10,7 +10,7 @@
 
 /*
  * AC_PrecLand_IRLock - implements precision landing using target vectors provided
- *                         by a companion computer (i.e. Odroid) communicating via MAVLink
+ *                         by a companion computer (i.e. Odroid) communicating via AGPILOTLink
  */
 
 class AC_PrecLand_IRLock : public AC_PrecLand_Backend

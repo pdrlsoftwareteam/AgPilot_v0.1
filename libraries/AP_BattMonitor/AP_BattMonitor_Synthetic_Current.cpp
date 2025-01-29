@@ -4,7 +4,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include "AP_BattMonitor_Synthetic_Current.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 /*

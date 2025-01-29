@@ -31,7 +31,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
 
@@ -415,7 +415,7 @@ void AP_AHRS::update(bool skip_ins_update)
             break;
 #endif
         }
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AHRS: %s active", shortname);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "AHRS: %s active", shortname);
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -2549,7 +2549,7 @@ bool AP_AHRS::resetHeightDatum(void)
 }
 
 // send a EKF_STATUS_REPORT for current EKF
-void AP_AHRS::send_ekf_status_report(GCS_MAVLINK &link) const
+void AP_AHRS::send_ekf_status_report(GCS_AGPILOTLINK &link) const
 {
     switch (ekf_type()) {
     case EKFType::NONE:

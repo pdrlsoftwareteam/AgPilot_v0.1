@@ -18,7 +18,7 @@
 
 #include "SIM_RF_MaxsonarSerialLV.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 
 using namespace SITL;

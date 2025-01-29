@@ -3,7 +3,7 @@
 #include <AP_Compass/AP_Compass.h>
 
 #include "Compass_learn.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_NavEKF/EKFGSF_yaw.h>
 
@@ -15,7 +15,7 @@ extern const AP_HAL::HAL &hal;
 CompassLearn::CompassLearn(Compass &_compass) :
     compass(_compass)
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "CompassLearn: Initialised");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "CompassLearn: Initialised");
 }
 
 // accuracy threshold applied for GSF yaw estimate
@@ -61,10 +61,10 @@ void CompassLearn::update(void)
     }
 
     const auto result = compass.mag_cal_fixed_yaw(degrees(yaw_rad), (1U<<HAL_COMPASS_MAX_SENSORS)-1, 0, 0, true);
-    if (result == MAV_RESULT_ACCEPTED) {
+    if (result == AGPILOT_RESULT_ACCEPTED) {
         AP_Notify::flags.compass_cal_running = false;
         compass.set_learn_type(Compass::LEARN_NONE, true);
-        gcs().send_text(MAV_SEVERITY_INFO, "CompassLearn: Finished");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "CompassLearn: Finished");
     }
 }
 

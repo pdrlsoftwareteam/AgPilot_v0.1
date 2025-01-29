@@ -14,7 +14,7 @@ local loop_time = 5000 -- number of ms between runs
 
 function update() -- this is the loop which periodically runs
   for i = 1, #intervals do -- we want to iterate over every specified interval
-    local channel, message, interval_hz = table.unpack(intervals[i]) -- this extracts the channel, MAVLink ID, and interval
+    local channel, message, interval_hz = table.unpack(intervals[i]) -- this extracts the channel, AGPILOTLink ID, and interval
     gcs:set_message_interval(channel, message, math.floor(1000000 / interval_hz)) -- actually sets the interval as appropriate
   end
   return update, loop_time -- reschedules the loop

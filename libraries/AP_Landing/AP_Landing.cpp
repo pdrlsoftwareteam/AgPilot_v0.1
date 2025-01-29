@@ -18,7 +18,7 @@
  */
 
 #include "AP_Landing.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AC_Fence/AC_Fence.h>
 
@@ -253,7 +253,7 @@ bool AP_Landing::verify_land(const Location &prev_WP_loc, Location &next_WP_loc,
     default:
         // returning TRUE while executing verify_land() will increment the
         // mission index which in many cases will trigger an RTL for end-of-mission
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Landing configuration error, invalid LAND_TYPE");
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Landing configuration error, invalid LAND_TYPE");
         success = true;
         break;
     }
@@ -470,7 +470,7 @@ void AP_Landing::setup_landing_glide_slope(const Location &prev_WP_loc, const Lo
  */
 bool AP_Landing::restart_landing_sequence()
 {
-    if (mission.get_current_nav_cmd().id != MAV_CMD_NAV_LAND) {
+    if (mission.get_current_nav_cmd().id != AGPILOT_CMD_NAV_LAND) {
         return false;
     }
 
@@ -481,19 +481,19 @@ bool AP_Landing::restart_landing_sequence()
     AP_Mission::Mission_Command cmd;
 
     if (mission.read_cmd_from_storage(current_index+1,cmd) &&
-            cmd.id == MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT &&
+            cmd.id == AGPILOT_CMD_NAV_CONTINUE_AND_CHANGE_ALT &&
             (cmd.p1 == 0 || cmd.p1 == 1) &&
             mission.set_current_cmd(current_index+1))
     {
-        // if the next immediate command is MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT to climb, do it
-        gcs().send_text(MAV_SEVERITY_NOTICE, "Restarted landing sequence. Climbing to %dm", (signed)cmd.content.location.alt/100);
+        // if the next immediate command is AGPILOT_CMD_NAV_CONTINUE_AND_CHANGE_ALT to climb, do it
+        gcs().send_text(AGPILOT_SEVERITY_NOTICE, "Restarted landing sequence. Climbing to %dm", (signed)cmd.content.location.alt/100);
         success =  true;
     }
     else if (do_land_start_index != 0 &&
             mission.set_current_cmd(do_land_start_index))
     {
         // look for a DO_LAND_START and use that index
-        gcs().send_text(MAV_SEVERITY_NOTICE, "Restarted landing via DO_LAND_START: %d",do_land_start_index);
+        gcs().send_text(AGPILOT_SEVERITY_NOTICE, "Restarted landing via DO_LAND_START: %d",do_land_start_index);
         success =  true;
     }
     else if (prev_cmd_with_wp_index != AP_MISSION_CMD_INDEX_NONE &&
@@ -501,10 +501,10 @@ bool AP_Landing::restart_landing_sequence()
     {
         // if a suitable navigation waypoint was just executed, one that contains lat/lng/alt, then
         // repeat that cmd to restart the landing from the top of approach to repeat intended glide slope
-        gcs().send_text(MAV_SEVERITY_NOTICE, "Restarted landing sequence at waypoint %d", prev_cmd_with_wp_index);
+        gcs().send_text(AGPILOT_SEVERITY_NOTICE, "Restarted landing sequence at waypoint %d", prev_cmd_with_wp_index);
         success =  true;
     } else {
-        gcs().send_text(MAV_SEVERITY_WARNING, "Unable to restart landing sequence");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "Unable to restart landing sequence");
         success =  false;
     }
 

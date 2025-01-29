@@ -87,7 +87,7 @@ function update()
   -- find RC channel used to trigger POI
   rc_switch_ch = rc:find_channel_for_option(300) --scripting ch 1
   if (rc_switch_ch == nil) then
-      gcs:send_text(3, 'MountPOI: RCx_OPTION = 300 not set')    -- MAV_SEVERITY_ERROR
+      gcs:send_text(3, 'MountPOI: RCx_OPTION = 300 not set')    -- AGPILOT_SEVERITY_ERROR
       return update, 10000  -- check again in 10 seconds
   end
 
@@ -108,7 +108,7 @@ function update()
   -- retrieve vehicle location
   local vehicle_loc = ahrs:get_location()
   if vehicle_loc == nil then
-    gcs:send_text(3, "POI: vehicle pos unavailable") -- MAV_SEVERITY_ERROR
+    gcs:send_text(3, "POI: vehicle pos unavailable") -- AGPILOT_SEVERITY_ERROR
     return update, UPDATE_INTERVAL_MS
   end
   
@@ -118,7 +118,7 @@ function update()
   -- retrieve gimbal attitude
   local roll_deg, pitch_deg, yaw_bf_deg = mount:get_attitude_euler(0)
   if pitch_deg == nil or yaw_bf_deg == nil then
-    gcs:send_text(3, "POI: gimbal attitude unavailable") -- MAV_SEVERITY_ERROR
+    gcs:send_text(3, "POI: gimbal attitude unavailable") -- AGPILOT_SEVERITY_ERROR
     return update, UPDATE_INTERVAL_MS
   end
 
@@ -133,7 +133,7 @@ function update()
 
   -- fail if terrain alt cannot be retrieved
   if terrain_amsl_m == nil then
-    gcs:send_text(3, "POI: failed to get terrain alt") -- MAV_SEVERITY_ERROR
+    gcs:send_text(3, "POI: failed to get terrain alt") -- AGPILOT_SEVERITY_ERROR
     return update, UPDATE_INTERVAL_MS
   end
 
@@ -162,7 +162,7 @@ function update()
 
     -- fail if terrain alt cannot be retrieved
     if terrain_amsl_m == nil then
-      gcs:send_text(3, "POI: failed to get terrain alt") -- MAV_SEVERITY_ERROR
+      gcs:send_text(3, "POI: failed to get terrain alt") -- AGPILOT_SEVERITY_ERROR
       return update, UPDATE_INTERVAL_MS
     end
   end

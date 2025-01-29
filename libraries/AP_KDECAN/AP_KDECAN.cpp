@@ -23,7 +23,7 @@
 #include <AP_HAL/utility/sparse-endian.h>
 
 #include <SRV_Channel/SRV_Channel.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Motors/AP_Motors.h>

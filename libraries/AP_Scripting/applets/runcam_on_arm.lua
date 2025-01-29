@@ -25,18 +25,18 @@
 -- constants
 local RC_OPTION = {RunCamControl=78}
 local AuxSwitchPos = {LOW=0, MIDDLE=1, HIGH=2}
-local MAV_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
+local AGPILOT_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
 
 -- configuration
 local DELAY_LONG = param:get("CAM_RC_BTN_DELAY")
 if not DELAY_LONG then
-   gcs:send_text(MAV_SEVERITY.ERROR, "CAM_RC_* parameters missing; camera autoarming unavailable")
+   gcs:send_text(AGPILOT_SEVERITY.ERROR, "CAM_RC_* parameters missing; camera autoarming unavailable")
    return
 end
 local DELAY_SHORT = DELAY_LONG / 3
 
 
-gcs:send_text(MAV_SEVERITY.NOTICE, "Arming controls RUNCAM recording")
+gcs:send_text(AGPILOT_SEVERITY.NOTICE, "Arming controls RUNCAM recording")
 
 
 -- state
@@ -50,10 +50,10 @@ function update()
    if is_armed ~= prev_armed then
       -- a state transition has occurred
       if is_armed then
-         gcs:send_text(MAV_SEVERITY.INFO, "RUNCAM on")
+         gcs:send_text(AGPILOT_SEVERITY.INFO, "RUNCAM on")
          rc:run_aux_function(RC_OPTION.RunCamControl, AuxSwitchPos.HIGH)
       else
-         gcs:send_text(MAV_SEVERITY.INFO, "RUNCAM off")
+         gcs:send_text(AGPILOT_SEVERITY.INFO, "RUNCAM off")
          rc:run_aux_function(RC_OPTION.RunCamControl, AuxSwitchPos.LOW)
       end
       delay = DELAY_LONG

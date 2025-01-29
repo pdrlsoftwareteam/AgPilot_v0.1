@@ -32,7 +32,7 @@ public:
     // called at 50Hz
     virtual void update() override;
 
-#if AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED
+#if AP_NOTIFY_AGPILOTLINK_LED_CONTROL_SUPPORT_ENABLED
     // handle LED control, only used when LED_OVERRIDE=1
     virtual void handle_led_control(const mavlink_message_t &msg) override;
 #endif

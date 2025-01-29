@@ -628,7 +628,7 @@ def copy_tree(f, t, dirs_exist_ok=False):
 
 def write_webresults(results_to_write):
     """Write webpage results."""
-    t = mavtemplate.MAVTemplate()
+    t = mavtemplate.AGPILOTTemplate()
     for h in glob.glob(util.reltopdir('Tools/autotest/web/*.html')):
         html = util.loadfile(h)
         f = open(buildlogs_path(os.path.basename(h)), mode='w')
@@ -646,7 +646,7 @@ def write_fullresults():
     results.addglob("Google Earth track", '*.kmz')
     results.addfile('Full Logs', 'autotest-output.txt')
     results.addglob('DataFlash Log', '*-log.bin')
-    results.addglob("MAVLink log", '*.tlog')
+    results.addglob("AGPILOTLink log", '*.tlog')
     results.addglob("GPX track", '*.gpx')
 
     # results common to all vehicles:
@@ -844,7 +844,7 @@ if __name__ == "__main__":
                       help='list available subtests e.g. test.Copter')
     parser.add_option("--viewerip",
                       default=None,
-                      help='IP address to send MAVLink and fg packets to')
+                      help='IP address to send AGPILOTLink and fg packets to')
     parser.add_option("--map",
                       action='store_true',
                       default=False,

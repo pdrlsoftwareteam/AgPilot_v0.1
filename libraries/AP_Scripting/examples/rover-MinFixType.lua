@@ -15,12 +15,12 @@ LICENSE - GNU GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
 
 local SCRIPT_NAME = 'MinFixType'
 
---------  MAVLINK/AUTOPILOT 'CONSTANTS'  --------
+--------  AGPILOTLINK/AUTOPILOT 'CONSTANTS'  --------
 local ROVER_MODE_MANUAL       =  0
 local ROVER_MODE_HOLD         =  4
 local ROVER_MODE_AUTO         = 10
-local MAV_SEVERITY_WARNING    =  4
-local MAV_SEVERITY_INFO       =  6
+local AGPILOT_SEVERITY_WARNING    =  4
+local AGPILOT_SEVERITY_INFO       =  6
 
 --------  USER EDITABLE GLOBALS  --------
 local GPS_INSTANCE = 0                 -- GPS to monitor (moving base, most likely)
@@ -69,7 +69,7 @@ local function gcs_msg(msg_type, severity, txt)
     -- allow just a string to be passed for simple/routine messages
         txt      = msg_type
         msg_type = MSG_NORMAL
-        severity = MAV_SEVERITY_INFO
+        severity = AGPILOT_SEVERITY_INFO
     end
     if msg_type <= VERBOSE_MODE then
         gcs:send_text(severity, string.format('%s: %s', SCRIPT_NAME, txt))
@@ -98,11 +98,11 @@ end
 
 function resume_mission()
     if get_user_mode() ~= ROVER_MODE_AUTO then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Pause Canceled - Mode Change')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Pause Canceled - Mode Change')
         return standby, RUN_INTERVAL_MS
     end
     if not arming:is_armed() then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Pause Canceled - Disarmed')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Pause Canceled - Disarmed')
         return standby, RUN_INTERVAL_MS
     end
 
@@ -117,11 +117,11 @@ end
 
 function mission_paused()
     if get_user_mode() ~= ROVER_MODE_AUTO then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Pause Canceled - Mode Change')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Pause Canceled - Mode Change')
         return standby, RUN_INTERVAL_MS
     end
     if not arming:is_armed() then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Pause Canceled - Disarmed')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Pause Canceled - Disarmed')
         return standby, RUN_INTERVAL_MS
     end
 
@@ -133,7 +133,7 @@ function mission_paused()
     if vehicle:get_mode() == THR_SAFEGUARD_MODE then
         local mode = get_pause_mode()
         if mode == MSN_PAUSE_MODE then
-            gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Throttle neutral')
+            gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Throttle neutral')
             vehicle:set_mode(mode)
         end
         return mission_paused, RUN_INTERVAL_MS
@@ -141,7 +141,7 @@ function mission_paused()
 
     -- for edge cases where a non-RC command to resume was issued but fix type is still unsuitable
     if vehicle:get_mode() ~= MSN_PAUSE_MODE then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Cannot resume - ' .. FIX_TYPES[fix_type])
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Cannot resume - ' .. FIX_TYPES[fix_type])
         vehicle:set_mode(get_pause_mode())
     end
     return mission_paused, RUN_INTERVAL_MS
@@ -160,11 +160,11 @@ function transition_to_pause()
 
     local mode = get_pause_mode()
     if mode == THR_SAFEGUARD_MODE then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Throttle not neutral!')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Throttle not neutral!')
     end
 
     vehicle:set_mode(mode)
-    gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Mission Paused - ' .. FIX_TYPES[fix_type])
+    gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Mission Paused - ' .. FIX_TYPES[fix_type])
 
     return mission_paused, RUN_INTERVAL_MS
 end
@@ -177,7 +177,7 @@ function monitor()  -- monitor for reduced GPS fix state during auto mission
     local fix_type = gps:status(GPS_INSTANCE)
 
     if fix_type < MIN_FIX_TYPE then
-        gcs_msg(MSG_DEBUG, MAV_SEVERITY_WARNING, 'GPS ' .. (GPS_INSTANCE + 1) .. ' - ' .. FIX_TYPES[fix_type])
+        gcs_msg(MSG_DEBUG, AGPILOT_SEVERITY_WARNING, 'GPS ' .. (GPS_INSTANCE + 1) .. ' - ' .. FIX_TYPES[fix_type])
         return transition_to_pause, BAD_FIX_TIMEOUT
     end
 

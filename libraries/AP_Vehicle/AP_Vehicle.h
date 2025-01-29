@@ -396,7 +396,7 @@ protected:
 
 private:
 
-    // delay() callback that processing MAVLink packets
+    // delay() callback that processing AGPILOTLink packets
     static void scheduler_delay_callback();
 
     // if there's been a watchdog reset, notify the world via a

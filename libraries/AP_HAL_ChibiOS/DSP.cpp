@@ -22,7 +22,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "DSP.h"
 #include <cmath>
 
@@ -82,7 +82,7 @@ DSP::FFTWindowStateARM::FFTWindowStateARM(uint16_t window_size, uint16_t sample_
     : AP_HAL::DSP::FFTWindowState::FFTWindowState(window_size, sample_rate, sliding_window_size)
 {
     if (_freq_bins == nullptr || _hanning_window == nullptr || _rfft_data == nullptr || _derivative_freq_bins == nullptr) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to allocate %u bytes for window %u for DSP",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to allocate %u bytes for window %u for DSP",
             unsigned(sizeof(float) * (window_size * 3 + 2)), unsigned(window_size));
         return;
     }
@@ -249,7 +249,7 @@ uint16_t DSP::step_calc_frequencies_f32(FFTWindowStateARM* fft, uint16_t start_b
     _output_count++;
     // outputs at approx 1hz
     if (_output_count % 400 == 0) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "FFT(us): t1:%lu,t2:%lu,t3:%lu,t4:%lu,t5:%lu,t6:%lu",
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "FFT(us): t1:%lu,t2:%lu,t3:%lu,t4:%lu,t5:%lu,t6:%lu",
                         _hanning_timer._timer_avg, _arm_cfft_f32_timer._timer_avg, _bitreversal_timer._timer_avg, _stage_rfft_f32_timer._timer_avg, _arm_cmplx_mag_f32_timer._timer_avg, _step_calc_frequencies._timer_avg);
     }
 #endif

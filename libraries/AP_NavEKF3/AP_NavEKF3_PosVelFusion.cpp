@@ -2,7 +2,7 @@
 
 #include "AP_NavEKF3.h"
 #include "AP_NavEKF3_core.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_DAL/AP_DAL.h>
 
 /********************************************************
@@ -1890,7 +1890,7 @@ void NavEKF3_core::FuseBodyVel()
             // notify first time only
             if (!bodyVelFusionActive) {
                 bodyVelFusionActive = true;
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO, "EKF3 IMU%u fusing odometry",(unsigned)imu_index);
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "EKF3 IMU%u fusing odometry",(unsigned)imu_index);
             }
             // correct the covariance P = (I - K*H)*P
             // take advantage of the empty columns in KH to reduce the

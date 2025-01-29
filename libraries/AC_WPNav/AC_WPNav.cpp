@@ -2,7 +2,7 @@
 #include "AC_WPNav.h"
 #include "AP_RangeFinder/AP_RangeFinder.h"
 #include <AC_Avoidance/AP_OAPathPlanner.h>
-#include "GCS_MAVLink/GCS.h"
+#include "GCS_AGPILOTLink/GCS.h"
 #include "AP_Proximity/AP_Proximity.h"
 
 extern const AP_HAL::HAL& hal;

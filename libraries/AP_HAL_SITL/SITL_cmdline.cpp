@@ -86,7 +86,7 @@ void SITL_State::_usage(void)
            "\t--config string          set additional simulation config string\n"
            "\t--fg|-F ADDRESS          set Flight Gear view address, defaults to 127.0.0.1\n"
            "\t--disable-fgview         disable Flight Gear view\n"
-           "\t--gimbal                 enable simulated MAVLink gimbal\n"
+           "\t--gimbal                 enable simulated AGPILOTLink gimbal\n"
            "\t--autotest-dir DIR       set directory for additional files\n"
            "\t--defaults path          set path to defaults file\n"
            "\t--uartA device           set device string for UARTA\n"
@@ -117,7 +117,7 @@ void SITL_State::_usage(void)
            "\t--sim-port-out PORT      set port num for simulator out\n"
            "\t--irlock-port PORT       set port num for irlock\n"
            "\t--start-time TIMESTR     set simulation start time in UNIX timestamp\n"
-           "\t--sysid ID               set SYSID_THISMAV\n"
+           "\t--sysid ID               set SYSID_THISAGPILOT\n"
            "\t--slave number           set the number of JSON slaves\n"
         );
 }
@@ -495,9 +495,9 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
                 fprintf(stderr, "You must specify a SYSID greater than 0 and less than 256\n");
                 exit(1);
             }
-            temp_cmdline_param = {"SYSID_THISMAV", static_cast<float>(sysid)};
+            temp_cmdline_param = {"SYSID_THISAGPILOT", static_cast<float>(sysid)};
             cmdline_param.push_back(temp_cmdline_param);
-            printf("Setting SYSID_THISMAV=%d\n", sysid);
+            printf("Setting SYSID_THISAGPILOT=%d\n", sysid);
             break;
         }
 #if STORAGE_USE_POSIX

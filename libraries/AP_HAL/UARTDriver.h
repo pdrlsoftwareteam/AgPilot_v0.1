@@ -83,7 +83,7 @@ public:
         OPTION_PULLUP_TX          = (1U<<7), // apply pullup to TX
         OPTION_NODMA_RX           = (1U<<8), // don't use DMA for RX
         OPTION_NODMA_TX           = (1U<<9), // don't use DMA for TX
-        OPTION_MAVLINK_NO_FORWARD = (1U<<10), // don't forward MAVLink data to or from this device
+        OPTION_AGPILOTLINK_NO_FORWARD = (1U<<10), // don't forward AGPILOTLink data to or from this device
         OPTION_NOFIFO             = (1U<<11), // disable hardware FIFO
         OPTION_NOSTREAMOVERRIDE   = (1U<<12), // don't allow GCS to override streamrates
     };

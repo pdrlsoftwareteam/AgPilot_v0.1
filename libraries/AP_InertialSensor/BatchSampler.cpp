@@ -1,7 +1,7 @@
 #include "AP_InertialSensor.h"
 
 #if AP_INERTIALSENSOR_BATCHSAMPLER_ENABLED
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 // Class level parameters
@@ -61,7 +61,7 @@ void AP_InertialSensor::BatchSampler::init()
     _real_required_count = _required_count;
 
     const uint32_t total_allocation = 3*_real_required_count*sizeof(uint16_t);
-    GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "INS: alloc %u bytes for ISB (free=%u)", (unsigned int)total_allocation, (unsigned int)hal.util->available_memory());
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_DEBUG, "INS: alloc %u bytes for ISB (free=%u)", (unsigned int)total_allocation, (unsigned int)hal.util->available_memory());
 
     data_x = (int16_t*)calloc(_real_required_count, sizeof(int16_t));
     data_y = (int16_t*)calloc(_real_required_count, sizeof(int16_t));
@@ -73,7 +73,7 @@ void AP_InertialSensor::BatchSampler::init()
         data_x = nullptr;
         data_y = nullptr;
         data_z = nullptr;
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to allocate %u bytes for IMU batch sampling", (unsigned int)total_allocation);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to allocate %u bytes for IMU batch sampling", (unsigned int)total_allocation);
         return;
     }
 

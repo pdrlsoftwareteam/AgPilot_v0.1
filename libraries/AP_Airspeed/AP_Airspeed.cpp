@@ -34,7 +34,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_HAL/I2CDevice.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Logger/AP_Logger.h>
 #include <utility>
@@ -218,7 +218,7 @@ bool AP_Airspeed::add_backend(AP_Airspeed_Backend *backend)
     const uint8_t i = num_sensors;
     sensor[num_sensors++] = backend;
     if (!sensor[i]->init()) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Airspeed %u init failed", i+1);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Airspeed %u init failed", i+1);
         delete sensor[i];
         sensor[i] = nullptr;
     }
@@ -433,7 +433,7 @@ void AP_Airspeed::allocate()
             break;
         }
         if (sensor[i] && !sensor[i]->init()) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Airspeed %u init failed", i + 1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Airspeed %u init failed", i + 1);
             delete sensor[i];
             sensor[i] = nullptr;
         }
@@ -501,7 +501,7 @@ void AP_Airspeed::calibrate(bool in_startup)
         return;
     }
     if (hal.util->was_watchdog_reset()) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO,"Airspeed: skipping cal");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,"Airspeed: skipping cal");
         return;
     }
     for (uint8_t i=0; i<AIRSPEED_MAX_SENSORS; i++) {
@@ -516,7 +516,7 @@ void AP_Airspeed::calibrate(bool in_startup)
             continue;
         }
         if (sensor[i] == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Airspeed %u not initalized, cannot cal", i+1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Airspeed %u not initalized, cannot cal", i+1);
             continue;
         }
         state[i].cal.start_ms = AP_HAL::millis();
@@ -524,7 +524,7 @@ void AP_Airspeed::calibrate(bool in_startup)
         state[i].cal.sum = 0;
         state[i].cal.read_count = 0;
         calibration_state[i] = CalibrationState::IN_PROGRESS;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO,"Airspeed %u calibration started", i+1);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,"Airspeed %u calibration started", i+1);
     }
 #endif // HAL_BUILD_AP_PERIPH
 }
@@ -544,10 +544,10 @@ void AP_Airspeed::update_calibration(uint8_t i, float raw_pressure)
     if (AP_HAL::millis() - state[i].cal.start_ms >= 1000 &&
         state[i].cal.read_count > 15) {
         if (state[i].cal.count == 0) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Airspeed %u unhealthy", i + 1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Airspeed %u unhealthy", i + 1);
             calibration_state[i] = CalibrationState::FAILED;
         } else {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Airspeed %u calibrated", i + 1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Airspeed %u calibrated", i + 1);
             float calibrated_offset = state[i].cal.sum / state[i].cal.count;
             // check if new offset differs too greatly from last calibration, indicating pitot uncovered in wind
             if (fixed_wing_parameters != nullptr) {
@@ -555,7 +555,7 @@ void AP_Airspeed::update_calibration(uint8_t i, float raw_pressure)
                 // use percentage of ARSPD_FBW_MIN as criteria for max allowed change in offset
                 float max_change = 0.5*(sq((1 + (max_speed_pcnt * 0.01))*airspeed_min) - sq(airspeed_min));
                 if (max_speed_pcnt > 0 && (abs(calibrated_offset-param[i].offset) > max_change) && (abs(param[i].offset) > 0)) {
-                    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Arspd %d offset change large;cover and recal", i +1);
+                    GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Arspd %d offset change large;cover and recal", i +1);
                 }
             }
             param[i].offset.set_and_save(calibrated_offset);
@@ -671,7 +671,7 @@ void AP_Airspeed::update()
     }
 
 #if HAL_GCS_ENABLED
-    // debugging until we get MAVLink support for 2nd airspeed sensor
+    // debugging until we get AGPILOTLink support for 2nd airspeed sensor
     if (enabled(1)) {
         gcs().send_named_float("AS2", get_airspeed(1));
     }

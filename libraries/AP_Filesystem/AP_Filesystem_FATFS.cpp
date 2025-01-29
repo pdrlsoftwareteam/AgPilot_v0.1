@@ -11,7 +11,7 @@
 
 #include <ff.h>
 #include <AP_HAL_ChibiOS/sdcard.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if 0
 #define debug(fmt, args ...)  do {printf("%s:%d: " fmt "\n", __FUNCTION__, __LINE__, ## args); } while(0)
@@ -897,7 +897,7 @@ void AP_Filesystem_FATFS::format_handler(void)
     }
     WITH_SEMAPHORE(sem);
     format_status = FormatStatus::IN_PROGRESS;
-    GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Formatting SDCard");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Formatting SDCard");
     uint8_t *buf = (uint8_t *)hal.util->malloc_type(FF_MAX_SS, AP_HAL::Util::MEM_DMA_SAFE);
     if (buf == nullptr) {
         return;
@@ -907,10 +907,10 @@ void AP_Filesystem_FATFS::format_handler(void)
     hal.util->free_type(buf, FF_MAX_SS, AP_HAL::Util::MEM_DMA_SAFE);
     if (ret == FR_OK) {
         format_status = FormatStatus::SUCCESS;
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Format: OK");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Format: OK");
     } else {
         format_status = FormatStatus::FAILURE;
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Format: Failed (%d)", int(ret));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Format: Failed (%d)", int(ret));
     }
     sdcard_stop();
     sdcard_retry();

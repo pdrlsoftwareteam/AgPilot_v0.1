@@ -31,12 +31,12 @@
 
 #include "AnalogIn.h"
 
-#ifndef ESP32_ADC_MAVLINK_DEBUG
+#ifndef ESP32_ADC_AGPILOTLINK_DEBUG
 // this allows the first 6 analog channels to be reported by mavlink for debugging purposes
-#define ESP32_ADC_MAVLINK_DEBUG 0
+#define ESP32_ADC_AGPILOTLINK_DEBUG 0
 #endif
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define ANALOGIN_DEBUGGING 0
 
@@ -294,7 +294,7 @@ void AnalogIn::_timer_tick()
         }
     }
 
-#if ESP32_ADC_MAVLINK_DEBUG
+#if ESP32_ADC_AGPILOTLINK_DEBUG
     static uint8_t count;
     if (AP_HAL::millis() > 5000 && count++ == 10) {
         count = 0;
@@ -306,7 +306,7 @@ void AnalogIn::_timer_tick()
         for (uint8_t i = 0; i < n; i++) {
             adc[i] = buf_adc[i];
         }
-        mavlink_msg_ap_adc_send(MAVLINK_COMM_0, adc[0], adc[1], adc[2], adc[3], adc[4],
+        mavlink_msg_ap_adc_send(AGPILOTLINK_COMM_0, adc[0], adc[1], adc[2], adc[3], adc[4],
                                 adc[5]);
     }
 #endif

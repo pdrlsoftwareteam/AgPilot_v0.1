@@ -380,7 +380,7 @@ typedef union __attribute__((__packed__))
 typedef enum __attribute__((__packed__))
 {
   PING_PROTOCOL_NONE          = 0,
-  PING_PROTOCOL_MAVLINK       = 1 << 0,
+  PING_PROTOCOL_AGPILOTLINK       = 1 << 0,
   PING_PROTOCOL_UCP           = 1 << 1,
   PING_PROTOCOL_APOLLO        = 1 << 9,
   PING_PROTOCOL_UCP_HD        = 1 << 10,

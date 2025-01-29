@@ -52,7 +52,7 @@ public:
     virtual int16_t max_distance_cm() const { return params.max_distance_cm; }
     virtual int16_t min_distance_cm() const { return params.min_distance_cm; }
     int16_t ground_clearance_cm() const { return params.ground_clearance_cm; }
-    MAV_DISTANCE_SENSOR get_mav_distance_sensor_type() const;
+    AGPILOT_DISTANCE_SENSOR get_mav_distance_sensor_type() const;
     RangeFinder::Status status() const;
     RangeFinder::Type type() const { return (RangeFinder::Type)params.type.get(); }
 
@@ -97,5 +97,5 @@ protected:
     //Type Backend initialised with
     RangeFinder::Type _backend_type;
 
-    virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const = 0;
+    virtual AGPILOT_DISTANCE_SENSOR _get_mav_distance_sensor_type() const = 0;
 };

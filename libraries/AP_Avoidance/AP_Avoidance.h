@@ -58,7 +58,7 @@ public:
     // obstacle class to hold latest information for a known obstacles
     class Obstacle {
     public:
-        MAV_COLLISION_SRC src;
+        AGPILOT_COLLISION_SRC src;
         uint32_t src_id;
         uint32_t timestamp_ms;
 
@@ -66,7 +66,7 @@ public:
         Vector3f _velocity;
 
         // fields relating to this being a threat.  These would be the reason to have a separate list of threats:
-        MAV_COLLISION_THREAT_LEVEL threat_level;
+        AGPILOT_COLLISION_THREAT_LEVEL threat_level;
         float closest_approach_xy; // metres
         float closest_approach_z; // metres
         float time_to_closest_approach; // seconds, 3D approach
@@ -77,13 +77,13 @@ public:
 
     // add obstacle to the list of known obstacles
     void add_obstacle(uint32_t obstacle_timestamp_ms,
-                      const MAV_COLLISION_SRC src,
+                      const AGPILOT_COLLISION_SRC src,
                       uint32_t src_id,
                       const Location &loc,
                       const Vector3f &vel_ned);
 
     void add_obstacle(uint32_t obstacle_timestamp_ms,
-                      const MAV_COLLISION_SRC src,
+                      const AGPILOT_COLLISION_SRC src,
                       uint32_t src_id,
                       const Location &loc,
                       float cog,
@@ -98,9 +98,9 @@ public:
     void disable() { _enabled.set(false); };
 
     // current overall threat level
-    MAV_COLLISION_THREAT_LEVEL current_threat_level() const;
+    AGPILOT_COLLISION_THREAT_LEVEL current_threat_level() const;
 
-    // add obstacles into the Avoidance system from MAVLink messages
+    // add obstacles into the Avoidance system from AGPILOTLink messages
     void handle_msg(const mavlink_message_t &msg);
 
     // for holding parameters
@@ -113,14 +113,14 @@ protected:
 
     // avoid the most significant threat.  child classes must override this method
     // function returns the action that it is actually taking
-    virtual MAV_COLLISION_ACTION handle_avoidance(const AP_Avoidance::Obstacle *obstacle, MAV_COLLISION_ACTION requested_action) = 0;
+    virtual AGPILOT_COLLISION_ACTION handle_avoidance(const AP_Avoidance::Obstacle *obstacle, AGPILOT_COLLISION_ACTION requested_action) = 0;
 
     // recover after all threats have cleared.  child classes must override this method
     // recovery_action is from F_RCVRY parameter
     virtual void handle_recovery(RecoveryAction recovery_action) = 0;
 
     uint32_t _last_state_change_ms = 0;
-    MAV_COLLISION_THREAT_LEVEL _threat_level = MAV_COLLISION_THREAT_LEVEL_NONE;
+    AGPILOT_COLLISION_THREAT_LEVEL _threat_level = AGPILOT_COLLISION_THREAT_LEVEL_NONE;
 
     // gcs notification
     // specifies how long we should continue sending messages about a threat after it has cleared
@@ -131,9 +131,9 @@ protected:
 
     AP_Avoidance::Obstacle *most_serious_threat();
 
-    // returns an entry from the MAV_COLLISION_ACTION representative
+    // returns an entry from the AGPILOT_COLLISION_ACTION representative
     // of what the current avoidance handler is up to.
-    MAV_COLLISION_ACTION mav_avoidance_action() { return _latest_action; }
+    AGPILOT_COLLISION_ACTION mav_avoidance_action() { return _latest_action; }
 
     // get target destination that best gets vehicle away from the nearest obstacle
     bool get_destination_perpendicular(const AP_Avoidance::Obstacle *obstacle, Vector3f &newdest_neu, const float wp_speed_xy, const float wp_speed_z, const uint8_t _minimum_avoid_height);
@@ -148,7 +148,7 @@ protected:
 
 private:
 
-    void send_collision_all(const AP_Avoidance::Obstacle &threat, MAV_COLLISION_ACTION behaviour) const;
+    void send_collision_all(const AP_Avoidance::Obstacle &threat, AGPILOT_COLLISION_ACTION behaviour) const;
 
     // constants
     const uint32_t MAX_OBSTACLE_AGE_MS = 5000;      // obstacles that have not been heard from for 5 seconds are removed from the list
@@ -187,7 +187,7 @@ private:
     uint8_t _obstacles_allocated;
     uint8_t _obstacle_count;
     int8_t _current_most_serious_threat;
-    MAV_COLLISION_ACTION _latest_action = MAV_COLLISION_ACTION_NONE;
+    AGPILOT_COLLISION_ACTION _latest_action = AGPILOT_COLLISION_ACTION_NONE;
 
     // external references
     class AP_ADSB &_adsb;

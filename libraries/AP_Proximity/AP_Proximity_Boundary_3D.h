@@ -32,7 +32,7 @@
 // structure holding distances in PROXIMITY_MAX_DIRECTION directions. used for sending distances to ground station
 #define PROXIMITY_MAX_DIRECTION 8
 struct Proximity_Distance_Array {
-    uint8_t orientation[PROXIMITY_MAX_DIRECTION]; // orientation (i.e. rough direction) of the distance (see MAV_SENSOR_ORIENTATION)
+    uint8_t orientation[PROXIMITY_MAX_DIRECTION]; // orientation (i.e. rough direction) of the distance (see AGPILOT_SENSOR_ORIENTATION)
     float distance[PROXIMITY_MAX_DIRECTION];      // distance in meters
     bool valid(uint8_t offset) const {
         // returns true if the distance stored at offset is valid

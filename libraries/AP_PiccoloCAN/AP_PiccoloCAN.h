@@ -87,7 +87,7 @@ public:
     // called from SRV_Channels
     void update();
 
-    // send ESC telemetry messages over MAVLink
+    // send ESC telemetry messages over AGPILOTLink
     void send_esc_telemetry_mavlink(uint8_t mav_chan);
 
     // return true if a particular servo is 'active' on the Piccolo interface

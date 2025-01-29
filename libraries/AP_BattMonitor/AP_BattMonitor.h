@@ -4,7 +4,7 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_TemperatureSensor/AP_TemperatureSensor_config.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_BattMonitor_Params.h"
 #include "AP_BattMonitor_config.h"
 
@@ -129,7 +129,7 @@ public:
 
     // The BattMonitor_State structure is filled in by the backend driver
     struct BattMonitor_State {
-        cells       cell_voltages;             // battery cell voltages in millivolts, 10 cells matches the MAVLink spec
+        cells       cell_voltages;             // battery cell voltages in millivolts, 10 cells matches the AGPILOTLink spec
         float       voltage;                   // voltage in volts
         float       current_amps;              // current in amperes
         float       consumed_mah;              // total current draw in milliamp hours since start-up
@@ -263,7 +263,7 @@ public:
     bool reset_remaining(uint8_t instance, float percentage) { return reset_remaining_mask(1U<<instance, percentage);}
 
     // Returns mavlink charge state
-    MAV_BATTERY_CHARGE_STATE get_mavlink_charge_state(const uint8_t instance) const;
+    AGPILOT_BATTERY_CHARGE_STATE get_mavlink_charge_state(const uint8_t instance) const;
 
     // Returns mavlink fault state
     uint32_t get_mavlink_fault_bitmask(const uint8_t instance) const;

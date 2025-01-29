@@ -53,7 +53,7 @@ void lua_scripts::hook(lua_State *L, lua_Debug *ar) {
     luaL_error(L, "Exceeded CPU time");
 }
 
-void lua_scripts::print_error(MAV_SEVERITY severity) {
+void lua_scripts::print_error(AGPILOT_SEVERITY severity) {
     error_msg_buf_sem.take_blocking();
     if (error_msg_buf == nullptr) {
         error_msg_buf_sem.give();
@@ -64,7 +64,7 @@ void lua_scripts::print_error(MAV_SEVERITY severity) {
     error_msg_buf_sem.give();
 }
 
-void lua_scripts::set_and_print_new_error_message(MAV_SEVERITY severity, const char *fmt, ...) {
+void lua_scripts::set_and_print_new_error_message(AGPILOT_SEVERITY severity, const char *fmt, ...) {
     error_msg_buf_sem.take_blocking();
 
     // reset buffer and print count
@@ -113,7 +113,7 @@ void lua_scripts::set_and_print_new_error_message(MAV_SEVERITY severity, const c
 }
 
 int lua_scripts::atpanic(lua_State *L) {
-    set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Panic: %s", lua_tostring(L, -1));
+    set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Panic: %s", lua_tostring(L, -1));
     longjmp(panic_jmp, 1);
     return 0;
 }
@@ -122,7 +122,7 @@ int lua_scripts::atpanic(lua_State *L) {
 void lua_scripts::update_stats(const char *name, uint32_t run_time, int total_mem, int run_mem)
 {
     if ((_debug_options.get() & uint8_t(DebugLevel::RUNTIME_MSG)) != 0) {
-        gcs().send_text(MAV_SEVERITY_DEBUG, "Lua: Time: %u Mem: %d + %d",
+        gcs().send_text(AGPILOT_SEVERITY_DEBUG, "Lua: Time: %u Mem: %d + %d",
                                             (unsigned int)run_time,
                                             (int)total_mem,
                                             (int)run_mem);
@@ -150,19 +150,19 @@ lua_scripts::script_info *lua_scripts::load_script(lua_State *L, char *filename)
     if (int error = luaL_loadfile(L, filename)) {
         switch (error) {
             case LUA_ERRSYNTAX:
-                set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Error: %s", lua_tostring(L, -1));
+                set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Error: %s", lua_tostring(L, -1));
                 lua_pop(L, lua_gettop(L));
                 return nullptr;
             case LUA_ERRMEM:
-                set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Insufficent memory loading %s", filename);
+                set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Insufficent memory loading %s", filename);
                 lua_pop(L, lua_gettop(L));
                 return nullptr;
             case LUA_ERRFILE:
-                set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Unable to load the file: %s", lua_tostring(L, -1));
+                set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Unable to load the file: %s", lua_tostring(L, -1));
                 lua_pop(L, lua_gettop(L));
                 return nullptr;
             default:
-                set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Unknown error (%d) loading %s", error, filename);
+                set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Unknown error (%d) loading %s", error, filename);
                 lua_pop(L, lua_gettop(L));
                 return nullptr;
         }
@@ -174,7 +174,7 @@ lua_scripts::script_info *lua_scripts::load_script(lua_State *L, char *filename)
     script_info *new_script = (script_info *)_heap.allocate(sizeof(script_info));
     if (new_script == nullptr) {
         // No memory, shouldn't happen, we even attempted to do a GC
-        set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "Insufficent memory loading %s", filename);
+        set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "Insufficent memory loading %s", filename);
         lua_pop(L, 1); // we can't use the function we just loaded, so ditch it
         return nullptr;
     }
@@ -224,7 +224,7 @@ void lua_scripts::load_all_scripts_in_dir(lua_State *L, const char *dirname) {
 
     auto *d = AP::FS().opendir(dirname);
     if (d == nullptr) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Lua: open directory (%s) failed", dirname);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Lua: open directory (%s) failed", dirname);
         return;
     }
 
@@ -298,9 +298,9 @@ void lua_scripts::run_next_script(lua_State *L) {
     if(lua_pcall(L, 0, LUA_MULTRET, 0)) {
         if (overtime) {
             // script has consumed an excessive amount of CPU time
-            set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "%s exceeded time limit", script->name);
+            set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "%s exceeded time limit", script->name);
         } else {
-            set_and_print_new_error_message(MAV_SEVERITY_INFO, "%s", lua_tostring(L, -1));
+            set_and_print_new_error_message(AGPILOT_SEVERITY_INFO, "%s", lua_tostring(L, -1));
         }
         remove_script(L, script);
         lua_pop(L, 1);
@@ -316,13 +316,13 @@ void lua_scripts::run_next_script(lua_State *L) {
                 {
                     // sanity check the return types
                     if (lua_type(L, -1) != LUA_TNUMBER) {
-                        set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "%s did not return a delay (0x%d)", script->name, lua_type(L, -1));
+                        set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "%s did not return a delay (0x%d)", script->name, lua_type(L, -1));
                         lua_pop(L, 2);
                         remove_script(L, script);
                         return;
                     }
                     if (lua_type(L, -2) != LUA_TFUNCTION) {
-                        set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "%s did not return a function (0x%d)", script->name, lua_type(L, -2));
+                        set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "%s did not return a function (0x%d)", script->name, lua_type(L, -2));
                         lua_pop(L, 2);
                         remove_script(L, script);
                         return;
@@ -339,7 +339,7 @@ void lua_scripts::run_next_script(lua_State *L) {
                 }
             default:
                 {
-                    set_and_print_new_error_message(MAV_SEVERITY_CRITICAL, "%s returned bad result count (%d)", script->name, returned);
+                    set_and_print_new_error_message(AGPILOT_SEVERITY_CRITICAL, "%s returned bad result count (%d)", script->name, returned);
                     remove_script(L, script);
                     // pop all the results we got that we didn't expect
                     lua_pop(L, returned);
@@ -435,7 +435,7 @@ void lua_scripts::run(void) {
     bool succeeded_initial_load = false;
 
     if (!_heap.available()) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Lua: Unable to allocate a heap");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Lua: Unable to allocate a heap");
         return;
     }
 
@@ -460,7 +460,7 @@ void lua_scripts::run(void) {
     lua_state = lua_newstate(alloc, NULL);
     lua_State *L = lua_state;
     if (L == nullptr) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Lua: Couldn't allocate a lua state");
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Lua: Couldn't allocate a lua state");
         return;
     }
 
@@ -489,7 +489,7 @@ void lua_scripts::run(void) {
         loaded = true;
     }
     if (!loaded) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Lua: All directory's disabled see SCR_DIR_DISABLE");
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Lua: All directory's disabled see SCR_DIR_DISABLE");
     }
 
 #ifndef __clang_analyzer__
@@ -528,7 +528,7 @@ void lua_scripts::run(void) {
             }
 
             if ((_debug_options.get() & uint8_t(DebugLevel::RUNTIME_MSG)) != 0) {
-                gcs().send_text(MAV_SEVERITY_DEBUG, "Lua: Running %s", scripts->name);
+                gcs().send_text(AGPILOT_SEVERITY_DEBUG, "Lua: Running %s", scripts->name);
             }
             // copy name for logging, cant do it after as script reschedule moves the pointers
             const char * script_name = scripts->name;
@@ -557,7 +557,7 @@ void lua_scripts::run(void) {
 
         } else {
             if ((_debug_options.get() & uint8_t(DebugLevel::NO_SCRIPTS_TO_RUN)) != 0) {
-                gcs().send_text(MAV_SEVERITY_DEBUG, "Lua: No scripts to run");
+                gcs().send_text(AGPILOT_SEVERITY_DEBUG, "Lua: No scripts to run");
             }
             hal.scheduler->delay(1000);
         }
@@ -566,7 +566,7 @@ void lua_scripts::run(void) {
         const uint8_t error_prints = 10;
         if ((print_error_count < error_prints) && (AP_HAL::millis() - last_print_ms > 10000)) {
             // note that we do not clear the buffer after we have finished printing, this allows it to be used for a pre-arm check
-            print_error(MAV_SEVERITY_DEBUG);
+            print_error(AGPILOT_SEVERITY_DEBUG);
             print_error_count++;
         }
     }

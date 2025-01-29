@@ -3,7 +3,7 @@
 #include "AP_NavEKF2_core.h"
 #include <AP_DAL/AP_DAL.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -497,7 +497,7 @@ void  NavEKF2_core::getFilterGpsStatus(nav_gps_status &faults) const
 
 #if HAL_GCS_ENABLED
 // send an EKF_STATUS message to GCS
-void NavEKF2_core::send_status_report(GCS_MAVLINK &link) const
+void NavEKF2_core::send_status_report(GCS_AGPILOTLINK &link) const
 {
     // prepare flags
     uint16_t flags = 0;

@@ -3,7 +3,7 @@
 create ardupilot terrain database files
 '''
 
-from MAVProxy.modules.mavproxy_map import srtm
+from AGPILOTProxy.modules.mavproxy_map import srtm
 import math, struct, os, sys
 import crc16, time, struct
 
@@ -11,8 +11,8 @@ import crc16, time, struct
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-# MAVLink sends 4x4 grids
-TERRAIN_GRID_MAVLINK_SIZE = 4
+# AGPILOTLink sends 4x4 grids
+TERRAIN_GRID_AGPILOTLINK_SIZE = 4
 
 # a 2k grid_block on disk contains 8x7 of the mavlink grids.  Each
 # grid block overlaps by one with its neighbour. This ensures that
@@ -22,12 +22,12 @@ TERRAIN_GRID_BLOCK_MUL_X = 7
 TERRAIN_GRID_BLOCK_MUL_Y = 8
 
 # this is the spacing between 32x28 grid blocks, in grid_spacing units
-TERRAIN_GRID_BLOCK_SPACING_X = ((TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_MAVLINK_SIZE)
-TERRAIN_GRID_BLOCK_SPACING_Y = ((TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_MAVLINK_SIZE)
+TERRAIN_GRID_BLOCK_SPACING_X = ((TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_AGPILOTLINK_SIZE)
+TERRAIN_GRID_BLOCK_SPACING_Y = ((TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_AGPILOTLINK_SIZE)
 
 # giving a total grid size of a disk grid_block of 32x28
-TERRAIN_GRID_BLOCK_SIZE_X = (TERRAIN_GRID_MAVLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_X)
-TERRAIN_GRID_BLOCK_SIZE_Y = (TERRAIN_GRID_MAVLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_Y)
+TERRAIN_GRID_BLOCK_SIZE_X = (TERRAIN_GRID_AGPILOTLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_X)
+TERRAIN_GRID_BLOCK_SIZE_Y = (TERRAIN_GRID_AGPILOTLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_Y)
 
 # format of grid on disk
 TERRAIN_GRID_FORMAT_VERSION = 1
@@ -271,8 +271,8 @@ class DataFile(object):
 
     def bitnum(self, gx, gy):
         '''get bit number for a grid index'''
-        subgrid_x = gx // TERRAIN_GRID_MAVLINK_SIZE
-        subgrid_y = gy // TERRAIN_GRID_MAVLINK_SIZE
+        subgrid_x = gx // TERRAIN_GRID_AGPILOTLINK_SIZE
+        subgrid_y = gy // TERRAIN_GRID_AGPILOTLINK_SIZE
         return subgrid_y + TERRAIN_GRID_BLOCK_MUL_Y*subgrid_x
 
     def compare(self, block, test_threshold):

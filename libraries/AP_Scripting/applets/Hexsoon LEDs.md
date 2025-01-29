@@ -24,7 +24,7 @@ SCR_HEAP_SIZE 88032
 ```
 - Reboot
 
-- Use MP config tab -> MAVFtp to place this script in 'APM/scripts' folder
+- Use MP config tab -> AGPILOTFtp to place this script in 'APM/scripts' folder
 
 - Reboot
 

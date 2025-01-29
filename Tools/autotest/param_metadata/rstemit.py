@@ -12,7 +12,7 @@ except Exception:
 # Emit docs in a RST format
 class RSTEmit(Emit):
     def blurb(self):
-        return """This is a complete list of the parameters which can be set (e.g. via the MAVLink protocol) to control vehicle behaviour. They are stored in persistent storage on the vehicle.
+        return """This is a complete list of the parameters which can be set (e.g. via the AGPILOTLink protocol) to control vehicle behaviour. They are stored in persistent storage on the vehicle.
 
 This list is automatically generated from the latest ardupilot source code, and so may contain parameters which are not yet in the stable released versions of the code.
 """ # noqa

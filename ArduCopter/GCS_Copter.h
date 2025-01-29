@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "GCS_Mavlink.h"
 
 class GCS_Copter : public GCS
@@ -12,14 +12,14 @@ public:
     // the following define expands to a pair of methods to retrieve a
     // pointer to an object of the correct subclass for the link at
     // offset ofs.  These are of the form:
-    // GCS_MAVLINK_XXXX *chan(const uint8_t ofs) override;
-    // const GCS_MAVLINK_XXXX *chan(const uint8_t ofs) override const;
-    GCS_MAVLINK_CHAN_METHOD_DEFINITIONS(GCS_MAVLINK_Copter);
+    // GCS_AGPILOTLINK_XXXX *chan(const uint8_t ofs) override;
+    // const GCS_AGPILOTLINK_XXXX *chan(const uint8_t ofs) override const;
+    GCS_AGPILOTLINK_CHAN_METHOD_DEFINITIONS(GCS_AGPILOTLINK_Copter);
 
     void update_vehicle_sensor_status_flags(void) override;
 
     uint32_t custom_mode() const override;
-    MAV_TYPE frame_type() const override;
+    AGPILOT_TYPE frame_type() const override;
 
     const char* frame_string() const override;
 
@@ -41,9 +41,9 @@ protected:
         return 250;
     }
 
-    GCS_MAVLINK_Copter *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
+    GCS_AGPILOTLINK_Copter *new_gcs_mavlink_backend(GCS_AGPILOTLINK_Parameters &params,
                                                 AP_HAL::UARTDriver &uart) override {
-        return new GCS_MAVLINK_Copter(params, uart);
+        return new GCS_AGPILOTLINK_Copter(params, uart);
     }
 
 };

@@ -36,7 +36,7 @@ public:
     bool run(void) override;
 
     // method to send a GENERATOR_STATUS mavlink message
-    void send_generator_status(const GCS_MAVLINK &channel) override;
+    void send_generator_status(const GCS_AGPILOTLINK &channel) override;
 
     // prearm checks to ensure generator is good for arming.  Note
     // that if the generator has never sent us a message then these
@@ -65,7 +65,7 @@ private:
     RunState pilot_desired_runstate = RunState::STOP;
     RunState commanded_runstate = RunState::STOP;  // output is based on this
     void set_pilot_desired_runstate(RunState newstate) {
-        // gcs().send_text(MAV_SEVERITY_INFO, "RichenPower: Moving to state (%u) from (%u)\n", (unsigned)newstate, (unsigned)runstate);
+        // gcs().send_text(AGPILOT_SEVERITY_INFO, "RichenPower: Moving to state (%u) from (%u)\n", (unsigned)newstate, (unsigned)runstate);
         pilot_desired_runstate = newstate;
     }
     void update_runstate();

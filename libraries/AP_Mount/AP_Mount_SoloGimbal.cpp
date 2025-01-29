@@ -3,8 +3,8 @@
 
 #include "SoloGimbal.h"
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 AP_Mount_SoloGimbal::AP_Mount_SoloGimbal(AP_Mount &frontend, AP_Mount_Params &params, uint8_t instance) :
     AP_Mount_Backend(frontend, params, instance),
@@ -15,7 +15,7 @@ AP_Mount_SoloGimbal::AP_Mount_SoloGimbal(AP_Mount &frontend, AP_Mount_Params &pa
 void AP_Mount_SoloGimbal::init()
 {
     _initialised = true;
-    set_mode((enum MAV_MOUNT_MODE)_params.default_mode.get());
+    set_mode((enum AGPILOT_MOUNT_MODE)_params.default_mode.get());
 }
 
 void AP_Mount_SoloGimbal::update_fast()
@@ -34,14 +34,14 @@ void AP_Mount_SoloGimbal::update()
     // update based on mount mode
     switch(get_mode()) {
         // move mount to a "retracted" position.  we do not implement a separate servo based retract mechanism
-        case MAV_MOUNT_MODE_RETRACT:
+        case AGPILOT_MOUNT_MODE_RETRACT:
             _gimbal.set_lockedToBody(true);
             // initialise _angle_rad to smooth transition if user changes to RC_TARGETTINg
             _angle_rad = {0, 0, 0, false};
             break;
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             _gimbal.set_lockedToBody(false);
             const Vector3f &target = _params.neutral_angles.get();
             _angle_rad.roll = radians(target.x);
@@ -52,7 +52,7 @@ void AP_Mount_SoloGimbal::update()
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             _gimbal.set_lockedToBody(false);
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
@@ -65,7 +65,7 @@ void AP_Mount_SoloGimbal::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             _gimbal.set_lockedToBody(false);
             // update targets using pilot's RC inputs
             MountTarget rc_target {};
@@ -78,17 +78,17 @@ void AP_Mount_SoloGimbal::update()
         }
 
         // point mount to a GPS point given by the mission planner
-        case MAV_MOUNT_MODE_GPS_POINT:
+        case AGPILOT_MOUNT_MODE_GPS_POINT:
             _gimbal.set_lockedToBody(false);
             IGNORE_RETURN(get_angle_target_to_roi(_angle_rad));
             break;
 
-        case MAV_MOUNT_MODE_HOME_LOCATION:
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION:
             _gimbal.set_lockedToBody(false);
             IGNORE_RETURN(get_angle_target_to_home(_angle_rad));
             break;
 
-        case MAV_MOUNT_MODE_SYSID_TARGET:
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET:
             _gimbal.set_lockedToBody(false);
             IGNORE_RETURN(get_angle_target_to_sysid(_angle_rad));
             break;

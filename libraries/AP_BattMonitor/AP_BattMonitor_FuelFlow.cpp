@@ -5,7 +5,7 @@
 #include "AP_BattMonitor_FuelFlow.h"
 
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "AC_Sprayer/AC_Sprayer.h"
 #include "AP_AHRS/AP_AHRS.h"
 #include "AP_Arming/AP_Arming.h"
@@ -79,7 +79,7 @@ void AP_BattMonitor_FuelFlow::read()
 					last_pin,
 					FUNCTOR_BIND_MEMBER(&AP_BattMonitor_FuelFlow::irq_handler, void, uint8_t, bool, uint32_t),
 					AP_HAL::GPIO::INTERRUPT_RISING)) {
-				GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "FuelFlow: Failed to attach to pin %u", last_pin);
+				GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "FuelFlow: Failed to attach to pin %u", last_pin);
 			}
 		}
 	}
@@ -150,8 +150,8 @@ void AP_BattMonitor_FuelFlow::read()
 				static int gcs_count = 0;
 				AP::sprayer()->setPulseCount(0);
 
-				gcs().send_text(MAV_SEVERITY_WARNING, "Pani Samplay %d", gcs_count++);
-				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
+				gcs().send_text(AGPILOT_SEVERITY_WARNING, "Pani Samplay %d", gcs_count++);
+				gcs().send_text(AGPILOT_SEVERITY_INFO, "Tank Empty");
 			}
 			if(pcount > 10)
 			{

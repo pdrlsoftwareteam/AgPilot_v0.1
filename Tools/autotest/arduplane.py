@@ -562,7 +562,7 @@ class AutoTestPlane(AutoTest):
 
         new_alt = 100
         self.run_cmd_int(
-            mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+            mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
             0,
             0,
             0,
@@ -570,7 +570,7 @@ class AutoTestPlane(AutoTest):
             int(loc.lat * 1e7),
             int(loc.lng * 1e7),
             new_alt,    # alt
-            frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
         )
         self.wait_altitude(new_alt-10, new_alt, timeout=30, relative=True)
 
@@ -726,7 +726,7 @@ class AutoTestPlane(AutoTest):
         self.progress("Entering guided and flying somewhere constant")
         self.change_mode("GUIDED")
         self.run_cmd_int(
-            mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+            mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
             0,
             0,
             0,
@@ -744,7 +744,7 @@ class AutoTestPlane(AutoTest):
         self.progress("Setting groundspeed")
         new_target_groundspeed = initial_speed + 5
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+            mavutil.mavlink.AGPILOT_CMD_DO_CHANGE_SPEED,
             1, # groundspeed
             new_target_groundspeed,
             -1, # throttle / no change
@@ -761,7 +761,7 @@ class AutoTestPlane(AutoTest):
 
         # clear target groundspeed
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+            mavutil.mavlink.AGPILOT_CMD_DO_CHANGE_SPEED,
             1, # groundspeed
             0,
             -1, # throttle / no change
@@ -773,7 +773,7 @@ class AutoTestPlane(AutoTest):
         self.progress("Setting airspeed")
         new_target_airspeed = initial_speed + 5
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+            mavutil.mavlink.AGPILOT_CMD_DO_CHANGE_SPEED,
             0, # airspeed
             new_target_airspeed,
             -1, # throttle / no change
@@ -979,7 +979,7 @@ class AutoTestPlane(AutoTest):
         '''Fly throttle failsafe'''
         self.change_mode('MANUAL')
         m = self.mav.recv_match(type='SYS_STATUS', blocking=True)
-        receiver_bit = mavutil.mavlink.MAV_SYS_STATUS_SENSOR_RC_RECEIVER
+        receiver_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_RC_RECEIVER
         self.progress("Testing receiver enabled")
         if (not (m.onboard_control_sensors_enabled & receiver_bit)):
             raise PreconditionFailedException()
@@ -1122,7 +1122,7 @@ class AutoTestPlane(AutoTest):
 
     def ThrottleFailsafeFence(self):
         '''Fly fence survives throttle failsafe'''
-        fence_bit = mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE
+        fence_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE
 
         self.progress("Checking fence is not present before being configured")
         m = self.mav.recv_match(type='SYS_STATUS', blocking=True)
@@ -1148,7 +1148,7 @@ class AutoTestPlane(AutoTest):
             raise NotAchievedException("Got FENCE_STATUS unexpectedly")
 
         self.progress("Checking fence is initially OK")
-        self.wait_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE,
+        self.wait_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE,
                                present=True,
                                enabled=True,
                                healthy=True,
@@ -1163,7 +1163,7 @@ class AutoTestPlane(AutoTest):
         self.do_timesync_roundtrip()
 
         self.progress("Checking fence is OK after receiver failure (bind-values)")
-        fence_bit = mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE
+        fence_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE
         m = self.assert_receive_message('SYS_STATUS')
         if (not (m.onboard_control_sensors_enabled & fence_bit)):
             raise NotAchievedException("Fence not enabled after RC fail")
@@ -1248,7 +1248,7 @@ class AutoTestPlane(AutoTest):
             ("enabled", enabled, m.onboard_control_sensors_enabled),
             ("health", health, m.onboard_control_sensors_health),
         ]
-        bit = mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE
+        bit = mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE
         for test in tests:
             (name, want, field) = test
             got = (field & bit) != 0
@@ -1331,7 +1331,7 @@ class AutoTestPlane(AutoTest):
                 raise NotAchievedException("Expected zero points remaining")
             self.assert_fence_sys_status(False, False, True)
             self.progress("Trying to enable fence with no points")
-            self.do_fence_enable(want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+            self.do_fence_enable(want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
 
             # test a rather unfortunate behaviour:
             self.progress("Killing a live fence with fence-clear")
@@ -1340,7 +1340,7 @@ class AutoTestPlane(AutoTest):
             self.do_fence_enable()
             self.assert_fence_sys_status(True, True, True)
             self.clear_fence()
-            self.wait_sensor_state(mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE, False, False, True)
+            self.wait_sensor_state(mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE, False, False, True)
             if self.get_parameter("FENCE_TOTAL") != 0:
                 raise NotAchievedException("Expected zero points remaining")
             self.assert_fence_sys_status(False, False, True)
@@ -1378,7 +1378,7 @@ class AutoTestPlane(AutoTest):
                 mavutil.location(1.001, 1.000, 0, 0)
             ]
             self.upload_fences_from_locations(
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 [
                     locs
                 ]
@@ -1401,7 +1401,7 @@ class AutoTestPlane(AutoTest):
                 mavutil.location(home_loc.lat + 0.001, home_loc.lng - 0.001, 0, 0),
             ]
             self.upload_fences_from_locations(
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
                 [
                     locs
                 ]
@@ -1512,7 +1512,7 @@ class AutoTestPlane(AutoTest):
         except Exception as e:
             self.print_exception_caught(e)
             ex = e
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if ex is not None:
             raise ex
 
@@ -1534,8 +1534,8 @@ class AutoTestPlane(AutoTest):
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1545,10 +1545,10 @@ class AutoTestPlane(AutoTest):
                 int(fence_loc.lat * 1e7), # latitude
                 int(fence_loc.lng * 1e7), # longitude
                 0, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE
             )
         ]
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            fence_return_mission_items)
         self.delay_sim_time(1)
 
@@ -1740,7 +1740,7 @@ class AutoTestPlane(AutoTest):
         self.change_mode('MANUAL')
 
         self.progress("Asserting we do support transfer of fence via mission item protocol")
-        self.assert_capability(mavutil.mavlink.MAV_PROTOCOL_CAPABILITY_MISSION_FENCE)
+        self.assert_capability(mavutil.mavlink.AGPILOT_PROTOCOL_CAPABILITY_MISSION_FENCE)
 
         # grab home position:
         self.mav.recv_match(type='HOME_POSITION', blocking=True)
@@ -1890,15 +1890,15 @@ class AutoTestPlane(AutoTest):
             loc = self.mav.location()
             self.location_offset_ne(loc, 500, 500)
             self.run_cmd_int(
-                mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+                mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
                 0,
-                mavutil.mavlink.MAV_DO_REPOSITION_FLAGS_CHANGE_MODE,
+                mavutil.mavlink.AGPILOT_DO_REPOSITION_FLAGS_CHANGE_MODE,
                 0,
                 0,
                 int(loc.lat * 1e7),
                 int(loc.lng * 1e7),
                 100,    # alt
-                frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                frame=mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
             )
             self.wait_location(loc, accuracy=100)
             self.progress("Stewing")
@@ -2149,7 +2149,7 @@ class AutoTestPlane(AutoTest):
         self.set_parameters({
             "ADSB_TYPE": 1,
             "AVD_ENABLE": 1,
-            "AVD_F_ACTION": mavutil.mavlink.MAV_COLLISION_ACTION_MOVE_HORIZONTALLY,
+            "AVD_F_ACTION": mavutil.mavlink.AGPILOT_COLLISION_ACTION_MOVE_HORIZONTALLY,
             "AVD_F_RCVRY": 3,  # resume auto or loiter
         })
         self.reboot_sitl()
@@ -2192,7 +2192,7 @@ class AutoTestPlane(AutoTest):
             self.set_parameters({
                 "ADSB_TYPE": 1,
                 "AVD_ENABLE": 1,
-                "AVD_F_ACTION": mavutil.mavlink.MAV_COLLISION_ACTION_RTL,
+                "AVD_F_ACTION": mavutil.mavlink.AGPILOT_COLLISION_ACTION_RTL,
             })
             self.reboot_sitl()
             self.wait_ready_to_arm()
@@ -2204,9 +2204,9 @@ class AutoTestPlane(AutoTest):
             m = self.assert_receive_message('COLLISION', timeout=4)
             if m.threat_level != 2:
                 raise NotAchievedException("Expected some threat at least")
-            if m.action != mavutil.mavlink.MAV_COLLISION_ACTION_RTL:
+            if m.action != mavutil.mavlink.AGPILOT_COLLISION_ACTION_RTL:
                 raise NotAchievedException("Incorrect action; want=%u got=%u" %
-                                           (mavutil.mavlink.MAV_COLLISION_ACTION_RTL, m.action))
+                                           (mavutil.mavlink.AGPILOT_COLLISION_ACTION_RTL, m.action))
             self.wait_mode("RTL")
 
             self.progress("Sending far-away ABSD_VEHICLE message")
@@ -2259,8 +2259,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             2, # current - guided-mode request
             0, # autocontinue
             0, # p1
@@ -2270,9 +2270,9 @@ class AutoTestPlane(AutoTest):
             int(loc.lat * 1e7), # latitude
             int(loc.lng * 1e7), # longitude
             loc.alt, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         m = self.assert_receive_message('MISSION_ACK', timeout=5)
-        if m.type != mavutil.mavlink.MAV_MISSION_ERROR:
+        if m.type != mavutil.mavlink.AGPILOT_MISSION_ERROR:
             raise NotAchievedException("Did not get appropriate error")
 
         self.start_subtest("Enter guided and flying somewhere constant")
@@ -2281,8 +2281,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             2, # current - guided-mode request
             0, # autocontinue
             0, # p1
@@ -2292,9 +2292,9 @@ class AutoTestPlane(AutoTest):
             int(loc.lat * 1e7), # latitude
             int(loc.lng * 1e7), # longitude
             desired_relative_alt, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         m = self.assert_receive_message('MISSION_ACK', timeout=5)
-        if m.type != mavutil.mavlink.MAV_MISSION_ACCEPTED:
+        if m.type != mavutil.mavlink.AGPILOT_MISSION_ACCEPTED:
             raise NotAchievedException("Did not get accepted response")
         self.wait_location(loc, accuracy=100) # based on loiter radius
         self.wait_altitude(altitude_min=desired_relative_alt-3,
@@ -2311,8 +2311,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             3, # current - change-alt request
             0, # autocontinue
             0, # p1
@@ -2322,7 +2322,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0,
             desired_relative_alt, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
         self.wait_altitude(altitude_min=desired_relative_alt-3,
                            altitude_max=desired_relative_alt+3,
@@ -2831,7 +2831,7 @@ class AutoTestPlane(AutoTest):
         self.reboot_sitl()
         self.delay_sim_time(5)
         self.progress("Running accelcal")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_PREFLIGHT_CALIBRATION,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_PREFLIGHT_CALIBRATION,
                      0, 0, 0, 0, 4, 0, 0,
                      timeout=5)
 
@@ -2992,11 +2992,11 @@ class AutoTestPlane(AutoTest):
 
         self.set_parameter("SIM_IMUT_FIXED", 12)
         self.progress("Running accel cal")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_PREFLIGHT_CALIBRATION,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_PREFLIGHT_CALIBRATION,
                      0, 0, 0, 0, 4, 0, 0,
                      timeout=5)
         self.progress("Running gyro cal")
-        self.run_cmd(mavutil.mavlink.MAV_CMD_PREFLIGHT_CALIBRATION,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_PREFLIGHT_CALIBRATION,
                      0, 0, 0, 0, 1, 0, 0,
                      timeout=5)
         self.set_parameters({
@@ -3237,7 +3237,7 @@ class AutoTestPlane(AutoTest):
                 self.change_mode("GUIDED")
                 loc = self.mav.location()
                 self.run_cmd_int(
-                    mavutil.mavlink.MAV_CMD_DO_REPOSITION,
+                    mavutil.mavlink.AGPILOT_CMD_DO_REPOSITION,
                     0,
                     0,
                     0,
@@ -3254,7 +3254,7 @@ class AutoTestPlane(AutoTest):
                 m = self.mav.recv_match(type='VFR_HUD', blocking=True)
                 self.set_parameter("SIM_ARSPD_FAIL", m.airspeed)
                 self.run_cmd(
-                    mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+                    mavutil.mavlink.AGPILOT_CMD_DO_CHANGE_SPEED,
                     0, # airspeed
                     30,
                     -1, # throttle / no change
@@ -3308,7 +3308,7 @@ class AutoTestPlane(AutoTest):
 
     def FenceAltCeilFloor(self):
         '''Tests the fence ceiling and floor'''
-        fence_bit = mavutil.mavlink.MAV_SYS_STATUS_GEOFENCE
+        fence_bit = mavutil.mavlink.AGPILOT_SYS_STATUS_GEOFENCE
         self.set_parameters({
             "FENCE_TYPE": 9,     # Set fence type to max and min alt
             "FENCE_ACTION": 0,   # Set action to report
@@ -3368,7 +3368,7 @@ class AutoTestPlane(AutoTest):
             mavutil.location(home_loc.lat + 0.001, home_loc.lng - 0.001, 0, 0),
         ]
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
             [
                 locs
             ]
@@ -3431,7 +3431,7 @@ class AutoTestPlane(AutoTest):
             mavutil.location(home_loc.lat + 0.001, home_loc.lng - 0.001, 0, 0),
         ]
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
             [
                 locs
             ]
@@ -3448,17 +3448,17 @@ class AutoTestPlane(AutoTest):
         self.wait_mode("GUIDED", timeout=120) # We should RTL because of fence breach
         self.delay_sim_time(60)
 
-        items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(items) != 4:
             raise NotAchievedException("Unexpected fencepoint count (want=%u got=%u)" % (4, len(items)))
 
         # Check there are no fence return points specified still
         for fence_loc in items:
-            if fence_loc.command == mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT:
+            if fence_loc.command == mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT:
                 raise NotAchievedException(
                     "Unexpected fence return point found (%u) got %u" %
                     (fence_loc.command,
-                     mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT))
+                     mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT))
 
         # Work out the approximate return point when no fence return point present
         # Logic taken from AC_PolyFence_loader.cpp
@@ -3517,17 +3517,17 @@ class AutoTestPlane(AutoTest):
         self.wait_mode("GUIDED") # We should RTL because of fence breach
         self.delay_sim_time(30)
 
-        items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(items) != 0:
             raise NotAchievedException("Unexpected fencepoint count (want=%u got=%u)" % (0, len(items)))
 
         # Check there are no fence return points specified still
         for fence_loc in items:
-            if fence_loc.command == mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT:
+            if fence_loc.command == mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT:
                 raise NotAchievedException(
                     "Unexpected fence return point found (%u) got %u" %
                     (fence_loc.command,
-                     mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT))
+                     mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT))
 
         # Wait for guided return to vehicle calculated fence return location
         self.wait_distance_to_location(home_loc, 90, 110)
@@ -3563,7 +3563,7 @@ class AutoTestPlane(AutoTest):
         attempt_fence_breached_disable(start_mode="FBWA", end_mode="FBWA", expected_mode="GUIDED", action=6)
         attempt_fence_breached_disable(start_mode="FBWA", end_mode="FBWA", expected_mode="GUIDED", action=7)
 
-    def MAV_DO_AUX_FUNCTION(self):
+    def AGPILOT_DO_AUX_FUNCTION(self):
         '''Test triggering Auxiliary Functions via mavlink'''
         self.context_collect('STATUSTEXT')
         self.run_auxfunc(64, 2)  # 64 == reverse throttle
@@ -3576,14 +3576,14 @@ class AutoTestPlane(AutoTest):
         self.run_auxfunc(
             65231,
             2,
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED
         )
 
         self.start_subtest("Bad switchpos")
         self.run_auxfunc(
             62,
             17,
-            want_result=mavutil.mavlink.MAV_RESULT_DENIED
+            want_result=mavutil.mavlink.AGPILOT_RESULT_DENIED
         )
 
     def FlyEachFrame(self):
@@ -3642,19 +3642,19 @@ class AutoTestPlane(AutoTest):
         self.delay_sim_time(5)
         self.set_rc(9, 1000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             True,
             True)
         self.set_rc(9, 2000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             False,
             True)
         self.set_rc(9, 1000)
         self.wait_sensor_state(
-            mavutil.mavlink.MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
+            mavutil.mavlink.AGPILOT_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE,
             True,
             True,
             True)
@@ -3681,7 +3681,7 @@ class AutoTestPlane(AutoTest):
             new_home.longitude = new_home.longitude + 2000
             new_home.altitude = new_home.altitude + 300000 # 300 metres
             self.run_cmd_int(
-                mavutil.mavlink.MAV_CMD_DO_SET_HOME,
+                mavutil.mavlink.AGPILOT_CMD_DO_SET_HOME,
                 0, # p1,
                 0, # p2,
                 0, # p3,
@@ -3946,8 +3946,8 @@ class AutoTestPlane(AutoTest):
 
         self.progress("Mission OK")
 
-    def MAV_CMD_NAV_LOITER_TURNS(self, target_system=1, target_component=1):
-        '''test MAV_CMD_NAV_LOITER_TURNS mission item'''
+    def AGPILOT_CMD_NAV_LOITER_TURNS(self, target_system=1, target_component=1):
+        '''test AGPILOT_CMD_NAV_LOITER_TURNS mission item'''
         alt = 100
         seq = 0
         items = []
@@ -3960,8 +3960,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             seq, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             0, # p1
@@ -3971,7 +3971,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             0, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION))
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION))
         seq += 1
 
         # add takeoff
@@ -3979,8 +3979,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             seq, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_TAKEOFF,
             0, # current
             0, # autocontinue
             0, # p1
@@ -3990,7 +3990,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             alt, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION))
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION))
         seq += 1
 
         # add circles
@@ -3999,8 +3999,8 @@ class AutoTestPlane(AutoTest):
                 target_system,
                 target_component,
                 seq, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_LOITER_TURNS,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_LOITER_TURNS,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -4010,7 +4010,7 @@ class AutoTestPlane(AutoTest):
                 int(loc.lat*1e7), # latitude
                 int(loc.lng*1e7), # longitude
                 alt, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION))
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION))
             seq += 1
 
         # add an RTL
@@ -4018,8 +4018,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             seq, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_RETURN_TO_LAUNCH,
             0, # current
             0, # autocontinue
             0, # p1
@@ -4029,11 +4029,11 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             0, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION))
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION))
         seq += 1
 
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION, items)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION, items)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         ofs = 2
         self.progress("Checking downloaded mission is as expected")
         for (loc, radius) in tests:
@@ -4074,7 +4074,7 @@ class AutoTestPlane(AutoTest):
             disarmed = True
         except ValueError as e:
             self.progress("Got %s" % repr(e))
-            if "Expected MAV_RESULT_ACCEPTED got MAV_RESULT_FAILED" not in str(e):
+            if "Expected AGPILOT_RESULT_ACCEPTED got AGPILOT_RESULT_FAILED" not in str(e):
                 raise e
         if disarmed:
             raise NotAchievedException("Disarmed when we shouldn't have")
@@ -4256,8 +4256,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             0, # p1
@@ -4267,7 +4267,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             0, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def mission_jump_tag(self, tag, target_system=1, target_component=1):
         '''create a jump tag mission item'''
@@ -4275,8 +4275,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_JUMP_TAG,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_JUMP_TAG,
             0, # current
             0, # autocontinue
             tag, # p1
@@ -4286,7 +4286,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             0, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def mission_do_jump_tag(self, tag, target_system=1, target_component=1):
         '''create a jump tag mission item'''
@@ -4294,8 +4294,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_DO_JUMP_TAG,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_DO_JUMP_TAG,
             0, # current
             0, # autocontinue
             tag, # p1
@@ -4305,7 +4305,7 @@ class AutoTestPlane(AutoTest):
             0, # latitude
             0, # longitude
             0, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def mission_anonymous_waypoint(self, target_system=1, target_component=1):
         '''just a boring waypoint'''
@@ -4313,8 +4313,8 @@ class AutoTestPlane(AutoTest):
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             0, # current
             0, # autocontinue
             0, # p1
@@ -4324,7 +4324,7 @@ class AutoTestPlane(AutoTest):
             1, # latitude
             1, # longitude
             1, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
     def renumber_mission_items(self, mission):
         count = 0
@@ -4347,7 +4347,7 @@ class AutoTestPlane(AutoTest):
         self.check_mission_upload_download(mission)
         self.progress("Checking incorrect tag behaviour")
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_JUMP_TAG,
+            mavutil.mavlink.AGPILOT_CMD_DO_JUMP_TAG,
             jump_target + 1, # p1
             0,  # p2
             0,  # p3
@@ -4355,11 +4355,11 @@ class AutoTestPlane(AutoTest):
             0,  # p5
             0,  # p6
             0,  # p7
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED
         )
         self.progress("Checking correct tag behaviour")
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_JUMP_TAG,
+            mavutil.mavlink.AGPILOT_CMD_DO_JUMP_TAG,
             jump_target,  # p1
             0,  # p2
             0,  # p3
@@ -4396,14 +4396,14 @@ class AutoTestPlane(AutoTest):
         # commands on or after the index. Two scenarios:
         # 1) AUTO mission triggered: The the set_command will fail and it will cause an RTL event
         #       (Harder to test, need vehicle to actually reach the waypoint)
-        # 2) GCS/MAVLink: It will return MAV_RESULT_FAILED and there's on change to the mission. (Easy to test)
+        # 2) GCS/AGPILOTLink: It will return AGPILOT_RESULT_FAILED and there's on change to the mission. (Easy to test)
         self.renumber_mission_items(mission)
         self.check_mission_upload_download(mission)
         self.progress("Checking correct tag behaviour")
         self.change_mode('AUTO')
         self.arm_vehicle()
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_JUMP_TAG,
+            mavutil.mavlink.AGPILOT_CMD_DO_JUMP_TAG,
             17,  # p1
             0,  # p2
             0,  # p3
@@ -4411,12 +4411,12 @@ class AutoTestPlane(AutoTest):
             0,  # p5
             0,  # p6
             0,  # p7
-            want_result=mavutil.mavlink.MAV_RESULT_FAILED
+            want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED
         )
         self.disarm_vehicle()
 
     def MissionJumpTags(self):
-        '''test MAV_CMD_JUMP_TAG'''
+        '''test AGPILOT_CMD_JUMP_TAG'''
         self.wait_ready_to_arm()
         self.MissionJumpTags_missing_jump_target()
         self.MissionJumpTags_do_jump_to_bad_tag()
@@ -4454,7 +4454,7 @@ class AutoTestPlane(AutoTest):
         # reboot to clear potentially bad state
 
     def trigger_airspeed_cal(self):
-        self.run_cmd(mavutil.mavlink.MAV_CMD_PREFLIGHT_CALIBRATION,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_PREFLIGHT_CALIBRATION,
                      0, 0, 1, 0, 0, 0, 0)
 
     def AirspeedCal(self):
@@ -4528,13 +4528,13 @@ class AutoTestPlane(AutoTest):
             self.FRSkySPort,
             self.FRSkyPassThroughStatustext,
             self.FRSkyPassThroughSensorIDs,
-            self.FRSkyMAVlite,
+            self.FRSkyAGPILOTlite,
             self.FRSkyD,
             self.LTM,
             self.DEVO,
             self.AdvancedFailsafe,
             self.LOITER,
-            self.MAV_CMD_NAV_LOITER_TURNS,
+            self.AGPILOT_CMD_NAV_LOITER_TURNS,
             self.DeepStall,
             self.WatchdogHome,
             self.LargeMissions,
@@ -4551,7 +4551,7 @@ class AutoTestPlane(AutoTest):
             self.RTL_CLIMB_MIN,
             self.ClimbBeforeTurn,
             self.IMUTempCal,
-            self.MAV_DO_AUX_FUNCTION,
+            self.AGPILOT_DO_AUX_FUNCTION,
             self.SmartBattery,
             self.FlyEachFrame,
             self.RCDisableAirspeedUse,
@@ -4560,7 +4560,7 @@ class AutoTestPlane(AutoTest):
             self.LandingDrift,
             self.ForcedDCM,
             self.DCMFallback,
-            self.MAVFTP,
+            self.AGPILOTFTP,
             self.AUTOTUNE,
             self.MegaSquirt,
             self.MSP_DJI,

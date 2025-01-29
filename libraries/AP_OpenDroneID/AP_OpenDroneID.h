@@ -17,11 +17,11 @@
  *  Contributors: Tom Pittenger, Josh Henderson
  *  Parts of this code are based on/copied from the Open Drone ID project https://github.com/opendroneid/opendroneid-core-c
  *
- * The code has been tested with the BlueMark DroneBeacon MAVLink transponder running this command in the ArduPlane folder:
+ * The code has been tested with the BlueMark DroneBeacon AGPILOTLink transponder running this command in the ArduPlane folder:
  * sim_vehicle.py --wipe-eeprom --console --map -A --serial1=uart:/dev/ttyUSB1:9600
- * (and a DroneBeacon MAVLink transponder connected to ttyUSB1)
+ * (and a DroneBeacon AGPILOTLink transponder connected to ttyUSB1)
  *
- * The Remote ID implementation expects a transponder that caches the received MAVLink messages from ArduPilot
+ * The Remote ID implementation expects a transponder that caches the received AGPILOTLink messages from ArduPilot
  * and transmits them at the required intervals. So static messages are only sent once to the transponder.
  */
 
@@ -39,7 +39,7 @@
 
 #include <AP_Math/AP_Math.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Common/Location.h>
 
 #define ODID_ID_SIZE 20
@@ -130,8 +130,8 @@ private:
         return (uint8_t(_options.get()) & uint8_t(option)) != 0;
     }
 
-    mavlink_channel_t _chan; // MAVLink channel that communicates with the Remote ID Transceiver
-    const mavlink_channel_t MAV_CHAN_INVALID = mavlink_channel_t(255U);
+    mavlink_channel_t _chan; // AGPILOTLink channel that communicates with the Remote ID Transceiver
+    const mavlink_channel_t AGPILOT_CHAN_INVALID = mavlink_channel_t(255U);
     uint32_t _last_send_location_ms;
     uint32_t _last_send_system_update_ms;
     uint32_t _last_send_static_messages_ms;
@@ -166,7 +166,7 @@ private:
     // last time we sent a lost operator location notice
     uint32_t last_lost_operator_msg_ms;
     
-    // transmit functions to manually send a static MAVLink message
+    // transmit functions to manually send a static AGPILOTLink message
     void send_dynamic_out();
     void send_static_out();
     void send_basic_id_message();
@@ -185,10 +185,10 @@ private:
     uint32_t last_msg_send_ms;
 
     // helper functions
-    MAV_ODID_HOR_ACC create_enum_horizontal_accuracy(float Accuracy) const;
-    MAV_ODID_VER_ACC create_enum_vertical_accuracy(float Accuracy) const;
-    MAV_ODID_SPEED_ACC create_enum_speed_accuracy(float Accuracy) const;
-    MAV_ODID_TIME_ACC create_enum_timestamp_accuracy(float Accuracy) const;
+    AGPILOT_ODID_HOR_ACC create_enum_horizontal_accuracy(float Accuracy) const;
+    AGPILOT_ODID_VER_ACC create_enum_vertical_accuracy(float Accuracy) const;
+    AGPILOT_ODID_SPEED_ACC create_enum_speed_accuracy(float Accuracy) const;
+    AGPILOT_ODID_TIME_ACC create_enum_timestamp_accuracy(float Accuracy) const;
     uint16_t create_direction(uint16_t direction) const;
     uint16_t create_speed_horizontal(uint16_t speed) const;
     int16_t create_speed_vertical(int16_t speed) const;

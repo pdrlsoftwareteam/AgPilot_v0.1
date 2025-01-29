@@ -3,7 +3,7 @@
 #if HAL_MOUNT_GREMSY_ENABLED
 
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -24,20 +24,20 @@ void AP_Mount_Gremsy::update()
     switch (get_mode()) {
 
         // move mount to a "retracted" position.  We disable motors
-        case MAV_MOUNT_MODE_RETRACT:
+        case AGPILOT_MOUNT_MODE_RETRACT:
             // handled below
             send_gimbal_device_retract();
             break;
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             const Vector3f &angle_bf_target = _params.neutral_angles.get();
             send_gimbal_device_set_attitude(ToRad(angle_bf_target.x), ToRad(angle_bf_target.y), ToRad(angle_bf_target.z), false);
             }
             break;
 
         // use angle or rate targets provided by a mavlink message or mission command
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 send_gimbal_device_set_attitude(mavt_target.angle_rad.roll, mavt_target.angle_rad.pitch, mavt_target.angle_rad.yaw, mavt_target.angle_rad.yaw_is_ef);
@@ -49,7 +49,7 @@ void AP_Mount_Gremsy::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's rc inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -61,7 +61,7 @@ void AP_Mount_Gremsy::update()
         }
 
         // point mount to a GPS point given by the mission planner
-        case MAV_MOUNT_MODE_GPS_POINT: {
+        case AGPILOT_MOUNT_MODE_GPS_POINT: {
             MountTarget angle_target_rad {};
             if (get_angle_target_to_roi(angle_target_rad)) {
                 send_gimbal_device_set_attitude(angle_target_rad.roll, angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -70,7 +70,7 @@ void AP_Mount_Gremsy::update()
         }
 
         // point mount to home
-        case MAV_MOUNT_MODE_HOME_LOCATION: {
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION: {
             MountTarget angle_target_rad {};
             if (get_angle_target_to_home(angle_target_rad)) {
                 send_gimbal_device_set_attitude(angle_target_rad.roll, angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -78,7 +78,7 @@ void AP_Mount_Gremsy::update()
             break;
         }
 
-        case MAV_MOUNT_MODE_SYSID_TARGET: {
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET: {
             MountTarget angle_target_rad {};
             if (get_angle_target_to_sysid(angle_target_rad)) {
                 send_gimbal_device_set_attitude(angle_target_rad.roll, angle_target_rad.pitch, angle_target_rad.yaw, angle_target_rad.yaw_is_ef);
@@ -133,7 +133,7 @@ bool AP_Mount_Gremsy::get_attitude_quaternion(Quaternion& att_quat)
     return true;
 }
 
-// search for gimbal in GCS_MAVLink routing table
+// search for gimbal in GCS_AGPILOTLink routing table
 void AP_Mount_Gremsy::find_gimbal()
 {
     // do not look for gimbal for first 10 seconds so user may see banner
@@ -149,9 +149,9 @@ void AP_Mount_Gremsy::find_gimbal()
 
     // search for a mavlink enabled gimbal
     if (_link == nullptr) {
-        // we expect that instance 0 has compid = MAV_COMP_ID_GIMBAL, instance 1 has compid = MAV_COMP_ID_GIMBAL2, etc
-        uint8_t compid = (_instance == 0) ? MAV_COMP_ID_GIMBAL : MAV_COMP_ID_GIMBAL2 + (_instance - 1);
-        _link = GCS_MAVLINK::find_by_mavtype_and_compid(MAV_TYPE_GIMBAL, compid, _sysid);
+        // we expect that instance 0 has compid = AGPILOT_COMP_ID_GIMBAL, instance 1 has compid = AGPILOT_COMP_ID_GIMBAL2, etc
+        uint8_t compid = (_instance == 0) ? AGPILOT_COMP_ID_GIMBAL : AGPILOT_COMP_ID_GIMBAL2 + (_instance - 1);
+        _link = GCS_AGPILOTLINK::find_by_mavtype_and_compid(AGPILOT_TYPE_GIMBAL, compid, _sysid);
         if (_link == nullptr) {
             // have not yet found a gimbal so return
             return;
@@ -200,7 +200,7 @@ void AP_Mount_Gremsy::handle_gimbal_device_information(const mavlink_message_t &
     const uint8_t fw_ver_build = (info.firmware_version & 0xFF000000) >> 24;
 
     // display gimbal info to user
-    gcs().send_text(MAV_SEVERITY_INFO, "Mount: %s %s fw:%u.%u.%u.%u",
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Mount: %s %s fw:%u.%u.%u.%u",
             info.vendor_name,
             info.model_name,
             (unsigned)fw_ver_major,
@@ -232,20 +232,20 @@ void AP_Mount_Gremsy::request_gimbal_device_information() const
     }
 
     const mavlink_command_long_t pkt {
-        MAVLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION,  // param1
+        AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION,  // param1
         0,  // param2
         0,  // param3
         0,  // param4
         0,  // param5
         0,  // param6
         0,  // param7
-        MAV_CMD_REQUEST_MESSAGE,
+        AGPILOT_CMD_REQUEST_MESSAGE,
         _sysid,
         _compid,
         0  // confirmation
     };
 
-    _link->send_message(MAVLINK_MSG_ID_COMMAND_LONG, (const char*)&pkt);
+    _link->send_message(AGPILOTLINK_MSG_ID_COMMAND_LONG, (const char*)&pkt);
 }
 
 // start sending ATTITUDE and AUTOPILOT_STATE_FOR_GIMBAL_DEVICE to gimbal
@@ -256,10 +256,10 @@ bool AP_Mount_Gremsy::start_sending_attitude_to_gimbal()
         return false;
     }
     // send AUTOPILOT_STATE_FOR_GIMBAL_DEVICE
-    const MAV_RESULT res = _link->set_message_interval(MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE, AP_MOUNT_GREMSY_ATTITUDE_INTERVAL_US);
+    const AGPILOT_RESULT res = _link->set_message_interval(AGPILOTLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE, AP_MOUNT_GREMSY_ATTITUDE_INTERVAL_US);
 
     // return true on success
-    return (res == MAV_RESULT_ACCEPTED);
+    return (res == AGPILOT_RESULT_ACCEPTED);
 }
 
 // send GIMBAL_DEVICE_SET_ATTITUDE to gimbal to command gimbal to retract (aka relax)
@@ -275,7 +275,7 @@ void AP_Mount_Gremsy::send_gimbal_device_retract() const
         _compid
     };
 
-    _link->send_message(MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
+    _link->send_message(AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
 }
 
 // send GIMBAL_DEVICE_SET_ATTITUDE to gimbal to control rate
@@ -295,7 +295,7 @@ void AP_Mount_Gremsy::send_gimbal_device_set_rate(float roll_rads, float pitch_r
         _compid
     };
 
-    _link->send_message(MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
+    _link->send_message(AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
 }
 
 // send GIMBAL_DEVICE_SET_ATTITUDE to gimbal to control attitude
@@ -324,7 +324,7 @@ void AP_Mount_Gremsy::send_gimbal_device_set_attitude(float roll_rad, float pitc
         _compid
     };
 
-    _link->send_message(MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
+    _link->send_message(AGPILOTLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE, (const char*)&pkt);
 }
 
 #endif // HAL_MOUNT_GREMSY_ENABLED

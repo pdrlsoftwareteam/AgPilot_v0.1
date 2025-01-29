@@ -343,7 +343,7 @@ class AutoTestSub(AutoTest):
             0, # timestamp
             1, # target system_id
             1, # target component id
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
             0b1111111111111000, # mask specifying use-only-lat-lon-alt
             lat, # lat
             lon, # lon
@@ -375,7 +375,7 @@ class AutoTestSub(AutoTest):
         """Reboot SITL instance and wait it to reconnect."""
         # out battery is reset to full on reboot.  So reduce it to 10%
         # and wait for it to go above 50.
-        self.run_cmd(mavutil.mavlink.MAV_CMD_BATTERY_RESET,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_BATTERY_RESET,
                      255,  # battery mask
                      10,  # percentage
                      0,
@@ -392,8 +392,8 @@ class AutoTestSub(AutoTest):
             # ask for the message:
             batt = None
             try:
-                self.send_cmd(mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,
-                              mavutil.mavlink.MAVLINK_MSG_ID_BATTERY_STATUS,
+                self.send_cmd(mavutil.mavlink.AGPILOT_CMD_REQUEST_MESSAGE,
+                              mavutil.mavlink.AGPILOTLINK_MSG_ID_BATTERY_STATUS,
                               0,
                               0,
                               0,
@@ -447,7 +447,7 @@ class AutoTestSub(AutoTest):
             self.DoubleCircle,
             self.MotorThrustHoverParameterIgnore,
             self.SET_POSITION_TARGET_GLOBAL_INT,
-            self.TestLogDownloadMAVProxy,
+            self.TestLogDownloadAGPILOTProxy,
         ])
 
         return ret

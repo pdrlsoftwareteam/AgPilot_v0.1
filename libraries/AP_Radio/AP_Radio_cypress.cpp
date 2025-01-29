@@ -11,7 +11,7 @@
 #include <AP_Math/crc.h>
 #include "telem_structure.h"
 #include <AP_Notify/AP_Notify.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 /*
   driver for CYRF6936 radio
@@ -40,7 +40,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-#define Debug(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(MAV_SEVERITY_INFO, fmt, ##args); }} while (0)
+#define Debug(level, fmt, args...)   do { if ((level) <= get_debug_level()) { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ##args); }} while (0)
 
 #define LP_FIFO_SIZE  16      // Physical data FIFO lengths in Radio
 

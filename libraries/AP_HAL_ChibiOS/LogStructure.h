@@ -14,8 +14,8 @@
 // @Field: IErr: Internal error mask
 // @Field: IErrCnt: Count of internal error occurances
 // @Field: IErrLn: Internal Error line
-// @Field: MM: MAVLink message currently being processed
-// @Field: MC: MAVLink command currently being processed
+// @Field: MM: AGPILOTLink message currently being processed
+// @Field: MC: AGPILOTLink command currently being processed
 // @Field: SmLn: If semaphore taken, line of semaphore take call
 // @Field: SPICnt: count of SPI transactions
 // @Field: I2CCnt: count of i2c transactions

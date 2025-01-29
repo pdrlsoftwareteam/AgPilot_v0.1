@@ -2,7 +2,7 @@
 
 #if AP_BATTERY_LTC2946_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/utility/sparse-endian.h>
 
 #include "AP_BattMonitor_LTC2946.h"
@@ -33,13 +33,13 @@ void AP_BattMonitor_LTC2946::init(void)
     uint8_t id = 0;
     WITH_SEMAPHORE(dev->get_semaphore());
     if (!dev->read_registers(REG_MFR_ID, &id, 1) || id != ID_LTC2946) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "LTC2946: Failed to find device 0x%04x", unsigned(id));
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "LTC2946: Failed to find device 0x%04x", unsigned(id));
         return;
     }
 
     if (!dev->write_register(REG_CTRLA, REGA_CONF) ||
         !dev->write_register(REG_CTRLB, REGB_CONF)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "LTC2946: Failed to configure device");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "LTC2946: Failed to configure device");
         return;
     }
 
@@ -47,7 +47,7 @@ void AP_BattMonitor_LTC2946::init(void)
     voltage_LSB = 102.4 / 4095.0;
     current_LSB = (0.1024/0.0005) / 4095.0;
 
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "LTC2946: found monitor on bus %u", HAL_BATTMON_LTC2946_BUS);
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "LTC2946: found monitor on bus %u", HAL_BATTMON_LTC2946_BUS);
 
     if (dev) {
         dev->register_periodic_callback(25000, FUNCTOR_BIND_MEMBER(&AP_BattMonitor_LTC2946::timer, void));

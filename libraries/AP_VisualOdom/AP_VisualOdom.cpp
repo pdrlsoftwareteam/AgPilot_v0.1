@@ -18,7 +18,7 @@
 #if HAL_VISUALODOM_ENABLED
 
 #include "AP_VisualOdom_Backend.h"
-#include "AP_VisualOdom_MAV.h"
+#include "AP_VisualOdom_AGPILOT.h"
 #include "AP_VisualOdom_IntelT265.h"
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
@@ -31,7 +31,7 @@ const AP_Param::GroupInfo AP_VisualOdom::var_info[] = {
     // @Param: _TYPE
     // @DisplayName: Visual odometry camera connection type
     // @Description: Visual odometry camera connection type
-    // @Values: 0:None,1:MAVLink,2:IntelT265,3:VOXL(ModalAI)
+    // @Values: 0:None,1:AGPILOTLink,2:IntelT265,3:VOXL(ModalAI)
     // @User: Advanced
     // @RebootRequired: True
     AP_GROUPINFO_FLAGS("_TYPE", 0, AP_VisualOdom, _type, 0, AP_PARAM_FLAG_ENABLE),
@@ -128,8 +128,8 @@ void AP_VisualOdom::init()
     case VisualOdom_Type::None:
         // do nothing
         break;
-    case VisualOdom_Type::MAV:
-        _driver = new AP_VisualOdom_MAV(*this);
+    case VisualOdom_Type::AGPILOT:
+        _driver = new AP_VisualOdom_AGPILOT(*this);
         break;
     case VisualOdom_Type::IntelT265:
     case VisualOdom_Type::VOXL:

@@ -205,7 +205,7 @@ void SITL_State::wait_clock(uint64_t wait_time_usec)
         }
     }
     // check the outbound TCP queue size.  If it is too long then
-    // MAVProxy/pymavlink take too long to process packets and it ends
+    // AGPILOTProxy/pymavlink take too long to process packets and it ends
     // up seeing traffic well into our past and hits time-out
     // conditions.
     if (speedup > 1 && hal.scheduler->in_main_thread()) {
@@ -322,7 +322,7 @@ SITL::SerialDevice *SITL_State::create_serial_sim(const char *name, const char *
         if (rf_mavlink != nullptr) {
             AP_HAL::panic("Only one rf_mavlink at a time");
         }
-        rf_mavlink = new SITL::RF_MAVLink();
+        rf_mavlink = new SITL::RF_AGPILOTLink();
         return rf_mavlink;
 
     } else if (streq(name, "frsky-d")) {

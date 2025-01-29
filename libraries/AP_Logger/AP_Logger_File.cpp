@@ -23,7 +23,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 
 
@@ -157,7 +157,7 @@ void AP_Logger_File::periodic_1Hz()
         if (io_thread_warning_decimation_counter == 0 && _initialised) {
             // we don't print this error unless we did initialise. When _initialised is set to true
             // we register the IO timer callback
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "AP_Logger: stuck thread (%s)", last_io_operation);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_CRITICAL, "AP_Logger: stuck thread (%s)", last_io_operation);
         }
         if (io_thread_warning_decimation_counter++ > 30) {
             io_thread_warning_decimation_counter = 0;

@@ -31,7 +31,7 @@ extern const AP_HAL::HAL& hal;
 #ifdef HAL_SERIAL2_PROTOCOL
 #define SERIAL2_PROTOCOL HAL_SERIAL2_PROTOCOL
 #else
-#define SERIAL2_PROTOCOL SerialProtocol_MAVLink2
+#define SERIAL2_PROTOCOL SerialProtocol_AGPILOTLink2
 #endif
 
 #ifndef HAL_SERIAL3_PROTOCOL
@@ -51,12 +51,12 @@ extern const AP_HAL::HAL& hal;
 #define SERIAL5_BAUD HAL_SERIAL5_BAUD
 #else
 #define SERIAL5_PROTOCOL SerialProtocol_None
-#define SERIAL5_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
+#define SERIAL5_BAUD AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000
 #endif
 
 #ifndef HAL_SERIAL6_PROTOCOL
 #define SERIAL6_PROTOCOL SerialProtocol_None
-#define SERIAL6_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
+#define SERIAL6_BAUD AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000
 #else
 #define SERIAL6_PROTOCOL HAL_SERIAL6_PROTOCOL
 #define SERIAL6_BAUD HAL_SERIAL6_BAUD
@@ -64,7 +64,7 @@ extern const AP_HAL::HAL& hal;
 
 #ifndef HAL_SERIAL7_PROTOCOL
 #define SERIAL7_PROTOCOL SerialProtocol_None
-#define SERIAL7_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
+#define SERIAL7_BAUD AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000
 #else
 #define SERIAL7_PROTOCOL HAL_SERIAL7_PROTOCOL
 #define SERIAL7_BAUD HAL_SERIAL7_BAUD
@@ -72,7 +72,7 @@ extern const AP_HAL::HAL& hal;
 
 #ifndef HAL_SERIAL8_PROTOCOL
 #define SERIAL8_PROTOCOL SerialProtocol_None
-#define SERIAL8_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
+#define SERIAL8_BAUD AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000
 #else
 #define SERIAL8_PROTOCOL HAL_SERIAL8_PROTOCOL
 #define SERIAL8_BAUD HAL_SERIAL8_BAUD
@@ -80,7 +80,7 @@ extern const AP_HAL::HAL& hal;
 
 #ifndef HAL_SERIAL9_PROTOCOL
 #define SERIAL9_PROTOCOL SerialProtocol_None
-#define SERIAL9_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
+#define SERIAL9_BAUD AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000
 #else
 #define SERIAL9_PROTOCOL HAL_SERIAL9_PROTOCOL
 #define SERIAL9_BAUD HAL_SERIAL9_BAUD
@@ -126,27 +126,27 @@ const AP_Param::GroupInfo AP_SerialManager::var_info[] = {
     // @Param: 0_PROTOCOL
     // @DisplayName: Console protocol selection
     // @Description: Control what protocol to use on the console. 
-    // @Values: 1:MAVlink1, 2:MAVLink2
+    // @Values: 1:AGPILOTlink1, 2:AGPILOTLink2
     // @User: Standard
     // @RebootRequired: True
-    AP_GROUPINFO("0_PROTOCOL",  11, AP_SerialManager, state[0].protocol, SerialProtocol_MAVLink2),
+    AP_GROUPINFO("0_PROTOCOL",  11, AP_SerialManager, state[0].protocol, SerialProtocol_AGPILOTLink2),
 #endif
 
 #if SERIALMANAGER_NUM_PORTS > 1
     // @Param: 1_PROTOCOL
     // @DisplayName: Telem1 protocol selection
     // @Description: Control what protocol to use on the Telem1 port. Note that the Frsky options require external converter hardware. See the wiki for details.
-    // @Values: -1:None, 1:MAVLink1, 2:MAVLink2, 3:Frsky D, 4:Frsky SPort, 5:GPS, 7:Alexmos Gimbal Serial, 8:Gimbal, 9:Rangefinder, 10:FrSky SPort Passthrough (OpenTX), 11:Lidar360, 13:Beacon, 14:Volz servo out, 15:SBus servo out, 16:ESC Telemetry, 17:Devo Telemetry, 18:OpticalFlow, 19:RobotisServo, 20:NMEA Output, 21:WindVane, 22:SLCAN, 23:RCIN, 24:EFI Serial, 25:LTM, 26:RunCam, 27:HottTelem, 28:Scripting, 29:Crossfire VTX, 30:Generator, 31:Winch, 32:MSP, 33:DJI FPV, 34:AirSpeed, 35:ADSB, 36:AHRS, 37:SmartAudio, 38:FETtecOneWire, 39:Torqeedo, 40:AIS, 41:CoDevESC, 42:DisplayPort, 43:MAVLink High Latency, 44:IRC Tramp
+    // @Values: -1:None, 1:AGPILOTLink1, 2:AGPILOTLink2, 3:Frsky D, 4:Frsky SPort, 5:GPS, 7:Alexmos Gimbal Serial, 8:Gimbal, 9:Rangefinder, 10:FrSky SPort Passthrough (OpenTX), 11:Lidar360, 13:Beacon, 14:Volz servo out, 15:SBus servo out, 16:ESC Telemetry, 17:Devo Telemetry, 18:OpticalFlow, 19:RobotisServo, 20:NMEA Output, 21:WindVane, 22:SLCAN, 23:RCIN, 24:EFI Serial, 25:LTM, 26:RunCam, 27:HottTelem, 28:Scripting, 29:Crossfire VTX, 30:Generator, 31:Winch, 32:MSP, 33:DJI FPV, 34:AirSpeed, 35:ADSB, 36:AHRS, 37:SmartAudio, 38:FETtecOneWire, 39:Torqeedo, 40:AIS, 41:CoDevESC, 42:DisplayPort, 43:AGPILOTLink High Latency, 44:IRC Tramp
     // @User: Standard
     // @RebootRequired: True
-    AP_GROUPINFO("1_PROTOCOL",  1, AP_SerialManager, state[1].protocol, SerialProtocol_MAVLink2),
+    AP_GROUPINFO("1_PROTOCOL",  1, AP_SerialManager, state[1].protocol, SerialProtocol_AGPILOTLink2),
 
     // @Param: 1_BAUD
     // @DisplayName: Telem1 Baud Rate
     // @Description: The baud rate used on the Telem1 port. Most stm32-based boards can support rates of up to 1500. If you setup a rate you cannot support and then can't connect to your board you should load a firmware from a different vehicle type. That will reset all your parameters to defaults.
     // @Values: 1:1200,2:2400,4:4800,9:9600,19:19200,38:38400,57:57600,111:111100,115:115200,230:230400,256:256000,460:460800,500:500000,921:921600,1500:1500000,2000:2000000
     // @User: Standard
-    AP_GROUPINFO("1_BAUD", 2, AP_SerialManager, state[1].baud, AP_SERIALMANAGER_MAVLINK_BAUD/1000),
+    AP_GROUPINFO("1_BAUD", 2, AP_SerialManager, state[1].baud, AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000),
 #endif
 
 #if SERIALMANAGER_NUM_PORTS > 2
@@ -160,7 +160,7 @@ const AP_Param::GroupInfo AP_SerialManager::var_info[] = {
     // @CopyFieldsFrom: SERIAL1_BAUD
     // @DisplayName: Telemetry 2 Baud Rate
     // @Description: The baud rate of the Telem2 port. Most stm32-based boards can support rates of up to 1500. If you setup a rate you cannot support and then can't connect to your board you should load a firmware from a different vehicle type. That will reset all your parameters to defaults.
-    AP_GROUPINFO("2_BAUD", 4, AP_SerialManager, state[2].baud, AP_SERIALMANAGER_MAVLINK_BAUD/1000),
+    AP_GROUPINFO("2_BAUD", 4, AP_SerialManager, state[2].baud, AP_SERIALMANAGER_AGPILOTLINK_BAUD/1000),
 #endif
 
 #if SERIALMANAGER_NUM_PORTS > 3
@@ -282,7 +282,7 @@ const AP_Param::GroupInfo AP_SerialManager::var_info[] = {
 
     // @Param: _PASSTIMO
     // @DisplayName: Serial passthru timeout
-    // @Description: This sets a timeout for serial pass-through in seconds. When the pass-through is enabled by setting the SERIAL_PASS1 and SERIAL_PASS2 parameters then it remains in effect until no data comes from the first port for SERIAL_PASSTIMO seconds. This allows the port to revent to its normal usage (such as MAVLink connection to a GCS) when it is no longer needed. A value of 0 means no timeout.
+    // @Description: This sets a timeout for serial pass-through in seconds. When the pass-through is enabled by setting the SERIAL_PASS1 and SERIAL_PASS2 parameters then it remains in effect until no data comes from the first port for SERIAL_PASSTIMO seconds. This allows the port to revent to its normal usage (such as AGPILOTLink connection to a GCS) when it is no longer needed. A value of 0 means no timeout.
     // @Range: 0 120
     // @Units: s
     // @User: Advanced
@@ -382,12 +382,12 @@ void AP_SerialManager::init()
 #ifdef HAL_OTG1_CONFIG
     /*
       prevent users from changing USB protocol to other than
-      MAVLink. This fixes an issue where users trying to get SLCAN
+      AGPILOTLink. This fixes an issue where users trying to get SLCAN
       change SERIAL0_PROTOCOL to 22 and find they can no longer connect
      */
-    if (state[0].protocol != SerialProtocol_MAVLink &&
-        state[0].protocol != SerialProtocol_MAVLink2) {
-        state[0].protocol.set(SerialProtocol_MAVLink2);
+    if (state[0].protocol != SerialProtocol_AGPILOTLink &&
+        state[0].protocol != SerialProtocol_AGPILOTLink2) {
+        state[0].protocol.set(SerialProtocol_AGPILOTLink2);
     }
 #endif
 
@@ -411,12 +411,12 @@ void AP_SerialManager::init()
 #endif
                     break;
                 case SerialProtocol_Console:
-                case SerialProtocol_MAVLink:
-                case SerialProtocol_MAVLink2:
-                case SerialProtocol_MAVLinkHL:
+                case SerialProtocol_AGPILOTLink:
+                case SerialProtocol_AGPILOTLink2:
+                case SerialProtocol_AGPILOTLinkHL:
                     uart->begin(state[i].baudrate(),
-                                         AP_SERIALMANAGER_MAVLINK_BUFSIZE_RX,
-                                         AP_SERIALMANAGER_MAVLINK_BUFSIZE_TX);
+                                         AP_SERIALMANAGER_AGPILOTLINK_BUFSIZE_RX,
+                                         AP_SERIALMANAGER_AGPILOTLINK_BUFSIZE_TX);
                     break;
                 case SerialProtocol_FrSky_D:
                     // Note baudrate is hardcoded to 9600
@@ -668,8 +668,8 @@ bool AP_SerialManager::protocol_match(enum SerialProtocol protocol1, enum Serial
     }
 
     // mavlink match
-    if (((protocol1 == SerialProtocol_MAVLink) || (protocol1 == SerialProtocol_MAVLink2) || (protocol1 == SerialProtocol_MAVLinkHL)) &&
-        ((protocol2 == SerialProtocol_MAVLink) || (protocol2 == SerialProtocol_MAVLink2) || (protocol2 == SerialProtocol_MAVLinkHL))) {
+    if (((protocol1 == SerialProtocol_AGPILOTLink) || (protocol1 == SerialProtocol_AGPILOTLink2) || (protocol1 == SerialProtocol_AGPILOTLinkHL)) &&
+        ((protocol2 == SerialProtocol_AGPILOTLink) || (protocol2 == SerialProtocol_AGPILOTLink2) || (protocol2 == SerialProtocol_AGPILOTLinkHL))) {
         return true;
     }
 

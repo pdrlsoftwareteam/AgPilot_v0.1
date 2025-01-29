@@ -5,7 +5,7 @@
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_GPS/AP_GPS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_RPM/AP_RPM.h>
 
 #include "AP_Frsky_SPortParser.h"

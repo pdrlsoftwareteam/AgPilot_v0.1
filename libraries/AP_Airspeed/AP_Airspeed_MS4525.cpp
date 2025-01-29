@@ -24,7 +24,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_HAL/I2CDevice.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 #include <utility>
 
@@ -88,14 +88,14 @@ bool AP_Airspeed_MS4525::init()
         }
     }
 
-    GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "MS4525[%u]: no sensor found", get_instance());
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "MS4525[%u]: no sensor found", get_instance());
     return false;
 
 found_sensor:
     _dev->set_device_type(uint8_t(DevType::MS4525));
     set_bus_id(_dev->get_bus_id());
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "MS4525[%u]: Found bus %u addr 0x%02x", get_instance(), _dev->bus_num(), _dev->get_bus_address());
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "MS4525[%u]: Found bus %u addr 0x%02x", get_instance(), _dev->bus_num(), _dev->get_bus_address());
 
     // drop to 2 retries for runtime
     _dev->set_retries(2);

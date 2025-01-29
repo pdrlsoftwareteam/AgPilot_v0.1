@@ -7,10 +7,10 @@
 #include "AP_Logger_File.h"
 #include "AP_Logger_DataFlash.h"
 #include "AP_Logger_W25N01GV.h"
-#include "AP_Logger_MAVLink.h"
+#include "AP_Logger_AGPILOTLink.h"
 
 #include <AP_InternalError/AP_InternalError.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Rally/AP_Rally.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -40,8 +40,8 @@ extern const AP_HAL::HAL& hal;
 #define HAL_LOGGING_STACK_SIZE 1580
 #endif
 
-#ifndef HAL_LOGGING_MAV_BUFSIZE
-#define HAL_LOGGING_MAV_BUFSIZE  8
+#ifndef HAL_LOGGING_AGPILOT_BUFSIZE
+#define HAL_LOGGING_AGPILOT_BUFSIZE  8
 #endif 
 
 #ifndef HAL_LOGGING_FILE_TIMEOUT
@@ -60,8 +60,8 @@ extern const AP_HAL::HAL& hal;
 #  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::BLOCK
 # elif HAL_LOGGING_FILESYSTEM_ENABLED
 #  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::FILESYSTEM
-# elif HAL_LOGGING_MAVLINK_ENABLED
-#  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::MAVLINK
+# elif HAL_LOGGING_AGPILOTLINK_ENABLED
+#  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::AGPILOTLINK
 # else
 #  define HAL_LOGGING_BACKENDS_DEFAULT 0
 # endif
@@ -79,7 +79,7 @@ const AP_Param::GroupInfo AP_Logger::var_info[] = {
     // @Param: _BACKEND_TYPE
     // @DisplayName: AP_Logger Backend Storage type
     // @Description: Bitmap of what Logger backend types to enable. Block-based logging is available on SITL and boards with dataflash chips. Multiple backends can be selected.
-    // @Bitmask: 0:File,1:MAVLink,2:Block
+    // @Bitmask: 0:File,1:AGPILOTLink,2:Block
     // @User: Standard
     AP_GROUPINFO("_BACKEND_TYPE",  0, AP_Logger, _params.backend_types,       uint8_t(HAL_LOGGING_BACKENDS_DEFAULT)),
 
@@ -110,13 +110,13 @@ const AP_Param::GroupInfo AP_Logger::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("_FILE_DSRMROT",  4, AP_Logger, _params.file_disarm_rot,       0),
 
-#if HAL_LOGGING_MAVLINK_ENABLED
-    // @Param: _MAV_BUFSIZE
-    // @DisplayName: Maximum AP_Logger MAVLink Backend buffer size
+#if HAL_LOGGING_AGPILOTLINK_ENABLED
+    // @Param: _AGPILOT_BUFSIZE
+    // @DisplayName: Maximum AP_Logger AGPILOTLink Backend buffer size
     // @Description: Maximum amount of memory to allocate to AP_Logger-over-mavlink
     // @User: Advanced
     // @Units: kB
-    AP_GROUPINFO("_MAV_BUFSIZE",  5, AP_Logger, _params.mav_bufsize,       HAL_LOGGING_MAV_BUFSIZE),
+    AP_GROUPINFO("_AGPILOT_BUFSIZE",  5, AP_Logger, _params.mav_bufsize,       HAL_LOGGING_AGPILOT_BUFSIZE),
 #endif
 
     // @Param: _FILE_TIMEOUT
@@ -143,15 +143,15 @@ const AP_Param::GroupInfo AP_Logger::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("_FILE_RATEMAX",  8, AP_Logger, _params.file_ratemax, 0),
 
-#if HAL_LOGGING_MAVLINK_ENABLED
-    // @Param: _MAV_RATEMAX
+#if HAL_LOGGING_AGPILOTLINK_ENABLED
+    // @Param: _AGPILOT_RATEMAX
     // @DisplayName: Maximum logging rate for mavlink backend
     // @Description: This sets the maximum rate that streaming log messages will be logged to the mavlink backend. A value of zero means that rate limiting is disabled.
     // @Units: Hz
     // @Range: 0 1000
     // @Increment: 0.1
     // @User: Standard
-    AP_GROUPINFO("_MAV_RATEMAX",  9, AP_Logger, _params.mav_ratemax, 0),
+    AP_GROUPINFO("_AGPILOT_RATEMAX",  9, AP_Logger, _params.mav_ratemax, 0),
 #endif
 
 #if HAL_LOGGING_BLOCK_ENABLED
@@ -196,7 +196,7 @@ void AP_Logger::Init(const struct LogStructure *structures, uint8_t num_types)
     _params.file_bufsize.convert_parameter_width(AP_PARAM_INT8);
 
     if (hal.util->was_watchdog_armed()) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Forcing logging for watchdog reset");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Forcing logging for watchdog reset");
         _params.log_disarmed.set(LogDisarmed::LOG_WHILE_DISARMED);
     }
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -218,8 +218,8 @@ void AP_Logger::Init(const struct LogStructure *structures, uint8_t num_types)
 #if HAL_LOGGING_DATAFLASH_ENABLED
         { Backend_Type::BLOCK, HAL_LOGGING_DATAFLASH_DRIVER::probe },
 #endif
-#if HAL_LOGGING_MAVLINK_ENABLED
-        { Backend_Type::MAVLINK, AP_Logger_MAVLink::probe },
+#if HAL_LOGGING_AGPILOTLINK_ENABLED
+        { Backend_Type::AGPILOTLINK, AP_Logger_AGPILOTLink::probe },
 #endif
 };
 
@@ -829,19 +829,19 @@ bool AP_Logger::logging_started(void) {
     return false;
 }
 
-void AP_Logger::handle_mavlink_msg(GCS_MAVLINK &link, const mavlink_message_t &msg)
+void AP_Logger::handle_mavlink_msg(GCS_AGPILOTLINK &link, const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS:
+    case AGPILOTLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS:
         FOR_EACH_BACKEND(remote_log_block_status_msg(link, msg));
         break;
-    case MAVLINK_MSG_ID_LOG_REQUEST_LIST:
+    case AGPILOTLINK_MSG_ID_LOG_REQUEST_LIST:
         FALLTHROUGH;
-    case MAVLINK_MSG_ID_LOG_REQUEST_DATA:
+    case AGPILOTLINK_MSG_ID_LOG_REQUEST_DATA:
         FALLTHROUGH;
-    case MAVLINK_MSG_ID_LOG_ERASE:
+    case AGPILOTLINK_MSG_ID_LOG_ERASE:
         FALLTHROUGH;
-    case MAVLINK_MSG_ID_LOG_REQUEST_END:
+    case AGPILOTLINK_MSG_ID_LOG_REQUEST_END:
         handle_log_message(link, msg);
         break;
     }
@@ -1381,7 +1381,7 @@ bool AP_Logger::check_crash_dump_save(void)
     }
     AP::FS().close(fd2);
     AP::FS().close(fd);
-    GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Saved crash_dump.bin");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Saved crash_dump.bin");
     return true;
 }
 
@@ -1695,7 +1695,7 @@ void AP_Logger::file_content_update(FileContent &file_content)
         }
         file_content.offset = 0;
         if (file_content.fast) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Logging %s", file->filename);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Logging %s", file->filename);
         }
     }
 

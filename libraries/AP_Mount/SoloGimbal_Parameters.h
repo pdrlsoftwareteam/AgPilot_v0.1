@@ -1,7 +1,7 @@
 #pragma once
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_Mount.h"
 #if HAL_SOLO_GIMBAL_ENABLED
 
@@ -32,7 +32,7 @@ enum gmb_param_t {
     GMB_PARAM_GMB_SND_TORQUE,
     GMB_PARAM_GMB_SYSID,
     GMB_PARAM_GMB_FLASH,
-    MAVLINK_GIMBAL_NUM_TRACKED_PARAMS
+    AGPILOTLINK_GIMBAL_NUM_TRACKED_PARAMS
 };
 
 enum gmb_flashing_step_t {
@@ -82,7 +82,7 @@ private:
         gmb_param_state_t state;
         uint8_t fetch_attempts;
         bool seen;
-    } _params[MAVLINK_GIMBAL_NUM_TRACKED_PARAMS];
+    } _params[AGPILOTLINK_GIMBAL_NUM_TRACKED_PARAMS];
 
     uint32_t _last_request_ms;
     uint32_t _last_set_ms;

@@ -58,31 +58,31 @@ bool AP_MotorsMatrix::init(uint8_t expected_num_motors)
     set_initialised_ok(expected_num_motors == num_motors);
 
     if (!initialised_ok()) {
-        _mav_type = MAV_TYPE_GENERIC;
+        _mav_type = AGPILOT_TYPE_GENERIC;
         return false;
     }
 
     switch (num_motors) {
         case 3:
-            _mav_type = MAV_TYPE_TRICOPTER;
+            _mav_type = AGPILOT_TYPE_TRICOPTER;
             break;
         case 4:
-            _mav_type = MAV_TYPE_QUADROTOR;
+            _mav_type = AGPILOT_TYPE_QUADROTOR;
             break;
         case 6:
-            _mav_type = MAV_TYPE_HEXAROTOR;
+            _mav_type = AGPILOT_TYPE_HEXAROTOR;
             break;
         case 8:
-            _mav_type = MAV_TYPE_OCTOROTOR;
+            _mav_type = AGPILOT_TYPE_OCTOROTOR;
             break;
         case 10:
-            _mav_type = MAV_TYPE_DECAROTOR;
+            _mav_type = AGPILOT_TYPE_DECAROTOR;
             break;
         case 12:
-            _mav_type = MAV_TYPE_DODECAROTOR;
+            _mav_type = AGPILOT_TYPE_DODECAROTOR;
             break;
         default:
-            _mav_type = MAV_TYPE_GENERIC;
+            _mav_type = AGPILOT_TYPE_GENERIC;
     }
 
     normalise_rpy_factors();
@@ -573,7 +573,7 @@ void AP_MotorsMatrix::add_motors_raw(const struct MotorDefRaw *motors, uint8_t n
 bool AP_MotorsMatrix::setup_quad_matrix(motor_frame_type frame_type)
 {
     _frame_class_string = "QUAD";
-    _mav_type = MAV_TYPE_QUADROTOR;
+    _mav_type = AGPILOT_TYPE_QUADROTOR;
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
         _frame_type_string = "PLUS";
@@ -773,7 +773,7 @@ bool AP_MotorsMatrix::setup_quad_matrix(motor_frame_type frame_type)
 bool AP_MotorsMatrix::setup_hexa_matrix(motor_frame_type frame_type)
 {
     _frame_class_string = "HEXA";
-    _mav_type = MAV_TYPE_HEXAROTOR;
+    _mav_type = AGPILOT_TYPE_HEXAROTOR;
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
         _frame_type_string = "PLUS";
@@ -853,7 +853,7 @@ bool AP_MotorsMatrix::setup_hexa_matrix(motor_frame_type frame_type)
 bool AP_MotorsMatrix::setup_octa_matrix(motor_frame_type frame_type)
 {
     _frame_class_string = "OCTA";
-    _mav_type = MAV_TYPE_OCTOROTOR;
+    _mav_type = AGPILOT_TYPE_OCTOROTOR;
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
         _frame_type_string = "PLUS";
@@ -972,7 +972,7 @@ bool AP_MotorsMatrix::setup_octa_matrix(motor_frame_type frame_type)
 #if AP_MOTORS_FRAME_OCTAQUAD_ENABLED
 bool AP_MotorsMatrix::setup_octaquad_matrix(motor_frame_type frame_type)
 {
-    _mav_type = MAV_TYPE_OCTOROTOR;
+    _mav_type = AGPILOT_TYPE_OCTOROTOR;
     _frame_class_string = "OCTAQUAD";
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
@@ -1095,7 +1095,7 @@ bool AP_MotorsMatrix::setup_octaquad_matrix(motor_frame_type frame_type)
 #if AP_MOTORS_FRAME_DODECAHEXA_ENABLED
 bool AP_MotorsMatrix::setup_dodecahexa_matrix(motor_frame_type frame_type)
 {
-    _mav_type = MAV_TYPE_DODECAROTOR;
+    _mav_type = AGPILOT_TYPE_DODECAROTOR;
     _frame_class_string = "DODECAHEXA";
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
@@ -1147,7 +1147,7 @@ bool AP_MotorsMatrix::setup_dodecahexa_matrix(motor_frame_type frame_type)
 #if AP_MOTORS_FRAME_Y6_ENABLED
 bool AP_MotorsMatrix::setup_y6_matrix(motor_frame_type frame_type)
 {
-    _mav_type = MAV_TYPE_HEXAROTOR;
+    _mav_type = AGPILOT_TYPE_HEXAROTOR;
     _frame_class_string = "Y6";
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_Y6B: {
@@ -1198,7 +1198,7 @@ bool AP_MotorsMatrix::setup_y6_matrix(motor_frame_type frame_type)
 #if AP_MOTORS_FRAME_DECA_ENABLED
 bool AP_MotorsMatrix::setup_deca_matrix(motor_frame_type frame_type)
 {
-    _mav_type = MAV_TYPE_DECAROTOR;
+    _mav_type = AGPILOT_TYPE_DECAROTOR;
     _frame_class_string = "DECA";
     switch (frame_type) {
     case MOTOR_FRAME_TYPE_PLUS: {
@@ -1293,7 +1293,7 @@ void AP_MotorsMatrix::setup_motors(motor_frame_class frame_class, motor_frame_ty
         // matrix doesn't support the configured class
         _frame_class_string = "UNSUPPORTED";
         success = false;
-        _mav_type = MAV_TYPE_GENERIC;
+        _mav_type = AGPILOT_TYPE_GENERIC;
         break;
     } // switch frame_class
 

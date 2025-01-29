@@ -1,6 +1,6 @@
-# MAVProxy modules #
+# AGPILOTProxy modules #
 
-This folder contains modules for MAVProxy specifically for ArduPilot. Add the
+This folder contains modules for AGPILOTProxy specifically for ArduPilot. Add the
 path to this folder to your `PYTHONPATH` in order to use it.
 
 # Modules #

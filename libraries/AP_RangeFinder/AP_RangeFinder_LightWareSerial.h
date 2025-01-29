@@ -24,8 +24,8 @@ protected:
 
     using AP_RangeFinder_Backend_Serial::AP_RangeFinder_Backend_Serial;
 
-    MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
-        return MAV_DISTANCE_SENSOR_LASER;
+    AGPILOT_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
+        return AGPILOT_DISTANCE_SENSOR_LASER;
     }
 
     bool get_signal_quality_pct(uint8_t &quality_pct) const override {

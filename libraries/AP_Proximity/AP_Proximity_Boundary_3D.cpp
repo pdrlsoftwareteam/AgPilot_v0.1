@@ -416,7 +416,7 @@ bool AP_Proximity_Boundary_3D::get_filtered_distance(const Face &face, float &di
 bool AP_Proximity_Boundary_3D::get_layer_distances(uint8_t layer_number, float dist_max, Proximity_Distance_Array &prx_dist_array, Proximity_Distance_Array &prx_filt_dist_array) const
 {
     // cycle through all sectors filling in distances and orientations
-    // see MAV_SENSOR_ORIENTATION for orientations (0 = forward, 1 = 45 degree clockwise from north, etc)
+    // see AGPILOT_SENSOR_ORIENTATION for orientations (0 = forward, 1 = 45 degree clockwise from north, etc)
     bool valid_distances = false;
     prx_dist_array.offset_valid = 0;
     prx_filt_dist_array.offset_valid = 0;

@@ -33,7 +33,7 @@ def wait_prearm_ok(mav, timeout=30):
         m = mav.recv_match(type='SYS_STATUS', blocking=True, timeout=2)
         if m is None:
             return
-        if m.onboard_control_sensors_health & mavutil.mavlink.MAV_SYS_STATUS_PREARM_CHECK != 0:
+        if m.onboard_control_sensors_health & mavutil.mavlink.AGPILOT_SYS_STATUS_PREARM_CHECK != 0:
             print("Prearm OK")
             return
     print("Failed to get pre-arm OK")

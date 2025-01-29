@@ -102,7 +102,7 @@ void AP_Winch::set_desired_rate(float rate)
 }
 
 // send status to ground station
-void AP_Winch::send_status(const GCS_MAVLINK &channel)
+void AP_Winch::send_status(const GCS_AGPILOTLINK &channel)
 {
     if (backend != nullptr) {
         backend->send_status(channel);

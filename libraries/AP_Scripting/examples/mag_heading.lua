@@ -31,14 +31,14 @@ end
 
 gcs:send_text(0, "MagHeading loaded")
 
-local MAV_SEVERITY_ERROR = 3
+local AGPILOT_SEVERITY_ERROR = 3
 
 -- wrapper around update(). This calls update() and if update faults
 -- then an error is displayed, but the script is not stopped
 function protected_wrapper()
     local success, err = pcall(update)
     if not success then
-        gcs:send_text(MAV_SEVERITY_ERROR, "Internal Error: " .. err)
+        gcs:send_text(AGPILOT_SEVERITY_ERROR, "Internal Error: " .. err)
         -- when we fault we run the update function again after 1s, slowing it
         -- down a bit so we don't flood the console with errors
         return protected_wrapper, 1000

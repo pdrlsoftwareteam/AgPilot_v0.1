@@ -4,7 +4,7 @@
 #include <AP_Math/AP_Math.h>
 #include <Filter/Filter.h>         // filter library
 #include <Filter/DerivativeFilter.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 // offsets for motors in motor_out and _motor_filtered arrays
 #define AP_MOTORS_MOT_1 0U
@@ -265,7 +265,7 @@ public:
     // returns true is pwm type is normal
     bool is_normal_pwm_type() const { return (_pwm_type == PWM_TYPE_NORMAL) || (_pwm_type == PWM_TYPE_PWM_RANGE); }
 
-    MAV_TYPE get_frame_mav_type() const { return _mav_type; }
+    AGPILOT_TYPE get_frame_mav_type() const { return _mav_type; }
 
     // direct motor write
     virtual void        rc_write(uint8_t chan, uint16_t pwm);
@@ -343,7 +343,7 @@ protected:
     bool                _thrust_balanced;       // true when output thrust is well balanced
     float               _thrust_boost_ratio;    // choice between highest and second highest motor output for output mixing (0 ~ 1). Zero is normal operation
 
-    MAV_TYPE _mav_type; // MAV_TYPE_GENERIC = 0;
+    AGPILOT_TYPE _mav_type; // AGPILOT_TYPE_GENERIC = 0;
 
     enum pwm_type { PWM_TYPE_NORMAL     = 0,
                     PWM_TYPE_ONESHOT    = 1,

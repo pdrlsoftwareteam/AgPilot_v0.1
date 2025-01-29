@@ -19,7 +19,7 @@
 #endif
 
 #include "HarmonicNotchFilter.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define HNF_MAX_FILTERS HAL_HNF_MAX_FILTERS // must be even for double-notch filters
 #define HNF_MAX_HARMONICS 8
@@ -153,7 +153,7 @@ void HarmonicNotchFilter<T>::allocate_filters(uint8_t num_notches, uint8_t harmo
     if (_num_filters > 0) {
         _filters = new NotchFilter<T>[_num_filters];
         if (_filters == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Failed to allocate %u bytes for notch filter", (unsigned int)(_num_filters * sizeof(NotchFilter<T>)));
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Failed to allocate %u bytes for notch filter", (unsigned int)(_num_filters * sizeof(NotchFilter<T>)));
             _num_filters = 0;
         }
     }

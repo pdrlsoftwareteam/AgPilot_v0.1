@@ -1,5 +1,5 @@
 #include "Copter.h"
-#include "GCS_MAVLink/GCS.h"
+#include "GCS_AGPILOTLink/GCS.h"
 #include "../libraries/AC_Avoidance/AP_OAPathPlanner.h"
 #include "../libraries/AC_Avoidance/AC_Avoid.h"
 #if MODE_AUTO_ENABLED == ENABLED
@@ -48,7 +48,7 @@ bool ModeAuto::init(bool ignore_checks)
     if (mission.num_commands() > 1 || ignore_checks) {
         // reject switching to auto mode if landed with motors armed but first command is not a takeoff (reduce chance of flips)
         if (motors->armed() && copter.ap.land_complete && !mission.starts_with_takeoff_cmd()) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto: Missing Takeoff Cmd");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Auto: Missing Takeoff Cmd");
             return false;
         }
 
@@ -145,10 +145,10 @@ void ModeAuto::run()
             // if mission is running restart the current command if it is a waypoint or spline command
             if ((mission.state() == AP_Mission::MISSION_RUNNING) && (_mode == SubMode::WP)) {
                 if (mission.restart_current_nav_cmd()) {
-                    gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto mission changed, restarted command");
+                    gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Auto mission changed, restarted command");
                 } else {
                     // failed to restart mission for some reason
-                    gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto mission changed but failed to restart command");
+                    gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Auto mission changed but failed to restart command");
                 }
             }
         }
@@ -264,9 +264,9 @@ bool ModeAuto::jump_to_landing_sequence_auto_RTL(ModeReason reason)
         // mode change failed, revert force resume flag
         mission.set_force_resume(false);
 
-        gcs().send_text(MAV_SEVERITY_WARNING, "Mode change to AUTO RTL failed");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "Mode change to AUTO RTL failed");
     } else {
-        gcs().send_text(MAV_SEVERITY_WARNING, "Mode change to AUTO RTL failed: No landing sequence found");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "Mode change to AUTO RTL failed: No landing sequence found");
     }
 
     AP::logger().Write_Error(LogErrorSubsystem::FLIGHT_MODE, LogErrorCode(Number::AUTO_RTL));
@@ -664,111 +664,111 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
     ///
     /// navigation commands
     ///
-    case MAV_CMD_NAV_VTOL_TAKEOFF:
-    case MAV_CMD_NAV_TAKEOFF:                   // 22
+    case AGPILOT_CMD_NAV_VTOL_TAKEOFF:
+    case AGPILOT_CMD_NAV_TAKEOFF:                   // 22
         do_takeoff(cmd);
         break;
 
-    case MAV_CMD_NAV_WAYPOINT:                  // 16  Navigate to Waypoint
+    case AGPILOT_CMD_NAV_WAYPOINT:                  // 16  Navigate to Waypoint
         do_nav_wp(cmd);
         break;
 
-    case MAV_CMD_NAV_VTOL_LAND:
-    case MAV_CMD_NAV_LAND:              // 21 LAND to Waypoint
+    case AGPILOT_CMD_NAV_VTOL_LAND:
+    case AGPILOT_CMD_NAV_LAND:              // 21 LAND to Waypoint
         do_land(cmd);
         break;
 
-    case MAV_CMD_NAV_LOITER_UNLIM:              // 17 Loiter indefinitely
+    case AGPILOT_CMD_NAV_LOITER_UNLIM:              // 17 Loiter indefinitely
         do_loiter_unlimited(cmd);
         break;
 
-    case MAV_CMD_NAV_RETURN_TO_LAUNCH:             //20
+    case AGPILOT_CMD_NAV_RETURN_TO_LAUNCH:             //20
         do_RTL();
         break;
 
-    case MAV_CMD_NAV_SPLINE_WAYPOINT:           // 82  Navigate to Waypoint using spline
+    case AGPILOT_CMD_NAV_SPLINE_WAYPOINT:           // 82  Navigate to Waypoint using spline
         do_spline_wp(cmd);
         break;
 
 #if NAV_GUIDED == ENABLED
-    case MAV_CMD_NAV_GUIDED_ENABLE:             // 92  accept navigation commands from external nav computer
+    case AGPILOT_CMD_NAV_GUIDED_ENABLE:             // 92  accept navigation commands from external nav computer
         do_nav_guided_enable(cmd);
         break;
 #endif
 
-    case MAV_CMD_NAV_DELAY:                    // 93 Delay the next navigation command
+    case AGPILOT_CMD_NAV_DELAY:                    // 93 Delay the next navigation command
         do_nav_delay(cmd);
         break;
 
-    case MAV_CMD_NAV_PAYLOAD_PLACE:              // 94 place at Waypoint
+    case AGPILOT_CMD_NAV_PAYLOAD_PLACE:              // 94 place at Waypoint
         do_payload_place(cmd);
         break;
 
 #if AP_SCRIPTING_ENABLED
-	case MAV_CMD_NAV_SCRIPT_TIME:
+	case AGPILOT_CMD_NAV_SCRIPT_TIME:
 		do_nav_script_time(cmd);
 		break;
 #endif
 
-    case MAV_CMD_NAV_ATTITUDE_TIME:
+    case AGPILOT_CMD_NAV_ATTITUDE_TIME:
         do_nav_attitude_time(cmd);
         break;
 
     //
     // conditional commands
     //
-    case MAV_CMD_CONDITION_DELAY:             // 112
+    case AGPILOT_CMD_CONDITION_DELAY:             // 112
         do_wait_delay(cmd);
         break;
 
-    case MAV_CMD_CONDITION_DISTANCE:             // 114
+    case AGPILOT_CMD_CONDITION_DISTANCE:             // 114
         do_within_distance(cmd);
         break;
 
-    case MAV_CMD_CONDITION_YAW:             // 115
+    case AGPILOT_CMD_CONDITION_YAW:             // 115
         do_yaw(cmd);
         break;
 
     ///
     /// do commands
     ///
-    case MAV_CMD_DO_CHANGE_SPEED:             // 178
+    case AGPILOT_CMD_DO_CHANGE_SPEED:             // 178
         do_change_speed(cmd);
         break;
 
-    case MAV_CMD_DO_SET_HOME:             // 179
+    case AGPILOT_CMD_DO_SET_HOME:             // 179
         do_set_home(cmd);
         break;
 
-    case MAV_CMD_DO_SET_ROI:                // 201
+    case AGPILOT_CMD_DO_SET_ROI:                // 201
         // point the copter and camera at a region of interest (ROI)
         do_roi(cmd);
         break;
 
-    case MAV_CMD_DO_MOUNT_CONTROL:          // 205
+    case AGPILOT_CMD_DO_MOUNT_CONTROL:          // 205
         // point the camera to a specified angle
         do_mount_control(cmd);
         break;
     
-    case MAV_CMD_DO_FENCE_ENABLE:
+    case AGPILOT_CMD_DO_FENCE_ENABLE:
 #if AP_FENCE_ENABLED
         if (cmd.p1 == 0) { //disable
             copter.fence.enable(false);
-            gcs().send_text(MAV_SEVERITY_INFO, "Fence Disabled");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Fence Disabled");
         } else { //enable fence
             copter.fence.enable(true);
-            gcs().send_text(MAV_SEVERITY_INFO, "Fence Enabled");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "Fence Enabled");
         }
 #endif //AP_FENCE_ENABLED
         break;
 
 #if AP_WINCH_ENABLED
-    case MAV_CMD_DO_WINCH:                             // Mission command to control winch
+    case AGPILOT_CMD_DO_WINCH:                             // Mission command to control winch
         do_winch(cmd);
         break;
 #endif
 
-    case MAV_CMD_DO_LAND_START:
+    case AGPILOT_CMD_DO_LAND_START:
         break;
 
     default:
@@ -809,14 +809,14 @@ bool ModeAuto::do_guided(const AP_Mission::Mission_Command& cmd)
     // switch to handle different commands
     switch (cmd.id) {
 
-        case MAV_CMD_NAV_WAYPOINT:
+        case AGPILOT_CMD_NAV_WAYPOINT:
         {
             // set wp_nav's destination
             Location dest(cmd.content.location);
             return copter.mode_guided.set_destination(dest);
         }
 
-        case MAV_CMD_CONDITION_YAW:
+        case AGPILOT_CMD_CONDITION_YAW:
             do_yaw(cmd);
             return true;
 
@@ -889,85 +889,85 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
     //
     // navigation commands
     //
-    case MAV_CMD_NAV_VTOL_TAKEOFF:
-    case MAV_CMD_NAV_TAKEOFF:
+    case AGPILOT_CMD_NAV_VTOL_TAKEOFF:
+    case AGPILOT_CMD_NAV_TAKEOFF:
         cmd_complete = verify_takeoff();
         break;
 
-    case MAV_CMD_NAV_WAYPOINT:
+    case AGPILOT_CMD_NAV_WAYPOINT:
         cmd_complete = verify_nav_wp(cmd);
         break;
 
-    case MAV_CMD_NAV_VTOL_LAND:
-    case MAV_CMD_NAV_LAND:
+    case AGPILOT_CMD_NAV_VTOL_LAND:
+    case AGPILOT_CMD_NAV_LAND:
         cmd_complete = verify_land();
         break;
 
-    case MAV_CMD_NAV_PAYLOAD_PLACE:
+    case AGPILOT_CMD_NAV_PAYLOAD_PLACE:
         cmd_complete = verify_payload_place();
         break;
 
-    case MAV_CMD_NAV_LOITER_UNLIM:
+    case AGPILOT_CMD_NAV_LOITER_UNLIM:
         cmd_complete = verify_loiter_unlimited();
         break;
 
-    case MAV_CMD_NAV_RETURN_TO_LAUNCH:
+    case AGPILOT_CMD_NAV_RETURN_TO_LAUNCH:
         cmd_complete = verify_RTL();
         break;
 
-    case MAV_CMD_NAV_SPLINE_WAYPOINT:
+    case AGPILOT_CMD_NAV_SPLINE_WAYPOINT:
         cmd_complete = verify_spline_wp(cmd);
         break;
 
 #if NAV_GUIDED == ENABLED
-    case MAV_CMD_NAV_GUIDED_ENABLE:
+    case AGPILOT_CMD_NAV_GUIDED_ENABLE:
         cmd_complete = verify_nav_guided_enable(cmd);
         break;
 #endif
 
-     case MAV_CMD_NAV_DELAY:
+     case AGPILOT_CMD_NAV_DELAY:
         cmd_complete = verify_nav_delay(cmd);
         break;
 
 #if AP_SCRIPTING_ENABLED
-	case MAV_CMD_NAV_SCRIPT_TIME:
+	case AGPILOT_CMD_NAV_SCRIPT_TIME:
 		cmd_complete = verify_nav_script_time();
 		break;
 #endif
 
-    case MAV_CMD_NAV_ATTITUDE_TIME:
+    case AGPILOT_CMD_NAV_ATTITUDE_TIME:
         cmd_complete = verify_nav_attitude_time(cmd);
         break;
 
     ///
     /// conditional commands
     ///
-    case MAV_CMD_CONDITION_DELAY:
+    case AGPILOT_CMD_CONDITION_DELAY:
         cmd_complete = verify_wait_delay();
         break;
 
-    case MAV_CMD_CONDITION_DISTANCE:
+    case AGPILOT_CMD_CONDITION_DISTANCE:
         cmd_complete = verify_within_distance();
         break;
 
-    case MAV_CMD_CONDITION_YAW:
+    case AGPILOT_CMD_CONDITION_YAW:
         cmd_complete = verify_yaw();
         break;
 
     // do commands (always return true)
-    case MAV_CMD_DO_CHANGE_SPEED:
-    case MAV_CMD_DO_SET_HOME:
-    case MAV_CMD_DO_SET_ROI:
-    case MAV_CMD_DO_MOUNT_CONTROL:
-    case MAV_CMD_DO_FENCE_ENABLE:
-    case MAV_CMD_DO_WINCH:
-    case MAV_CMD_DO_LAND_START:
+    case AGPILOT_CMD_DO_CHANGE_SPEED:
+    case AGPILOT_CMD_DO_SET_HOME:
+    case AGPILOT_CMD_DO_SET_ROI:
+    case AGPILOT_CMD_DO_MOUNT_CONTROL:
+    case AGPILOT_CMD_DO_FENCE_ENABLE:
+    case AGPILOT_CMD_DO_WINCH:
+    case AGPILOT_CMD_DO_LAND_START:
         cmd_complete = true;
         break;
 
     default:
         // error message
-        gcs().send_text(MAV_SEVERITY_WARNING,"Skipping invalid cmd #%i",cmd.id);
+        gcs().send_text(AGPILOT_SEVERITY_WARNING,"Skipping invalid cmd #%i",cmd.id);
         // return true if we do not recognize the command so that we move on to the next command
         cmd_complete = true;
         break;
@@ -1319,7 +1319,7 @@ void ModeAuto::payload_place_run()
             // do nothing on this loop
             break;
         case PayloadPlaceStateType_Descent:
-            gcs().send_text(MAV_SEVERITY_INFO, "%s landed", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s landed", prefix_str);
             nav_payload_place.state = PayloadPlaceStateType_Release;
             break;
         case PayloadPlaceStateType_Release:
@@ -1339,11 +1339,11 @@ void ModeAuto::payload_place_run()
         case PayloadPlaceStateType_FlyToLocation:
         case PayloadPlaceStateType_Descent_Start:
             set_submode(SubMode::NAV_PAYLOAD_PLACE);
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Manual release", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s Manual release", prefix_str);
             nav_payload_place.state = PayloadPlaceStateType_Done;
             break;
         case PayloadPlaceStateType_Descent:
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Manual release", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s Manual release", prefix_str);
             nav_payload_place.state = PayloadPlaceStateType_Release;
             break;
         case PayloadPlaceStateType_Release:
@@ -1378,7 +1378,7 @@ void ModeAuto::payload_place_run()
         if (!is_zero(nav_payload_place.descent_max_cm) &&
             nav_payload_place.descent_start_altitude_cm - inertial_nav.get_position_z_up_cm() > nav_payload_place.descent_max_cm) {
             nav_payload_place.state = PayloadPlaceStateType_Ascent_Start;
-            gcs().send_text(MAV_SEVERITY_WARNING, "%s Reached maximum descent", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_WARNING, "%s Reached maximum descent", prefix_str);
             break;
         }
         // calibrate the decent thrust after aircraft has reached constant decent rate and release if threshold is reached
@@ -1399,7 +1399,7 @@ void ModeAuto::payload_place_run()
             if (!copter.rangefinder_state.enabled) {
                 // abort payload place because rangefinder is not enabled
                 nav_payload_place.state = PayloadPlaceStateType_Ascent_Start;
-                gcs().send_text(MAV_SEVERITY_WARNING, "%s PLDP_RNG_MIN set and rangefinder not enabled", prefix_str);
+                gcs().send_text(AGPILOT_SEVERITY_WARNING, "%s PLDP_RNG_MIN set and rangefinder not enabled", prefix_str);
                 break;
             } else if (copter.rangefinder_alt_ok() && (copter.rangefinder_state.glitch_count == 0) && (copter.rangefinder_state.alt_cm > g2.pldp_range_finder_minimum_m * 100.0)) {
                 // range finder altitude is above minimum
@@ -1419,7 +1419,7 @@ void ModeAuto::payload_place_run()
 
         if (now_ms - nav_payload_place.place_start_time_ms > placed_check_duration_ms) {
             nav_payload_place.state = PayloadPlaceStateType_Release;
-            gcs().send_text(MAV_SEVERITY_INFO, "%s payload release thrust threshold: %f", prefix_str, static_cast<double>(g2.pldp_thrust_placed_fraction * nav_payload_place.descent_thrust_level));
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s payload release thrust threshold: %f", prefix_str, static_cast<double>(g2.pldp_thrust_placed_fraction * nav_payload_place.descent_thrust_level));
         }
         break;
 
@@ -1428,7 +1428,7 @@ void ModeAuto::payload_place_run()
         pos_control->init_z_controller_no_descent();
 #if AP_GRIPPER_ENABLED == ENABLED
         if (g2.gripper.valid()) {
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Releasing the gripper", prefix_str);
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "%s Releasing the gripper", prefix_str);
             g2.gripper.release();
             nav_payload_place.state = PayloadPlaceStateType_Releasing;
         } else {
@@ -1657,26 +1657,26 @@ bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const
 
     // whether vehicle should stop at the target position depends upon the next command
     switch (next_cmd.id) {
-    case MAV_CMD_NAV_WAYPOINT:
-    case MAV_CMD_NAV_LOITER_UNLIM:
-    case MAV_CMD_NAV_PAYLOAD_PLACE: {
+    case AGPILOT_CMD_NAV_WAYPOINT:
+    case AGPILOT_CMD_NAV_LOITER_UNLIM:
+    case AGPILOT_CMD_NAV_PAYLOAD_PLACE: {
         const Location dest_loc = loc_from_cmd(current_cmd, default_loc);
         const Location next_dest_loc = loc_from_cmd(next_cmd, dest_loc);
         return wp_nav->set_wp_destination_next_loc(next_dest_loc);
     }
-    case MAV_CMD_NAV_SPLINE_WAYPOINT: {
+    case AGPILOT_CMD_NAV_SPLINE_WAYPOINT: {
         // get spline's location and next location from command and send to wp_nav
         Location next_dest_loc, next_next_dest_loc;
         bool next_next_dest_loc_is_spline;
         get_spline_from_cmd(next_cmd, default_loc, next_dest_loc, next_next_dest_loc, next_next_dest_loc_is_spline);
         return wp_nav->set_spline_destination_next_loc(next_dest_loc, next_next_dest_loc, next_next_dest_loc_is_spline);
     }
-    case MAV_CMD_NAV_VTOL_LAND:
-    case MAV_CMD_NAV_LAND:
+    case AGPILOT_CMD_NAV_VTOL_LAND:
+    case AGPILOT_CMD_NAV_LAND:
         // stop because we may change between rel,abs and terrain alt types
-    case MAV_CMD_NAV_RETURN_TO_LAUNCH:
-    case MAV_CMD_NAV_VTOL_TAKEOFF:
-    case MAV_CMD_NAV_TAKEOFF:
+    case AGPILOT_CMD_NAV_RETURN_TO_LAUNCH:
+    case AGPILOT_CMD_NAV_VTOL_TAKEOFF:
+    case AGPILOT_CMD_NAV_TAKEOFF:
         // always stop for RTL and takeoff commands
     default:
         // for unsupported commands it is safer to stop
@@ -1703,7 +1703,7 @@ void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
             // use current alt-above-home and report error
             target_loc.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
             AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "Land: no terrain data, using alt-above-home");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "Land: no terrain data, using alt-above-home");
         }
 
         if (!wp_start(target_loc)) {
@@ -1774,7 +1774,7 @@ void ModeAuto::do_loiter_to_alt(const AP_Mission::Mission_Command& cmd)
     if (!target_loc.get_alt_cm(Location::AltFrame::ABOVE_HOME, loiter_to_alt.alt)) {
         loiter_to_alt.reached_destination_xy = true;
         loiter_to_alt.reached_alt = true;
-        gcs().send_text(MAV_SEVERITY_INFO, "bad do_loiter_to_alt");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "bad do_loiter_to_alt");
         return;
     }
     loiter_to_alt.reached_destination_xy = false;
@@ -1845,7 +1845,7 @@ void ModeAuto::get_spline_from_cmd(const AP_Mission::Mission_Command& cmd, const
     AP_Mission::Mission_Command temp_cmd;
     if (cmd.p1 == 0 && mission.get_next_nav_cmd(cmd.index+1, temp_cmd)) {
         next_dest_loc = loc_from_cmd(temp_cmd, dest_loc);
-        next_dest_loc_is_spline = temp_cmd.id == MAV_CMD_NAV_SPLINE_WAYPOINT;
+        next_dest_loc_is_spline = temp_cmd.id == AGPILOT_CMD_NAV_SPLINE_WAYPOINT;
     } else {
         next_dest_loc = dest_loc;
         next_dest_loc_is_spline = false;
@@ -1885,7 +1885,7 @@ void ModeAuto::do_nav_delay(const AP_Mission::Mission_Command& cmd)
         // absolute delay to utc time
         nav_delay_time_max_ms = AP::rtc().get_time_utc(cmd.content.nav_delay.hour_utc, cmd.content.nav_delay.min_utc, cmd.content.nav_delay.sec_utc, 0);
     }
-    gcs().send_text(MAV_SEVERITY_INFO, "Delaying %u sec", (unsigned)(nav_delay_time_max_ms/1000));
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Delaying %u sec", (unsigned)(nav_delay_time_max_ms/1000));
 }
 
 #if AP_SCRIPTING_ENABLED
@@ -1979,10 +1979,10 @@ void ModeAuto::do_set_home(const AP_Mission::Mission_Command& cmd)
     }
 }
 
-// do_roi - starts actions required by MAV_CMD_DO_SET_ROI
+// do_roi - starts actions required by AGPILOT_CMD_DO_SET_ROI
 //          this involves either moving the camera to point at the ROI (region of interest)
 //          and possibly rotating the copter to point at the ROI if our mount type does not support a yaw feature
-// TO-DO: add support for other features of MAV_CMD_DO_SET_ROI including pointing at a given waypoint
+// TO-DO: add support for other features of AGPILOT_CMD_DO_SET_ROI including pointing at a given waypoint
 void ModeAuto::do_roi(const AP_Mission::Mission_Command& cmd)
 {
     auto_yaw.set_roi(cmd.content.location);
@@ -2039,7 +2039,7 @@ void ModeAuto::do_payload_place(const AP_Mission::Mission_Command& cmd)
             // use current alt-above-home and report error
             target_loc.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
             AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "PayloadPlace: no terrain data, using alt-above-home");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "PayloadPlace: no terrain data, using alt-above-home");
         }
         if (!wp_start(target_loc)) {
             // failure to set next destination can only be because of missing terrain data
@@ -2183,7 +2183,7 @@ bool ModeAuto::verify_loiter_time(const AP_Mission::Mission_Command& cmd)
 
     // check if loiter timer has run out
     if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Reached command #%i",cmd.index);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Reached command #%i",cmd.index);
         return true;
     }
 
@@ -2266,7 +2266,7 @@ bool ModeAuto::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
             // play a tone
             AP_Notify::events.waypoint_complete = 1;
         }
-        gcs().send_text(MAV_SEVERITY_INFO, "Reached command #%i",cmd.index);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Reached command #%i",cmd.index);
         return true;
     }
     return false;
@@ -2303,7 +2303,7 @@ bool ModeAuto::verify_spline_wp(const AP_Mission::Mission_Command& cmd)
 
     // check if timer has run out
     if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Reached command #%i",cmd.index);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Reached command #%i",cmd.index);
         return true;
     }
     return false;

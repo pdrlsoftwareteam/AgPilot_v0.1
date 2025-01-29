@@ -28,7 +28,7 @@
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <stdio.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define LOG_TAG "SLCAN"
 
@@ -545,7 +545,7 @@ void SLCAN::CANIface::update_slcan_port()
         }
         _port->lock_port(_serial_lock_key, _serial_lock_key);
         _prev_ser_port = _slcan_ser_port;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "CANManager: Starting SLCAN Passthrough on Serial %d with CAN%d", _slcan_ser_port.get(), _iface_num);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "CANManager: Starting SLCAN Passthrough on Serial %d with CAN%d", _slcan_ser_port.get(), _iface_num);
         _last_had_activity = AP_HAL::native_millis();
     }
     if (_port == nullptr) {

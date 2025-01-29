@@ -25,7 +25,7 @@
 #include <AP_Math/AP_Math.h>
 #include <stdio.h>
 #include <AP_InertialSensor/AP_InertialSensor_Invensensev2.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 
 extern const AP_HAL::HAL &hal;

@@ -85,7 +85,7 @@ void Copter::crash_check()
     if (crash_counter >= (CRASH_CHECK_TRIGGER_SEC * scheduler.get_loop_rate_hz())) {
         AP::logger().Write_Error(LogErrorSubsystem::CRASH_CHECK, LogErrorCode::CRASH_CHECK_CRASH);
         // send message to gcs
-        gcs().send_text(MAV_SEVERITY_EMERGENCY,"Crash: Disarming: AngErr=%.0f>%.0f, Accel=%.1f<%.1f", angle_error, CRASH_CHECK_ANGLE_DEVIATION_DEG, filtered_acc, CRASH_CHECK_ACCEL_MAX);
+        gcs().send_text(AGPILOT_SEVERITY_EMERGENCY,"Crash: Disarming: AngErr=%.0f>%.0f, Accel=%.1f<%.1f", angle_error, CRASH_CHECK_ANGLE_DEVIATION_DEG, filtered_acc, CRASH_CHECK_ACCEL_MAX);
         // disarm motors
         copter.arming.disarm(AP_Arming::Method::CRASH);
     }
@@ -160,7 +160,7 @@ void Copter::thrust_loss_check()
         thrust_loss_counter = 0;
         AP::logger().Write_Error(LogErrorSubsystem::THRUST_LOSS_CHECK, LogErrorCode::FAILSAFE_OCCURRED);
         // send message to gcs
-        gcs().send_text(MAV_SEVERITY_EMERGENCY, "Potential Thrust Loss (%d)", (int)motors->get_lost_motor() + 1);
+        gcs().send_text(AGPILOT_SEVERITY_EMERGENCY, "Potential Thrust Loss (%d)", (int)motors->get_lost_motor() + 1);
         // enable thrust loss handling
         motors->set_thrust_boost(true);
         // the motors library disables this when it is no longer needed to achieve the commanded output
@@ -219,7 +219,7 @@ void Copter::yaw_imbalance_check()
         const uint32_t now = millis();
         if (now - last_yaw_warn_ms > YAW_IMBALANCE_WARN_MS) {
             last_yaw_warn_ms = now;
-            gcs().send_text(MAV_SEVERITY_EMERGENCY, "Yaw Imbalance %0.0f%%", I *100);
+            gcs().send_text(AGPILOT_SEVERITY_EMERGENCY, "Yaw Imbalance %0.0f%%", I *100);
         }
     }
 }
@@ -345,7 +345,7 @@ void Copter::parachute_manual_release()
     // do not release if we are landed or below the minimum altitude above home
     if (ap.land_complete) {
         // warn user of reason for failure
-        gcs().send_text(MAV_SEVERITY_INFO,"Parachute: Landed");
+        gcs().send_text(AGPILOT_SEVERITY_INFO,"Parachute: Landed");
         AP::logger().Write_Error(LogErrorSubsystem::PARACHUTES, LogErrorCode::PARACHUTE_LANDED);
         return;
     }
@@ -353,7 +353,7 @@ void Copter::parachute_manual_release()
     // do not release if we are landed or below the minimum altitude above home
     if ((parachute.alt_min() != 0 && (current_loc.alt < (int32_t)parachute.alt_min() * 100))) {
         // warn user of reason for failure
-        gcs().send_text(MAV_SEVERITY_ALERT,"Parachute: Too low");
+        gcs().send_text(AGPILOT_SEVERITY_ALERT,"Parachute: Too low");
         AP::logger().Write_Error(LogErrorSubsystem::PARACHUTES, LogErrorCode::PARACHUTE_TOO_LOW);
         return;
     }

@@ -18,7 +18,7 @@
 
 #include "SIM_RF_Wasp.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -57,7 +57,7 @@ void RF_Wasp::check_configuration()
                     offs += 1; // for '>'
                     offs += 1; // for space
                     strncpy(string_configs[i].value, &_buffer[offs], MIN(ARRAY_SIZE(config.format), unsigned(cr - _buffer - offs - 1))); // -1 for the lf, -1 for the cr
-//                    gcs().send_text(MAV_SEVERITY_INFO, "Wasp: config (%s) (%s)", string_configs[i].name, string_configs[i].value);
+//                    gcs().send_text(AGPILOT_SEVERITY_INFO, "Wasp: config (%s) (%s)", string_configs[i].name, string_configs[i].value);
                     char response[128];
                     const size_t x = snprintf(response,
                                               ARRAY_SIZE(response),
@@ -80,7 +80,7 @@ void RF_Wasp::check_configuration()
                     char tmp[32]{};
                     strncpy(tmp, &_buffer[offs], MIN(ARRAY_SIZE(config.format), unsigned(cr - _buffer - offs - 1))); // -1 for the lf, -1 for the cr
                     *(integer_configs[i].value) = atoi(tmp);
-//                    gcs().send_text(MAV_SEVERITY_INFO, "Wasp: config (%s) (%d)", integer_configs[i].name, *(integer_configs[i].value));
+//                    gcs().send_text(AGPILOT_SEVERITY_INFO, "Wasp: config (%s) (%d)", integer_configs[i].name, *(integer_configs[i].value));
                     char response[128];
                     const size_t x = snprintf(response,
                                               ARRAY_SIZE(response),
@@ -94,7 +94,7 @@ void RF_Wasp::check_configuration()
             }
         }
         if (!set) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Wasp: unknown setting (%s)", &_buffer[0]);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Wasp: unknown setting (%s)", &_buffer[0]);
         }
     }
 

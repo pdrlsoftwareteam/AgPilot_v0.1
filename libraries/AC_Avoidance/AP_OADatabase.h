@@ -2,7 +2,7 @@
 
 #include <AP_HAL/Semaphores.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Param/AP_Param.h>
 
 class AP_OADatabase {
@@ -104,9 +104,9 @@ private:
         uint16_t        size;                               // cached value of _database_size_param that sticks after initialized
     } _database;
 
-    uint16_t _next_index_to_send[MAVLINK_COMM_NUM_BUFFERS]; // index of next object in _database to send to GCS
-    uint16_t _highest_index_sent[MAVLINK_COMM_NUM_BUFFERS]; // highest index in _database sent to GCS
-    uint32_t _last_send_to_gcs_ms[MAVLINK_COMM_NUM_BUFFERS];// system time that send_adsb_vehicle was last called
+    uint16_t _next_index_to_send[AGPILOTLINK_COMM_NUM_BUFFERS]; // index of next object in _database to send to GCS
+    uint16_t _highest_index_sent[AGPILOTLINK_COMM_NUM_BUFFERS]; // highest index in _database sent to GCS
+    uint32_t _last_send_to_gcs_ms[AGPILOTLINK_COMM_NUM_BUFFERS];// system time that send_adsb_vehicle was last called
 
     static AP_OADatabase *_singleton;
 };

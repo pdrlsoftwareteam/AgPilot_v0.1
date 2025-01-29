@@ -27,7 +27,7 @@
 #include <AP_GPS/AP_GPS.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #define DEVOM_SYNC_BYTE        0xAA
 #define AP_SERIALMANAGER_DEVO_TELEM_BAUD        38400

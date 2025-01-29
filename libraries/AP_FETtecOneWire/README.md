@@ -11,7 +11,7 @@ For purchase, connection and configuration information please see the [ArduPilot
 - use ArduPilot's coding guidelines and naming conventions
 - control motor speed
 - Use the AP_ESC_Telem base class to:
-  - copy ESC telemetry data into MAVLink telemetry
+  - copy ESC telemetry data into AGPILOTLink telemetry
   - save ESC telemetry data in dataflash logs
   - use RPM telemetry for dynamic notch filter frequencies
   - sum the current telemetry info from all ESCs and use it as virtual battery current monitor sensor

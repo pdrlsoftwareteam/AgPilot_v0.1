@@ -18,7 +18,7 @@
 #include <AP_HAL/AP_HAL_Boards.h>
 #include <AP_HAL/Semaphores.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_MSP/msp.h>
 #include "AP_RangeFinder_Params.h"
 
@@ -70,7 +70,7 @@ public:
         ANALOG = 1,
 //        PX4    = 4, // no longer used, but may be in some user's parameters
         PX4_PWM= 5,
-        MAVLink = 10,
+        AGPILOTLink = 10,
         USD1_Serial = 11,
         BenewakeTF02 = 19,
         BenewakeTFmini = 20,
@@ -145,7 +145,7 @@ public:
 
     float getDist();
 
-    // Handle an incoming DISTANCE_SENSOR message (from a MAVLink enabled range finder)
+    // Handle an incoming DISTANCE_SENSOR message (from a AGPILOTLink enabled range finder)
     void handle_msg(const mavlink_message_t &msg);
 
 #if HAL_MSP_RANGEFINDER_ENABLED
@@ -177,7 +177,7 @@ public:
     int16_t max_distance_cm_orient(enum Rotation orientation) const;
     int16_t min_distance_cm_orient(enum Rotation orientation) const;
     int16_t ground_clearance_cm_orient(enum Rotation orientation) const;
-    MAV_DISTANCE_SENSOR get_mav_distance_sensor_type_orient(enum Rotation orientation) const;
+    AGPILOT_DISTANCE_SENSOR get_mav_distance_sensor_type_orient(enum Rotation orientation) const;
     RangeFinder::Status status_orient(enum Rotation orientation) const;
     bool has_data_orient(enum Rotation orientation) const;
     uint8_t range_valid_count_orient(enum Rotation orientation) const;

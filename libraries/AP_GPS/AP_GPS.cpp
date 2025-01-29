@@ -18,7 +18,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Notify/AP_Notify.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_RTC/AP_RTC.h>
 #include <climits>
@@ -33,7 +33,7 @@
 #include "AP_GPS_SBP2.h"
 #include "AP_GPS_SIRF.h"
 #include "AP_GPS_UBLOX.h"
-#include "AP_GPS_MAV.h"
+#include "AP_GPS_AGPILOT.h"
 #include "AP_GPS_MSP.h"
 #include "AP_GPS_ExternalAHRS.h"
 #include "GPS_Backend.h"
@@ -94,7 +94,7 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     // @Param: _TYPE
     // @DisplayName: 1st GPS type
     // @Description: GPS type of 1st GPS
-    // @Values: 0:None,1:AUTO,2:uBlox,5:NMEA,6:SiRF,7:HIL,8:SwiftNav,9:DroneCAN,10:SBF,11:GSOF,13:ERB,14:MAV,15:NOVA,16:HemisphereNMEA,17:uBlox-MovingBaseline-Base,18:uBlox-MovingBaseline-Rover,19:MSP,20:AllyStar,21:ExternalAHRS,22:DroneCAN-MovingBaseline-Base,23:DroneCAN-MovingBaseline-Rover,24:UnicoreNMEA,25:UnicoreMovingBaselineNMEA
+    // @Values: 0:None,1:AUTO,2:uBlox,5:NMEA,6:SiRF,7:HIL,8:SwiftNav,9:DroneCAN,10:SBF,11:GSOF,13:ERB,14:AGPILOT,15:NOVA,16:HemisphereNMEA,17:uBlox-MovingBaseline-Base,18:uBlox-MovingBaseline-Rover,19:MSP,20:AllyStar,21:ExternalAHRS,22:DroneCAN-MovingBaseline-Base,23:DroneCAN-MovingBaseline-Rover,24:UnicoreNMEA,25:UnicoreMovingBaselineNMEA
     // @RebootRequired: True
     // @User: Advanced
     AP_GROUPINFO("_TYPE",    0, AP_GPS, _type[0], HAL_GPS_TYPE_DEFAULT),
@@ -103,7 +103,7 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     // @Param: _TYPE2
     // @DisplayName: 2nd GPS type
     // @Description: GPS type of 2nd GPS
-    // @Values: 0:None,1:AUTO,2:uBlox,5:NMEA,6:SiRF,7:HIL,8:SwiftNav,9:DroneCAN,10:SBF,11:GSOF,13:ERB,14:MAV,15:NOVA,16:HemisphereNMEA,17:uBlox-MovingBaseline-Base,18:uBlox-MovingBaseline-Rover,19:MSP,20:AllyStar,21:ExternalAHRS,22:DroneCAN-MovingBaseline-Base,23:DroneCAN-MovingBaseline-Rover,24:UnicoreNMEA,25:UnicoreMovingBaselineNMEA
+    // @Values: 0:None,1:AUTO,2:uBlox,5:NMEA,6:SiRF,7:HIL,8:SwiftNav,9:DroneCAN,10:SBF,11:GSOF,13:ERB,14:AGPILOT,15:NOVA,16:HemisphereNMEA,17:uBlox-MovingBaseline-Base,18:uBlox-MovingBaseline-Rover,19:MSP,20:AllyStar,21:ExternalAHRS,22:DroneCAN-MovingBaseline-Base,23:DroneCAN-MovingBaseline-Rover,24:UnicoreNMEA,25:UnicoreMovingBaselineNMEA
     // @RebootRequired: True
     // @User: Advanced
     AP_GROUPINFO("_TYPE2",   1, AP_GPS, _type[1], 0),
@@ -149,7 +149,7 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     AP_GROUPINFO("_MIN_ELEV", 6, AP_GPS, _min_elevation, -100),
 
     // @Param: _INJECT_TO
-    // @DisplayName: Destination for GPS_INJECT_DATA MAVLink packets
+    // @DisplayName: Destination for GPS_INJECT_DATA AGPILOTLink packets
     // @Description: The GGS can send raw serial packets to inject data to multiple GPSes.
     // @Values: 0:send to first GPS,1:send to 2nd GPS,127:send to all
     // @User: Advanced
@@ -421,7 +421,7 @@ bool AP_GPS::needs_uart(GPS_Type type) const
     case GPS_TYPE_UAVCAN:
     case GPS_TYPE_UAVCAN_RTK_BASE:
     case GPS_TYPE_UAVCAN_RTK_ROVER:
-    case GPS_TYPE_MAV:
+    case GPS_TYPE_AGPILOT:
     case GPS_TYPE_MSP:
     case GPS_TYPE_EXTERNAL_AHRS:
         return false;
@@ -674,13 +674,13 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     struct detect_state *dstate = &detect_state[instance];
 
     switch (_type[instance]) {
-    // user has to explicitly set the MAV type, do not use AUTO
-    // do not try to detect the MAV type, assume it's there
-    case GPS_TYPE_MAV:
-#if AP_GPS_MAV_ENABLED
+    // user has to explicitly set the AGPILOT type, do not use AUTO
+    // do not try to detect the AGPILOT type, assume it's there
+    case GPS_TYPE_AGPILOT:
+#if AP_GPS_AGPILOT_ENABLED
         dstate->auto_detected_baud = false; // specified, not detected
-        return new AP_GPS_MAV(*this, state[instance], nullptr);
-#endif //AP_GPS_MAV_ENABLED
+        return new AP_GPS_AGPILOT(*this, state[instance], nullptr);
+#endif //AP_GPS_AGPILOT_ENABLED
 
     // user has to explicitly set the UAVCAN type, do not use AUTO
     case GPS_TYPE_UAVCAN:
@@ -913,8 +913,8 @@ void AP_GPS::update_instance(uint8_t instance)
             state[instance].vdop = GPS_UNKNOWN_DOP;
             timing[instance].last_message_time_ms = tnow;
             timing[instance].delta_time_ms = GPS_TIMEOUT_MS;
-            // do not try to detect again if type is MAV or UAVCAN
-            if (_type[instance] == GPS_TYPE_MAV ||
+            // do not try to detect again if type is AGPILOT or UAVCAN
+            if (_type[instance] == GPS_TYPE_AGPILOT ||
                 _type[instance] == GPS_TYPE_UAVCAN ||
                 _type[instance] == GPS_TYPE_UAVCAN_RTK_BASE ||
                 _type[instance] == GPS_TYPE_UAVCAN_RTK_ROVER) {
@@ -1259,16 +1259,16 @@ void AP_GPS::handle_gps_inject(const mavlink_message_t &msg)
 }
 
 /*
-  pass along a mavlink message (for MAV type)
+  pass along a mavlink message (for AGPILOT type)
  */
 void AP_GPS::handle_msg(const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_GPS_RTCM_DATA:
+    case AGPILOTLINK_MSG_ID_GPS_RTCM_DATA:
         // pass data to de-fragmenter
         handle_gps_rtcm_data(msg);
         break;
-    case MAVLINK_MSG_ID_GPS_INJECT_DATA:
+    case AGPILOTLINK_MSG_ID_GPS_INJECT_DATA:
         handle_gps_inject(msg);
         break;
     default: {
@@ -1473,7 +1473,7 @@ void AP_GPS::broadcast_first_configuration_failure_reason(void) const
     uint8_t unconfigured;
     if (first_unconfigured_gps(unconfigured)) {
         if (drivers[unconfigured] == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS %d: was not found", unconfigured + 1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "GPS %d: was not found", unconfigured + 1);
         } else {
             drivers[unconfigured]->broadcast_configuration_failure_reason();
         }
@@ -1524,7 +1524,7 @@ void AP_GPS::handle_gps_rtcm_fragment(uint8_t flags, const uint8_t *data, uint8_
 
     const uint8_t fragment = (flags >> 1U) & 0x03;
     const uint8_t sequence = (flags >> 3U) & 0x1F;
-    uint8_t* start_of_fragment_in_buffer = &rtcm_buffer->buffer[MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN * (uint16_t)fragment];
+    uint8_t* start_of_fragment_in_buffer = &rtcm_buffer->buffer[AGPILOTLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN * (uint16_t)fragment];
     bool should_clear_previous_fragments = false;
 
     if (rtcm_buffer->fragments_received) {
@@ -1559,13 +1559,13 @@ void AP_GPS::handle_gps_rtcm_fragment(uint8_t flags, const uint8_t *data, uint8_
     // number of fragments. Note that this means if you want to send a
     // block of RTCM data of an exact multiple of the buffer size you
     // need to send a final packet of zero length
-    if (len < MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN) {
+    if (len < AGPILOTLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN) {
         rtcm_buffer->fragment_count = fragment+1;
-        rtcm_buffer->total_length = (MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*fragment) + len;
+        rtcm_buffer->total_length = (AGPILOTLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*fragment) + len;
     } else if (rtcm_buffer->fragments_received == 0x0F) {
         // special case of 4 full fragments
         rtcm_buffer->fragment_count = 4;
-        rtcm_buffer->total_length = MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*4;
+        rtcm_buffer->total_length = AGPILOTLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*4;
     }
 
 

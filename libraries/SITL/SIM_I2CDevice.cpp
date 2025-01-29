@@ -6,8 +6,8 @@
 #endif
 
 #if HAL_DEBUG_I2DEVICE
-#include <GCS_MAVLink/GCS.h>
-#define DEBUG(fmt, args ...)  do { if (get_debug()) { GCS_SEND_TEXT(MAV_SEVERITY_INFO, fmt, ## args); } } while (0)
+#include <GCS_AGPILOTLink/GCS.h>
+#define DEBUG(fmt, args ...)  do { if (get_debug()) { GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, fmt, ## args); } } while (0)
 #else
 #define DEBUG(fmt, args ...)
 #endif

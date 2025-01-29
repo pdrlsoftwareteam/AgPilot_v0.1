@@ -226,7 +226,7 @@ define HAL_BATT_VOLT_SCALE 3.28
 define HAL_BATT_CURR_SCALE 3.06
 
 # setup serial port defaults for ESP8266
-define DEFAULT_SERIAL5_PROTOCOL SerialProtocol_MAVLink
+define DEFAULT_SERIAL5_PROTOCOL SerialProtocol_AGPILOTLink
 define DEFAULT_SERIAL5_BAUD 921600
 
 # 6 PWM available by default

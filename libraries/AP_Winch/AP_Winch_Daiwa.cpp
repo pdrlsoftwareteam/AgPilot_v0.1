@@ -3,7 +3,7 @@
 #if AP_WINCH_DAIWA_ENABLED
 
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 extern const AP_HAL::HAL& hal;
@@ -43,21 +43,21 @@ void AP_Winch_Daiwa::update()
 }
 
 //send generator status
-void AP_Winch_Daiwa::send_status(const GCS_MAVLINK &channel)
+void AP_Winch_Daiwa::send_status(const GCS_AGPILOTLINK &channel)
 {
     // prepare status bitmask
     uint32_t status_bitmask = 0;
     if (healthy()) {
-        status_bitmask |= MAV_WINCH_STATUS_HEALTHY;
+        status_bitmask |= AGPILOT_WINCH_STATUS_HEALTHY;
     }
     if (latest.thread_end) {
-        status_bitmask |= MAV_WINCH_STATUS_FULLY_RETRACTED;
+        status_bitmask |= AGPILOT_WINCH_STATUS_FULLY_RETRACTED;
     }
     if (latest.moving > 0) {
-        status_bitmask |= MAV_WINCH_STATUS_MOVING;
+        status_bitmask |= AGPILOT_WINCH_STATUS_MOVING;
     }
     if (latest.clutch > 0) {
-        status_bitmask |= MAV_WINCH_STATUS_CLUTCH_ENGAGED;
+        status_bitmask |= AGPILOT_WINCH_STATUS_CLUTCH_ENGAGED;
     }
 
     // convert speed percentage to absolute speed

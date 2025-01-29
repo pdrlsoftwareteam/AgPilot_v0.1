@@ -15,7 +15,7 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -118,7 +118,7 @@ void AP_SmartRTL::init()
     // check if memory allocation failed
     if (_path == nullptr || _prune.loops == nullptr || _simplify.stack == nullptr) {
         log_action(SRTL_DEACTIVATED_INIT_FAILED);
-        gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL deactivated: init failed");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "SmartRTL deactivated: init failed");
         free(_path);
         free(_prune.loops);
         free(_simplify.stack);
@@ -388,7 +388,7 @@ void AP_SmartRTL::run_background_cleanup()
     // warn if buffer is about to be filled
     uint32_t now_ms = AP_HAL::millis();
     if ((path_points_count >0) && (path_points_count >= _path_points_max - 9) && (now_ms - _last_low_space_notify_ms > 10000)) {
-        gcs().send_text(MAV_SEVERITY_INFO, "SmartRTL Low on space!");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "SmartRTL Low on space!");
        _last_low_space_notify_ms = now_ms;
     }
 
@@ -864,7 +864,7 @@ void AP_SmartRTL::deactivate(SRTL_Actions action, const char *reason)
 {
     _active = false;
     log_action(action);
-    gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL deactivated: %s", reason);
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "SmartRTL deactivated: %s", reason);
 }
 
 // logging

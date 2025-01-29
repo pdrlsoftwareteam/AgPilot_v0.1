@@ -25,7 +25,7 @@
 #if HAL_ADSB_UCP_ENABLED
 
 #include <AP_SerialManager/AP_SerialManager.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
@@ -164,7 +164,7 @@ void AP_ADSB_uAvionix_UCP::handle_msg(const GDL90_RX_MESSAGE &msg)
             memcpy(&primaryFwPartNumber, rx.decoded.identification.primaryFwPartNumber, str_len);
             primaryFwPartNumber[str_len] = 0;
             
-            GCS_SEND_TEXT(MAV_SEVERITY_DEBUG,"ADSB:Detected %s v%u.%u.%u SN:%u %s",
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_DEBUG,"ADSB:Detected %s v%u.%u.%u SN:%u %s",
                 get_hardware_name(rx.decoded.identification.primary.hwId),
                 (unsigned)rx.decoded.identification.primary.fwMajorVersion,
                 (unsigned)rx.decoded.identification.primary.fwMinorVersion,
@@ -264,7 +264,7 @@ void AP_ADSB_uAvionix_UCP::handle_msg(const GDL90_RX_MESSAGE &msg)
         // not handled, outbound only
         break;
     default:
-        //GCS_SEND_TEXT(MAV_SEVERITY_DEBUG,"ADSB:Unknown msg %d", (int)msg.messageId);
+        //GCS_SEND_TEXT(AGPILOT_SEVERITY_DEBUG,"ADSB:Unknown msg %d", (int)msg.messageId);
         break;
     }
 }

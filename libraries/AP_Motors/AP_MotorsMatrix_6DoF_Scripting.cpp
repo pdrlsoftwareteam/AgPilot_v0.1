@@ -17,9 +17,9 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsMatrix_6DoF_Scripting.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -264,7 +264,7 @@ void AP_MotorsMatrix_6DoF_Scripting::add_motor(int8_t motor_num, float roll_fact
 
         uint8_t chan;
         if (!SRV_Channels::find_channel(function, chan)) {
-            gcs().send_text(MAV_SEVERITY_ERROR, "Motors: unable to setup motor %u", motor_num);
+            gcs().send_text(AGPILOT_SEVERITY_ERROR, "Motors: unable to setup motor %u", motor_num);
             return;
         }
 
@@ -291,31 +291,31 @@ bool AP_MotorsMatrix_6DoF_Scripting::init(uint8_t expected_num_motors) {
     set_initialised_ok(expected_num_motors == num_motors);
 
     if (!initialised_ok()) {
-        _mav_type = MAV_TYPE_GENERIC;
+        _mav_type = AGPILOT_TYPE_GENERIC;
         return false;
     }
 
     switch (num_motors) {
         case 3:
-            _mav_type = MAV_TYPE_TRICOPTER;
+            _mav_type = AGPILOT_TYPE_TRICOPTER;
             break;
         case 4:
-            _mav_type = MAV_TYPE_QUADROTOR;
+            _mav_type = AGPILOT_TYPE_QUADROTOR;
             break;
         case 6:
-            _mav_type = MAV_TYPE_HEXAROTOR;
+            _mav_type = AGPILOT_TYPE_HEXAROTOR;
             break;
         case 8:
-            _mav_type = MAV_TYPE_OCTOROTOR;
+            _mav_type = AGPILOT_TYPE_OCTOROTOR;
             break;
         case 10:
-            _mav_type = MAV_TYPE_DECAROTOR;
+            _mav_type = AGPILOT_TYPE_DECAROTOR;
             break;
         case 12:
-            _mav_type = MAV_TYPE_DODECAROTOR;
+            _mav_type = AGPILOT_TYPE_DODECAROTOR;
             break;
         default:
-            _mav_type = MAV_TYPE_GENERIC;
+            _mav_type = AGPILOT_TYPE_GENERIC;
     }
 
     return true;

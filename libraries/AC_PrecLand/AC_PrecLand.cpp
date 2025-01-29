@@ -8,7 +8,7 @@
 #include "AC_PrecLand_SITL_Gazebo.h"
 #include "AC_PrecLand_SITL.h"
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 extern const AP_HAL::HAL& hal;
@@ -390,7 +390,7 @@ bool AC_PrecLand::target_acquired()
     if ((AP_HAL::millis()-_last_update_ms) > LANDING_TARGET_TIMEOUT_MS) {
         if (_target_acquired) {
             // just lost the landing target, inform the user. This message will only be sent once everytime target is lost
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "PrecLand: Target Lost");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "PrecLand: Target Lost");
         }
         // not had a sensor update since a long time
         // probably lost the target
@@ -502,7 +502,7 @@ void AC_PrecLand::run_estimator(float rangefinder_alt_m, bool rangefinder_alt_va
             // Update if a new Line-Of-Sight measurement is available
             if (construct_pos_meas_using_rangefinder(rangefinder_alt_m, rangefinder_alt_valid)) {
                 if (!_estimator_initialized) {
-                    gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Target Found");
+                    gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Target Found");
                     _estimator_initialized = true;
                 }
                 _target_pos_rel_est_NE.x = _target_pos_rel_meas_NED.x;
@@ -535,7 +535,7 @@ void AC_PrecLand::run_estimator(float rangefinder_alt_m, bool rangefinder_alt_va
                 float xy_pos_var = sq(_target_pos_rel_meas_NED.z*(0.01f + 0.01f*AP::ahrs().get_gyro().length()) + 0.02f);
                 if (!_estimator_initialized) {
                     // Inform the user landing target has been found
-                    gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Target Found");
+                    gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Target Found");
                     // start init of EKF. We will let the filter consume the data for a while before it available for consumption
                     // reset filter state
                     if (inertial_data_delayed->inertialNavVelocityValid) {
@@ -591,11 +591,11 @@ void AC_PrecLand::check_ekf_init_timeout()
         if (AP_HAL::millis()-_last_update_ms > EKF_INIT_SENSOR_MIN_UPDATE_MS) {
             // we have lost the target, not enough readings to initialize the EKF
             _estimator_initialized = false;
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "PrecLand: Init Failed");
+            gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "PrecLand: Init Failed");
         } else if (AP_HAL::millis()-_estimator_init_ms > EKF_INIT_TIME_MS) {
             // the target has been visible for a while, EKF should now have initialized to a good value
             _target_acquired = true;
-            gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Init Complete");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Init Complete");
         }
     }
 }

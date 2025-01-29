@@ -24,7 +24,7 @@
 #include <SITL/SIM_RF_MaxsonarSerialLV.h>
 #include <SITL/SIM_RF_Wasp.h>
 #include <SITL/SIM_RF_NMEA.h>
-#include <SITL/SIM_RF_MAVLink.h>
+#include <SITL/SIM_RF_AGPILOTLink.h>
 #include <SITL/SIM_RF_GYUS42v2.h>
 #include <SITL/SIM_VectorNav.h>
 #include <SITL/SIM_LORD.h>
@@ -149,8 +149,8 @@ private:
     SITL::RF_Wasp *wasp;
     // simulated NMEA rangefinder:
     SITL::RF_NMEA *nmea;
-    // simulated MAVLink rangefinder:
-    SITL::RF_MAVLink *rf_mavlink;
+    // simulated AGPILOTLink rangefinder:
+    SITL::RF_AGPILOTLink *rf_mavlink;
     // simulated GYUS42v2 rangefinder:
     SITL::RF_GYUS42v2 *gyus42v2;
 

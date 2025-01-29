@@ -4,8 +4,8 @@
 
 #include <AP_Math/AP_Math.h>
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_GPS/AP_GPS.h>
@@ -14,7 +14,7 @@
 #include "AP_Camera_Servo.h"
 #include "AP_Camera_Relay.h"
 #include "AP_Camera_Mount.h"
-#include "AP_Camera_MAVLink.h"
+#include "AP_Camera_AGPILOTLink.h"
 #include "AP_Camera_SoloGimbal.h"
 
 const AP_Param::GroupInfo AP_Camera::var_info[] = {
@@ -158,10 +158,10 @@ void AP_Camera::init()
             _backends[instance] = new AP_Camera_Mount(*this, _params[instance], instance);
             break;
 #endif
-#if AP_CAMERA_MAVLINK_ENABLED
-        // check for MAVLink enabled camera driver
-        case CameraType::MAVLINK:
-            _backends[instance] = new AP_Camera_MAVLink(*this, _params[instance], instance);
+#if AP_CAMERA_AGPILOTLINK_ENABLED
+        // check for AGPILOTLink enabled camera driver
+        case CameraType::AGPILOTLINK:
+            _backends[instance] = new AP_Camera_AGPILOTLink(*this, _params[instance], instance);
             break;
 #endif
         case CameraType::NONE:
@@ -185,7 +185,7 @@ void AP_Camera::init()
 // handle incoming mavlink messages
 void AP_Camera::handle_message(mavlink_channel_t chan, const mavlink_message_t &msg)
 {
-    if (msg.msgid == MAVLINK_MSG_ID_DIGICAM_CONTROL) {
+    if (msg.msgid == AGPILOTLINK_MSG_ID_DIGICAM_CONTROL) {
         // decode deprecated MavLink message that controls camera.
         __mavlink_digicam_control_t packet;
         mavlink_msg_digicam_control_decode(&msg, &packet);
@@ -202,53 +202,53 @@ void AP_Camera::handle_message(mavlink_channel_t chan, const mavlink_message_t &
 }
 
 // handle command_long mavlink messages
-MAV_RESULT AP_Camera::handle_command_long(const mavlink_command_long_t &packet)
+AGPILOT_RESULT AP_Camera::handle_command_long(const mavlink_command_long_t &packet)
 {
     switch (packet.command) {
-    case MAV_CMD_DO_DIGICAM_CONFIGURE:
+    case AGPILOT_CMD_DO_DIGICAM_CONFIGURE:
         configure(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6, packet.param7);
-        return MAV_RESULT_ACCEPTED;
-    case MAV_CMD_DO_DIGICAM_CONTROL:
+        return AGPILOT_RESULT_ACCEPTED;
+    case AGPILOT_CMD_DO_DIGICAM_CONTROL:
         control(packet.param1, packet.param2, packet.param3, packet.param4, packet.param5, packet.param6);
-        return MAV_RESULT_ACCEPTED;
-    case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
+        return AGPILOT_RESULT_ACCEPTED;
+    case AGPILOT_CMD_DO_SET_CAM_TRIGG_DIST:
         set_trigger_distance(packet.param1);
         if (is_equal(packet.param3, 1.0f)) {
             take_picture();
         }
-        return MAV_RESULT_ACCEPTED;
-    case MAV_CMD_SET_CAMERA_ZOOM:
+        return AGPILOT_RESULT_ACCEPTED;
+    case AGPILOT_CMD_SET_CAMERA_ZOOM:
         if (is_equal(packet.param1, (float)ZOOM_TYPE_CONTINUOUS)) {
             set_zoom_step((int8_t)packet.param2);
-            return MAV_RESULT_ACCEPTED;
+            return AGPILOT_RESULT_ACCEPTED;
         }
-        return MAV_RESULT_UNSUPPORTED;
-    case MAV_CMD_SET_CAMERA_FOCUS:
+        return AGPILOT_RESULT_UNSUPPORTED;
+    case AGPILOT_CMD_SET_CAMERA_FOCUS:
         // accept any of the auto focus types
         if (is_equal(packet.param1, (float)FOCUS_TYPE_AUTO) ||
             is_equal(packet.param1, (float)FOCUS_TYPE_AUTO_SINGLE) ||
             is_equal(packet.param1, (float)FOCUS_TYPE_AUTO_CONTINUOUS)) {
             set_auto_focus();
-            return MAV_RESULT_ACCEPTED;
+            return AGPILOT_RESULT_ACCEPTED;
         }
         // accept step or continuous manual focus
         if (is_equal(packet.param1, (float)FOCUS_TYPE_CONTINUOUS)) {
             set_manual_focus_step((int8_t)packet.param2);
-            return MAV_RESULT_ACCEPTED;
+            return AGPILOT_RESULT_ACCEPTED;
         }
-        return MAV_RESULT_UNSUPPORTED;
-    case MAV_CMD_IMAGE_START_CAPTURE:
+        return AGPILOT_RESULT_UNSUPPORTED;
+    case AGPILOT_CMD_IMAGE_START_CAPTURE:
         if (!is_zero(packet.param2) || !is_equal(packet.param3, 1.0f) || !is_zero(packet.param4)) {
             // time interval is not supported
             // multiple image capture is not supported
             // capture sequence number is not supported
-            return MAV_RESULT_UNSUPPORTED;
+            return AGPILOT_RESULT_UNSUPPORTED;
         }
         take_picture();
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
 
     default:
-        return MAV_RESULT_UNSUPPORTED;
+        return AGPILOT_RESULT_UNSUPPORTED;
     }
 }
 

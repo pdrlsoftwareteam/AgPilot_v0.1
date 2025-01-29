@@ -10,7 +10,7 @@
 #include <AP_Math/AP_Math.h>
 
 #if HAL_GCS_ENABLED
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #endif
 
 extern const AP_HAL::HAL &hal;
@@ -167,18 +167,18 @@ bool AP_CheckFirmware::write_bootloader(const struct bl_data *bld)
     const uint32_t flash_addr = hal.flash->getpageaddr(0);
     EXPECT_DELAY_MS(3000);
     if (!hal.flash->erasepage(0)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Bootloader erase failed");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Bootloader erase failed");
         return false;
     }
     EXPECT_DELAY_MS(3000);
     if (!hal.flash->write(flash_addr, bld->data1, bld->length1)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Bootloader write1 failed");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Bootloader write1 failed");
         return false;
     }
     EXPECT_DELAY_MS(3000);
     if (bld->length2 != 0 &&
         !hal.flash->write(flash_addr+bld->offset2, bld->data2, bld->length2)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Bootloader write1 failed");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Bootloader write1 failed");
         return false;
     }
     return true;
@@ -233,14 +233,14 @@ bool AP_CheckFirmware::set_public_keys(uint8_t key_idx, uint8_t num_keys, const 
 {
     auto *bld = read_bootloader();
     if (bld == nullptr) {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Failed to load bootloader into memory");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Failed to load bootloader into memory");
         return false;
     }
     const uint8_t key[] = AP_PUBLIC_KEY_SIGNATURE;
     struct ap_secure_data *sec_data = (struct ap_secure_data *)memmem(bld->data1, bld->length1, key, sizeof(key));
     if (sec_data == nullptr) {
         delete bld;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Failed to find key signature");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "Failed to find key signature");
         return false;
     }
     memcpy(sec_data->public_key[key_idx].key, key_data, num_keys*AP_PUBLIC_KEY_LEN);
@@ -270,16 +270,16 @@ bool AP_CheckFirmware::set_public_keys(uint8_t key_idx, uint8_t num_keys, const 
 void AP_CheckFirmware::handle_secure_command(mavlink_channel_t chan, const mavlink_secure_command_t &pkt)
 {
     mavlink_secure_command_reply_t reply {};
-    reply.result = MAV_RESULT_UNSUPPORTED;
+    reply.result = AGPILOT_RESULT_UNSUPPORTED;
     reply.sequence = pkt.sequence;
     reply.operation = pkt.operation;
 
     if (uint16_t(pkt.data_length) + uint16_t(pkt.sig_length) > sizeof(pkt.data)) {
-        reply.result = MAV_RESULT_DENIED;
+        reply.result = AGPILOT_RESULT_DENIED;
         goto send_reply;
     }
     if (!check_signature(pkt)) {
-        reply.result = MAV_RESULT_DENIED;
+        reply.result = AGPILOT_RESULT_DENIED;
         goto send_reply;
     }
 
@@ -289,14 +289,14 @@ void AP_CheckFirmware::handle_secure_command(mavlink_channel_t chan, const mavli
         make_session_key(session_key);
         reply.data_length = sizeof(session_key);
         memcpy(reply.data, session_key, reply.data_length);
-        reply.result = MAV_RESULT_ACCEPTED;
+        reply.result = AGPILOT_RESULT_ACCEPTED;
         break;
     }
 
     case SECURE_COMMAND_GET_PUBLIC_KEYS: {
         const struct ap_secure_data *sec_data = find_public_keys();
         if (pkt.data_length != 2) {
-            reply.result = MAV_RESULT_UNSUPPORTED;
+            reply.result = AGPILOT_RESULT_UNSUPPORTED;
             goto send_reply;
         }
         const uint8_t key_idx = pkt.data[0];
@@ -306,7 +306,7 @@ void AP_CheckFirmware::handle_secure_command(mavlink_channel_t chan, const mavli
             num_keys > max_fetch ||
             key_idx+num_keys > AP_PUBLIC_KEY_MAX_KEYS ||
             sec_data == nullptr) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
 
@@ -320,61 +320,61 @@ void AP_CheckFirmware::handle_secure_command(mavlink_channel_t chan, const mavli
         reply.data_length = 1+num_keys*AP_PUBLIC_KEY_LEN;
         reply.data[0] = key_idx;
         memcpy(&reply.data[1], &sec_data->public_key[key_idx], reply.data_length-1);
-        reply.result = MAV_RESULT_ACCEPTED;
+        reply.result = AGPILOT_RESULT_ACCEPTED;
         break;
     }
 
     case SECURE_COMMAND_SET_PUBLIC_KEYS: {
         if (pkt.data_length < AP_PUBLIC_KEY_LEN+1) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         const uint8_t key_idx = pkt.data[0];
         const uint8_t num_keys = (pkt.data_length-1) / AP_PUBLIC_KEY_LEN;
         if (num_keys == 0) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         if (key_idx >= AP_PUBLIC_KEY_MAX_KEYS ||
             key_idx+num_keys > AP_PUBLIC_KEY_MAX_KEYS) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         if (set_public_keys(key_idx, num_keys, &pkt.data[1])) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Bootloader update OK");
-            reply.result = MAV_RESULT_ACCEPTED;
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Bootloader update OK");
+            reply.result = AGPILOT_RESULT_ACCEPTED;
         } else {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
         }
         break;
     }
 
     case SECURE_COMMAND_REMOVE_PUBLIC_KEYS: {
         if (pkt.data_length != 2) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         const uint8_t key_idx = pkt.data[0];
         const uint8_t num_keys = pkt.data[1];
         if (num_keys == 0) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         if (key_idx >= AP_PUBLIC_KEY_MAX_KEYS ||
             key_idx+num_keys > AP_PUBLIC_KEY_MAX_KEYS) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         uint8_t *data = new uint8_t[num_keys*AP_PUBLIC_KEY_LEN];
         if (data == nullptr) {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
             goto send_reply;
         }
         if (set_public_keys(key_idx, num_keys, data)) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Bootloader update OK");
-            reply.result = MAV_RESULT_ACCEPTED;
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Bootloader update OK");
+            reply.result = AGPILOT_RESULT_ACCEPTED;
         } else {
-            reply.result = MAV_RESULT_FAILED;
+            reply.result = AGPILOT_RESULT_FAILED;
         }
         delete[] data;
         break;
@@ -392,7 +392,7 @@ send_reply:
 void AP_CheckFirmware::handle_msg(mavlink_channel_t chan, const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_SECURE_COMMAND: {
+    case AGPILOTLINK_MSG_ID_SECURE_COMMAND: {
         mavlink_secure_command_t pkt;
         mavlink_msg_secure_command_decode(&msg, &pkt);
         handle_secure_command(chan, pkt);

@@ -13,7 +13,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /*
-  gimbal simulator class for MAVLink gimbal
+  gimbal simulator class for AGPILOTLink gimbal
 */
 
 #include "SIM_Gimbal.h"
@@ -234,9 +234,9 @@ void Gimbal::param_send(const struct gimbal_param *p)
     param_value.param_value = p->value;
     param_value.param_count = 0;
     param_value.param_index = 0;
-    param_value.param_type = MAV_PARAM_TYPE_REAL32;
+    param_value.param_type = AGPILOT_PARAM_TYPE_REAL32;
 
-    mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+    mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
     uint8_t saved_seq = chan0_status->current_tx_seq;
     chan0_status->current_tx_seq = mavlink.seq;
     uint16_t len = mavlink_msg_param_value_encode(vehicle_system_id,
@@ -253,7 +253,7 @@ void Gimbal::param_send(const struct gimbal_param *p)
 
     
 /*
-  send a report to the vehicle control code over MAVLink
+  send a report to the vehicle control code over AGPILOTLink
 */
 void Gimbal::send_report(void)
 {
@@ -280,7 +280,7 @@ void Gimbal::send_report(void)
         }
     }
 
-    // check for incoming MAVLink messages
+    // check for incoming AGPILOTLink messages
     uint8_t buf[100];
     ssize_t ret;
 
@@ -290,9 +290,9 @@ void Gimbal::send_report(void)
             mavlink_status_t status;
             if (mavlink_frame_char_buffer(&mavlink.rxmsg, &mavlink.status,
                                           buf[i],
-                                          &msg, &status) == MAVLINK_FRAMING_OK) {
+                                          &msg, &status) == AGPILOTLINK_FRAMING_OK) {
                 switch (msg.msgid) {
-                case MAVLINK_MSG_ID_HEARTBEAT: {
+                case AGPILOTLINK_MSG_ID_HEARTBEAT: {
                     mavlink_heartbeat_t pkt;
                     mavlink_msg_heartbeat_decode(&msg, &pkt);
                     debug("got HB type=%u autopilot=%u base_mode=0x%x\n", pkt.type, pkt.autopilot, pkt.base_mode);
@@ -304,7 +304,7 @@ void Gimbal::send_report(void)
                     }
                     break;
                 }
-                case MAVLINK_MSG_ID_GIMBAL_CONTROL: {
+                case AGPILOTLINK_MSG_ID_GIMBAL_CONTROL: {
                     static uint32_t counter;
                     if (counter++ % 100 == 0) {
                         printf("GIMBAL_CONTROL %u\n", counter);
@@ -319,7 +319,7 @@ void Gimbal::send_report(void)
                     seen_gimbal_control = true;
                     break;
                 }
-                case MAVLINK_MSG_ID_PARAM_SET: {
+                case AGPILOTLINK_MSG_ID_PARAM_SET: {
                     mavlink_param_set_t pkt;
                     mavlink_msg_param_set_decode(&msg, &pkt);
                     printf("Gimbal got PARAM_SET %.16s %f\n", pkt.param_id, pkt.param_value);
@@ -332,10 +332,10 @@ void Gimbal::send_report(void)
 
                     break;
                 }
-                case MAVLINK_MSG_ID_PARAM_REQUEST_LIST: {
+                case AGPILOTLINK_MSG_ID_PARAM_REQUEST_LIST: {
                     mavlink_param_request_list_t pkt;
                     mavlink_msg_param_request_list_decode(&msg, &pkt);
-                    if (pkt.target_system == 0 && pkt.target_component == MAV_COMP_ID_GIMBAL) {
+                    if (pkt.target_system == 0 && pkt.target_component == AGPILOT_COMP_ID_GIMBAL) {
                         // start param send
                         param_send_idx = 0;
                         param_send_last_ms = AP_HAL::millis();
@@ -359,8 +359,8 @@ void Gimbal::send_report(void)
 
     if (now - last_heartbeat_ms >= 1000) {
         mavlink_heartbeat_t heartbeat;
-        heartbeat.type = MAV_TYPE_GIMBAL;
-        heartbeat.autopilot = MAV_AUTOPILOT_ARDUPILOTMEGA;
+        heartbeat.type = AGPILOT_TYPE_GIMBAL;
+        heartbeat.autopilot = AGPILOT_AUTOPILOT_ARDUPILOTMEGA;
         heartbeat.base_mode = 0;
         heartbeat.system_status = 0;
         heartbeat.mavlink_version = 0;
@@ -370,7 +370,7 @@ void Gimbal::send_report(void)
           save and restore sequence number for chan0, as it is used by
           generated encode functions
          */
-        mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
         uint8_t saved_seq = chan0_status->current_tx_seq;
         chan0_status->current_tx_seq = mavlink.seq;
         len = mavlink_msg_heartbeat_encode(vehicle_system_id,
@@ -403,7 +403,7 @@ void Gimbal::send_report(void)
         gimbal_report.joint_el = joint_angles.y;
         gimbal_report.joint_az = joint_angles.z;
 
-        mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
         uint8_t saved_seq = chan0_status->current_tx_seq;
         chan0_status->current_tx_seq = mavlink.seq;
         len = mavlink_msg_gimbal_report_encode(vehicle_system_id,

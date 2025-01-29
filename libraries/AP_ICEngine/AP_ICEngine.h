@@ -49,7 +49,7 @@ public:
     // get current engine control state
     ICE_State get_state(void) const { return state; }
 
-    // handle DO_ENGINE_CONTROL messages via MAVLink or mission
+    // handle DO_ENGINE_CONTROL messages via AGPILOTLink or mission
     bool engine_control(float start_control, float cold_start, float height_delay);
 
     // update min throttle for idle governor

@@ -90,12 +90,12 @@ class ExtractFeatures(object):
             ('HAL_MOUNT_{type}_ENABLED', r'AP_Mount_(?P<type>.*)::update\b',),
             ('HAL_SOLO_GIMBAL_ENABLED', 'AP_Mount_SoloGimbal::init',),
             ('HAL_MOUNT_STORM32SERIAL_ENABLED', 'AP_Mount_SToRM32_serial::init',),
-            ('HAL_MOUNT_STORM32MAVLINK_ENABLED', 'AP_Mount_SToRM32::init',),
+            ('HAL_MOUNT_STORM32AGPILOTLINK_ENABLED', 'AP_Mount_SToRM32::init',),
 
             ('HAL_{type}_TELEM_ENABLED', r'AP_(?P<type>.*)_Telem::init',),
             ('HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED', 'AP_CRSF_Telem::calc_text_selection',),
             ('AP_LTM_TELEM_ENABLED', 'AP_LTM_Telem::init',),
-            ('HAL_HIGH_LATENCY2_ENABLED', 'GCS_MAVLINK::handle_control_high_latency',),
+            ('HAL_HIGH_LATENCY2_ENABLED', 'GCS_AGPILOTLINK::handle_control_high_latency',),
 
             ('AP_FRSKY_TELEM_ENABLED', 'AP::frsky_telem',),
             ('AP_FRSKY_D_TELEM_ENABLED', 'AP_Frsky_D::send',),
@@ -167,8 +167,8 @@ class ExtractFeatures(object):
 
             ('AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED', r'RC_Channel::lookuptable',),
 
-            ('AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED', r'AP_Notify::play_tune'),
-            ('AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED', r'AP_Notify::handle_led_control'),
+            ('AP_NOTIFY_AGPILOTLINK_PLAY_TUNE_SUPPORT_ENABLED', r'AP_Notify::play_tune'),
+            ('AP_NOTIFY_AGPILOTLINK_LED_CONTROL_SUPPORT_ENABLED', r'AP_Notify::handle_led_control'),
             ('AP_NOTIFY_NCP5623_ENABLED', r'NCP5623::write'),
             ('AP_NOTIFY_PROFILED_ENABLED', r'ProfiLED::init_ports'),
             ('AP_NOTIFY_PROFILED_SPI_ENABLED', r'ProfiLED_SPI::rgb_set_id'),

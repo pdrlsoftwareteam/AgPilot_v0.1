@@ -13,7 +13,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /*
-  ADSB simulator class for MAVLink ADSB peripheral
+  ADSB simulator class for AGPILOTLink ADSB peripheral
 */
 
 #include "SIM_ADSB.h"
@@ -116,7 +116,7 @@ void ADSB::update(const class Aircraft &aircraft)
 }
 
 /*
-  send a report to the vehicle control code over MAVLink
+  send a report to the vehicle control code over AGPILOTLink
 */
 void ADSB::send_report(const class Aircraft &aircraft)
 {
@@ -126,7 +126,7 @@ void ADSB::send_report(const class Aircraft &aircraft)
         return;
     }
 
-    // check for incoming MAVLink messages
+    // check for incoming AGPILOTLink messages
     uint8_t buf[100];
     ssize_t ret;
 
@@ -136,9 +136,9 @@ void ADSB::send_report(const class Aircraft &aircraft)
             mavlink_status_t status;
             if (mavlink_frame_char_buffer(&mavlink.rxmsg, &mavlink.status,
                                           buf[i],
-                                          &msg, &status) == MAVLINK_FRAMING_OK) {
+                                          &msg, &status) == AGPILOTLINK_FRAMING_OK) {
                 switch (msg.msgid) {
-                case MAVLINK_MSG_ID_HEARTBEAT: {
+                case AGPILOTLINK_MSG_ID_HEARTBEAT: {
                     if (!seen_heartbeat) {
                         seen_heartbeat = true;
                         vehicle_component_id = msg.compid;
@@ -162,8 +162,8 @@ void ADSB::send_report(const class Aircraft &aircraft)
 
     if (now - last_heartbeat_ms >= 1000) {
         mavlink_heartbeat_t heartbeat;
-        heartbeat.type = MAV_TYPE_ADSB;
-        heartbeat.autopilot = MAV_AUTOPILOT_ARDUPILOTMEGA;
+        heartbeat.type = AGPILOT_TYPE_ADSB;
+        heartbeat.autopilot = AGPILOT_AUTOPILOT_ARDUPILOTMEGA;
         heartbeat.base_mode = 0;
         heartbeat.system_status = 0;
         heartbeat.mavlink_version = 0;
@@ -173,7 +173,7 @@ void ADSB::send_report(const class Aircraft &aircraft)
           save and restore sequence number for chan0, as it is used by
           generated encode functions
          */
-        mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
         uint8_t saved_seq = chan0_status->current_tx_seq;
         chan0_status->current_tx_seq = mavlink.seq;
         len = mavlink_msg_heartbeat_encode(vehicle_system_id,
@@ -233,11 +233,11 @@ void ADSB::send_report(const class Aircraft &aircraft)
 
             adsb_vehicle.squawk = 1200;
 
-            mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+            mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
             uint8_t saved_seq = chan0_status->current_tx_seq;
             chan0_status->current_tx_seq = mavlink.seq;
             len = mavlink_msg_adsb_vehicle_encode(vehicle_system_id,
-                                                  MAV_COMP_ID_ADSB,
+                                                  AGPILOT_COMP_ID_ADSB,
                                                   &msg, &adsb_vehicle);
             chan0_status->current_tx_seq = saved_seq;
             
@@ -253,14 +253,14 @@ void ADSB::send_report(const class Aircraft &aircraft)
     if (_sitl->adsb_tx && now - last_tx_report_ms > 1000) {
         last_tx_report_ms = now;
 
-        mavlink_status_t *chan0_status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        mavlink_status_t *chan0_status = mavlink_get_channel_status(AGPILOTLINK_COMM_0);
         uint8_t saved_seq = chan0_status->current_tx_seq;
         uint8_t saved_flags = chan0_status->flags;
-        chan0_status->flags &= ~MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
+        chan0_status->flags &= ~AGPILOTLINK_STATUS_FLAG_OUT_AGPILOTLINK1;
         chan0_status->current_tx_seq = mavlink.seq;
         const mavlink_uavionix_adsb_transceiver_health_report_t health_report = {UAVIONIX_ADSB_RF_HEALTH_OK};
         len = mavlink_msg_uavionix_adsb_transceiver_health_report_encode(vehicle_system_id,
-                                              MAV_COMP_ID_ADSB,
+                                              AGPILOT_COMP_ID_ADSB,
                                               &msg, &health_report);
         chan0_status->current_tx_seq = saved_seq;
         chan0_status->flags = saved_flags;

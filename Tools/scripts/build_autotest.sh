@@ -66,8 +66,8 @@ popd
 
 rsync -a APM/Tools/autotest/web-firmware/ buildlogs/binaries/
 
-echo "Updating MAVProxy"
-pushd MAVProxy
+echo "Updating AGPILOTProxy"
+pushd AGPILOTProxy
 git fetch origin
 git reset --hard origin/master
 git show

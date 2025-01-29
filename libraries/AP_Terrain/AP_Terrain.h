@@ -30,13 +30,13 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Common/Location.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define TERRAIN_DEBUG 0
 
 
-// MAVLink sends 4x4 grids
-#define TERRAIN_GRID_MAVLINK_SIZE 4
+// AGPILOTLink sends 4x4 grids
+#define TERRAIN_GRID_AGPILOTLINK_SIZE 4
 
 // a 2k grid_block on disk contains 8x7 of the mavlink grids.  Each
 // grid block overlaps by one with its neighbour. This ensures that
@@ -46,12 +46,12 @@
 #define TERRAIN_GRID_BLOCK_MUL_Y 8
 
 // this is the spacing between 32x28 grid blocks, in grid_spacing units
-#define TERRAIN_GRID_BLOCK_SPACING_X ((TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_MAVLINK_SIZE)
-#define TERRAIN_GRID_BLOCK_SPACING_Y ((TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_MAVLINK_SIZE)
+#define TERRAIN_GRID_BLOCK_SPACING_X ((TERRAIN_GRID_BLOCK_MUL_X-1)*TERRAIN_GRID_AGPILOTLINK_SIZE)
+#define TERRAIN_GRID_BLOCK_SPACING_Y ((TERRAIN_GRID_BLOCK_MUL_Y-1)*TERRAIN_GRID_AGPILOTLINK_SIZE)
 
 // giving a total grid size of a disk grid_block of 32x28
-#define TERRAIN_GRID_BLOCK_SIZE_X (TERRAIN_GRID_MAVLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_X)
-#define TERRAIN_GRID_BLOCK_SIZE_Y (TERRAIN_GRID_MAVLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_Y)
+#define TERRAIN_GRID_BLOCK_SIZE_X (TERRAIN_GRID_AGPILOTLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_X)
+#define TERRAIN_GRID_BLOCK_SIZE_Y (TERRAIN_GRID_AGPILOTLINK_SIZE*TERRAIN_GRID_BLOCK_MUL_Y)
 
 // number of grid_blocks in the LRU memory cache
 #define TERRAIN_GRID_BLOCK_CACHE_SIZE 12
@@ -388,7 +388,7 @@ private:
     union grid_io_block disk_block;
 
     // last time we asked for more grids
-    uint32_t last_request_time_ms[MAVLINK_COMM_NUM_BUFFERS];
+    uint32_t last_request_time_ms[AGPILOTLINK_COMM_NUM_BUFFERS];
 
     static const uint64_t bitmap_mask = (((uint64_t)1U)<<(TERRAIN_GRID_BLOCK_MUL_X*TERRAIN_GRID_BLOCK_MUL_Y)) - 1;
 

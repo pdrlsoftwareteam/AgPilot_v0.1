@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <AP_HAL/utility/sparse-endian.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 using namespace SITL;
 

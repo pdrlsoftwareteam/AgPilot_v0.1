@@ -3,7 +3,7 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
 
@@ -40,7 +40,7 @@ void AP_Airspeed::check_sensor_ahrs_wind_max_failures(uint8_t i)
     if (gps.status() < AP_GPS::GPS_Status::GPS_OK_FIX_3D) {
         // GPS speed can't be trusted, re-enable airspeed as a fallback
         if ((param[i].use == 0) && (state[i].failures.param_use_backup == 1)) {
-            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Airspeed sensor %d, Re-enabled as GPS fall-back", i+1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Airspeed sensor %d, Re-enabled as GPS fall-back", i+1);
             param[i].use.set_and_notify(state[i].failures.param_use_backup); 
             state[i].failures.param_use_backup = -1;
         }
@@ -89,7 +89,7 @@ void AP_Airspeed::check_sensor_ahrs_wind_max_failures(uint8_t i)
         if (((AP_Airspeed::OptionsMask::ON_FAILURE_AHRS_WIND_MAX_DO_DISABLE & _options) != 0) &&
                 (state[i].failures.health_probability < DISABLE_PROB_THRESH_CRIT)) {
             // if "disable" option is allowed and sensor is enabled and is probably not healthy
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Airspeed sensor %d failure. Disabling", i+1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Airspeed sensor %d failure. Disabling", i+1);
             state[i].failures.param_use_backup = param[i].use;
             param[i].use.set_and_notify(0);
             state[i].healthy = false;
@@ -105,7 +105,7 @@ void AP_Airspeed::check_sensor_ahrs_wind_max_failures(uint8_t i)
 
         if (is_positive(wind_warn) && (speed_diff > wind_warn) && ((now_ms - state[i].failures.last_warn_ms) > 15000)) {
             state[i].failures.last_warn_ms = now_ms;
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Airspeed %d warning %0.1fm/s air to gnd speed diff", i+1, speed_diff);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Airspeed %d warning %0.1fm/s air to gnd speed diff", i+1, speed_diff);
         }
 
     // if Re-Enable options is allowed, and sensor is disabled but was previously enabled, and is probably healthy
@@ -113,7 +113,7 @@ void AP_Airspeed::check_sensor_ahrs_wind_max_failures(uint8_t i)
                 (state[i].failures.param_use_backup > 0) && 
                 (state[i].failures.health_probability > RE_ENABLE_PROB_THRESH_OK)) {
 
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Airspeed sensor %d now OK. Re-enabled", i+1);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_NOTICE, "Airspeed sensor %d now OK. Re-enabled", i+1);
         param[i].use.set_and_notify(state[i].failures.param_use_backup); // resume
         state[i].failures.param_use_backup = -1; // set to invalid so we don't use it
     }

@@ -22,7 +22,7 @@ local VERSION = FWVersion:major() + (FWVersion:minor() * 0.1)
 assert(VERSION >= SCRIPT_AP_VERSION, string.format('%s Requires: %s:%.1f. Found Version: %s', SCRIPT_NAME, FWVersion:type(), SCRIPT_AP_VERSION, VERSION))
 
 
-local MAV_SEVERITY_ERROR = 3
+local AGPILOT_SEVERITY_ERROR = 3
 
 local K_THROTTLE = 70
 local K_HELIRSC = 31
@@ -556,7 +556,7 @@ gcs:send_text(0, SCRIPT_NAME .. string.format(" loaded"))
 function protected_wrapper()
     local success, err = pcall(update)
     if not success then
-        gcs:send_text(MAV_SEVERITY_ERROR, "Internal Error: " .. err)
+        gcs:send_text(AGPILOT_SEVERITY_ERROR, "Internal Error: " .. err)
         -- when we fault we run the update function again after 1s, slowing it
         -- down a bit so we don't flood the console with errors
         return protected_wrapper, 1000

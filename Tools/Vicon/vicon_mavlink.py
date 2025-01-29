@@ -9,7 +9,7 @@ from pymavlink.quaternion import Quaternion
 
 # force mavlink2 for yaw in GPS_INPUT
 import os
-os.environ['MAVLINK20'] = '1'
+os.environ['AGPILOTLINK20'] = '1'
 
 from pymavlink import mavutil
 from pymavlink import mavextra
@@ -27,7 +27,7 @@ parser.add_argument("--origin", type=str, help="origin in lat,lon,alt,yaw", defa
 parser.add_argument("--debug", type=int, default=0, help="debug level")
 parser.add_argument("--target-sysid", type=int, default=1, help="target mavlink sysid")
 parser.add_argument("--source-sysid", type=int, default=255, help="mavlink source sysid")
-parser.add_argument("--source-component", type=int, default=mavutil.mavlink.MAV_COMP_ID_VISUAL_INERTIAL_ODOMETRY, help="mavlink source component")
+parser.add_argument("--source-component", type=int, default=mavutil.mavlink.AGPILOT_COMP_ID_VISUAL_INERTIAL_ODOMETRY, help="mavlink source component")
 parser.add_argument("--rate", type=float, default=None, help="message rate for GLOBAL_VISION_POSITION_ESTIMATE")
 parser.add_argument("--gps-rate", type=int, default=5, help="message rate for GPS_INPUT")
 parser.add_argument("--gps-nsats", type=int, default=16, help="GPS satellite count")
@@ -151,7 +151,7 @@ def main_loop():
 
         if now - last_origin_send > 1 and not args.gps_only:
             # send a heartbeat msg
-            mav.mav.heartbeat_send(mavutil.mavlink.MAV_TYPE_GCS, mavutil.mavlink.MAV_AUTOPILOT_GENERIC, 0, 0, 0)
+            mav.mav.heartbeat_send(mavutil.mavlink.AGPILOT_TYPE_GCS, mavutil.mavlink.AGPILOT_AUTOPILOT_GENERIC, 0, 0, 0)
 
             # send origin at 1Hz
             mav.mav.set_gps_global_origin_send(args.target_sysid,

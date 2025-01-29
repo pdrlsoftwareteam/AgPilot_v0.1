@@ -22,7 +22,7 @@
      CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_DISCO) &&      \
     defined(HAVE_LIBIIO)
 #endif
-#include "AP_RangeFinder_MAVLink.h"
+#include "AP_RangeFinder_AGPILOTLink.h"
 #include "AP_RangeFinder_USD1_Serial.h"
 #include "AP_RangeFinder_TeraRanger_Serial.h"
 #include "AP_RangeFinder_VL53L1X.h"
@@ -44,7 +44,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include "GCS_MAVLink/GCS.h"
+#include "GCS_AGPILOTLink/GCS.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -315,10 +315,10 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
         serial_create_fn = AP_RangeFinder_USD1_Serial::create;
 #endif
         break;
-    case Type::MAVLink:
-#if AP_RANGEFINDER_MAVLINK_ENABLED
-        if (AP_RangeFinder_MAVLink::detect()) {
-            _add_backend(new AP_RangeFinder_MAVLink(state[instance], params[instance]), instance);
+    case Type::AGPILOTLink:
+#if AP_RANGEFINDER_AGPILOTLINK_ENABLED
+        if (AP_RangeFinder_AGPILOTLink::detect()) {
+            _add_backend(new AP_RangeFinder_AGPILOTLink(state[instance], params[instance]), instance);
         }
 #endif
         break;
@@ -598,11 +598,11 @@ uint32_t RangeFinder::last_reading_ms(enum Rotation orientation) const
     return backend->last_reading_ms();
 }
 
-MAV_DISTANCE_SENSOR RangeFinder::get_mav_distance_sensor_type_orient(enum Rotation orientation) const
+AGPILOT_DISTANCE_SENSOR RangeFinder::get_mav_distance_sensor_type_orient(enum Rotation orientation) const
 {
     AP_RangeFinder_Backend *backend = find_instance(orientation);
     if (backend == nullptr) {
-        return MAV_DISTANCE_SENSOR_UNKNOWN;
+        return AGPILOT_DISTANCE_SENSOR_UNKNOWN;
     }
     return backend->get_mav_distance_sensor_type();
 }

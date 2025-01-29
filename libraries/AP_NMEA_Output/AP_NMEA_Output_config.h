@@ -1,5 +1,5 @@
 #include <AP_HAL/AP_HAL_Boards.h>
-#include <GCS_MAVLink/GCS_config.h>
+#include <GCS_AGPILOTLink/GCS_config.h>
 
 // Needs SerialManager + (AHRS or GPS)
 #ifndef HAL_NMEA_OUTPUT_ENABLED

@@ -18,7 +18,7 @@ _ap_bin() {
     '--config[set additional simulation config string]:CONFIG' \
     '(-F --fg)'{-F,--fg}'[set Flight Gear view address, defaults to 127.0.0.1]:ADDRESS' \
     '--disable-fgview[disable Flight Gear view]' \
-    '--gimbal[enable simulated MAVLink gimbal]' \
+    '--gimbal[enable simulated AGPILOTLink gimbal]' \
     '--autotest-dir[set directory for additional files]:DIR:' \
     '--defaults[set path to defaults file]:PATH:' \
     '--uartA[set device string for UARTA]:DEVICE:' \

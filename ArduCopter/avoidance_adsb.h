@@ -23,7 +23,7 @@ private:
 
 protected:
     // override avoidance handler
-    MAV_COLLISION_ACTION handle_avoidance(const AP_Avoidance::Obstacle *obstacle, MAV_COLLISION_ACTION requested_action) override;
+    AGPILOT_COLLISION_ACTION handle_avoidance(const AP_Avoidance::Obstacle *obstacle, AGPILOT_COLLISION_ACTION requested_action) override;
 
     // override recovery handler
     void handle_recovery(RecoveryAction recovery_action) override;

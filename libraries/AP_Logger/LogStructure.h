@@ -296,7 +296,7 @@ struct PACKED log_RCOUT2 {
     uint16_t chan18;
 };
 
-struct PACKED log_MAV {
+struct PACKED log_AGPILOT {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     uint8_t chan;
@@ -360,7 +360,7 @@ struct PACKED log_Cmd {
     uint8_t frame;
 };
 
-struct PACKED log_MAVLink_Command {
+struct PACKED log_AGPILOTLink_Command {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     uint8_t target_system;
@@ -515,7 +515,7 @@ struct PACKED log_ARSP {
     uint8_t primary;
 };
 
-struct PACKED log_MAV_Stats {
+struct PACKED log_AGPILOT_Stats {
     LOG_PACKET_HEADER;
     uint64_t timestamp;
     uint32_t seqno;
@@ -769,7 +769,7 @@ struct PACKED log_VER {
 // @Field: Err: error flags
 
 // @LoggerMessage: DMS
-// @Description: DataFlash-Over-MAVLink statistics
+// @Description: DataFlash-Over-AGPILOTLink statistics
 // @Field: TimeUS: Time since system startup
 // @Field: N: Current block number
 // @Field: Dp: Number of times we rejected a write to the backend
@@ -864,20 +864,20 @@ struct PACKED log_VER {
 // @Field: Health: true if the compass is considered healthy
 // @Field: S: time measurement was taken
 
-// @LoggerMessage: MAV
-// @Description: GCS MAVLink link statistics
+// @LoggerMessage: AGPILOT
+// @Description: GCS AGPILOTLink link statistics
 // @Field: TimeUS: Time since system startup
 // @Field: chan: mavlink channel number
 // @Field: txp: transmitted packet count
 // @Field: rxp: received packet count
 // @Field: rxdp: perceived number of packets we never received
 // @Field: flags: compact representation of some stage of the channel
-// @FieldBitmaskEnum: flags: GCS_MAVLINK::Flags
+// @FieldBitmaskEnum: flags: GCS_AGPILOTLINK::Flags
 // @Field: ss: stream slowdown is the number of ms being added to each message to fit within bandwidth
 // @Field: tf: times buffer was full when a message was going to be sent
 
-// @LoggerMessage: MAVC
-// @Description: MAVLink command we have just executed
+// @LoggerMessage: AGPILOTC
+// @Description: AGPILOTLink command we have just executed
 // @Field: TimeUS: Time since system startup
 // @Field: TS: target system for command
 // @Field: TC: target component for command
@@ -1256,8 +1256,8 @@ LOG_STRUCTURE_FROM_PRECLAND \
       "MCU","Qffff","TimeUS,MTemp,MVolt,MVmin,MVmax", "sOvvv", "F0000", true }, \
     { LOG_CMD_MSG, sizeof(log_Cmd), \
       "CMD", "QHHHffffLLfB","TimeUS,CTot,CNum,CId,Prm1,Prm2,Prm3,Prm4,Lat,Lng,Alt,Frame", "s-------DUm-", "F-------GG0-" }, \
-    { LOG_MAVLINK_COMMAND_MSG, sizeof(log_MAVLink_Command), \
-      "MAVC", "QBBBBBHffffiifBB","TimeUS,TS,TC,SS,SC,Fr,Cmd,P1,P2,P3,P4,X,Y,Z,Res,WL", "s---------------", "F---------------" }, \
+    { LOG_AGPILOTLINK_COMMAND_MSG, sizeof(log_AGPILOTLink_Command), \
+      "AGPILOTC", "QBBBBBHffffiifBB","TimeUS,TS,TC,SS,SC,Fr,Cmd,P1,P2,P3,P4,X,Y,Z,Res,WL", "s---------------", "F---------------" }, \
     { LOG_RADIO_MSG, sizeof(log_Radio), \
       "RAD", "QBBBBBHH", "TimeUS,RSSI,RemRSSI,TxBuf,Noise,RemNoise,RxErrors,Fixed", "s-------", "F-------", true }, \
 LOG_STRUCTURE_FROM_CAMERA \
@@ -1269,7 +1269,7 @@ LOG_STRUCTURE_FROM_CAMERA \
       "MODE", "QMBB",         "TimeUS,Mode,ModeNum,Rsn", "s---", "F---" }, \
     { LOG_RFND_MSG, sizeof(log_RFND), \
       "RFND", "QBCBB", "TimeUS,Instance,Dist,Stat,Orient", "s#m--", "F-B--", true }, \
-    { LOG_MAV_STATS, sizeof(log_MAV_Stats), \
+    { LOG_AGPILOT_STATS, sizeof(log_AGPILOT_Stats), \
       "DMS", "QIIIIBBBBBBBBB",         "TimeUS,N,Dp,RT,RS,Fa,Fmn,Fmx,Pa,Pmn,Pmx,Sa,Smn,Smx", "s-------------", "F-------------" }, \
     LOG_STRUCTURE_FROM_BEACON                                       \
     LOG_STRUCTURE_FROM_PROXIMITY                                    \
@@ -1314,8 +1314,8 @@ LOG_STRUCTURE_FROM_FENCE \
       "DSF", "QIHIIII", "TimeUS,Dp,Blk,Bytes,FMn,FMx,FAv", "s--b---", "F--0---" }, \
     { LOG_RALLY_MSG, sizeof(log_Rally), \
       "RALY", "QBBLLh", "TimeUS,Tot,Seq,Lat,Lng,Alt", "s--DUm", "F--GGB" },  \
-    { LOG_MAV_MSG, sizeof(log_MAV),   \
-      "MAV", "QBHHHBHH",   "TimeUS,chan,txp,rxp,rxdp,flags,ss,tf", "s#----s-", "F-000-C-" },   \
+    { LOG_AGPILOT_MSG, sizeof(log_AGPILOT),   \
+      "AGPILOT", "QBHHHBHH",   "TimeUS,chan,txp,rxp,rxdp,flags,ss,tf", "s#----s-", "F-000-C-" },   \
 LOG_STRUCTURE_FROM_VISUALODOM \
     { LOG_OPTFLOW_MSG, sizeof(log_Optflow), \
       "OF",   "QBffff",   "TimeUS,Qual,flowX,flowY,bodyX,bodyY", "s-EEnn", "F-0000" , true }, \
@@ -1367,7 +1367,7 @@ enum LogMessages : uint8_t {
     LOG_IDS_FROM_AHRS,
     LOG_SIMSTATE_MSG,
     LOG_CMD_MSG,
-    LOG_MAVLINK_COMMAND_MSG,
+    LOG_AGPILOTLINK_COMMAND_MSG,
     LOG_RADIO_MSG,
     LOG_ATRP_MSG,
     LOG_IDS_FROM_CAMERA,
@@ -1391,7 +1391,7 @@ enum LogMessages : uint8_t {
     LOG_ARSP_MSG,
     LOG_IDS_FROM_RPM,
     LOG_RFND_MSG,
-    LOG_MAV_STATS,
+    LOG_AGPILOT_STATS,
     LOG_FORMAT_UNITS_MSG,
     LOG_UNIT_MSG,
     LOG_MULT_MSG,
@@ -1415,7 +1415,7 @@ enum LogMessages : uint8_t {
     LOG_OPTFLOW_MSG,
     LOG_EVENT_MSG,
     LOG_WHEELENCODER_MSG,
-    LOG_MAV_MSG,
+    LOG_AGPILOT_MSG,
     LOG_ERROR_MSG,
     LOG_ADSB_MSG,
     LOG_ARM_DISARM_MSG,

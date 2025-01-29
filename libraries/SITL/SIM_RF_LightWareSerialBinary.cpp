@@ -18,7 +18,7 @@
 
 #include "SIM_RF_LightWareSerialBinary.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 
 

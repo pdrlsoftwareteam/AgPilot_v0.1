@@ -1438,7 +1438,7 @@ function mission:set_current_cmd(index) end
 
 -- get_current_nav_index - returns the current "navigation" command index
 -- Note that this will return 0 if there is no command. This is
--- used in MAVLink reporting of the mission command
+-- used in AGPILOTLink reporting of the mission command
 ---@return integer
 function mission:get_current_nav_index() end
 
@@ -2015,7 +2015,7 @@ function onvif:set_absolutemove(pan, tilt, zoom) end
 function onvif:start(username, password, httphostname) end
 
 
--- MAVLink interaction with ground control station
+-- AGPILOTLink interaction with ground control station
 ---@class gcs
 gcs = {}
 
@@ -2026,66 +2026,66 @@ function gcs:send_named_float(name, value) end
 
 -- set message interval for a given serial port and message id
 ---@param port_num integer -- serial port number
----@param msg_id uint32_t_ud -- MAVLink message id
+---@param msg_id uint32_t_ud -- AGPILOTLink message id
 ---@param interval_us integer -- interval in micro seconds
 ---@return integer
 ---| '0' # Accepted
 ---| '4' # Failed
 function gcs:set_message_interval(port_num, msg_id, interval_us) end
 
--- get the vehicle MAV_TYPE
+-- get the vehicle AGPILOT_TYPE
 ---@return integer
----| '0' # MAV_TYPE_GENERIC=0, /* Generic micro air vehicle | */
----| '1' # MAV_TYPE_FIXED_WING=1, /* Fixed wing aircraft. | */
----| '2' # MAV_TYPE_QUADROTOR=2, /* Quadrotor | */
----| '3' # MAV_TYPE_COAXIAL=3, /* Coaxial helicopter | */
----| '4' # MAV_TYPE_HELICOPTER=4, /* Normal helicopter with tail rotor. | */
----| '5' # MAV_TYPE_ANTENNA_TRACKER=5, /* Ground installation | */
----| '6' # MAV_TYPE_GCS=6, /* Operator control unit / ground control station | */
----| '7' # MAV_TYPE_AIRSHIP=7, /* Airship, controlled | */
----| '8' # MAV_TYPE_FREE_BALLOON=8, /* Free balloon, uncontrolled | */
----| '9' # MAV_TYPE_ROCKET=9, /* Rocket | */
----| '10' # MAV_TYPE_GROUND_ROVER=10, /* Ground rover | */
----| '11' # MAV_TYPE_SURFACE_BOAT=11, /* Surface vessel, boat, ship | */
----| '12' # MAV_TYPE_SUBMARINE=12, /* Submarine | */
----| '13' # MAV_TYPE_HEXAROTOR=13, /* Hexarotor | */
----| '14' # MAV_TYPE_OCTOROTOR=14, /* Octorotor | */
----| '15' # MAV_TYPE_TRICOPTER=15, /* Tricopter | */
----| '16' # MAV_TYPE_FLAPPING_WING=16, /* Flapping wing | */
----| '17' # MAV_TYPE_KITE=17, /* Kite | */
----| '18' # MAV_TYPE_ONBOARD_CONTROLLER=18, /* Onboard companion controller | */
----| '19' # MAV_TYPE_VTOL_DUOROTOR=19, /* Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter. | */
----| '20' # MAV_TYPE_VTOL_QUADROTOR=20, /* Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter. | */
----| '21' # MAV_TYPE_VTOL_TILTROTOR=21, /* Tiltrotor VTOL | */
----| '22' # MAV_TYPE_VTOL_RESERVED2=22, /* VTOL reserved 2 | */
----| '23' # MAV_TYPE_VTOL_RESERVED3=23, /* VTOL reserved 3 | */
----| '24' # MAV_TYPE_VTOL_RESERVED4=24, /* VTOL reserved 4 | */
----| '25' # MAV_TYPE_VTOL_RESERVED5=25, /* VTOL reserved 5 | */
----| '26' # MAV_TYPE_GIMBAL=26, /* Gimbal | */
----| '27' # MAV_TYPE_ADSB=27, /* ADSB system | */
----| '28' # MAV_TYPE_PARAFOIL=28, /* Steerable, nonrigid airfoil | */
----| '29' # MAV_TYPE_DODECAROTOR=29, /* Dodecarotor | */
----| '30' # MAV_TYPE_CAMERA=30, /* Camera | */
----| '31' # MAV_TYPE_CHARGING_STATION=31, /* Charging station | */
----| '32' # MAV_TYPE_FLARM=32, /* FLARM collision avoidance system | */
----| '33' # MAV_TYPE_SERVO=33, /* Servo | */
----| '34' # MAV_TYPE_ODID=34, /* Open Drone ID. See https://mavlink.io/en/services/opendroneid.html. | */
----| '35' # MAV_TYPE_DECAROTOR=35, /* Decarotor | */
----| '36' # MAV_TYPE_BATTERY=36, /* Battery | */
----| '37' # MAV_TYPE_PARACHUTE=37, /* Parachute | */
----| '38' # MAV_TYPE_LOG=38, /* Log | */
----| '39' # MAV_TYPE_OSD=39, /* OSD | */
----| '40' # MAV_TYPE_IMU=40, /* IMU | */
----| '41' # MAV_TYPE_GPS=41, /* GPS | */
----| '42' # MAV_TYPE_WINCH=42, /* Winch | */
----| '43' # MAV_TYPE_ENUM_END=43, /*  | */
+---| '0' # AGPILOT_TYPE_GENERIC=0, /* Generic micro air vehicle | */
+---| '1' # AGPILOT_TYPE_FIXED_WING=1, /* Fixed wing aircraft. | */
+---| '2' # AGPILOT_TYPE_QUADROTOR=2, /* Quadrotor | */
+---| '3' # AGPILOT_TYPE_COAXIAL=3, /* Coaxial helicopter | */
+---| '4' # AGPILOT_TYPE_HELICOPTER=4, /* Normal helicopter with tail rotor. | */
+---| '5' # AGPILOT_TYPE_ANTENNA_TRACKER=5, /* Ground installation | */
+---| '6' # AGPILOT_TYPE_GCS=6, /* Operator control unit / ground control station | */
+---| '7' # AGPILOT_TYPE_AIRSHIP=7, /* Airship, controlled | */
+---| '8' # AGPILOT_TYPE_FREE_BALLOON=8, /* Free balloon, uncontrolled | */
+---| '9' # AGPILOT_TYPE_ROCKET=9, /* Rocket | */
+---| '10' # AGPILOT_TYPE_GROUND_ROVER=10, /* Ground rover | */
+---| '11' # AGPILOT_TYPE_SURFACE_BOAT=11, /* Surface vessel, boat, ship | */
+---| '12' # AGPILOT_TYPE_SUBMARINE=12, /* Submarine | */
+---| '13' # AGPILOT_TYPE_HEXAROTOR=13, /* Hexarotor | */
+---| '14' # AGPILOT_TYPE_OCTOROTOR=14, /* Octorotor | */
+---| '15' # AGPILOT_TYPE_TRICOPTER=15, /* Tricopter | */
+---| '16' # AGPILOT_TYPE_FLAPPING_WING=16, /* Flapping wing | */
+---| '17' # AGPILOT_TYPE_KITE=17, /* Kite | */
+---| '18' # AGPILOT_TYPE_ONBOARD_CONTROLLER=18, /* Onboard companion controller | */
+---| '19' # AGPILOT_TYPE_VTOL_DUOROTOR=19, /* Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter. | */
+---| '20' # AGPILOT_TYPE_VTOL_QUADROTOR=20, /* Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter. | */
+---| '21' # AGPILOT_TYPE_VTOL_TILTROTOR=21, /* Tiltrotor VTOL | */
+---| '22' # AGPILOT_TYPE_VTOL_RESERVED2=22, /* VTOL reserved 2 | */
+---| '23' # AGPILOT_TYPE_VTOL_RESERVED3=23, /* VTOL reserved 3 | */
+---| '24' # AGPILOT_TYPE_VTOL_RESERVED4=24, /* VTOL reserved 4 | */
+---| '25' # AGPILOT_TYPE_VTOL_RESERVED5=25, /* VTOL reserved 5 | */
+---| '26' # AGPILOT_TYPE_GIMBAL=26, /* Gimbal | */
+---| '27' # AGPILOT_TYPE_ADSB=27, /* ADSB system | */
+---| '28' # AGPILOT_TYPE_PARAFOIL=28, /* Steerable, nonrigid airfoil | */
+---| '29' # AGPILOT_TYPE_DODECAROTOR=29, /* Dodecarotor | */
+---| '30' # AGPILOT_TYPE_CAMERA=30, /* Camera | */
+---| '31' # AGPILOT_TYPE_CHARGING_STATION=31, /* Charging station | */
+---| '32' # AGPILOT_TYPE_FLARM=32, /* FLARM collision avoidance system | */
+---| '33' # AGPILOT_TYPE_SERVO=33, /* Servo | */
+---| '34' # AGPILOT_TYPE_ODID=34, /* Open Drone ID. See https://mavlink.io/en/services/opendroneid.html. | */
+---| '35' # AGPILOT_TYPE_DECAROTOR=35, /* Decarotor | */
+---| '36' # AGPILOT_TYPE_BATTERY=36, /* Battery | */
+---| '37' # AGPILOT_TYPE_PARACHUTE=37, /* Parachute | */
+---| '38' # AGPILOT_TYPE_LOG=38, /* Log | */
+---| '39' # AGPILOT_TYPE_OSD=39, /* OSD | */
+---| '40' # AGPILOT_TYPE_IMU=40, /* IMU | */
+---| '41' # AGPILOT_TYPE_GPS=41, /* GPS | */
+---| '42' # AGPILOT_TYPE_WINCH=42, /* Winch | */
+---| '43' # AGPILOT_TYPE_ENUM_END=43, /*  | */
 function gcs:frame_type() end
 
 -- get the throttle value in %
 ---@return integer
 function gcs:get_hud_throttle() end
 
--- set high latency control state. Analogous to MAV_CMD_CONTROL_HIGH_LATENCY
+-- set high latency control state. Analogous to AGPILOT_CMD_CONTROL_HIGH_LATENCY
 ---@param enabled boolean -- true to enable or false to disable
 ---@return void
 function gcs:enable_high_latency_connections(enabled) end

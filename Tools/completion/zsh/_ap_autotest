@@ -16,7 +16,7 @@ _ap_autotest() {
       _arguments -C \
         '--skip[list of steps to skip (comma separated)]' \
         '(-j --jobs)'{-j,--jobs}'[number of processors to use during build]:int:' \
-        '--viewerip[IP address to send MAVLink and fg packets to]:VIEWERIP:' \
+        '--viewerip[IP address to send AGPILOTLink and fg packets to]:VIEWERIP:' \
         '--map[show map]' \
         '--experimental[enable experimental tests]' \
         '--timeout[maximum runtime in seconds]:TIMEOUT:' \

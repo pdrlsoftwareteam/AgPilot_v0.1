@@ -27,7 +27,7 @@
 
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 const AP_Param::GroupInfo AP_RunCam::var_info[] = {
@@ -958,11 +958,11 @@ void AP_RunCam::parse_device_info(const Request& request)
     }
     if (_features > 0) {
         _state = State::INITIALIZED;
-        gcs().send_text(MAV_SEVERITY_INFO, "RunCam initialized, features 0x%04X, %d-key OSD\n", _features.get(),
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "RunCam initialized, features 0x%04X, %d-key OSD\n", _features.get(),
             has_5_key_OSD() ? 5 : has_2_key_OSD() ? 2 : 0);
     } else {
         // nothing as as nothing does
-        gcs().send_text(MAV_SEVERITY_WARNING, "RunCam device not found\n");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "RunCam device not found\n");
     }
     debug("RunCam: initialized state: video: %d, osd: %d, cam: %d\n", int(_video_recording), int(_osd_option), int(_cam_control_option));
 }

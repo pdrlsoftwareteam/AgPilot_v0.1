@@ -1,7 +1,7 @@
 #include "AP_Mount_Backend.h"
 #if HAL_MOUNT_ENABLED
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -19,7 +19,7 @@ void AP_Mount_Backend::set_angle_target(float roll_deg, float pitch_deg, float y
     mavt_target.angle_rad.yaw_is_ef = yaw_is_earth_frame;
 
     // set the mode to mavlink targeting
-    set_mode(MAV_MOUNT_MODE_MAVLINK_TARGETING);
+    set_mode(AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING);
 }
 
 // sets rate target in deg/s
@@ -34,7 +34,7 @@ void AP_Mount_Backend::set_rate_target(float roll_degs, float pitch_degs, float 
     mavt_target.rate_rads.yaw_is_ef = yaw_is_earth_frame;
 
     // set the mode to mavlink targeting
-    set_mode(MAV_MOUNT_MODE_MAVLINK_TARGETING);
+    set_mode(AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING);
 }
 
 // set_roi_target - sets target location that mount should attempt to point towards
@@ -45,7 +45,7 @@ void AP_Mount_Backend::set_roi_target(const Location &target_loc)
     _roi_target_set = true;
 
     // set the mode to GPS tracking mode
-    set_mode(MAV_MOUNT_MODE_GPS_POINT);
+    set_mode(AGPILOT_MOUNT_MODE_GPS_POINT);
 }
 
 // set_sys_target - sets system that mount should attempt to point towards
@@ -54,13 +54,13 @@ void AP_Mount_Backend::set_target_sysid(uint8_t sysid)
     _target_sysid = sysid;
 
     // set the mode to sysid tracking mode
-    set_mode(MAV_MOUNT_MODE_SYSID_TARGET);
+    set_mode(AGPILOT_MOUNT_MODE_SYSID_TARGET);
 }
 
 // process MOUNT_CONFIGURE messages received from GCS. deprecated.
 void AP_Mount_Backend::handle_mount_configure(const mavlink_mount_configure_t &packet)
 {
-    set_mode((MAV_MOUNT_MODE)packet.mount_mode);
+    set_mode((AGPILOT_MOUNT_MODE)packet.mount_mode);
 }
 
 // send a GIMBAL_DEVICE_ATTITUDE_STATUS message to GCS
@@ -68,7 +68,7 @@ void AP_Mount_Backend::send_gimbal_device_attitude_status(mavlink_channel_t chan
 {
     if (suppress_heartbeat()) {
         // block heartbeat from transmitting to the GCS
-        GCS_MAVLINK::disable_channel_routing(chan);
+        GCS_AGPILOTLINK::disable_channel_routing(chan);
     }
 
     Quaternion att_quat;
@@ -95,14 +95,14 @@ void AP_Mount_Backend::send_gimbal_device_attitude_status(mavlink_channel_t chan
 void AP_Mount_Backend::handle_mount_control(const mavlink_mount_control_t &packet)
 {
     switch (get_mode()) {
-    case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+    case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
         // input_a : Pitch in centi-degrees
         // input_b : Roll in centi-degrees
         // input_c : Yaw in centi-degrees (interpreted as body-frame)
         set_angle_target(packet.input_b * 0.01, packet.input_a * 0.01, packet.input_c * 0.01, false);
         break;
 
-    case MAV_MOUNT_MODE_GPS_POINT: {
+    case AGPILOT_MOUNT_MODE_GPS_POINT: {
         // input_a : lat in degE7
         // input_b : lon in degE7
         // input_c : alt  in cm (interpreted as above home)
@@ -116,33 +116,33 @@ void AP_Mount_Backend::handle_mount_control(const mavlink_mount_control_t &packe
         break;
     }
 
-    case MAV_MOUNT_MODE_RETRACT:
-    case MAV_MOUNT_MODE_NEUTRAL:
-    case MAV_MOUNT_MODE_RC_TARGETING:
-    case MAV_MOUNT_MODE_SYSID_TARGET:
-    case MAV_MOUNT_MODE_HOME_LOCATION:
+    case AGPILOT_MOUNT_MODE_RETRACT:
+    case AGPILOT_MOUNT_MODE_NEUTRAL:
+    case AGPILOT_MOUNT_MODE_RC_TARGETING:
+    case AGPILOT_MOUNT_MODE_SYSID_TARGET:
+    case AGPILOT_MOUNT_MODE_HOME_LOCATION:
     default:
         // no effect in these modes
         break;
     }
 }
 
-// handle do_mount_control command.  Returns MAV_RESULT_ACCEPTED on success
-MAV_RESULT AP_Mount_Backend::handle_command_do_mount_control(const mavlink_command_long_t &packet)
+// handle do_mount_control command.  Returns AGPILOT_RESULT_ACCEPTED on success
+AGPILOT_RESULT AP_Mount_Backend::handle_command_do_mount_control(const mavlink_command_long_t &packet)
 {
-    const MAV_MOUNT_MODE new_mode = (MAV_MOUNT_MODE)packet.param7;
+    const AGPILOT_MOUNT_MODE new_mode = (AGPILOT_MOUNT_MODE)packet.param7;
 
     // interpret message fields based on mode
     switch (new_mode) {
-    case MAV_MOUNT_MODE_RETRACT:
-    case MAV_MOUNT_MODE_NEUTRAL:
-    case MAV_MOUNT_MODE_RC_TARGETING:
-    case MAV_MOUNT_MODE_HOME_LOCATION:
+    case AGPILOT_MOUNT_MODE_RETRACT:
+    case AGPILOT_MOUNT_MODE_NEUTRAL:
+    case AGPILOT_MOUNT_MODE_RC_TARGETING:
+    case AGPILOT_MOUNT_MODE_HOME_LOCATION:
         // simply set mode
         set_mode(new_mode);
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
 
-    case MAV_MOUNT_MODE_MAVLINK_TARGETING: {
+    case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING: {
         // set body-frame target angles (in degrees) from mavlink message
         const float pitch_deg = packet.param1;  // param1: pitch (in degrees)
         const float roll_deg = packet.param2;   // param2: roll in degrees
@@ -151,21 +151,21 @@ MAV_RESULT AP_Mount_Backend::handle_command_do_mount_control(const mavlink_comma
         // warn if angles are invalid to catch angles sent in centi-degrees
         if ((fabsf(pitch_deg) > 90) || (fabsf(roll_deg) > 180) || (fabsf(yaw_deg) > 360)) {
             send_warning_to_GCS("invalid angle targets");
-            return MAV_RESULT_FAILED;
+            return AGPILOT_RESULT_FAILED;
         }
 
         set_angle_target(packet.param2, packet.param1, packet.param3, false);
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
     }
 
-    case MAV_MOUNT_MODE_GPS_POINT: {
+    case AGPILOT_MOUNT_MODE_GPS_POINT: {
         // set lat, lon, alt position targets from mavlink message
 
         // warn if lat, lon appear to be in param1,2 instead of param5,6 as this indicates
-        // sender is relying on a bug in AP-4.2's (and earlier) handling of MAV_CMD_DO_MOUNT_CONTROL
+        // sender is relying on a bug in AP-4.2's (and earlier) handling of AGPILOT_CMD_DO_MOUNT_CONTROL
         if (!is_zero(packet.param1) && !is_zero(packet.param2) && is_zero(packet.param5) && is_zero(packet.param6)) {
             send_warning_to_GCS("GPS_POINT target invalid");
-            return MAV_RESULT_FAILED;
+            return AGPILOT_RESULT_FAILED;
         }
 
         // param4: altitude in meters
@@ -178,12 +178,12 @@ MAV_RESULT AP_Mount_Backend::handle_command_do_mount_control(const mavlink_comma
             Location::AltFrame::ABOVE_HOME
         };
         set_roi_target(target_location);
-        return MAV_RESULT_ACCEPTED;
+        return AGPILOT_RESULT_ACCEPTED;
     }
 
     default:
         // invalid mode
-        return MAV_RESULT_FAILED;
+        return AGPILOT_RESULT_FAILED;
     }
 }
 
@@ -387,8 +387,8 @@ void AP_Mount_Backend::update_angle_target_from_rate(const MountTarget& rate_rad
 // helper function to provide GIMBAL_DEVICE_FLAGS for use in GIMBAL_DEVICE_ATTITUDE_STATUS message
 uint16_t AP_Mount_Backend::get_gimbal_device_flags() const
 {
-    const uint16_t flags = (get_mode() == MAV_MOUNT_MODE_RETRACT ? GIMBAL_DEVICE_FLAGS_RETRACT : 0) |
-                           (get_mode() == MAV_MOUNT_MODE_NEUTRAL ? GIMBAL_DEVICE_FLAGS_NEUTRAL : 0) |
+    const uint16_t flags = (get_mode() == AGPILOT_MOUNT_MODE_RETRACT ? GIMBAL_DEVICE_FLAGS_RETRACT : 0) |
+                           (get_mode() == AGPILOT_MOUNT_MODE_NEUTRAL ? GIMBAL_DEVICE_FLAGS_NEUTRAL : 0) |
                            GIMBAL_DEVICE_FLAGS_ROLL_LOCK | // roll angle is always earth-frame
                            GIMBAL_DEVICE_FLAGS_PITCH_LOCK; // pitch angle is always earth-frame, yaw_angle is always body-frame
     return flags;
@@ -427,7 +427,7 @@ void AP_Mount_Backend::send_warning_to_GCS(const char* warning_str)
         return;
     }
 
-    gcs().send_text(MAV_SEVERITY_WARNING, "Mount: %s", warning_str);
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "Mount: %s", warning_str);
     _last_warning_ms = now_ms;
 }
 

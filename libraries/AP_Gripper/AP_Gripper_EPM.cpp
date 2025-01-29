@@ -13,7 +13,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <SRV_Channel/SRV_Channel.h>
 
@@ -65,7 +65,7 @@ void AP_Gripper_EPM::grab()
         // move the servo output to the grab position
         SRV_Channels::set_output_pwm(SRV_Channel::k_gripper, config.grab_pwm);
     }
-    gcs().send_text(MAV_SEVERITY_INFO, "Gripper load grabbing");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Gripper load grabbing");
     AP::logger().Write_Event(LogEvent::GRIPPER_GRAB);
 }
 
@@ -89,7 +89,7 @@ void AP_Gripper_EPM::release()
         // move the servo to the release position
         SRV_Channels::set_output_pwm(SRV_Channel::k_gripper, config.release_pwm);
     }
-    gcs().send_text(MAV_SEVERITY_INFO, "Gripper load releasing");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "Gripper load releasing");
     AP::logger().Write_Event(LogEvent::GRIPPER_RELEASE);
 }
 

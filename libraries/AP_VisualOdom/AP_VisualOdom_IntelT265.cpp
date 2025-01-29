@@ -19,7 +19,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 #define VISUALODOM_RESET_IGNORE_DURATION_MS 1000    // sensor data is ignored for 1sec after a position reset
@@ -175,7 +175,7 @@ void AP_VisualOdom_IntelT265::align_yaw(const Vector3f &position, const Quaterni
     // trim yaw by difference between ahrs and sensor yaw
     const float yaw_trim_orig = _yaw_trim;
     _yaw_trim = wrap_2PI(yaw_rad - sens_yaw);
-    gcs().send_text(MAV_SEVERITY_INFO, "VisOdom: yaw shifted %d to %d deg",
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "VisOdom: yaw shifted %d to %d deg",
                     (int)degrees(_yaw_trim - yaw_trim_orig),
                     (int)wrap_360(degrees(sens_yaw + _yaw_trim)));
 
@@ -332,7 +332,7 @@ void AP_VisualOdom_IntelT265::handle_voxl_camera_reset_jump(const Vector3f &sens
     }
 
     // warng user of reset
-    gcs().send_text(MAV_SEVERITY_WARNING, "VisOdom: reset");
+    gcs().send_text(AGPILOT_SEVERITY_WARNING, "VisOdom: reset");
 
     // align sensor yaw to match current yaw estimate
     align_yaw_to_ahrs(sensor_pos, sensor_att);

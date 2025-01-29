@@ -1238,12 +1238,12 @@ int AP_PDRL_Logger::checkTimeBreach(uint64_t *currentTime)
 
 
 
-int AP_PDRL_Logger::setTakeOffLolation(MAV_LANDED_STATE landState)
+int AP_PDRL_Logger::setTakeOffLolation(AGPILOT_LANDED_STATE landState)
 {
 	if(takeOffLogged == 0 )
 	{
 		//check if take off detected make takeOffLogged = 1; and landDetected = 0
-		if((landState == MAV_LANDED_STATE_TAKEOFF)|| (landState == MAV_LANDED_STATE_IN_AIR))
+		if((landState == AGPILOT_LANDED_STATE_TAKEOFF)|| (landState == AGPILOT_LANDED_STATE_IN_AIR))
 		{
 			AP_AHRS &ahrs = AP::ahrs();
 			const AP_GPS &gps = AP::gps();
@@ -1274,12 +1274,12 @@ int AP_PDRL_Logger::setTakeOffLolation(MAV_LANDED_STATE landState)
 	return 0;
 }
 
-int AP_PDRL_Logger::setLandLolation(MAV_LANDED_STATE landState)
+int AP_PDRL_Logger::setLandLolation(AGPILOT_LANDED_STATE landState)
 {
 	if(landDetected == 0)
 	{
 		//check if land detected make landDetected = 1; takeOffLogged = 0
-		if((landState == MAV_LANDED_STATE_LANDING) || (landState == MAV_LANDED_STATE_ON_GROUND))
+		if((landState == AGPILOT_LANDED_STATE_LANDING) || (landState == AGPILOT_LANDED_STATE_ON_GROUND))
 		{
 			AP_AHRS &ahrs = AP::ahrs();
 			const AP_GPS &gps = AP::gps();
@@ -1312,7 +1312,7 @@ int AP_PDRL_Logger::setLandLolation(MAV_LANDED_STATE landState)
 	return 0;
 }
 
-void AP_PDRL_Logger::logTakeOffLand(MAV_LANDED_STATE landState)
+void AP_PDRL_Logger::logTakeOffLand(AGPILOT_LANDED_STATE landState)
 {
 	setTakeOffLolation(landState);
 	setLandLolation(landState);
@@ -1506,7 +1506,7 @@ void AP_PDRL_Logger::logStrToFile(char* logBuff,size_t len)
     	month+=1;
         snprintf(datetimeBuf, sizeof(datetimeBuf), "%04u-%02u-%02u %02u:%02u:%02u.%03u",
                  year, month, day, hour, min, sec, ms);
-      //  gcs().send_text(MAV_SEVERITY_INFO, "Using RTC Time: %s", datetimeBuf);
+      //  gcs().send_text(AGPILOT_SEVERITY_INFO, "Using RTC Time: %s", datetimeBuf);
     }
     else
     {
@@ -1528,13 +1528,13 @@ void AP_PDRL_Logger::logStrToFile(char* logBuff,size_t len)
             // Format the date and time as "YYYY-MM-DD HH:MM:SS"
             strftime(datetimeBuf, sizeof(datetimeBuf), "%Y-%m-%d %H:%M:%S", ist_tm);
 
-           // gcs().send_text(MAV_SEVERITY_INFO, "Using GPS Time: %s", datetimeBuf);
+           // gcs().send_text(AGPILOT_SEVERITY_INFO, "Using GPS Time: %s", datetimeBuf);
         }
         else
         {
             // Fallback if neither RTC nor GPS time is available
             strcpy(datetimeBuf, "No valid time available");
-           // gcs().send_text(MAV_SEVERITY_INFO, "Failed to retrieve both RTC and GPS time");
+           // gcs().send_text(AGPILOT_SEVERITY_INFO, "Failed to retrieve both RTC and GPS time");
         }
     }
 

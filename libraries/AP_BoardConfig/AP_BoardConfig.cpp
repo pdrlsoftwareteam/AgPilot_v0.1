@@ -23,10 +23,10 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Filesystem/AP_Filesystem.h>
-#include <GCS_MAVLink/GCS.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #include <stdio.h>
 
@@ -160,7 +160,7 @@ const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
 
     // @Param: SAFETY_DEFLT
     // @DisplayName: Sets default state of the safety switch
-    // @Description: This controls the default state of the safety switch at startup. When set to 1 the safety switch will start in the safe state (flashing) at boot. When set to zero the safety switch will start in the unsafe state (solid) at startup. Note that if a safety switch is fitted the user can still control the safety state after startup using the switch. The safety state can also be controlled in software using a MAVLink message.
+    // @Description: This controls the default state of the safety switch at startup. When set to 1 the safety switch will start in the safe state (flashing) at boot. When set to zero the safety switch will start in the unsafe state (solid) at startup. Note that if a safety switch is fitted the user can still control the safety state after startup using the switch. The safety state can also be controlled in software using a AGPILOTLink message.
     // @Values: 0:Disabled,1:Enabled
     // @RebootRequired: True
     // @User: Standard
@@ -283,7 +283,7 @@ const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
     // @Param: OPTIONS
     // @DisplayName: Board options
     // @Description: Board specific option flags
-    // @Bitmask: 0:Enable hardware watchdog, 1:Disable MAVftp, 2:Enable set of internal parameters, 3:Enable Debug Pins, 4:Unlock flash on reboot, 5:Write protect firmware flash on reboot, 6:Write protect bootloader flash on reboot
+    // @Bitmask: 0:Enable hardware watchdog, 1:Disable AGPILOTftp, 2:Enable set of internal parameters, 3:Enable Debug Pins, 4:Unlock flash on reboot, 5:Write protect firmware flash on reboot, 6:Write protect bootloader flash on reboot
     // @User: Advanced
     AP_GROUPINFO("OPTIONS", 19, AP_BoardConfig, _options, HAL_BRD_OPTIONS_DEFAULT),
 
@@ -421,7 +421,7 @@ void AP_BoardConfig::throw_error(const char *err_type, const char *fmt, va_list 
         uint32_t now = AP_HAL::millis();
         if (now - last_print_ms >= 5000) {
             last_print_ms = now;
-            char printfmt[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+2];
+            char printfmt[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+2];
             hal.util->snprintf(printfmt, sizeof(printfmt), "%s: %s\n", err_type, fmt);
             {
                 va_list arg_copy;
@@ -434,7 +434,7 @@ void AP_BoardConfig::throw_error(const char *err_type, const char *fmt, va_list 
             {
                 va_list arg_copy;
                 va_copy(arg_copy, arg);
-                gcs().send_textv(MAV_SEVERITY_CRITICAL, printfmt, arg_copy);
+                gcs().send_textv(AGPILOT_SEVERITY_CRITICAL, printfmt, arg_copy);
                 va_end(arg_copy);
             }
 #endif

@@ -18,7 +18,7 @@
 
 #include <AP_HAL/AP_HAL.h>                                      //This is a common Hardware Abstraction Layer.
 #include <AP_GPS/AP_GPS.h>
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_Notify/AP_BoardLED.h>
 #include <AP_SerialManager/AP_SerialManager.h>
@@ -39,7 +39,7 @@ AP_BoardLED board_led;
 // create fake gcs object
 GCS_Dummy _gcs;                                                 //gcs stands for Ground Control Station
 
-const AP_Param::GroupInfo GCS_MAVLINK_Parameters::var_info[] = {
+const AP_Param::GroupInfo GCS_AGPILOTLINK_Parameters::var_info[] = {
         AP_GROUPEND
 };
 

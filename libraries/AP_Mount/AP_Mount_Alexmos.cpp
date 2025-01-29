@@ -12,7 +12,7 @@ void AP_Mount_Alexmos::init()
         _initialised = true;
         get_boardinfo();
         read_params(0); //we request parameters for profile 0 and therfore get global and profile parameters
-        set_mode((enum MAV_MOUNT_MODE)_params.default_mode.get());
+        set_mode((enum AGPILOT_MOUNT_MODE)_params.default_mode.get());
     }
 }
 
@@ -28,7 +28,7 @@ void AP_Mount_Alexmos::update()
     // update based on mount mode
     switch (get_mode()) {
         // move mount to a "retracted" position.  we do not implement a separate servo based retract mechanism
-        case MAV_MOUNT_MODE_RETRACT: {
+        case AGPILOT_MOUNT_MODE_RETRACT: {
             const Vector3f &target = _params.retract_angles.get();
             _angle_rad.roll = radians(target.x);
             _angle_rad.pitch = radians(target.y);
@@ -38,7 +38,7 @@ void AP_Mount_Alexmos::update()
         }
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             const Vector3f &target = _params.neutral_angles.get();
             _angle_rad.roll = radians(target.x);
             _angle_rad.pitch = radians(target.y);
@@ -48,7 +48,7 @@ void AP_Mount_Alexmos::update()
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 _angle_rad = mavt_target.angle_rad;
@@ -60,7 +60,7 @@ void AP_Mount_Alexmos::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's RC inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -72,15 +72,15 @@ void AP_Mount_Alexmos::update()
         }
 
         // point mount to a GPS point given by the mission planner
-        case MAV_MOUNT_MODE_GPS_POINT:
+        case AGPILOT_MOUNT_MODE_GPS_POINT:
             IGNORE_RETURN(get_angle_target_to_roi(_angle_rad));
             break;
 
-        case MAV_MOUNT_MODE_HOME_LOCATION:
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION:
             IGNORE_RETURN(get_angle_target_to_home(_angle_rad));
             break;
 
-        case MAV_MOUNT_MODE_SYSID_TARGET:
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET:
             IGNORE_RETURN(get_angle_target_to_sysid(_angle_rad));
             break;
 

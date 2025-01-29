@@ -36,7 +36,7 @@
 
 #include <AP_MSP/msp.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include "AP_OpticalFlow_Calibrator.h"
 
 class OpticalFlow_backend;
@@ -61,7 +61,7 @@ public:
         PIXART = 2,
         BEBOP = 3,
         CXOF = 4,
-        MAVLINK = 5,
+        AGPILOTLINK = 5,
         UAVCAN = 6,
         MSP = 7,
         UPFLOW = 8,

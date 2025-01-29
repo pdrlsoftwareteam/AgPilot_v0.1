@@ -29,7 +29,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Common/ExpandingString.h>
 #ifndef HAL_NO_UARTDRIVER
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #endif
 
 #if AP_SIM_ENABLED
@@ -866,9 +866,9 @@ void RCOutput::print_group_setup_error(pwm_group &group, const char* error_strin
     }
 
     if (min_chan == max_chan) {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Chan %i, %s: %s",min_chan+1,get_output_mode_string(group.current_mode),error_string);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Chan %i, %s: %s",min_chan+1,get_output_mode_string(group.current_mode),error_string);
     } else {
-        GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "Chan %i to %i, %s: %s",min_chan+1,max_chan+1,get_output_mode_string(group.current_mode),error_string);
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "Chan %i to %i, %s: %s",min_chan+1,max_chan+1,get_output_mode_string(group.current_mode),error_string);
     }
 #endif
 }

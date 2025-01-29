@@ -22,8 +22,8 @@ FLASH_RESERVE_START_KB 128
 # order of UARTs (and USB)
 SERIAL_ORDER OTG1 USART2 EMPTY USART1 UART4 EMPTY UART7 OTG2
 
-# default the 2nd interface to MAVLink2
-define HAL_OTG2_PROTOCOL SerialProtocol_MAVLink2
+# default the 2nd interface to AGPILOTLink2
+define HAL_OTG2_PROTOCOL SerialProtocol_AGPILOTLink2
 
 define HAL_STORAGE_SIZE 32768
 

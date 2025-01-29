@@ -33,7 +33,7 @@
 #include "AP_InertialSensor_Invensensev3.h"
 #include <utility>
 #include <stdio.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 

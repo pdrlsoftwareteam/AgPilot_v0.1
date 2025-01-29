@@ -42,7 +42,7 @@ SERIALx_PROTOCOL 21
 SERIALx_BAUD 57
 ```
 
-After a re-boot you should see wind messages reported to the GCS. For example `MAV_APPWNDDIR` and `MAV_APPWNDSPD` can be selected in mission planner to display the apparent wind direction and speed.
+After a re-boot you should see wind messages reported to the GCS. For example `AGPILOT_APPWNDDIR` and `AGPILOT_APPWNDSPD` can be selected in mission planner to display the apparent wind direction and speed.
 
 ![Mission Planner wind speed and direction](Mission_Planner_Quick.PNG)
 

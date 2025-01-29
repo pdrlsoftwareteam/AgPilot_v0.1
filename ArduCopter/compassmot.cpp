@@ -5,7 +5,7 @@
  */
 
 // setup_compassmot - sets compass's motor interference parameters
-MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
+AGPILOT_RESULT Copter::mavlink_compassmot(const GCS_AGPILOTLINK &gcs_chan)
 {
     int8_t   comp_type;                 // throttle or current based compensation
     Vector3f compass_base[COMPASS_MAX_INSTANCES];           // compass vector when throttle is zero
@@ -24,48 +24,48 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     // exit immediately if we are already in compassmot
     if (ap.compass_mot) {
         // ignore restart messages
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     } else {
         ap.compass_mot = true;
     }
 
     // check compass is enabled
     if (!AP::compass().available()) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "Compass disabled");
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL, "Compass disabled");
         ap.compass_mot = false;
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     }
 
     // check compass health
     compass.read();
     for (uint8_t i=0; i<compass.get_count(); i++) {
         if (!compass.healthy(i)) {
-            gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "Check compass");
+            gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL, "Check compass");
             ap.compass_mot = false;
-            return MAV_RESULT_TEMPORARILY_REJECTED;
+            return AGPILOT_RESULT_TEMPORARILY_REJECTED;
         }
     }
 
     // check if radio is calibrated
     if (!arming.rc_calibration_checks(true)) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "RC not calibrated");
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL, "RC not calibrated");
         ap.compass_mot = false;
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     }
 
     // check throttle is at zero
     read_radio();
     if (channel_throttle->get_control_in() != 0) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "Throttle not zero");
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL, "Throttle not zero");
         ap.compass_mot = false;
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     }
 
     // check we are landed
     if (!ap.land_complete) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "Not landed");
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL, "Not landed");
         ap.compass_mot = false;
-        return MAV_RESULT_TEMPORARILY_REJECTED;
+        return AGPILOT_RESULT_TEMPORARILY_REJECTED;
     }
 
     // disable cpu failsafe
@@ -81,20 +81,20 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     }
 
     // send back initial ACK
-    mavlink_msg_command_ack_send(gcs_chan.get_chan(), MAV_CMD_PREFLIGHT_CALIBRATION,0,
+    mavlink_msg_command_ack_send(gcs_chan.get_chan(), AGPILOT_CMD_PREFLIGHT_CALIBRATION,0,
                                  0, 0, 0, 0);
 
     // flash leds
     AP_Notify::flags.esc_calibration = true;
 
     // warn user we are starting calibration
-    gcs_chan.send_text(MAV_SEVERITY_INFO, "Starting calibration");
+    gcs_chan.send_text(AGPILOT_SEVERITY_INFO, "Starting calibration");
 
     // inform what type of compensation we are attempting
     if (comp_type == AP_COMPASS_MOT_COMP_CURRENT) {
-        gcs_chan.send_text(MAV_SEVERITY_INFO, "Current");
+        gcs_chan.send_text(AGPILOT_SEVERITY_INFO, "Current");
     } else {
-        gcs_chan.send_text(MAV_SEVERITY_INFO, "Throttle");
+        gcs_chan.send_text(AGPILOT_SEVERITY_INFO, "Throttle");
     }
 
     // disable throttle failsafe
@@ -241,10 +241,10 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
         }
         compass.save_motor_compensation();
         // display success message
-        gcs_chan.send_text(MAV_SEVERITY_INFO, "Calibration successful");
+        gcs_chan.send_text(AGPILOT_SEVERITY_INFO, "Calibration successful");
     } else {
         // compensation vector never updated, report failure
-        gcs_chan.send_text(MAV_SEVERITY_NOTICE, "Failed");
+        gcs_chan.send_text(AGPILOT_SEVERITY_NOTICE, "Failed");
         compass.motor_compensation_type(AP_COMPASS_MOT_COMP_DISABLED);
     }
 
@@ -260,5 +260,5 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     // flag we have completed
     ap.compass_mot = false;
 
-    return MAV_RESULT_ACCEPTED;
+    return AGPILOT_RESULT_ACCEPTED;
 }

@@ -1,6 +1,6 @@
 # UDP Proxy
 
-This is a tool to do UDP proxying, particularly for MAVLink
+This is a tool to do UDP proxying, particularly for AGPILOTLink
 connections. It is useful when operating both a ground station and
 aircraft on network links that don't have a public IP address.
 
@@ -27,7 +27,7 @@ re-establish after a network outage.
 The main disadvantage of udpproxy is that it offers no security. If
 someone knows that UDP ports and host you are using then they could
 connect to your aircraft and control it. The risk can be reduced by
-enabling MAVLink2 signing which allows you to ensure that nobody can
+enabling AGPILOTLink2 signing which allows you to ensure that nobody can
 control the aircraft without knowing the signing key.
 
 You can also reduce the risk by using firewall rules on the computer

@@ -18,7 +18,7 @@
 #if AP_VIDEOTX_ENABLED
 
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -498,7 +498,7 @@ bool AP_VideoTX::set_defaults()
 void AP_VideoTX::announce_vtx_settings() const
 {
     // Output a friendly message so the user knows the VTX has been detected
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "VTX: %s%d %dMHz, PWR: %dmW",
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "VTX: %s%d %dMHz, PWR: %dmW",
         band_names[_band.get()], _channel.get() + 1, _frequency_mhz.get(),
         has_option(VideoOptions::VTX_PITMODE) ? 0 : _power_mw.get());
 }

@@ -33,7 +33,7 @@ public:
     virtual bool run(void) { return false; }
 
     // Use generator mavlink message
-    virtual void send_generator_status(const GCS_MAVLINK &channel) {}
+    virtual void send_generator_status(const GCS_AGPILOTLINK &channel) {}
 
 protected:
 

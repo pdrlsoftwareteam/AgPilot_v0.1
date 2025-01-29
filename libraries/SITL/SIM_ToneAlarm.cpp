@@ -16,7 +16,7 @@
   simple tonealarm simulator class
 */
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SITL/SITL.h>
 
 #include "SIM_ToneAlarm.h"

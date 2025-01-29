@@ -128,7 +128,7 @@ class DecodeWatchDog(object):
     class ComponentMM(Component):
 
         def expansion(self):
-            return "MAVLink Message"
+            return "AGPILOTLink Message"
 
         def decode(self):
             if int(self.value) == 0:
@@ -138,7 +138,7 @@ class DecodeWatchDog(object):
     class ComponentMC(Component):
 
         def expansion(self):
-            return "MAVLink Command"
+            return "AGPILOTLink Command"
 
         def decode(self):
             if int(self.value) == 0:

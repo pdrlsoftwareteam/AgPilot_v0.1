@@ -24,14 +24,14 @@ local VERBOSE_MODE    =   2  -- 0 to suppress all GCS messages,
                              -- 1 for normal status messages
                              -- 2 for additional GPS/debug messages
 
---------  MAVLINK/AUTOPILOT 'CONSTANTS'  --------
+--------  AGPILOTLINK/AUTOPILOT 'CONSTANTS'  --------
 local ROVER_MODE_AUTO = 10
 local STANDBY         =  0
 local SAVE_WPS        =  1
 local CLEAR_WPS       =  2
 local WAYPOINT        = 16   -- waypoint command
-local MAV_SEVERITY_WARNING = 4
-local MAV_SEVERITY_INFO    = 6
+local AGPILOT_SEVERITY_WARNING = 4
+local AGPILOT_SEVERITY_INFO    = 6
 local MSG_NORMAL           = 1
 local MSG_DEBUG            = 2
 
@@ -45,7 +45,7 @@ local function gcs_msg(msg_type, severity, txt)
     -- allow just a string to be passed for simple/routine messages
         txt      = msg_type
         msg_type = MSG_NORMAL
-        severity = MAV_SEVERITY_INFO
+        severity = AGPILOT_SEVERITY_INFO
     end
     if msg_type <= VERBOSE_MODE then
         gcs:send_text(severity, string.format('%s: %s', SCRIPT_NAME, txt))
@@ -69,7 +69,7 @@ local function new_mission()
     item:z(home:alt())
 
     if not mission:set_item(0, item) then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Failed to create new mission')
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Failed to create new mission')
         return false
     end
 
@@ -80,7 +80,7 @@ local function save_wp(position, index)
     local item = mavlink_mission_item_int_t()
 
     if (not position) then
-		gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, string.format('WP %d - invalid position', index))
+		gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, string.format('WP %d - invalid position', index))
         return false
     end
 
@@ -90,7 +90,7 @@ local function save_wp(position, index)
     item:z(0)
 
     if not mission:set_item(index, item) then
-        gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, string.format('WP %d - failed to save', index))
+        gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, string.format('WP %d - failed to save', index))
         return false
     end
 
@@ -144,7 +144,7 @@ function standby()
     end
     if sw_pos == CLEAR_WPS then
         if new_mission() then
-            gcs_msg(MSG_NORMAL, MAV_SEVERITY_WARNING, 'Mission cleared')
+            gcs_msg(MSG_NORMAL, AGPILOT_SEVERITY_WARNING, 'Mission cleared')
         end
         return await_switch_change, RUN_INTERVAL_MS
     end

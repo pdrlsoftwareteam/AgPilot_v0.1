@@ -18,7 +18,7 @@
 #if AP_BEACON_NOOPLOOP_ENABLED
 
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <ctype.h>
 #include <stdio.h>
 

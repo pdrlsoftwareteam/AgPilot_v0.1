@@ -3,7 +3,7 @@
 #if AP_WINCH_PWM_ENABLED
 
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 extern const AP_HAL::HAL& hal;
@@ -71,12 +71,12 @@ void AP_Winch_PWM::control_winch()
 }
 
 //send generator status
-void AP_Winch_PWM::send_status(const GCS_MAVLINK &channel)
+void AP_Winch_PWM::send_status(const GCS_AGPILOTLINK &channel)
 {
     // prepare status bitmask
     uint32_t status_bitmask = 0;
     if (healthy()) {
-        status_bitmask |= MAV_WINCH_STATUS_HEALTHY;
+        status_bitmask |= AGPILOT_WINCH_STATUS_HEALTHY;
     }
 
     // send status

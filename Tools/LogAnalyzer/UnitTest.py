@@ -87,7 +87,7 @@ try:
         'WPNAV_SPEED_DN': 150.0,
         'WP_YAW_BEHAVIOR': 2.0,
         'RC11_REV': 1.0,
-        'SYSID_THISMAV': 1.0,
+        'SYSID_THISAGPILOT': 1.0,
         'SR0_EXTRA1': 10.0,
         'SR0_EXTRA2': 10.0,
         'ACRO_BAL_PITCH': 200.0,

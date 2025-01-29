@@ -25,7 +25,7 @@
 #include "AP_GPS.h"
 #include <AP_HAL/Util.h>
 #include <AP_Logger/AP_Logger.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "RTCM3_Parser.h"
 #include <stdio.h>
 
@@ -102,7 +102,7 @@ AP_GPS_UBLOX::AP_GPS_UBLOX(AP_GPS &_gps, AP_GPS::GPS_State &_state, AP_HAL::UART
     if (role == AP_GPS::GPS_ROLE_MB_BASE && !mb_use_uart2()) {
         rtcm3_parser = new RTCM3_Parser;
         if (rtcm3_parser == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_ERROR, "u-blox %d: failed RTCMv3 parser allocation", state.instance + 1);
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_ERROR, "u-blox %d: failed RTCMv3 parser allocation", state.instance + 1);
         }
         _unconfigured_messages |= CONFIG_RTK_MOVBASE;
     }
@@ -952,7 +952,7 @@ AP_GPS_UBLOX::_parse_gps(void)
 {
     if (_class == CLASS_SEC) {
 //      if(_msg_id == MSG_STATUS) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,
                                              "u-blox Unique Id :%u%u%u%u%u",
                                              (unsigned)_buffer.secmsg.uniqueId[0],
                                              (unsigned)_buffer.secmsg.uniqueId[1],
@@ -1315,7 +1315,7 @@ AP_GPS_UBLOX::_parse_gps(void)
             _have_version = true;
             strncpy(_version.hwVersion, _buffer.mon_ver.hwVersion, sizeof(_version.hwVersion));
             strncpy(_version.swVersion, _buffer.mon_ver.swVersion, sizeof(_version.swVersion));
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, 
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, 
                                              "u-blox %d HW: %s SW: %s",
                                              state.instance + 1,
                                              _version.hwVersion,
@@ -1567,7 +1567,7 @@ AP_GPS_UBLOX::_parse_gps(void)
                     state.status = AP_GPS::GPS_OK_FIX_3D_RTK_FIXED;
                 break;
             case 4:
-                GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+                GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,
                                 "Unexpected state %d", _buffer.pvt.flags);
                 state.status = AP_GPS::GPS_OK_FIX_3D;
                 break;
@@ -1905,7 +1905,7 @@ AP_GPS_UBLOX::_save_cfg()
     _send_message(CLASS_CFG, MSG_CFG_CFG, &save_cfg, sizeof(save_cfg));
     _last_cfg_sent_time = AP_HAL::millis();
     _num_cfg_save_tries++;
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,
                                      "GPS %d: u-blox saving config",
                                      state.instance + 1);
 }
@@ -1981,7 +1981,7 @@ AP_GPS_UBLOX::_request_version(void)
 void
 AP_GPS_UBLOX::_request_uniqid(void)
 {
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO,"Requesting GPS uniqueid");
+    GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO,"Requesting GPS uniqueid");
     _send_message(CLASS_SEC, MSG_STATUS, nullptr, 0);
 }
 
@@ -2023,7 +2023,7 @@ void
 AP_GPS_UBLOX::broadcast_configuration_failure_reason(void) const {
     for (uint8_t i = 0; i < ARRAY_SIZE(reasons); i++) {
         if (_unconfigured_messages & (1 << i)) {
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS %u: u-blox %s configuration 0x%02x",
+            GCS_SEND_TEXT(AGPILOT_SEVERITY_INFO, "GPS %u: u-blox %s configuration 0x%02x",
                 (unsigned int)(state.instance + 1), reasons[i], (unsigned int)_unconfigured_messages);
             break;
         }

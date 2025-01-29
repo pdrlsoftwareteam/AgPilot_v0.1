@@ -50,7 +50,7 @@ function update()
   end
 
   if terrain_height < terrain_min_alt then
-    -- send message at severity level 2 (MAV_SEVERITY_CRITICAL), this will appear on the MP HUD and be read out if speech is enabled
+    -- send message at severity level 2 (AGPILOT_SEVERITY_CRITICAL), this will appear on the MP HUD and be read out if speech is enabled
     gcs:send_text(2, string.format("Terrain Warning: %0.1f meters",terrain_height))
     return update, warn_ms
   end

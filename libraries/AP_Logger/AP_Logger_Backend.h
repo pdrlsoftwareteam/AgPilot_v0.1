@@ -87,7 +87,7 @@ public:
     /* stop logging - close output files etc etc.
      *
      * note that this doesn't stop logging from starting up again
-     * immediately - e.g. AP_Logger_MAVLink might get another start
+     * immediately - e.g. AP_Logger_AGPILOTLink might get another start
      * packet from a client.
      */
     virtual void stop_logging(void) = 0;
@@ -102,10 +102,10 @@ public:
     virtual void flush(void) { }
 #endif
 
-     // for Logger_MAVlink
-    virtual void remote_log_block_status_msg(const GCS_MAVLINK &link,
+     // for Logger_AGPILOTlink
+    virtual void remote_log_block_status_msg(const GCS_AGPILOTLINK &link,
                                              const mavlink_message_t &msg) { }
-    // end for Logger_MAVlink
+    // end for Logger_AGPILOTlink
 
    virtual void periodic_tasks();
 

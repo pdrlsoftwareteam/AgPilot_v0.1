@@ -5,7 +5,7 @@
 #if HAL_SOLO_GIMBAL_ENABLED
 
 #include <stdio.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 
 extern const AP_HAL::HAL& hal;
@@ -53,7 +53,7 @@ void SoloGimbal::receive_feedback(mavlink_channel_t chan, const mavlink_message_
     if (report_msg.target_system != 1) {
         _state = GIMBAL_STATE_NOT_PRESENT;
     } else {
-        GCS_MAVLINK::set_channel_private(chan);
+        GCS_AGPILOTLINK::set_channel_private(chan);
     }
 
     switch(_state) {

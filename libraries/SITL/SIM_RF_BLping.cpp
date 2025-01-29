@@ -18,7 +18,7 @@
 
 #include "SIM_RF_BLping.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <stdio.h>
 
 

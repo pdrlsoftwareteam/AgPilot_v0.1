@@ -28,7 +28,7 @@
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_RSSI/AP_RSSI.h>
 #include <AP_RTC/AP_RTC.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #include "AP_MSP.h"
 #include "AP_MSP_Telem_Backend.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 #define THISFIRMWARE "AP_Periph V1.5.0-dev"
 

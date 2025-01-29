@@ -171,7 +171,7 @@
 
 class Copter : public AP_Vehicle {
 public:
-    friend class GCS_MAVLINK_Copter;
+    friend class GCS_AGPILOTLINK_Copter;
     friend class GCS_Copter;
     friend class AP_Rally_Copter;
     friend class Parameters;
@@ -215,7 +215,7 @@ private:
     Parameters g;
     ParametersG2 g2;
 
-    // used to detect MAVLink acks from GCS to stop compassmot
+    // used to detect AGPILOTLink acks from GCS to stop compassmot
     uint8_t command_ack_counter;
 
     // primary input control channels
@@ -686,7 +686,7 @@ private:
     bool far_from_EKF_origin(const Location& loc);
 
     // compassmot.cpp
-    MAV_RESULT mavlink_compassmot(const GCS_MAVLINK &gcs_chan);
+    AGPILOT_RESULT mavlink_compassmot(const GCS_AGPILOTLINK &gcs_chan);
 
     // crash_check.cpp
     void crash_check();
@@ -803,8 +803,8 @@ private:
 
     // motor_test.cpp
     void motor_test_output();
-    bool mavlink_motor_control_check(const GCS_MAVLINK &gcs_chan, bool check_rc, const char* mode);
-    MAV_RESULT mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t motor_seq, uint8_t throttle_type, float throttle_value, float timeout_sec, uint8_t motor_count);
+    bool mavlink_motor_control_check(const GCS_AGPILOTLINK &gcs_chan, bool check_rc, const char* mode);
+    AGPILOT_RESULT mavlink_motor_test_start(const GCS_AGPILOTLINK &gcs_chan, uint8_t motor_seq, uint8_t throttle_type, float throttle_value, float timeout_sec, uint8_t motor_count);
     void motor_test_stop();
 
     // motors.cpp

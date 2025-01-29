@@ -50,7 +50,7 @@ class mavgen(Task.Task):
         return nodes, names
 
     def run(self):
-        sys.path.insert(0,self.env.get_flat('MAVLINK_DIR'))
+        sys.path.insert(0,self.env.get_flat('AGPILOTLINK_DIR'))
         from pymavlink.generator import mavgen
         class mavgen_options:
             language = 'C'
@@ -88,7 +88,7 @@ def process_mavgen(self):
     task.env['OUTPUT_DIR'] = self.output_dir.abspath()
 
     task.env.env = dict(os.environ)
-    task.env.env['PYTHONPATH'] = task.env.MAVLINK_DIR
+    task.env.env['PYTHONPATH'] = task.env.AGPILOTLINK_DIR
 
 def configure(cfg):
     """
@@ -98,4 +98,4 @@ def configure(cfg):
     cfg.check_python_version(minver=(2,7,0))
 
     env = cfg.env
-    env.MAVLINK_DIR = cfg.srcnode.make_node('modules/bhumi_mavlink/').abspath()
+    env.AGPILOTLINK_DIR = cfg.srcnode.make_node('modules/bhumi_mavlink/').abspath()

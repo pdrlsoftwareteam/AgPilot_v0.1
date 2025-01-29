@@ -1,7 +1,7 @@
 #pragma once
 
 #include <AP_Common/AP_Common.h>
-#include "GCS_MAVLink.h"
+#include "GCS_AGPILOTLink.h"
 
 #define AP_PARAM_VEHICLE_NAME periph
 

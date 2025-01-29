@@ -2,7 +2,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <time.h>
 
 extern const AP_HAL::HAL& hal;
@@ -25,7 +25,7 @@ const AP_Param::GroupInfo AP_RTC::var_info[] = {
     // @Param: _TYPES
     // @DisplayName: Allowed sources of RTC time
     // @Description: Specifies which sources of UTC time will be accepted
-    // @Bitmask: 0:GPS,1:MAVLINK_SYSTEM_TIME,2:HW
+    // @Bitmask: 0:GPS,1:AGPILOTLINK_SYSTEM_TIME,2:HW
     // @User: Advanced
     AP_GROUPINFO("_TYPES",  1, AP_RTC, allowed_types, 7),
 
@@ -77,7 +77,7 @@ void AP_RTC::set_utc_usec(uint64_t time_utc_usec, source_type type)
 
 #if HAL_GCS_ENABLED
     // update signing timestamp
-    GCS_MAVLINK::update_signing_timestamp(time_utc_usec);
+    GCS_AGPILOTLINK::update_signing_timestamp(time_utc_usec);
 #endif
 }
 

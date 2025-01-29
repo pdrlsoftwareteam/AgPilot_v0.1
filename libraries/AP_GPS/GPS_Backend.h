@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_RTC/JitterCorrection.h>
 #include "AP_GPS.h"
 #include "AP_GPS_config.h"
@@ -55,7 +55,7 @@ public:
 
     virtual void inject_data(const uint8_t *data, uint16_t len);
 
-    //MAVLink methods
+    //AGPILOTLink methods
     virtual bool supports_mavlink_gps_rtk_message() const { return false; }
     virtual void send_mavlink_gps_rtk(mavlink_channel_t chan);
 

@@ -19,7 +19,7 @@
 
 #include "AP_HAL_SITL.h"
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "DSP.h"
 #include <cmath>
 #include <assert.h>
@@ -65,7 +65,7 @@ DSP::FFTWindowStateSITL::FFTWindowStateSITL(uint16_t window_size, uint16_t sampl
     : AP_HAL::DSP::FFTWindowState::FFTWindowState(window_size, sample_rate, sliding_window_size)
 {
     if (_freq_bins == nullptr || _hanning_window == nullptr || _rfft_data == nullptr || _derivative_freq_bins == nullptr) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Failed to allocate window for DSP");
+        GCS_SEND_TEXT(AGPILOT_SEVERITY_WARNING, "Failed to allocate window for DSP");
         return;
     }
 

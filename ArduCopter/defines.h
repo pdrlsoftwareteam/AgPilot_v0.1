@@ -88,7 +88,7 @@ enum PayloadPlaceStateType {
 
 // bit options for DEV_OPTIONS parameter
 enum DevOptions {
-    DevOptionADSBMAVLink = 1,
+    DevOptionADSBAGPILOTLink = 1,
     DevOptionVFR_HUDRelativeAlt = 2,
 };
 

@@ -93,7 +93,7 @@ PE3 VDD_3V3_SENSORS_EN OUTPUT LOW
 
 # if you want to enable parameter backup/restore then uncomment the following two lines
 # Note: this will use 16k more RAM, so ensure you have enough by looking at MEMINFO messages
-# in MAVLink2 or in PM message in logs
+# in AGPILOTLink2 or in PM message in logs
 # undef HAL_STORAGE_SIZE
 # define HAL_STORAGE_SIZE 32768
 

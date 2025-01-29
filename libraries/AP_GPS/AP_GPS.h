@@ -23,7 +23,7 @@
 #include <AP_MSP/msp.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <SITL/SIM_GPS.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 /**
    maximum number of GPS instances available on this platform. If more
@@ -47,7 +47,7 @@
 #if GPS_MAX_INSTANCES > GPS_MAX_RECEIVERS
 #define GPS_BLENDED_INSTANCE GPS_MAX_RECEIVERS  // the virtual blended GPS is always the highest instance (2)
 #endif
-#define GPS_UNKNOWN_DOP UINT16_MAX // set unknown DOP's to maximum value, which is also correct for MAVLink
+#define GPS_UNKNOWN_DOP UINT16_MAX // set unknown DOP's to maximum value, which is also correct for AGPILOTLink
 
 // the number of GPS leap seconds - copied into SIM_GPS.cpp
 #define GPS_LEAPSECONDS_MILLIS 18000ULL
@@ -74,7 +74,7 @@ class AP_GPS
 {
     friend class AP_GPS_ERB;
     friend class AP_GPS_GSOF;
-    friend class AP_GPS_MAV;
+    friend class AP_GPS_AGPILOT;
     friend class AP_GPS_MSP;
     friend class AP_GPS_ExternalAHRS;
     friend class AP_GPS_NMEA;
@@ -118,7 +118,7 @@ public:
         GPS_TYPE_SBF   = 10,
         GPS_TYPE_GSOF  = 11,
         GPS_TYPE_ERB = 13,
-        GPS_TYPE_MAV = 14,
+        GPS_TYPE_AGPILOT = 14,
         GPS_TYPE_NOVA = 15,
         GPS_TYPE_HEMI = 16, // hemisphere NMEA
         GPS_TYPE_UBLOX_RTK_BASE = 17,
@@ -233,7 +233,7 @@ public:
     /// more) to process incoming data.
     void update(void);
 
-    // Pass mavlink data to message handlers (for MAV type)
+    // Pass mavlink data to message handlers (for AGPILOT type)
     void handle_msg(const mavlink_message_t &msg);
 #if HAL_MSP_GPS_ENABLED
     void handle_msp(const MSP::msp_gps_data_message_t &pkt);
@@ -470,7 +470,7 @@ public:
     // lock out a GPS port, allowing another application to use the port
     void lock_port(uint8_t instance, bool locked);
 
-    //MAVLink Status Sending
+    //AGPILOTLink Status Sending
     void send_mavlink_gps_raw(mavlink_channel_t chan);
     void send_mavlink_gps2_raw(mavlink_channel_t chan);
 
@@ -702,7 +702,7 @@ private:
         uint8_t sequence;
         uint8_t fragment_count;
         uint16_t total_length;
-        uint8_t buffer[MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*4];
+        uint8_t buffer[AGPILOTLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN*4];
     } *rtcm_buffer;
 
     // re-assemble GPS_RTCM_DATA message

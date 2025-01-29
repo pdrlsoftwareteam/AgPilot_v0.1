@@ -20,7 +20,7 @@
 
 #if HAL_SIM_PS_TERARANGERTOWER_ENABLED
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <stdio.h>
 #include <errno.h>

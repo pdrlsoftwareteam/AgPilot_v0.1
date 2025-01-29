@@ -19,8 +19,8 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_Notify/AP_Notify.h>
-#include <GCS_MAVLink/GCS.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AP_Proximity/AP_Proximity.h>
 #include <AP_Rally/AP_Rally.h>
@@ -218,7 +218,7 @@ void AP_Arming::check_failed(const enum AP_Arming::ArmingChecks check, bool repo
     if (!report) {
         return;
     }
-    char taggedfmt[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char taggedfmt[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
 
     // metafmt is wrapped around the passed-in format string to
     // prepend "PreArm" or "Arm", depending on what sorts of checks
@@ -229,10 +229,10 @@ void AP_Arming::check_failed(const enum AP_Arming::ArmingChecks check, bool repo
     }
     hal.util->snprintf(taggedfmt, sizeof(taggedfmt), metafmt, fmt);
 
-    MAV_SEVERITY severity = MAV_SEVERITY_CRITICAL;
+    AGPILOT_SEVERITY severity = AGPILOT_SEVERITY_CRITICAL;
     if (!check_enabled(check)) {
         // technically should be NOTICE, but will annoy users at that level:
-        severity = MAV_SEVERITY_DEBUG;
+        severity = AGPILOT_SEVERITY_DEBUG;
     }
     va_list arg_list;
     va_start(arg_list, fmt);
@@ -245,7 +245,7 @@ void AP_Arming::check_failed(bool report, const char *fmt, ...) const
     if (!report) {
         return;
     }
-    char taggedfmt[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char taggedfmt[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
 
     // metafmt is wrapped around the passed-in format string to
     // prepend "PreArm" or "Arm", depending on what sorts of checks
@@ -258,7 +258,7 @@ void AP_Arming::check_failed(bool report, const char *fmt, ...) const
 
     va_list arg_list;
     va_start(arg_list, fmt);
-    gcs().send_textv(MAV_SEVERITY_CRITICAL, taggedfmt, arg_list);
+    gcs().send_textv(AGPILOT_SEVERITY_CRITICAL, taggedfmt, arg_list);
     va_end(arg_list);
 }
 
@@ -274,7 +274,7 @@ bool AP_Arming::barometer_checks(bool report)
     }
 #endif
     if (check_enabled(ARMING_CHECK_BARO)) {
-        char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
+        char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
         if (!AP::baro().arming_checks(sizeof(buffer), buffer)) {
             check_failed(ARMING_CHECK_BARO, report, "Baro: %s", buffer);
             return false;
@@ -480,7 +480,7 @@ bool AP_Arming::ins_checks(bool report)
         // Check that the noise analyser works
         AP_GyroFFT *fft = AP::fft();
 
-        char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         if (fft != nullptr && !fft->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
             check_failed(ARMING_CHECK_INS, report, "%s", fail_msg);
             return false;
@@ -653,7 +653,7 @@ bool AP_Arming::battery_checks(bool report)
 {
     if (check_enabled(ARMING_CHECK_BATTERY)) {
 
-        char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
+        char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
         if (!AP::battery().arming_checks(sizeof(buffer), buffer)) {
             check_failed(ARMING_CHECK_BATTERY, report, "%s", buffer);
             return false;
@@ -805,15 +805,15 @@ bool AP_Arming::mission_checks(bool report)
 
         const struct MisItemTable {
           MIS_ITEM_CHECK check;
-          MAV_CMD mis_item_type;
+          AGPILOT_CMD mis_item_type;
           const char *type;
         } misChecks[] = {
-          {MIS_ITEM_CHECK_LAND,          MAV_CMD_NAV_LAND,           "land"},
-          {MIS_ITEM_CHECK_VTOL_LAND,     MAV_CMD_NAV_VTOL_LAND,      "vtol land"},
-          {MIS_ITEM_CHECK_DO_LAND_START, MAV_CMD_DO_LAND_START,      "do land start"},
-          {MIS_ITEM_CHECK_TAKEOFF,       MAV_CMD_NAV_TAKEOFF,        "takeoff"},
-          {MIS_ITEM_CHECK_VTOL_TAKEOFF,  MAV_CMD_NAV_VTOL_TAKEOFF,   "vtol takeoff"},
-          {MIS_ITEM_CHECK_RETURN_TO_LAUNCH,  MAV_CMD_NAV_RETURN_TO_LAUNCH,   "RTL"},
+          {MIS_ITEM_CHECK_LAND,          AGPILOT_CMD_NAV_LAND,           "land"},
+          {MIS_ITEM_CHECK_VTOL_LAND,     AGPILOT_CMD_NAV_VTOL_LAND,      "vtol land"},
+          {MIS_ITEM_CHECK_DO_LAND_START, AGPILOT_CMD_DO_LAND_START,      "do land start"},
+          {MIS_ITEM_CHECK_TAKEOFF,       AGPILOT_CMD_NAV_TAKEOFF,        "takeoff"},
+          {MIS_ITEM_CHECK_VTOL_TAKEOFF,  AGPILOT_CMD_NAV_VTOL_TAKEOFF,   "vtol takeoff"},
+          {MIS_ITEM_CHECK_RETURN_TO_LAUNCH,  AGPILOT_CMD_NAV_RETURN_TO_LAUNCH,   "RTL"},
         };
         for (uint8_t i = 0; i < ARRAY_SIZE(misChecks); i++) {
             if (_required_mission_items & misChecks[i].check) {
@@ -865,7 +865,7 @@ bool AP_Arming::rangefinder_checks(bool report)
             return true;
         }
 
-        char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         if (!range->prearm_healthy(buffer, ARRAY_SIZE(buffer))) {
             check_failed(ARMING_CHECK_RANGEFINDER, report, "%s", buffer);
             return false;
@@ -981,7 +981,7 @@ bool AP_Arming::heater_min_temperature_checks(bool report)
  */
 bool AP_Arming::system_checks(bool report)
 {
-    char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
+    char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
 
     if (check_enabled(ARMING_CHECK_SYSTEM)) {
         if (!hal.storage->healthy()) {
@@ -1096,7 +1096,7 @@ bool AP_Arming::terrain_checks(bool report) const
         return false;
     }
 
-    char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
     if (!terrain->pre_arm_checks(fail_msg, sizeof(fail_msg))) {
         check_failed(ARMING_CHECK_PARAMETERS, report, "%s", fail_msg);
         return false;
@@ -1120,7 +1120,7 @@ bool AP_Arming::proximity_checks(bool report) const
     if (proximity == nullptr) {
         return true;
     }
-    char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char buffer[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
     if (!proximity->prearm_healthy(buffer, ARRAY_SIZE(buffer))) {
         check_failed(report, "%s", buffer);
         return false;
@@ -1234,7 +1234,7 @@ bool AP_Arming::camera_checks(bool display_failure)
         }
 
         // check camera is ready
-        char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         if (!runcam->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
             check_failed(ARMING_CHECK_CAMERA, display_failure, "%s", fail_msg);
             return false;
@@ -1254,7 +1254,7 @@ bool AP_Arming::osd_checks(bool display_failure) const
         }
 
         // check camera is ready
-        char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         if (!osd->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
             check_failed(ARMING_CHECK_CAMERA, display_failure, "%s", fail_msg);
             return false;
@@ -1272,7 +1272,7 @@ bool AP_Arming::mount_checks(bool display_failure) const
         if (mount == nullptr) {
             return true;
         }
-        char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] = {};
+        char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] = {};
         if (!mount->pre_arm_checks(fail_msg, sizeof(fail_msg))) {
             check_failed(ARMING_CHECK_CAMERA, display_failure, "Mount: %s", fail_msg);
             return false;
@@ -1291,7 +1291,7 @@ bool AP_Arming::fettec_checks(bool display_failure) const
     }
 
     // check ESCs are ready
-    char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+    char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
     if (!f->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
         check_failed(ARMING_CHECK_ALL, display_failure, "FETtec: %s", fail_msg);
         return false;
@@ -1570,7 +1570,7 @@ bool AP_Arming::arm(AP_Arming::Method method, const bool do_arming_checks)
     running_arming_checks = false;
 
     if (armed && do_arming_checks && checks_to_perform == 0) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "Warning: Arming Checks Disabled");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "Warning: Arming Checks Disabled");
     }
     
 #if HAL_GYROFFT_ENABLED
@@ -1599,7 +1599,7 @@ bool AP_Arming::arm(AP_Arming::Method method, const bool do_arming_checks)
             // If a fence is set to auto-enable, turn on the fence
             if (fence->auto_enabled() == AC_Fence::AutoEnable::ONLY_WHEN_ARMED) {
                 fence->enable(true);
-                gcs().send_text(MAV_SEVERITY_INFO, "Fence: auto-enabled");
+                gcs().send_text(AGPILOT_SEVERITY_INFO, "Fence: auto-enabled");
             }
         }
     }
@@ -1717,7 +1717,7 @@ bool AP_Arming::visodom_checks(bool display_failure) const
 #if HAL_VISUALODOM_ENABLED
     AP_VisualOdom *visual_odom = AP::visualodom();
     if (visual_odom != nullptr) {
-        char fail_msg[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        char fail_msg[AGPILOTLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
         if (!visual_odom->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
             check_failed(ARMING_CHECK_VISION, display_failure, "VisOdom: %s", fail_msg);
             return false;
@@ -1798,7 +1798,7 @@ void AP_Arming::check_forced_logging(const AP_Arming::Method method)
             return;
 
         case Method::RUDDER:
-        case Method::MAVLINK:
+        case Method::AGPILOTLINK:
         case Method::AUXSWITCH:
         case Method::MOTORTEST:
         case Method::SCRIPTING:

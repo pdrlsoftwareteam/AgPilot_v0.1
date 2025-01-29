@@ -2,7 +2,7 @@
 #include "AP_InertialSensor_NONE.h"
 #include <SITL/SITL.h>
 #include <stdio.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_ESP32
 
@@ -260,7 +260,7 @@ void AP_InertialSensor_NONE::timer_update(void)
 
     static uint64_t last_msg_sent = 0;
     if (now > last_msg_sent + 2000000) { //2sec= 2000ms = 2000000us
-        //gcs().send_text(MAV_SEVERITY_WARNING, "NO IMU FOUND");
+        //gcs().send_text(AGPILOT_SEVERITY_WARNING, "NO IMU FOUND");
         DEV_PRINTF("INS: NO IMU FOUND\n");
         last_msg_sent = now;
     }

@@ -35,7 +35,7 @@ public:
     // servo rail voltage in volts, or 0 if unknown
     virtual float servorail_voltage(void) { return 0; }
 
-    // power supply status flags, see MAV_POWER_STATUS
+    // power supply status flags, see AGPILOT_POWER_STATUS
     virtual uint16_t power_status_flags(void) { return 0; }
 
     // bitmask of all _power_flags bits ever set, so transient

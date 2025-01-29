@@ -112,7 +112,7 @@ Additionally the logfile.txt contains a memory dump, which can be shared along w
 If a fault happens the information gets recorded in flash sector defined in hwdef define HAL_CRASH_DUMP_FLASHPAGE xx .
 
 Only one crash will be recorded per flash cycle. At every new firmware update the flash will be ready again to record the crash log. Maybe we can erase the crash flash page via a parameter or maybe right after we fetch the crash_dump.bin.
-To fetch the crash dump @SYS/crash_dump.bin can be fetched via MAVFTP.
+To fetch the crash dump @SYS/crash_dump.bin can be fetched via AGPILOTFTP.
 
 Once fetched one can either use the following command to immediately dump backtrace with locals:
 

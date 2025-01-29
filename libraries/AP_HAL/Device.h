@@ -346,7 +346,7 @@ protected:
     /*
       broken out device elements. The bitfields are used to keep
       the overall value small enough to fit in a float accurately,
-      which makes it possible to transport over the MAVLink
+      which makes it possible to transport over the AGPILOTLink
       parameter protocol without loss of information.
      */
     struct DeviceStructure {

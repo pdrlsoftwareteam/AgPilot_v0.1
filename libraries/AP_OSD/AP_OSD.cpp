@@ -36,7 +36,7 @@
 #include <AP_Notify/AP_Notify.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_RSSI/AP_RSSI.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // macro for easy use of var_info2
 #define AP_SUBGROUPINFO2(element, name, idx, thisclazz, elclazz) { name, AP_VAROFFSET(thisclazz, element), { group_info : elclazz::var_info2 }, AP_PARAM_FLAG_NESTED_OFFSET, idx, AP_PARAM_GROUP }
@@ -549,12 +549,12 @@ void AP_OSD::set_nav_info(NavInfo &navinfo)
 
 // handle OSD parameter configuration
 #if HAL_GCS_ENABLED
-void AP_OSD::handle_msg(const mavlink_message_t &msg, const GCS_MAVLINK& link)
+void AP_OSD::handle_msg(const mavlink_message_t &msg, const GCS_AGPILOTLINK& link)
 {
     bool found = false;
 
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_OSD_PARAM_CONFIG: {
+    case AGPILOTLINK_MSG_ID_OSD_PARAM_CONFIG: {
         mavlink_osd_param_config_t packet;
         mavlink_msg_osd_param_config_decode(&msg, &packet);
 #if OSD_PARAM_ENABLED
@@ -571,7 +571,7 @@ void AP_OSD::handle_msg(const mavlink_message_t &msg, const GCS_MAVLINK& link)
         }
     }
         break;
-    case MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG: {
+    case AGPILOTLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG: {
         mavlink_osd_param_show_config_t packet;
         mavlink_msg_osd_param_show_config_decode(&msg, &packet);
 #if OSD_PARAM_ENABLED

@@ -2868,8 +2868,8 @@ def add_apperiph_defaults(f):
 #define HAL_SERIAL3_PROTOCOL -1
 #define HAL_SERIAL4_PROTOCOL -1
 
-#ifndef HAL_LOGGING_MAVLINK_ENABLED
-#define HAL_LOGGING_MAVLINK_ENABLED 0
+#ifndef HAL_LOGGING_AGPILOTLINK_ENABLED
+#define HAL_LOGGING_AGPILOTLINK_ENABLED 0
 #endif
 
 #ifndef AP_MISSION_ENABLED
@@ -2998,8 +2998,8 @@ def add_apperiph_defaults(f):
 #define AP_GPS_SIRF_ENABLED 0
 #endif
 
-#ifndef AP_GPS_MAV_ENABLED
-#define AP_GPS_MAV_ENABLED 0
+#ifndef AP_GPS_AGPILOT_ENABLED
+#define AP_GPS_AGPILOT_ENABLED 0
 #endif
 
 #ifndef AP_GPS_NOVA_ENABLED

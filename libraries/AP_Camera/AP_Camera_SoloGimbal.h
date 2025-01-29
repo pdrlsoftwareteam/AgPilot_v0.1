@@ -5,7 +5,7 @@
 
 #if AP_CAMERA_SOLOGIMBAL_ENABLED
 
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 class AP_Camera_SoloGimbal : public AP_Camera_Backend
 {

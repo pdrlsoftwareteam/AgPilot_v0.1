@@ -18,7 +18,7 @@
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "WheelEncoder_SITL_Quadrature.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -55,7 +55,7 @@ void AP_WheelEncoder_SITL_Quadrature::update(void)
     // distance from center of wheel axis to each wheel
     const double half_wheelbase = ( fabsf(_frontend.get_pos_offset(0).y) + fabsf(_frontend.get_pos_offset(1).y) )/2.0f;
     if (is_zero(half_wheelbase)) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "WheelEncoder: wheel offset not set!");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "WheelEncoder: wheel offset not set!");
     }
 
     if (_state.instance == 0) { 
@@ -69,7 +69,7 @@ void AP_WheelEncoder_SITL_Quadrature::update(void)
 
     const double radius = _frontend.get_wheel_radius(_state.instance);
     if (is_zero(radius)) { // avoid divide by zero
-        gcs().send_text(MAV_SEVERITY_WARNING, "WheelEncoder: wheel radius not set!");
+        gcs().send_text(AGPILOT_SEVERITY_WARNING, "WheelEncoder: wheel radius not set!");
         return; 
     }
 

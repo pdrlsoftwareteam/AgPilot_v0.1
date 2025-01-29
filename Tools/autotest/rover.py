@@ -320,7 +320,7 @@ class AutoTestRover(AutoTest):
             self.start_subtest("Checking mavlink commands")
             self.change_mode("MANUAL")
             self.progress("Starting Sprayer")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SPRAYER,
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SPRAYER,
                          1,  # p1
                          0,  # p2
                          0,  # p3
@@ -333,7 +333,7 @@ class AutoTestRover(AutoTest):
             self.set_rc(3, 1700) # start driving forward
             self.wait_servo_channel_value(pump_ch, 1690, timeout=60, comparator=operator.gt)
             self.start_subtest("Stopping Sprayer")
-            self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SPRAYER,
+            self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SPRAYER,
                          0,  # p1
                          0,  # p2
                          0,  # p3
@@ -427,7 +427,7 @@ class AutoTestRover(AutoTest):
         self.mav.mav.command_long_send(
             target_sysid,
             target_compid,
-            mavutil.mavlink.MAV_CMD_DO_SEND_BANNER,
+            mavutil.mavlink.AGPILOT_CMD_DO_SEND_BANNER,
             1, # confirmation
             1, # send it
             0,
@@ -605,7 +605,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.print_exception_caught(e)
             ex = e
         self.context_pop()
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.disarm_vehicle(force=True)
         self.reboot_sitl()
         if ex:
@@ -622,7 +622,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 "Pin mask unchanged after relay cmd")
         self.progress("Pin mask changed after relay command")
 
-    def MAVProxy_SetModeUsingSwitch(self):
+    def AGPILOTProxy_SetModeUsingSwitch(self):
         """Set modes via mavproxy switch"""
         self.customise_SITL_commandline([
             "--rc-in-port", "5502",
@@ -654,7 +654,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         if ex is not None:
             raise ex
 
-    def MAVProxy_SetModeUsingMode(self):
+    def AGPILOTProxy_SetModeUsingMode(self):
         '''Set modes via mavproxy mode command'''
         fnoo = [(1, 'ACRO'),
                 (3, 'STEERING'),
@@ -914,7 +914,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 *channels
             )
             # long timeout required here as we may have sent a lot of
-            # things via MAVProxy...
+            # things via AGPILOTProxy...
             self.wait_rc_channel_value(ch, ch_override_value, timeout=30)
             self.set_parameter("RC_OVERRIDE_TIME", 0)
             self.wait_rc_channel_value(ch, 1000)
@@ -1190,7 +1190,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.disarm_vehicle()
 
     def DO_SET_MODE(self):
-        '''Set mode via MAV_COMMAND_DO_SET_MODE'''
+        '''Set mode via AGPILOT_COMMAND_DO_SET_MODE'''
         self.do_set_mode_via_command_long("HOLD")
         self.do_set_mode_via_command_long("MANUAL")
 
@@ -1221,8 +1221,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.set_rc(mode_ch, mapping[5])
         self.wait_mode('STEERING')
 
-    def MAVProxy_DO_SET_MODE(self):
-        '''Set mode using MAVProxy commandline DO_SET_MODE'''
+    def AGPILOTProxy_DO_SET_MODE(self):
+        '''Set mode using AGPILOTProxy commandline DO_SET_MODE'''
         mavproxy = self.start_mavproxy()
         self.mavproxy_do_set_mode_via_command_long(mavproxy, "HOLD")
         self.mavproxy_do_set_mode_via_command_long(mavproxy, "MANUAL")
@@ -1319,8 +1319,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1330,7 +1330,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_zero_vertex_count(self, target_system=1, target_component=1):
@@ -1339,8 +1339,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1350,7 +1350,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_wrong_vertex_count(self, target_system=1, target_component=1):
@@ -1359,8 +1359,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 2, # p1
@@ -1370,7 +1370,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_multiple_return_points(self, target_system=1, target_component=1):
@@ -1379,8 +1379,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1390,13 +1390,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1406,7 +1406,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_invalid_latlon(self, target_system=1, target_component=1):
@@ -1415,8 +1415,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1426,7 +1426,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(100 * 1e7), # bad latitude. bad.
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_multiple_return_points_with_bad_sequence_numbers(self, target_system=1, target_component=1):
@@ -1435,8 +1435,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1446,13 +1446,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1462,7 +1462,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(2.0 * 1e7), # latitude
                 int(2.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_which_exceeds_storage_space(self, target_system=1, target_component=1):
@@ -1472,8 +1472,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 i, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
                 0, # current
                 0, # autocontinue
                 10, # p1
@@ -1483,7 +1483,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             )
         return ret
 
@@ -1520,8 +1520,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1531,7 +1531,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_single_return_point_and_5_vertex_inclusion(self,
@@ -1542,8 +1542,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1553,13 +1553,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0017 * 1e7), # latitude
                 int(1.0017 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1
@@ -1569,13 +1569,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1
@@ -1585,13 +1585,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0001 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 32.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 3, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1
@@ -1601,13 +1601,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0001 * 1e7), # latitude
                 int(1.0001 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 4, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1
@@ -1617,13 +1617,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0002 * 1e7), # latitude
                 int(1.0002 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 5, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1
@@ -1633,7 +1633,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0002 * 1e7), # latitude
                 int(1.0003 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
 
     def fence_with_many_exclusion_circles(self, count=50, target_system=1, target_component=1):
@@ -1645,8 +1645,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 i, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
                 0, # current
                 0, # autocontinue
                 count, # p1
@@ -1656,7 +1656,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(lat_deg * 1e7), # latitude
                 int(lng_deg * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
             ret.append(item)
         return ret
 
@@ -1672,8 +1672,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     target_system,
                     target_component,
                     seq, # seq
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                    mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                    mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
                     0, # current
                     0, # autocontinue
                     pointcount, # p1
@@ -1683,7 +1683,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     int(lat_deg * 1e7), # latitude
                     int(lng_deg * 1e7), # longitude
                     33.0000, # altitude
-                    mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+                    mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
                 ret.append(item)
                 seq += 1
         return ret
@@ -1710,13 +1710,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         ]
 
     def assert_fence_does_not_upload(self, fence, target_system=1, target_component=1):
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
         # upload single item using mission item protocol:
         upload_failed = False
         try:
-            self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+            self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                                fence)
         except NotAchievedException:
             # TODO: make sure we failed for correct reason
@@ -1859,7 +1859,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         items = self.test_gcs_fence_need_centroid(
             target_system=target_system,
             target_component=target_component)
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            items)
         centroid = self.get_fence_point(0)
         want_lat = 1.0001
@@ -1874,9 +1874,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         items = self.test_gcs_fence_boring_triangle(
             target_system=target_system,
             target_component=target_component)
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            items)
-#        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+#        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         item_seq = 2
         item = items[item_seq]
         print("item is (%s)" % str(item))
@@ -1889,14 +1889,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_component,
             item_seq,
             item_seq,
-            mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
-        self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_FENCE, item_seq)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
+        self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE, item_seq)
         item.pack(self.mav.mav)
         self.mav.mav.send(item)
         self.progress("Answered request for fence point %u" % item_seq)
 
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
-        downloaded_items2 = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
+        downloaded_items2 = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if downloaded_items2[item_seq].x != item.x:
             raise NotAchievedException("Item did not update")
         self.check_fence_items_same([items[0], items[1], item, items[3]], downloaded_items2)
@@ -1907,8 +1907,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -1918,13 +1918,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -1934,13 +1934,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0001 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 32.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -1950,13 +1950,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0001 * 1e7), # latitude
                 int(1.0001 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 3, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -1966,7 +1966,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.00015 * 1e7), # latitude
                 int(1.00015 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ])
 
     def test_gcs_fence_need_centroid(self, target_system=1, target_component=1):
@@ -1975,8 +1975,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 4, # p1
@@ -1986,13 +1986,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 4, # p1
@@ -2002,13 +2002,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0002 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 32.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 4, # p1
@@ -2018,13 +2018,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0002 * 1e7), # latitude
                 int(1.0001 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 3, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
                 0, # current
                 0, # autocontinue
                 4, # p1
@@ -2034,14 +2034,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0001 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ])
 
     def click_location_from_item(self, mavproxy, item):
         mavproxy.send("click %f %f\n" % (item.x*1e-7, item.y*1e-7))
 
     def test_gcs_fence_via_mavproxy(self, target_system=1, target_component=1):
-        self.start_subtest("Fence via MAVProxy")
+        self.start_subtest("Fence via AGPILOTProxy")
         if not self.mavproxy_can_do_mision_item_protocols():
             return
         mavproxy = self.start_mavproxy()
@@ -2053,8 +2053,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_INCLUSION,
             0, # current
             0, # autocontinue
             radius, # p1
@@ -2064,12 +2064,12 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             int(1.0017 * 1e7), # latitude
             int(1.0017 * 1e7), # longitude
             0.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         print("item is (%s)" % str(item))
         self.click_location_from_item(mavproxy, item)
         mavproxy.send("fence addcircle inc %u\n" % radius)
         self.delay_sim_time(1)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         print("downloaded items: %s" % str(downloaded_items))
         self.check_fence_items_same([item], downloaded_items)
 
@@ -2078,8 +2078,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
             0, # current
             0, # autocontinue
             radius_exc, # p1
@@ -2089,11 +2089,11 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             int(1.0017 * 1e7), # latitude
             int(1.0017 * 1e7), # longitude
             0.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.click_location_from_item(mavproxy, item2)
         mavproxy.send("fence addcircle exc %f\n" % radius_exc)
         self.delay_sim_time(1)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         print("downloaded items: %s" % str(downloaded_items))
         self.check_fence_items_same([item, item2], downloaded_items)
         self.end_subsubtest("fence addcircle")
@@ -2104,7 +2104,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         pointcount = 7
         mavproxy.send("fence addpoly inc 20 %u 37.2\n" % pointcount) # radius, pointcount, rotaiton
         self.delay_sim_time(5)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(downloaded_items) != pointcount:
             raise NotAchievedException("Did not get expected number of points returned (want=%u got=%u)" %
                                        (pointcount, len(downloaded_items)))
@@ -2116,7 +2116,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         triangle = self.test_gcs_fence_boring_triangle(
             target_system=target_system,
             target_component=target_component)
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            triangle)
         mavproxy.send("fence list\n")
         self.delay_sim_time(1)
@@ -2125,7 +2125,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.click_location_from_item(mavproxy, triangle[2])
         mavproxy.send("fence movepolypoint 0 2\n")
         self.delay_sim_time(10)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.check_fence_items_same(triangle, downloaded_items)
         self.end_subsubtest("fence movepolypoint")
 
@@ -2148,13 +2148,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.progress("Testing FENCE_POINT protocol")
 
         self.start_subtest("FENCE_TOTAL manipulation")
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.assert_parameter_value("FENCE_TOTAL", 0)
 
         self.set_parameter("FENCE_TOTAL", 5)
         self.assert_parameter_value("FENCE_TOTAL", 5)
 
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.assert_parameter_value("FENCE_TOTAL", 0)
 
         self.progress("sending out-of-range fencepoint")
@@ -2214,22 +2214,22 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                            target_component=target_component)
 
         if not self.mavproxy_can_do_mision_item_protocols():
-            self.progress("MAVProxy too old to do fence point protocols")
+            self.progress("AGPILOTProxy too old to do fence point protocols")
             return
 
         self.progress("Download with new protocol")
-        items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(items) != 1:
             raise NotAchievedException("Unexpected fencepoint count (want=%u got=%u)" % (1, len(items)))
-        if items[0].command != mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT:
+        if items[0].command != mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT:
             raise NotAchievedException(
                 "Fence return point not of correct type expected (%u) got %u" %
                 (items[0].command,
-                 mavutil.mavlink.MAV_CMD_NAV_FENCE_RETURN_POINT))
-        if items[0].frame != mavutil.mavlink.MAV_FRAME_GLOBAL:
+                 mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_RETURN_POINT))
+        if items[0].frame != mavutil.mavlink.AGPILOT_FRAME_GLOBAL:
             raise NotAchievedException(
                 "Unexpected frame want=%s got=%s," %
-                (self.string_for_frame(mavutil.mavlink.MAV_FRAME_GLOBAL),
+                (self.string_for_frame(mavutil.mavlink.AGPILOT_FRAME_GLOBAL),
                  self.string_for_frame(items[0].frame)))
         got_lat = items[0].x
         want_lat = lat * 1e7
@@ -2245,11 +2245,11 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         items = self.test_gcs_fence_boring_triangle(
             target_system=target_system,
             target_component=target_component)
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            items)
 
         self.progress("Download with new protocol")
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(downloaded_items) != len(items):
             raise NotAchievedException("Did not download expected number of items (wanted=%u got=%u)" %
                                        (len(items), len(downloaded_items)))
@@ -2265,18 +2265,18 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         m = self.mav.recv_match(type="FENCE_POINT", blocking=True, timeout=1)
         print("m: %s" % str(m))
 
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
         self.progress("Checking count post-nuke")
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
         self.assert_mission_count_on_link(self.mav,
                                           0,
                                           target_system,
                                           target_component,
-                                          mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+                                          mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
 
         self.start_subtest("Ensuring bad fences get bounced")
         for fence in self.fences_which_should_not_upload(target_system=target_system, target_component=target_component):
@@ -2332,8 +2332,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             now = self.get_sim_time_cached()
             if now - last_heartbeat_sent > 1:
                 last_heartbeat_sent = now
-                self.mav.mav.heartbeat_send(mavutil.mavlink.MAV_TYPE_ONBOARD_CONTROLLER,
-                                            mavutil.mavlink.MAV_AUTOPILOT_INVALID,
+                self.mav.mav.heartbeat_send(mavutil.mavlink.AGPILOT_TYPE_ONBOARD_CONTROLLER,
+                                            mavutil.mavlink.AGPILOT_AUTOPILOT_INVALID,
                                             0,
                                             0,
                                             0)
@@ -2414,8 +2414,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 continue
 #            self.progress("Received (%s)" % str(m))
             if m.get_type() == "MISSION_ACK":
-                if m.type != mavutil.mavlink.MAV_MISSION_ACCEPTED:
-                    raise NotAchievedException("Expected MAV_MISSION_ACCEPTED, got (%s)" % m)
+                if m.type != mavutil.mavlink.AGPILOT_MISSION_ACCEPTED:
+                    raise NotAchievedException("Expected AGPILOT_MISSION_ACCEPTED, got (%s)" % m)
             if m.get_type() == "MISSION_COUNT":
                 break
         if m.target_system != expected_target_system:
@@ -2499,7 +2499,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.progress("Received item request OK")
 
     def assert_receive_mission_ack(self, mission_type,
-                                   want_type=mavutil.mavlink.MAV_MISSION_ACCEPTED,
+                                   want_type=mavutil.mavlink.AGPILOT_MISSION_ACCEPTED,
                                    target_system=None,
                                    target_component=None,
                                    mav=None):
@@ -2537,7 +2537,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
     def mavproxy_can_do_mision_item_protocols(self):
         return False
         if not self.mavproxy_version_gt(1, 8, 12):
-            self.progress("MAVProxy is too old; skipping tests")
+            self.progress("AGPILOTProxy is too old; skipping tests")
             return False
         return True
 
@@ -2548,7 +2548,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
     def click_three_in(self, mavproxy, target_system=1, target_component=1):
         mavproxy.send('rally clear\n')
         self.drain_mav()
-        # there are race conditions in MAVProxy.  Beware.
+        # there are race conditions in AGPILOTProxy.  Beware.
         mavproxy.send("click 1.0 1.0\n")
         mavproxy.send("rally add\n")
         self.delay_sim_time(1)
@@ -2563,11 +2563,11 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             3,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
 
     def GCSRally(self, target_system=1, target_component=1):
-        '''Upload and download of rally using MAVProxy'''
+        '''Upload and download of rally using AGPILOTProxy'''
         self.start_subtest("Testing mavproxy CLI for rally points")
         if not self.mavproxy_can_do_mision_item_protocols():
             return
@@ -2585,11 +2585,11 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         mavproxy.send('click %s %s\n' % (lat_s, lng_s))
         self.drain_mav()
         mavproxy.send('rally add\n')
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
         self.delay_sim_time(5)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(downloaded_items) != 1:
             raise NotAchievedException("Unexpected count (got=%u want=1)" %
                                        (len(downloaded_items), ))
@@ -2651,14 +2651,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                           0,
                                           target_system,
                                           target_component,
-                                          mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                          mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
         # warning: uses file saved from previous test
         self.start_subtest("Check rally load from filepath")
         mavproxy.send('rally load %s\n' % save_tmppath)
         mavproxy.expect(r"Loaded 1 rally items from ([^\s]*)\s")
         mavproxy.expect("Sent all .* rally items") # notional race condition here
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(downloaded_items) != 1:
             raise NotAchievedException("Unexpected item count (%u)" % len(downloaded_items))
         if abs(int(downloaded_items[0].x) - int(lat * 1e7)) > 3:
@@ -2681,20 +2681,20 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             2,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
         self.drain_mav()
         mavproxy.send("rally changealt 1 17.6\n")
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
         self.delay_sim_time(10)
         mavproxy.send("rally changealt 2 19.1\n")
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
         self.delay_sim_time(10)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(downloaded_items) != 2:
             raise NotAchievedException("Unexpected item count (%u)" % len(downloaded_items))
         if abs(int(downloaded_items[0].x) - int(1 * 1e7)) > 3:
@@ -2717,10 +2717,10 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
 
         self.progress("Now change two at once")
         mavproxy.send("rally changealt 1 17.3 2\n")
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(downloaded_items) != 2:
             raise NotAchievedException("Unexpected item count (%u)" % len(downloaded_items))
 
@@ -2756,20 +2756,20 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             2,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
         mavproxy.send("click 3.0 3.0\n")
         mavproxy.send("rally move 2\n")
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
         mavproxy.send("click 4.12345 4.987654\n")
         mavproxy.send("rally move 1\n")
-        self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+        self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                         target_system=255,
                                         target_component=0)
 
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(downloaded_items) != 2:
             raise NotAchievedException("Unexpected item count (%u)" % len(downloaded_items))
         if downloaded_items[0].x != 41234500:
@@ -2793,7 +2793,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.drain_mav()
         mavproxy.send('rally clear\n')
         self.drain_mav()
-        # there are race conditions in MAVProxy.  Beware.
+        # there are race conditions in AGPILOTProxy.  Beware.
         mavproxy.send("click 1.0 1.0\n")
         mavproxy.send("rally add\n")
         mavproxy.send("click 2.0 2.0\n")
@@ -2806,16 +2806,16 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             3,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
         click_lat = 2.0
         click_lon = 3.0
-        unmoved_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        unmoved_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(unmoved_items) != 3:
             raise NotAchievedException("Unexpected item count")
         mavproxy.send("click %f %f\n" % (click_lat, click_lon))
         mavproxy.send("rally movemulti 2 1 3\n")
-        # MAVProxy currently sends three separate items up.  That's
+        # AGPILOTProxy currently sends three separate items up.  That's
         # not great and I don't want to lock that behaviour in here.
         self.delay_sim_time(10)
         expected_moved_items = copy.copy(unmoved_items)
@@ -2825,7 +2825,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         expected_moved_items[1].y = 3.0 * 1e7
         expected_moved_items[2].x = 3.0 * 1e7
         expected_moved_items[2].y = 4.0 * 1e7
-        moved_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        moved_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         # we're moving an entire degree in latitude; quite an epsilon required...
         self.check_rally_items_same(expected_moved_items, moved_items, epsilon=10000)
 
@@ -2833,7 +2833,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         mavproxy.send("click %f %f\n" % (2, 2))
         mavproxy.send("rally movemulti 2 1 3 90\n")
 
-        # MAVProxy currently sends three separate items up.  That's
+        # AGPILOTProxy currently sends three separate items up.  That's
         # not great and I don't want to lock that behaviour in here.
         self.delay_sim_time(10)
         expected_moved_items = copy.copy(unmoved_items)
@@ -2843,7 +2843,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         expected_moved_items[1].y = 2.0 * 1e7
         expected_moved_items[2].x = 1.0 * 1e7
         expected_moved_items[2].y = 3.0 * 1e7
-        moved_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        moved_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         # we're moving an entire degree in latitude; quite an epsilon required...
         self.check_rally_items_same(expected_moved_items, moved_items, epsilon=12000)
         self.end_subsubtest("rally movemulti")
@@ -2855,7 +2855,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
 
         self.start_subsubtest("rally remove")
         self.click_three_in(target_system=target_system, target_component=target_component)
-        pure_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        pure_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.progress("Removing last in list")
         mavproxy.send("rally remove 3\n")
         self.delay_sim_time(10)
@@ -2864,9 +2864,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             2,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
-        fewer_downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        fewer_downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(fewer_downloaded_items) != 2:
             raise NotAchievedException("Unexpected download list length")
         shorter_items = copy.copy(pure_items)
@@ -2881,9 +2881,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             1,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
-        fewer_downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        fewer_downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if len(fewer_downloaded_items) != 1:
             raise NotAchievedException("Unexpected download list length")
         shorter_items = shorter_items[1:]
@@ -2897,7 +2897,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             0,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
         self.end_subsubtest("rally remove")
 
@@ -2929,7 +2929,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.start_subsubtest("rally undo")
         self.progress("Testing undo-remove")
         self.click_three_in(target_system=target_system, target_component=target_component)
-        pure_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        pure_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.progress("Removing first in list")
         mavproxy.send("rally remove 1\n")
         self.delay_sim_time(5)
@@ -2938,30 +2938,30 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             2,
             target_system,
             target_component,
-            mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
         )
         mavproxy.send("rally undo\n")
         self.delay_sim_time(5)
-        undone_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        undone_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.check_rally_items_same(pure_items, undone_items)
 
         self.progress("Testing undo-move")
 
-        pure_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        pure_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         mavproxy.send("click 4.12345 4.987654\n")
         mavproxy.send("rally move 1\n")
         # move has already been tested, assume it works...
         self.delay_sim_time(5)
         mavproxy.send("rally undo\n")
         self.delay_sim_time(5)
-        undone_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        undone_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.check_rally_items_same(pure_items, undone_items)
 
         self.end_subsubtest("rally undo")
 
         self.start_subsubtest("rally update")
         self.click_three_in(target_system=target_system, target_component=target_component)
-        pure_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        pure_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         rally_update_tmpfilepath = self.buildlogs_path("rally-tmp-update.txt")
         mavproxy.send("rally save %s\n" % rally_update_tmpfilepath)
         self.delay_sim_time(5)
@@ -2972,7 +2972,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.progress("Reverting to original")
         mavproxy.send("rally update %s\n" % rally_update_tmpfilepath)
         self.delay_sim_time(5)
-        reverted_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        reverted_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         self.check_rally_items_same(pure_items, reverted_items)
 
         self.progress("Making sure specifying a waypoint to be updated works")
@@ -2985,7 +2985,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.progress("Reverting to original item 2")
         mavproxy.send("rally update %s 2\n" % rally_update_tmpfilepath)
         self.delay_sim_time(5)
-        reverted_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+        reverted_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
         if reverted_items[0].x != 130000000:
             raise NotAchievedException("Expected item1 x to stay changed (got=%u want=%u)" % (reverted_items[0].x, 130000000))
         if reverted_items[1].x == 170000000:
@@ -3012,8 +3012,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     target_system,
                     target_component,
                     0, # seq
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                    mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                     0, # current
                     0, # autocontinue
                     0, # p1
@@ -3023,13 +3023,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     int(1.0000 * 1e7), # latitude
                     int(1.0000 * 1e7), # longitude
                     31.0000, # altitude
-                    mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
+                    mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
                 self.mav.mav.mission_item_int_encode(
                     target_system,
                     target_component,
                     1, # seq
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                    mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                     0, # current
                     0, # autocontinue
                     0, # p1
@@ -3039,13 +3039,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     item1_lat, # latitude
                     int(2.0000 * 1e7), # longitude
                     32.0000, # altitude
-                    mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
+                    mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
                 self.mav.mav.mission_item_int_encode(
                     target_system,
                     target_component,
                     2, # seq
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                    mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                     0, # current
                     0, # autocontinue
                     0, # p1
@@ -3055,11 +3055,11 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     int(3.0000 * 1e7), # latitude
                     int(3.0000 * 1e7), # longitude
                     33.0000, # altitude
-                    mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
+                    mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
             ]
-            self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                                items)
-            downloaded = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            downloaded = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             print("Got items (%s)" % str(items))
             if len(downloaded) != len(items):
                 raise NotAchievedException(
@@ -3074,7 +3074,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
 
             self.progress("Pruning count by setting parameter (urgh)")
             self.set_parameter("RALLY_TOTAL", 2)
-            downloaded = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            downloaded = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             if len(downloaded) != 2:
                 raise NotAchievedException(
                     "Failed to prune rally points by setting parameter.  want=%u got=%u" %
@@ -3093,7 +3093,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                           0, # "break" alt?!
                                           0, # "land dir"
                                           0) # flags
-            downloaded = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            downloaded = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             if len(downloaded) != 3:
                 raise NotAchievedException(
                     "resetting rally point count didn't change items returned")
@@ -3121,7 +3121,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             len(items),
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.drain_mav() # throw away requests for items
             self.mav.mav.srcSystem = 243
 
@@ -3130,18 +3130,18 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             len(items),
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_DENIED)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_DENIED)
 
             self.progress("Attempting download from sysid=%u" %
                           (self.mav.mav.srcSystem,))
             self.mav.mav.mission_request_list_send(target_system,
                                                    target_component,
-                                                   mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                                   mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_DENIED)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_DENIED)
 
             # wait for the upload from sysid=1 to time out:
             tstart = self.get_sim_time()
@@ -3167,9 +3167,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 if m.get_type() == 'MISSION_ACK':
                     if m.target_system != old_srcSystem:
                         raise NotAchievedException("Incorrect sourcesystem")
-                    if m.type != mavutil.mavlink.MAV_MISSION_OPERATION_CANCELLED:
+                    if m.type != mavutil.mavlink.AGPILOT_MISSION_OPERATION_CANCELLED:
                         raise NotAchievedException("Incorrect result")
-                    if m.mission_type != mavutil.mavlink.MAV_MISSION_TYPE_RALLY:
+                    if m.mission_type != mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY:
                         raise NotAchievedException("Incorrect mission_type")
                     got_ack = True
                     self.progress("Received desired ACK")
@@ -3180,12 +3180,12 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             0,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
             self.drain_mav()
             self.start_subtest("Check rally upload/download across separate links")
-            self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                                items)
             self.progress("ensure a mavlink1 connection can't do anything useful with new item types")
             self.set_parameter("SERIAL2_PROTOCOL", 1)
@@ -3196,12 +3196,12 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                               source_component=7)
             mav2.mav.mission_request_list_send(target_system,
                                                target_component,
-                                               mission_type=mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                               mission_type=mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             # so this looks a bit odd; the other end isn't sending
             # mavlink2 so can't fill in the extension here.
             self.assert_receive_mission_ack(
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION,
-                want_type=mavutil.mavlink.MAV_MISSION_UNSUPPORTED,
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION,
+                want_type=mavutil.mavlink.AGPILOT_MISSION_UNSUPPORTED,
                 mav=mav2,
             )
             # this relies on magic upgrade to serial2:
@@ -3213,14 +3213,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 expected_count,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.progress("Assert mission count on original link")
             self.assert_mission_count_on_link(
                 self.mav,
                 expected_count,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.progress("Get first item on new link")
 
             def drain_self_mav_fn():
@@ -3230,7 +3230,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 mav2,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                 delay_fn=drain_self_mav_fn)
             self.progress("Get first item on original link")
             m = self.get_mission_item_int_on_link(
@@ -3238,26 +3238,26 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 self.mav,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             if m2.x != m.x:
                 raise NotAchievedException("mission items do not match (%d vs %d)" % (m2.x, m.x))
-            self.get_mission_item_on_link(2, self.mav, target_system, target_component, mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.get_mission_item_on_link(2, self.mav, target_system, target_component, mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             # ensure we get nacks for bad mission item requests:
             self.mav.mav.mission_request_send(target_system,
                                               target_component,
                                               65,
-                                              mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                              mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_receive_mission_ack(
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                want_type=mavutil.mavlink.MAV_MISSION_INVALID_SEQUENCE,
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                want_type=mavutil.mavlink.AGPILOT_MISSION_INVALID_SEQUENCE,
             )
             self.mav.mav.mission_request_int_send(target_system,
                                                   target_component,
                                                   65,
-                                                  mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                                                  mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_receive_mission_ack(
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                want_type=mavutil.mavlink.MAV_MISSION_INVALID_SEQUENCE,
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                want_type=mavutil.mavlink.AGPILOT_MISSION_INVALID_SEQUENCE,
             )
 
             self.start_subtest("Should enforce items come from correct GCS")
@@ -3265,8 +3265,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             1,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 0)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 0)
             self.progress("Attempting to upload from bad sysid")
             old_sysid = self.mav.mav.srcSystem
             self.mav.mav.srcSystem = 17
@@ -3274,14 +3274,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[0])
             self.mav.mav.srcSystem = old_sysid
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_DENIED,
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_DENIED,
                                             target_system=17)
             self.progress("Sending from correct sysid")
             items[0].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[0])
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
             self.drain_mav()
             self.drain_all_pexpects()
@@ -3292,8 +3292,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             2,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 0)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 0)
             old_mav2_system = mav2.mav.srcSystem
             old_mav2_component = mav2.mav.srcComponent
             mav2.mav.srcSystem = self.mav.mav.srcSystem
@@ -3309,14 +3309,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             mav2.mav.srcComponent = old_mav2_component
             # we continue to receive requests on the original link:
             m = self.assert_receive_message('MISSION_REQUEST', timeout=1)
-            if m.mission_type != mavutil.mavlink.MAV_MISSION_TYPE_RALLY:
+            if m.mission_type != mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY:
                 raise NotAchievedException("Mission request of incorrect type")
             if m.seq != 1:
                 raise NotAchievedException("Unexpected sequence number (expected=%u got=%u)" % (1, m.seq))
             items[1].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[1])
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
             self.drain_mav()
             self.drain_all_pexpects()
@@ -3327,15 +3327,15 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             3,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 0)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 0)
 
             self.progress("Sending wp count")
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             3,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_MISSION, 0)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION, 0)
 
             self.progress("Answering request for mission item 0")
             self.drain_mav(mav=self.mav, unparsed=True)
@@ -3343,8 +3343,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3354,28 +3354,28 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.1000 * 1e7), # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_MISSION, 1)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION, 1)
 
             self.progress("Answering request for rally point 0")
             items[0].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[0])
             self.progress("Expecting request for rally item 1")
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 1)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 1)
             self.progress("Answering request for rally point 1")
             items[1].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[1])
             self.progress("Expecting request for rally item 2")
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 2)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 2)
 
             self.progress("Answering request for rally point 2")
             items[2].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[2])
             self.progress("Expecting mission ack for rally")
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
 
             self.progress("Answering request for waypoints item 1")
             self.drain_mav(unparsed=True)
@@ -3383,8 +3383,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3394,8 +3394,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.1000 * 1e7), # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_MISSION, 2)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION, 2)
 
             self.progress("Answering request for waypoints item 2")
             self.drain_mav(unparsed=True)
@@ -3403,8 +3403,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3414,16 +3414,16 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.1000 * 1e7), # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
             self.start_subtest("Test write-partial-list")
             self.progress("Clearing rally points using count-send")
-            self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                target_system=target_system,
                                target_component=target_component)
             self.progress("Should not be able to set items completely past the waypoint count")
-            self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
+            self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
                                                items)
             self.drain_mav(unparsed=True)
             self.mav.mav.mission_write_partial_list_send(
@@ -3431,9 +3431,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_component,
                 17,
                 20,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_ERROR)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_ERROR)
 
             self.progress("Should not be able to set items overlapping the waypoint count")
             self.drain_mav(unparsed=True)
@@ -3442,9 +3442,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_component,
                 0,
                 20,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_ERROR)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_ERROR)
 
             self.progress("try to overwrite items 1 and 2")
             self.drain_mav(unparsed=True)
@@ -3453,16 +3453,16 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_component,
                 1,
                 2,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 1)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 1)
             self.progress("Try shoving up an incorrectly sequenced item")
             self.drain_mav(unparsed=True)
             self.mav.mav.mission_item_int_send(
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3472,9 +3472,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.1000 * 1e7), # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_INVALID_SEQUENCE)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_INVALID_SEQUENCE)
 
             self.progress("Try shoving up an incorrectly sequenced item (but within band)")
             self.drain_mav(unparsed=True)
@@ -3482,8 +3482,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3493,9 +3493,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.1000 * 1e7), # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_INVALID_SEQUENCE)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_INVALID_SEQUENCE)
 
             self.progress("Now provide correct item")
             item1_latitude = int(1.2345 * 1e7)
@@ -3504,8 +3504,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_RALLY_POINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_RALLY_POINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3515,13 +3515,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 item1_latitude, # latitude
                 int(1.2000 * 1e7), # longitude
                 321.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY),
-            self.assert_receive_mission_item_request(mavutil.mavlink.MAV_MISSION_TYPE_RALLY, 2)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY),
+            self.assert_receive_mission_item_request(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY, 2)
             self.progress("Answering request for rally point 2")
             items[2].pack(self.mav.mav)
             self.drain_mav(unparsed=True)
             self.mav.mav.send(items[2])
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.progress("TODO: ensure partial mission write was good")
 
             self.start_subtest("clear mission types")
@@ -3530,43 +3530,43 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 3,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_mission_count_on_link(
                 self.mav,
                 3,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
             self.drain_mav(unparsed=True)
-            self.mav.mav.mission_clear_all_send(target_system, target_component, mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+            self.mav.mav.mission_clear_all_send(target_system, target_component, mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_mission_count_on_link(
                 self.mav,
                 0,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_mission_count_on_link(
                 self.mav,
                 3,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
             self.drain_mav(unparsed=True)
-            self.mav.mav.mission_clear_all_send(target_system, target_component, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            self.mav.mav.mission_clear_all_send(target_system, target_component, mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
             self.assert_mission_count_on_link(
                 self.mav,
                 0,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
             self.assert_mission_count_on_link(
                 self.mav,
                 0,
                 target_system,
                 target_component,
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
 
             self.start_subtest("try sending out-of-range counts")
             self.drain_mav(unparsed=True)
@@ -3575,14 +3575,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                             1,
                                             230)
             self.assert_receive_mission_ack(230,
-                                            want_type=mavutil.mavlink.MAV_MISSION_UNSUPPORTED)
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_UNSUPPORTED)
             self.drain_mav(unparsed=True)
             self.mav.mav.mission_count_send(target_system,
                                             target_component,
                                             16000,
-                                            mavutil.mavlink.MAV_MISSION_TYPE_RALLY)
-            self.assert_receive_mission_ack(mavutil.mavlink.MAV_MISSION_TYPE_RALLY,
-                                            want_type=mavutil.mavlink.MAV_MISSION_NO_SPACE)
+                                            mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY)
+            self.assert_receive_mission_ack(mavutil.mavlink.AGPILOT_MISSION_TYPE_RALLY,
+                                            want_type=mavutil.mavlink.AGPILOT_MISSION_NO_SPACE)
 
         except Exception as e:
             self.progress("Received exception (%s)" % self.get_exception_stacktrace(e))
@@ -3591,7 +3591,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.reboot_sitl()
 
     def GCSMission(self):
-        '''check MAVProxy's waypoint handling of missions'''
+        '''check AGPILOTProxy's waypoint handling of missions'''
         target_system = 1
         target_component = 1
         mavproxy = self.start_mavproxy()
@@ -3608,13 +3608,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.wait_current_waypoint(set_wp)
 
         self.start_subsubtest("wp changealt")
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         changealt_item = 1
 #        oldalt = downloaded_items[changealt_item].z
         want_newalt = 37.2
         mavproxy.send('wp changealt %u %f\n' % (changealt_item, want_newalt))
         self.delay_sim_time(5)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         if abs(downloaded_items[changealt_item].z - want_newalt) > 0.0001:
             raise NotAchievedException(
                 "changealt didn't (want=%f got=%f)" %
@@ -3628,7 +3628,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         mavproxy.send('wp sethome\n')
         self.delay_sim_time(5)
         # any way to close the loop on this one?
-        # downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        # downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         # if abs(downloaded_items[0].x - new_home_lat) > 0.0001:
         #     raise NotAchievedException("wp sethome didn't work")
         # if abs(downloaded_items[0].y - new_home_lng) > 0.0001:
@@ -3642,7 +3642,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.end_subsubtest("wp slope")
 
         if not self.mavproxy_can_do_mision_item_protocols():
-            # adding based on click location yet to be merged into MAVProxy
+            # adding based on click location yet to be merged into AGPILOTProxy
             return
 
         self.start_subsubtest("wp split")
@@ -3656,8 +3656,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3667,13 +3667,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0 * 1e7), # latitude
                 int(1.0 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3683,7 +3683,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(2.0 * 1e7), # latitude
                 int(2.0 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
         ]
         mavproxy.send("click 5 5\n") # space for home position
         mavproxy.send("wp add\n")
@@ -3694,7 +3694,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.click_location_from_item(mavproxy, items[2])
         mavproxy.send("wp add\n")
         self.delay_sim_time(5)
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         self.check_mission_waypoint_items_same(items, downloaded_items)
         mavproxy.send("wp split 2\n")
         self.delay_sim_time(5)
@@ -3705,8 +3705,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 0, # p1
@@ -3716,10 +3716,10 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.5 * 1e7), # latitude
                 int(1.5 * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
             items[2],
         ]
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION)
         self.check_mission_waypoint_items_same(items_with_split_in,
                                                downloaded_items)
 
@@ -3752,7 +3752,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     0,
                     target_system,
                     target_component,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
                     type_mask,
                     int(loc.lat * 1.0e7),
                     int(loc.lng * 1.0e7),
@@ -3806,7 +3806,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     0,
                     target_system,
                     target_component,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
                     type_mask,
                     int(loc.lat * 1.0e7),
                     int(loc.lng * 1.0e7),
@@ -3849,7 +3849,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     0,
                     target_system,
                     target_component,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
                     type_mask,
                     int(loc.lat * 1.0e7),
                     int(loc.lng * 1.0e7),
@@ -3914,7 +3914,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                     0,
                     target_system,
                     target_component,
-                    mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
+                    mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
                     type_mask,
                     int(loc.lat * 1.0e7),
                     int(loc.lng * 1.0e7),
@@ -3975,7 +3975,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
     def test_poly_fence_noarms(self, target_system=1, target_component=1):
         '''various tests to ensure we can't arm when in breach of a polyfence'''
         self.start_subtest("Ensure PolyFence arming checks work")
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
         self.delay_sim_time(5) # let breaches clear
@@ -4005,8 +4005,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1 - radius
@@ -4016,13 +4016,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(here.lat * 1e7), # latitude
                 int(here.lng * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1 - radius
@@ -4032,9 +4032,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(self.offset_location_ne(here, 100, 100).lat * 1e7), # latitude
                 int(here.lng * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            items)
         self.delay_sim_time(5) # ArduPilot only checks for breaches @1Hz
         self.drain_mav()
@@ -4047,7 +4047,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             raise NotAchievedException(
                 "Armed when within exclusion zone")
 
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            [])
         self.wait_fence_not_breached()
 
@@ -4061,8 +4061,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1 - radius
@@ -4072,13 +4072,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(here.lat * 1e7), # latitude
                 int(here.lng * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_INCLUSION,
                 0, # current
                 0, # autocontinue
                 5, # p1 - radius
@@ -4088,9 +4088,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(self.offset_location_ne(here, 100, 100).lat * 1e7), # latitude
                 int(here.lng * 1e7), # longitude
                 33.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_FENCE),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE),
         ]
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            items)
         self.delay_sim_time(5) # ArduPilot only checks for breaches @1Hz
         self.drain_mav()
@@ -4103,7 +4103,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             raise NotAchievedException(
                 "Armed when outside an inclusion zone")
 
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            [])
         self.wait_fence_not_breached()
 
@@ -4113,7 +4113,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         here = self.mav.location()
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -4139,7 +4139,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             raise NotAchievedException(
                 "Armed when within polygon exclusion zone")
 
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            [])
         self.wait_fence_not_breached()
 
@@ -4149,7 +4149,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         here = self.mav.location()
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -4175,7 +4175,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             raise NotAchievedException(
                 "Armed when outside polygon inclusion zone")
 
-        self.upload_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.upload_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                                            [])
         self.wait_fence_not_breached()
 
@@ -4185,7 +4185,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.mav.mav.mission_count_send(target_system,
                                         target_component,
                                         1,
-                                        mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+                                        mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         m = self.mav.recv_match(type=['MISSION_REQUEST', 'MISSION_ACK'],
                                 blocking=True,
                                 timeout=1)
@@ -4230,9 +4230,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 self.progress("Valid re-request received.")
                 continue
             if m.get_type() == "MISSION_ACK":
-                if m.mission_type != mavutil.mavlink.MAV_MISSION_TYPE_FENCE:
+                if m.mission_type != mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE:
                     raise NotAchievedException("Wrong mission type")
-                if m.type != mavutil.mavlink.MAV_MISSION_OPERATION_CANCELLED:
+                if m.type != mavutil.mavlink.AGPILOT_MISSION_OPERATION_CANCELLED:
                     raise NotAchievedException("Wrong result")
                 received_ack = True
                 continue
@@ -4276,14 +4276,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.mav.mav.mission_count_send(target_system,
                                         target_component,
                                         2,
-                                        mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+                                        mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.progress("Sending item with seq=0")
         item = self.mav.mav.mission_item_int_encode(
             target_system,
             target_component,
             0, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
             0, # current
             0, # autocontinue
             1, # p1 radius
@@ -4293,7 +4293,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             int(1.1 * 1e7), # latitude
             int(1.2 * 1e7), # longitude
             33.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         self.expect_request_for_item(item)
         item.pack(self.mav.mav)
         self.mav.mav.send(item)
@@ -4303,8 +4303,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_system,
             target_component,
             1, # seq
-            mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_EXCLUSION,
             0, # current
             0, # autocontinue
             1, # p1 radius
@@ -4314,7 +4314,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             int(1.1 * 1e7), # latitude
             int(1.2 * 1e7), # longitude
             33.0000, # altitude
-            mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+            mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
 
         self.expect_request_for_item(item)
 
@@ -4348,9 +4348,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 self.progress("Valid re-request received.")
                 continue
             if m.get_type() == "MISSION_ACK":
-                if m.mission_type != mavutil.mavlink.MAV_MISSION_TYPE_FENCE:
+                if m.mission_type != mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE:
                     raise NotAchievedException("Wrong mission type")
-                if m.type != mavutil.mavlink.MAV_MISSION_OPERATION_CANCELLED:
+                if m.type != mavutil.mavlink.AGPILOT_MISSION_OPERATION_CANCELLED:
                     raise NotAchievedException("Wrong result")
                 received_ack = True
                 continue
@@ -4369,7 +4369,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                                           target_component=target_component)
 
     def test_poly_fence_compatability_ordering(self, target_system=1, target_component=1):
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
         here = self.mav.location()
@@ -4382,7 +4382,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 40), # tl,
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[1, 2, 3, 4, 5, 0])
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
 
@@ -4395,7 +4395,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 40), # tl,
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[1, 2, 3, 0, 4, 5])
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
 
@@ -4408,7 +4408,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 40), # tl,
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[0, 1, 2, 5, 3, 4])
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
 
@@ -4429,7 +4429,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         #     failed = "got=0.000000 want=" in str(e)
         # if not failed:
         #     raise NotAchievedException("Expected failure, did not get it")
-        # self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        # self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
         #                    target_system=target_system,
         #                    target_component=target_component)
 
@@ -4442,7 +4442,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 40), # tl,
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[4, 3, 2, 1, 0, 5])
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
 
@@ -4457,7 +4457,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 40), # tl,
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[1, 2, 3, 4, 5, 0])
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(downloaded_items) != 5:
             # that's one return point and then bl, br, tr, then tl
             raise NotAchievedException("Bad number of downloaded items in original download")
@@ -4470,20 +4470,20 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.offset_location_ne(here, -50, 20), # closing point
         ], ordering=[1, 2, 3, 4, 0])
 
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         want_count = 4
         if len(downloaded_items) != want_count:
             # that's one return point and then bl, tr, then tl
             raise NotAchievedException("Bad number of downloaded items in second download got=%u wanted=%u" %
                                        (len(downloaded_items), want_count))
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         if len(downloaded_items) != 4:
             # that's one return point and then bl, tr, then tl
             raise NotAchievedException("Bad number of downloaded items in second download (second time) got=%u want=%u" %
                                        (len(downloaded_items), want_count))
 
     def test_poly_fence_compatability(self, target_system=1, target_component=1):
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_FENCE,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE,
                            target_system=target_system,
                            target_component=target_component)
 
@@ -4523,7 +4523,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         here = self.mav.location()
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -4539,7 +4539,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             ]
         )
         self.reboot_sitl()
-        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.MAV_MISSION_TYPE_FENCE)
+        downloaded_items = self.download_using_mission_protocol(mavutil.mavlink.AGPILOT_MISSION_TYPE_FENCE)
         downloaded_len = len(downloaded_items)
         if downloaded_len != 8:
             raise NotAchievedException("Items did not survive reboot (want=%u got=%u)" %
@@ -4581,7 +4581,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
     def test_poly_fence_inclusion_overlapping_inclusion_circles(self, here, target_system=1, target_component=1):
         self.start_subtest("Overlapping circular inclusion")
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_CIRCLE_INCLUSION,
             [
                 {
                     "radius": 30,
@@ -4620,7 +4620,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_component=target_component)
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
             [
                 [
                     self.offset_location_ne(here, -40, -20), # tl
@@ -4653,7 +4653,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_component=target_component)
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION,
             [
                 [
                     self.offset_location_ne(here, -20, -25), # tl
@@ -4690,7 +4690,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
     def test_poly_fence_exclusion(self, here, target_system=1, target_component=1):
 
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -4772,7 +4772,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         magic_throttle_value = 1812
         self.wait_ready_to_arm()
         self.run_cmd(
-            mavutil.mavlink.MAV_CMD_DO_MOTOR_TEST,
+            mavutil.mavlink.AGPILOT_CMD_DO_MOTOR_TEST,
             1, # p1 - motor instance
             mavutil.mavlink.MOTOR_TEST_THROTTLE_PWM, # p2 - throttle type
             magic_throttle_value, # p3 - throttle
@@ -4837,8 +4837,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             target_system,
             target_component,
             0,
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-            mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+            mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+            mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
             2, # current
             0, # autocontinue
             0, # param1
@@ -4924,7 +4924,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.start_subtest("Ensure we can steer around obstacles in guided mode")
         here = self.mav.location()
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -4976,7 +4976,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.start_subtest("Ensure we stop before breaching an exclusion fence")
         here = self.mav.location()
         self.upload_fences_from_locations(
-            mavutil.mavlink.MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
+            mavutil.mavlink.AGPILOT_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION,
             [
                 [ # east
                     self.offset_location_ne(here, -50, 20), # bl
@@ -5353,7 +5353,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.test_scripting_auxfunc()
 
     def test_mission_frame(self, frame, target_system=1, target_component=1):
-        self.clear_mission(mavutil.mavlink.MAV_MISSION_TYPE_MISSION,
+        self.clear_mission(mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION,
                            target_system=target_system,
                            target_component=target_component)
         items = [
@@ -5362,8 +5362,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -5373,13 +5373,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
                 frame,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -5389,19 +5389,19 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
         ]
 
         self.check_mission_upload_download(items)
 
     def MissionFrames(self, target_system=1, target_component=1):
         '''Upload/Download of items in different frames'''
-        for frame in (mavutil.mavlink.MAV_FRAME_GLOBAL_TERRAIN_ALT_INT,
-                      mavutil.mavlink.MAV_FRAME_GLOBAL_TERRAIN_ALT,
-                      mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-                      mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                      mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                      mavutil.mavlink.MAV_FRAME_GLOBAL):
+        for frame in (mavutil.mavlink.AGPILOT_FRAME_GLOBAL_TERRAIN_ALT_INT,
+                      mavutil.mavlink.AGPILOT_FRAME_GLOBAL_TERRAIN_ALT,
+                      mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                      mavutil.mavlink.AGPILOT_FRAME_GLOBAL_RELATIVE_ALT,
+                      mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                      mavutil.mavlink.AGPILOT_FRAME_GLOBAL):
             self.test_mission_frame(frame,
                                     target_system=1,
                                     target_component=1)
@@ -5423,14 +5423,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         distances.extend([invalid_distance] * (72-len(distances)))
         self.mav.mav.obstacle_distance_send(
             self.mavlink_time_boot_us(),
-            mavutil.mavlink.MAV_DISTANCE_SENSOR_LASER,
+            mavutil.mavlink.AGPILOT_DISTANCE_SENSOR_LASER,
             distances,
             increment,
             data["min_distance"],
             data["max_distance"],
             increment_f,
             data["angle_offset"],
-            mavutil.mavlink.MAV_FRAME_BODY_FRD
+            mavutil.mavlink.AGPILOT_FRAME_BODY_FRD
         )
 
     def send_obstacle_distances_expect_distance_sensor_messages(self, obstacle_distances_in, expect_distance_sensor_messages):
@@ -5478,13 +5478,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 self.progress("Have now seen all expected messages")
                 break
 
-    def AP_Proximity_MAV(self):
-        '''Test MAV proximity backend'''
+    def AP_Proximity_AGPILOT(self):
+        '''Test AGPILOT proximity backend'''
         self.context_push()
         ex = None
         try:
             self.set_parameters({
-                "PRX1_TYPE": 2,  # AP_Proximity_MAV
+                "PRX1_TYPE": 2,  # AP_Proximity_AGPILOT
                 "OA_TYPE": 2,  # dijkstra
                 "OA_DB_OUTPUT": 3,  # send all items
             })
@@ -5542,14 +5542,14 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
 
     def SendToComponents(self):
         '''Test ArduPilot send_to_components function'''
-        self.set_parameter("CAM1_TYPE", 5) # Camera with MAVlink trigger
+        self.set_parameter("CAM1_TYPE", 5) # Camera with AGPILOTlink trigger
         self.reboot_sitl() # needed for CAM1_TYPE to take effect
         self.progress("Introducing ourselves to the autopilot as a component")
         old_srcSystem = self.mav.mav.srcSystem
         self.mav.mav.srcSystem = 1
         self.mav.mav.heartbeat_send(
-            mavutil.mavlink.MAV_TYPE_ONBOARD_CONTROLLER,
-            mavutil.mavlink.MAV_AUTOPILOT_INVALID,
+            mavutil.mavlink.AGPILOT_TYPE_ONBOARD_CONTROLLER,
+            mavutil.mavlink.AGPILOT_AUTOPILOT_INVALID,
             0,
             0,
             0)
@@ -5578,7 +5578,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.progress("Message: %s" % str(m))
             if m is None:
                 continue
-            if m.command != mavutil.mavlink.MAV_CMD_DO_DIGICAM_CONTROL:
+            if m.command != mavutil.mavlink.AGPILOT_CMD_DO_DIGICAM_CONTROL:
                 raise NotAchievedException("Did not get correct command")
             if m.param6 != 17:
                 raise NotAchievedException("Did not get correct command_id")
@@ -5739,7 +5739,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 0, # time_boot_ms
                 target_sysid,
                 target_compid,
-                mavutil.mavlink.MAV_FRAME_LOCAL_NED,
+                mavutil.mavlink.AGPILOT_FRAME_LOCAL_NED,
                 mavutil.mavlink.POSITION_TARGET_TYPEMASK_VX_IGNORE |
                 mavutil.mavlink.POSITION_TARGET_TYPEMASK_VY_IGNORE |
                 mavutil.mavlink.POSITION_TARGET_TYPEMASK_VZ_IGNORE |
@@ -5842,21 +5842,21 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         self.context_pop()
         self.reboot_sitl()
 
-    def MAVProxyParam(self):
-        '''Test MAVProxy parameter handling'''
+    def AGPILOTProxyParam(self):
+        '''Test AGPILOTProxy parameter handling'''
         mavproxy = self.start_mavproxy()
         mavproxy.send("param fetch\n")
         mavproxy.expect("Received [0-9]+ parameters")
         self.stop_mavproxy(mavproxy)
 
-    def MAV_CMD_DO_SET_MISSION_CURRENT_mission(self, target_system=1, target_component=1):
+    def AGPILOT_CMD_DO_SET_MISSION_CURRENT_mission(self, target_system=1, target_component=1):
         return copy.copy([
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 0, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -5866,13 +5866,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 1, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -5882,13 +5882,13 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
             self.mav.mav.mission_item_int_encode(
                 target_system,
                 target_component,
                 2, # seq
-                mavutil.mavlink.MAV_FRAME_GLOBAL_INT,
-                mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                mavutil.mavlink.AGPILOT_FRAME_GLOBAL_INT,
+                mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT,
                 0, # current
                 0, # autocontinue
                 3, # p1
@@ -5898,20 +5898,20 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 int(1.0000 * 1e7), # latitude
                 int(1.0000 * 1e7), # longitude
                 31.0000, # altitude
-                mavutil.mavlink.MAV_MISSION_TYPE_MISSION),
+                mavutil.mavlink.AGPILOT_MISSION_TYPE_MISSION),
         ])
 
-    def MAV_CMD_DO_SET_MISSION_CURRENT(self, target_sysid=None, target_compid=1):
+    def AGPILOT_CMD_DO_SET_MISSION_CURRENT(self, target_sysid=None, target_compid=1):
         '''Test handling of CMD_DO_SET_MISSION_CURRENT'''
         if target_sysid is None:
             target_sysid = self.sysid_thismav()
-        self.check_mission_upload_download(self.MAV_CMD_DO_SET_MISSION_CURRENT_mission())
+        self.check_mission_upload_download(self.AGPILOT_CMD_DO_SET_MISSION_CURRENT_mission())
 
         self.set_current_waypoint(2)
 
         self.set_current_waypoint_using_mav_cmd_do_set_mission_current(2)
 
-        self.run_cmd(mavutil.mavlink.MAV_CMD_DO_SET_MISSION_CURRENT,
+        self.run_cmd(mavutil.mavlink.AGPILOT_CMD_DO_SET_MISSION_CURRENT,
                      17,
                      0,
                      0,
@@ -5922,7 +5922,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                      timeout=1,
                      target_sysid=target_sysid,
                      target_compid=target_compid,
-                     want_result=mavutil.mavlink.MAV_RESULT_FAILED)
+                     want_result=mavutil.mavlink.AGPILOT_RESULT_FAILED)
 
     def FlashStorage(self):
         '''Test flash storage (for parameters etc)'''
@@ -6097,9 +6097,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         items = []
         self.set_parameter('STICK_MIXING', 1)
         # home
-        items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0),)
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 0, 0, 0),)
         # 1 waypoint a long way away
-        items.append((mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 2000, 0, 0),)
+        items.append((mavutil.mavlink.AGPILOT_CMD_NAV_WAYPOINT, 2000, 0, 0),)
         self.upload_simple_relhome_mission(items)
         if self.mavproxy is not None:
             # handy for getting pretty pictures
@@ -6193,8 +6193,8 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
                 return
             if m.get_type() == 'HEARTBEAT':
                 mav2.mav.heartbeat_send(
-                    mavutil.mavlink.MAV_TYPE_ONBOARD_CONTROLLER,
-                    mavutil.mavlink.MAV_AUTOPILOT_INVALID,
+                    mavutil.mavlink.AGPILOT_TYPE_ONBOARD_CONTROLLER,
+                    mavutil.mavlink.AGPILOT_AUTOPILOT_INVALID,
                     0,
                     0,
                     0)
@@ -6286,9 +6286,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
         ret = super(AutoTestRover, self).tests()
 
         ret.extend([
-            self.MAVProxy_SetModeUsingSwitch,
+            self.AGPILOTProxy_SetModeUsingSwitch,
             self.HIGH_LATENCY2,
-            self.MAVProxy_SetModeUsingMode,
+            self.AGPILOTProxy_SetModeUsingMode,
             self.ModeSwitch,
             self.AuxModeSwitch,
             self.DriveRTL,
@@ -6298,7 +6298,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             # self.DriveBrake,  # disabled due to frequent failures
             self.GetBanner,
             self.DO_SET_MODE,
-            self.MAVProxy_DO_SET_MODE,
+            self.AGPILOTProxy_DO_SET_MODE,
             self.ServoRelayEvents,
             self.RCOverrides,
             self.RCOverridesCancel,
@@ -6313,17 +6313,17 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.SYSID_ENFORCE,
             self.SET_ATTITUDE_TARGET,
             self.SET_POSITION_TARGET_LOCAL_NED,
-            self.MAV_CMD_DO_SET_MISSION_CURRENT,
+            self.AGPILOT_CMD_DO_SET_MISSION_CURRENT,
             self.Button,
             self.Rally,
             self.Offboard,
-            self.MAVProxyParam,
+            self.AGPILOTProxyParam,
             self.GCSFence,
             self.GCSMission,
             self.GCSRally,
             self.MotorTest,
             self.WheelEncoders,
-            self.DataFlashOverMAVLink,
+            self.DataFlashOverAGPILOTLink,
             self.DataFlash,
             self.SkidSteer,
             self.PolyFence,
@@ -6340,7 +6340,7 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             self.SetpointGlobalVel,
             self.AccelCal,
             self.RangeFinder,
-            self.AP_Proximity_MAV,
+            self.AP_Proximity_AGPILOT,
             self.EndMissionBehavior,
             self.FlashStorage,
             self.FRAMStorage,

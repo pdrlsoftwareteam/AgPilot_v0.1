@@ -16,7 +16,7 @@
 #include "AP_WindVane.h"
 #include "AP_WindVane_Backend.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 // base class constructor.
 AP_WindVane_Backend::AP_WindVane_Backend(AP_WindVane &frontend) :
@@ -27,7 +27,7 @@ AP_WindVane_Backend::AP_WindVane_Backend(AP_WindVane &frontend) :
 // calibrate WindVane
 void AP_WindVane_Backend::calibrate()
 {
-    gcs().send_text(MAV_SEVERITY_INFO, "WindVane: No cal required");
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "WindVane: No cal required");
     _frontend._calibration.set_and_save(0);
     return;
 }

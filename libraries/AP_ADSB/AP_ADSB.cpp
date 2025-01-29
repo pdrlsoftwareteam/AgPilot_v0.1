@@ -23,11 +23,11 @@
 #include "AP_ADSB.h"
 
 #if HAL_ADSB_ENABLED
-#include "AP_ADSB_uAvionix_MAVLink.h"
+#include "AP_ADSB_uAvionix_AGPILOTLink.h"
 #include "AP_ADSB_uAvionix_UCP.h"
 #include "AP_ADSB_Sagetech.h"
 #include "AP_ADSB_Sagetech_MXS.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
@@ -55,8 +55,8 @@ AP_ADSB *AP_ADSB::_singleton;
 const AP_Param::GroupInfo AP_ADSB::var_info[] = {
     // @Param: TYPE
     // @DisplayName: ADSB Type
-    // @Description: Type of ADS-B hardware for ADSB-in and ADSB-out configuration and operation. If any type is selected then MAVLink based ADSB-in messages will always be enabled
-    // @Values: 0:Disabled,1:uAvionix-MAVLink,2:Sagetech,3:uAvionix-UCP,4:Sagetech MX Series
+    // @Description: Type of ADS-B hardware for ADSB-in and ADSB-out configuration and operation. If any type is selected then AGPILOTLink based ADSB-in messages will always be enabled
+    // @Values: 0:Disabled,1:uAvionix-AGPILOTLink,2:Sagetech,3:uAvionix-UCP,4:Sagetech MX Series
     // @User: Standard
     // @RebootRequired: True
     AP_GROUPINFO_FLAGS("TYPE",     0, AP_ADSB, _type[0],    0, AP_PARAM_FLAG_ENABLE),
@@ -198,7 +198,7 @@ void AP_ADSB::init(void)
         if (in_state.vehicle_list == nullptr) {
             // dynamic RAM allocation of in_state.vehicle_list[] failed
             _init_failed = true; // this keeps us from constantly trying to init forever in main update
-            gcs().send_text(MAV_SEVERITY_INFO, "ADSB: Unable to initialize ADSB vehicle list");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "ADSB: Unable to initialize ADSB vehicle list");
             return;
         }
         in_state.list_size_allocated = in_state.list_size_param;
@@ -222,7 +222,7 @@ void AP_ADSB::init(void)
 
     if (detected_num_instances == 0) {
         _init_failed = true;
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "ADSB: Unable to initialize ADSB driver");
+        gcs().send_text(AGPILOT_SEVERITY_CRITICAL, "ADSB: Unable to initialize ADSB driver");
     }
 }
 
@@ -258,10 +258,10 @@ void AP_ADSB::detect_instance(uint8_t instance)
     case Type::None:
         return;
 
-    case Type::uAvionix_MAVLink:
-#if HAL_ADSB_UAVIONIX_MAVLINK_ENABLED
-        if (AP_ADSB_uAvionix_MAVLink::detect()) {
-            _backend[instance] = new AP_ADSB_uAvionix_MAVLink(*this, instance);
+    case Type::uAvionix_AGPILOTLink:
+#if HAL_ADSB_UAVIONIX_AGPILOTLINK_ENABLED
+        if (AP_ADSB_uAvionix_AGPILOTLink::detect()) {
+            _backend[instance] = new AP_ADSB_uAvionix_AGPILOTLink(*this, instance);
         }
 #endif
         break;
@@ -630,10 +630,10 @@ void AP_ADSB::handle_out_cfg(const mavlink_uavionix_adsb_out_cfg_t &packet)
     out_state.cfg.stall_speed_cm = packet.stallSpeed;
 
     // guard against string with non-null end char
-    const char c = out_state.cfg.callsign[MAVLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1];
-    out_state.cfg.callsign[MAVLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1] = 0;
-    gcs().send_text(MAV_SEVERITY_INFO, "ADSB: Using ICAO_id %d and Callsign %s", (int)out_state.cfg.ICAO_id, out_state.cfg.callsign);
-    out_state.cfg.callsign[MAVLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1] = c;
+    const char c = out_state.cfg.callsign[AGPILOTLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1];
+    out_state.cfg.callsign[AGPILOTLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1] = 0;
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "ADSB: Using ICAO_id %d and Callsign %s", (int)out_state.cfg.ICAO_id, out_state.cfg.callsign);
+    out_state.cfg.callsign[AGPILOTLINK_MSG_UAVIONIX_ADSB_OUT_CFG_FIELD_CALLSIGN_LEN-1] = c;
 
     // send now
     out_state.last_config_ms = 0;
@@ -666,7 +666,7 @@ void AP_ADSB::handle_out_control(const mavlink_uavionix_adsb_out_control_t &pack
 void AP_ADSB::handle_transceiver_report(const mavlink_channel_t chan, const mavlink_uavionix_adsb_transceiver_health_report_t &packet)
 {
     if (out_state.chan != chan) {
-        gcs().send_text(MAV_SEVERITY_DEBUG, "ADSB: Found transceiver on channel %d", chan);
+        gcs().send_text(AGPILOT_SEVERITY_DEBUG, "ADSB: Found transceiver on channel %d", chan);
     }
 
     out_state.chan_last_ms = AP_HAL::millis();
@@ -767,7 +767,7 @@ bool AP_ADSB::next_sample(adsb_vehicle_t &vehicle)
 void AP_ADSB::handle_message(const mavlink_channel_t chan, const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
-        case MAVLINK_MSG_ID_ADSB_VEHICLE: {
+        case AGPILOTLINK_MSG_ID_ADSB_VEHICLE: {
             adsb_vehicle_t vehicle {};
             mavlink_msg_adsb_vehicle_decode(&msg, &vehicle.info);
             vehicle.last_update_ms = AP_HAL::millis() - uint32_t(vehicle.info.tslc * 1000U);
@@ -775,25 +775,25 @@ void AP_ADSB::handle_message(const mavlink_channel_t chan, const mavlink_message
             break;
         }
 
-        case MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT: {
+        case AGPILOTLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT: {
             mavlink_uavionix_adsb_transceiver_health_report_t packet {};
             mavlink_msg_uavionix_adsb_transceiver_health_report_decode(&msg, &packet);
             handle_transceiver_report(chan, packet);
             break;
         }
 
-        case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG: {
+        case AGPILOTLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG: {
             mavlink_uavionix_adsb_out_cfg_t packet {};
             mavlink_msg_uavionix_adsb_out_cfg_decode(&msg, &packet);
             handle_out_cfg(packet);
             break;
         }
 
-        case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_DYNAMIC:
+        case AGPILOTLINK_MSG_ID_UAVIONIX_ADSB_OUT_DYNAMIC:
             // unhandled, this is an outbound packet only
             break;
 
-        case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CONTROL: {
+        case AGPILOTLINK_MSG_ID_UAVIONIX_ADSB_OUT_CONTROL: {
             mavlink_uavionix_adsb_out_control_t packet {};            
             mavlink_msg_uavionix_adsb_out_control_decode(&msg, &packet);
             handle_out_control(packet);

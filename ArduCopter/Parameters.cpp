@@ -30,12 +30,12 @@ const AP_Param::Info Copter::var_info[] = {
     // @ReadOnly: True
     GSCALAR(format_version, "FORMAT_VERSION",   0),
 
-    // @Param: SYSID_THISMAV
-    // @DisplayName: MAVLink system ID of this vehicle
-    // @Description: Allows setting an individual MAVLink system id for this vehicle to distinguish it from others on the same network
+    // @Param: SYSID_THISAGPILOT
+    // @DisplayName: AGPILOTLink system ID of this vehicle
+    // @Description: Allows setting an individual AGPILOTLink system id for this vehicle to distinguish it from others on the same network
     // @Range: 1 255
     // @User: Advanced
-    GSCALAR(sysid_this_mav, "SYSID_THISMAV",   MAV_SYSTEM_ID),
+    GSCALAR(sysid_this_mav, "SYSID_THISAGPILOT",   AGPILOT_SYSTEM_ID),
 
     // @Param: SYSID_MYGCS
     // @DisplayName: My ground station number
@@ -85,7 +85,7 @@ const AP_Param::Info Copter::var_info[] = {
 
     // @Param: GCS_PID_MASK
     // @DisplayName: GCS PID tuning mask
-    // @Description: bitmask of PIDs to send MAVLink PID_TUNING messages for
+    // @Description: bitmask of PIDs to send AGPILOTLink PID_TUNING messages for
     // @User: Advanced
     // @Values: 0:None,1:Roll,2:Pitch,4:Yaw,8:AccelZ
     // @Bitmask: 0:Roll,1:Pitch,2:Yaw,3:AccelZ
@@ -465,42 +465,42 @@ const AP_Param::Info Copter::var_info[] = {
 
     // @Group: SR0_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[0],  gcs0,       "SR0_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[0],  gcs0,       "SR0_",     GCS_AGPILOTLINK_Parameters),
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 2
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 2
     // @Group: SR1_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[1],  gcs1,       "SR1_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[1],  gcs1,       "SR1_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 3
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 3
     // @Group: SR2_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[2],  gcs2,       "SR2_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[2],  gcs2,       "SR2_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 4
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 4
     // @Group: SR3_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[3],  gcs3,       "SR3_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[3],  gcs3,       "SR3_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 5
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 5
     // @Group: SR4_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[4],  gcs4,       "SR4_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[4],  gcs4,       "SR4_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 6
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 6
     // @Group: SR5_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[5],  gcs5,       "SR5_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[5],  gcs5,       "SR5_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
-#if MAVLINK_COMM_NUM_BUFFERS >= 7
+#if AGPILOTLINK_COMM_NUM_BUFFERS >= 7
     // @Group: SR6_
     // @Path: GCS_Mavlink.cpp
-    GOBJECTN(_gcs.chan_parameters[6],  gcs6,       "SR6_",     GCS_MAVLINK_Parameters),
+    GOBJECTN(_gcs.chan_parameters[6],  gcs6,       "SR6_",     GCS_AGPILOTLINK_Parameters),
 #endif
 
     // @Group: AHRS_

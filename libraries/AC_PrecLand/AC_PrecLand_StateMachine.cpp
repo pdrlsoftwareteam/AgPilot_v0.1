@@ -1,7 +1,7 @@
 #include "AC_PrecLand_StateMachine.h"
 #include <AC_PrecLand/AC_PrecLand.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 static const float MAX_POS_ERROR_M = 0.75f;  // Maximum possition error for retry locations
 static const uint32_t FAILSAFE_INIT_TIMEOUT_MS = 7000;   // Timeout in ms before failsafe measures are started. During this period vehicle is completely stopped to give user the time to take over
@@ -182,7 +182,7 @@ AC_PrecLand_StateMachine::Status AC_PrecLand_StateMachine::retry_landing(Vector3
         _retry_state = RetryLanding::IN_PROGRESS;
         // inform the user what we are doing
         if (_retry_count <= _precland->get_max_retry_allowed()) {
-            gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Retrying");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Retrying");
         }
         retry_pos_m = go_to_pos;
         return Status::RETRYING;
@@ -215,7 +215,7 @@ AC_PrecLand_StateMachine::Status AC_PrecLand_StateMachine::retry_landing(Vector3
         if (fabsf(pos.z - retry_pos_m.z) < MAX_POS_ERROR_M) {
             // we have descended to the original height where we started the climb from
             _retry_state = RetryLanding::COMPLETE;
-            gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Retry Completed");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Retry Completed");
         }
         return Status::RETRYING;
     }
@@ -245,7 +245,7 @@ AC_PrecLand_StateMachine::FailSafeAction AC_PrecLand_StateMachine::get_failsafe_
         // start the timer
         failsafe_start_ms = AP_HAL::millis();
         failsafe_initialized = true;
-        gcs().send_text(MAV_SEVERITY_INFO, "PrecLand: Failsafe Measures");
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "PrecLand: Failsafe Measures");
     }
 
     // Depending on the strictness we will either land vertically, wait for some time and then land vertically, not land at all

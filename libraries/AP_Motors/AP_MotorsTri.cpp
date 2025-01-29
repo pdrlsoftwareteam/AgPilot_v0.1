@@ -17,7 +17,7 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
 #include <AP_Math/AP_Math.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 #include "AP_MotorsTri.h"
@@ -42,7 +42,7 @@ void AP_MotorsTri::init(motor_frame_class frame_class, motor_frame_type frame_ty
 #if !APM_BUILD_TYPE(APM_BUILD_ArduPlane) // Tilt Rotors do not need a yaw servo
     // find the yaw servo
     if (!SRV_Channels::get_channel_for(SRV_Channel::k_motor7, AP_MOTORS_CH_TRI_YAW)) {
-        gcs().send_text(MAV_SEVERITY_ERROR, "MotorsTri: unable to setup yaw channel");
+        gcs().send_text(AGPILOT_SEVERITY_ERROR, "MotorsTri: unable to setup yaw channel");
         // don't set initialised_ok
         return;
     }
@@ -58,7 +58,7 @@ void AP_MotorsTri::init(motor_frame_class frame_class, motor_frame_type frame_ty
         _pitch_reversed = true;
     }
 
-    _mav_type = MAV_TYPE_TRICOPTER;
+    _mav_type = AGPILOT_TYPE_TRICOPTER;
 
     // record successful initialisation if what we setup was the desired frame_class
     set_initialised_ok(frame_class == MOTOR_FRAME_TRI);

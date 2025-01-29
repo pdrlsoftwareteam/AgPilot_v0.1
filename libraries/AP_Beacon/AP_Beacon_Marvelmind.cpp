@@ -36,8 +36,8 @@ extern const AP_HAL::HAL& hal;
 #define MM_DEBUG_LEVEL 0
 
 #if MM_DEBUG_LEVEL
-  #include <GCS_MAVLink/GCS.h>
-  #define Debug(level, fmt, args ...)  do { if (level <= MM_DEBUG_LEVEL) { gcs().send_text(MAV_SEVERITY_INFO, fmt, ## args); } } while (0)
+  #include <GCS_AGPILOTLink/GCS.h>
+  #define Debug(level, fmt, args ...)  do { if (level <= MM_DEBUG_LEVEL) { gcs().send_text(AGPILOT_SEVERITY_INFO, fmt, ## args); } } while (0)
 #else
   #define Debug(level, fmt, args ...)
 #endif

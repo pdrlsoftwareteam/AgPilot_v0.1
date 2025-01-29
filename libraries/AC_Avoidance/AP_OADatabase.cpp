@@ -14,7 +14,7 @@
 #include "AP_OADatabase.h"
 
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
@@ -125,7 +125,7 @@ void AP_OADatabase::init()
     dist_to_radius_scalar = tanf(radians(MAX(_beam_width, 1.0f)));
 
     if (!healthy()) {
-        gcs().send_text(MAV_SEVERITY_INFO, "DB init failed . Sizes queue:%u, db:%u", (unsigned int)_queue.size, (unsigned int)_database.size);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "DB init failed . Sizes queue:%u, db:%u", (unsigned int)_queue.size, (unsigned int)_database.size);
         delete _queue.items;
         delete[] _database.items;
         return;
@@ -369,8 +369,8 @@ bool AP_OADatabase::is_close_to_item_in_database(const uint16_t index, const OA_
 void AP_OADatabase::send_adsb_vehicle(mavlink_channel_t chan, uint16_t interval_ms)
 {
     // ensure database's send_to_gcs field is large enough
-    static_assert(MAVLINK_COMM_NUM_BUFFERS <= sizeof(OA_DbItem::send_to_gcs) * 8,
-                  "AP_OADatabase's OA_DBItem.send_to_gcs bitmask must be large enough to hold MAVLINK_COMM_NUM_BUFFERS");
+    static_assert(AGPILOTLINK_COMM_NUM_BUFFERS <= sizeof(OA_DbItem::send_to_gcs) * 8,
+                  "AP_OADatabase's OA_DBItem.send_to_gcs bitmask must be large enough to hold AGPILOTLINK_COMM_NUM_BUFFERS");
 
     if ((_output_level.get() <= (int8_t)OA_DbOutputLevel::OUTPUT_LEVEL_DISABLED) || !healthy()) {
         return;

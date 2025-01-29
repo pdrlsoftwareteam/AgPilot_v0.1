@@ -8,7 +8,7 @@
 #ifndef LIBRARIES_AP_PDRL_COMMANDER_AP_PDRL_COMMANDER_LOGGER_H_
 #define LIBRARIES_AP_PDRL_COMMANDER_AP_PDRL_COMMANDER_LOGGER_H_
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
@@ -105,9 +105,9 @@ public:
 	int makeJsonAndSignLogFileLatest();
 	size_t getFileSignature(uint8_t *currentHashFileName,unsigned char* signatureBuff,size_t sigBuffSize);
 	int checkTimeBreach(uint64_t *currentTime);
-	int setTakeOffLolation(MAV_LANDED_STATE landState);
-	int setLandLolation(MAV_LANDED_STATE landState);
-	void logTakeOffLand(MAV_LANDED_STATE landState);
+	int setTakeOffLolation(AGPILOT_LANDED_STATE landState);
+	int setLandLolation(AGPILOT_LANDED_STATE landState);
+	void logTakeOffLand(AGPILOT_LANDED_STATE landState);
 	int mbedtls_md_file(const mbedtls_md_info_t *md_info, const char *path, unsigned char *output );
 	void setHashBuffer(char* hash,uint64_t hashLen,uint64_t totalLen,uint64_t offset);
 	void freeHashBuffer();

@@ -2,8 +2,8 @@
 
 local auth_id = arming:get_aux_auth_id()
 
-local MAV_CMD_NAV_TAKEOFF = 22
-local MAV_CMD_NAV_VTOL_TAKEOFF = 84
+local AGPILOT_CMD_NAV_TAKEOFF = 22
+local AGPILOT_CMD_NAV_VTOL_TAKEOFF = 84
 
 function update() -- this is the loop which periodically runs
   if auth_id then
@@ -15,7 +15,7 @@ function update() -- this is the loop which periodically runs
     elseif ((index ~= 0) and (index ~= 1)) then
       -- index of 0 is valid because when you switch to AUTO it will automatically change to 1
       arming:set_aux_auth_failed(auth_id, "Mission index is not ready")
-    elseif ((cmd_id ~= MAV_CMD_NAV_TAKEOFF) and (cmd_id ~= MAV_CMD_NAV_VTOL_TAKEOFF)) then
+    elseif ((cmd_id ~= AGPILOT_CMD_NAV_TAKEOFF) and (cmd_id ~= AGPILOT_CMD_NAV_VTOL_TAKEOFF)) then
       arming:set_aux_auth_failed(auth_id, "Mission is not ready to takeoff")
     else
       arming:set_aux_auth_passed(auth_id)

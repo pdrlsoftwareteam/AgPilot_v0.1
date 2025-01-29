@@ -13,13 +13,13 @@
 #include <AP_Terrain/AP_Terrain.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #if APM_BUILD_TYPE(APM_BUILD_Rover)
 #include <AP_WindVane/AP_WindVane.h>
 #endif
 
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-#include "AP_Frsky_MAVlite.h"
+#include "AP_Frsky_AGPILOTlite.h"
 #include "AP_Frsky_Parameters.h"
 #endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
 
@@ -145,7 +145,7 @@ void AP_Frsky_SPort_Passthrough::setup_wfq_scheduler(void)
     // initialize default sport sensor ID
     set_sensor_id(_frsky_parameters->_dnlink_id, downlink_sensor_id);
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    set_scheduler_entry(MAV, 35, 25);           // mavlite
+    set_scheduler_entry(AGPILOT, 35, 25);           // mavlite
     // initialize sport sensor IDs
     set_sensor_id(_frsky_parameters->_uplink_id, _SPort_bidir.uplink_sensor_id);
     set_sensor_id(_frsky_parameters->_dnlink1_id, _SPort_bidir.downlink1_sensor_id);
@@ -167,7 +167,7 @@ void AP_Frsky_SPort_Passthrough::adjust_packet_weight(bool queue_empty)
      */
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
     if (!_SPort_bidir.tx_packet_queue.is_empty()) {
-        _scheduler.packet_weight[MAV] = 30;             // mavlite
+        _scheduler.packet_weight[AGPILOT] = 30;             // mavlite
         if (!queue_empty) {
             _scheduler.packet_weight[TEXT] = 45;        // messages
             _scheduler.packet_weight[ATTITUDE] = 80;    // attitude
@@ -176,7 +176,7 @@ void AP_Frsky_SPort_Passthrough::adjust_packet_weight(bool queue_empty)
             _scheduler.packet_weight[ATTITUDE] = 80;    // attitude
         }
     } else {
-        _scheduler.packet_weight[MAV] = 5000;           // mavlite
+        _scheduler.packet_weight[AGPILOT] = 5000;           // mavlite
         if (!queue_empty) {
             _scheduler.packet_weight[TEXT] = 45;        // messages
             _scheduler.packet_weight[ATTITUDE] = 80;    // attitude
@@ -271,7 +271,7 @@ bool AP_Frsky_SPort_Passthrough::is_packet_ready(uint8_t idx, bool queue_empty)
         packet_ready = _use_external_data && _sport_push_buffer.pending;
         break;
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    case MAV:
+    case AGPILOT:
         packet_ready = !_SPort_bidir.tx_packet_queue.is_empty();
         break;
 #endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
@@ -353,7 +353,7 @@ void AP_Frsky_SPort_Passthrough::process_packet(uint8_t idx)
         }
         break;
 #if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    case MAV: // mavlite
+    case AGPILOT: // mavlite
         process_tx_queue();
         break;
 #endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
@@ -473,7 +473,7 @@ uint32_t AP_Frsky_SPort_Passthrough::calc_param(void)
     switch (_paramID) {
     case NONE:
     case FRAME_TYPE:
-        param_value = gcs().frame_type(); // see MAV_TYPE in Mavlink definition file common.h
+        param_value = gcs().frame_type(); // see AGPILOT_TYPE in Mavlink definition file common.h
         _paramID = BATT_CAPACITY_1;
         break;
     case BATT_CAPACITY_1:
@@ -901,8 +901,8 @@ void AP_Frsky_SPort_Passthrough::process_rx_queue()
 {
     AP_Frsky_SPort::sport_packet_t packet;
     uint8_t loop_count = 0; // prevent looping forever
-    while (_SPort_bidir.rx_packet_queue.pop(packet) && loop_count++ < MAVLITE_MSG_SPORT_PACKETS_COUNT(MAVLITE_MAX_PAYLOAD_LEN)) {
-        AP_Frsky_MAVlite_Message rxmsg;
+    while (_SPort_bidir.rx_packet_queue.pop(packet) && loop_count++ < AGPILOTLITE_MSG_SPORT_PACKETS_COUNT(AGPILOTLITE_MAX_PAYLOAD_LEN)) {
+        AP_Frsky_AGPILOTlite_Message rxmsg;
 
         if (sport_to_mavlite.process(rxmsg, packet)) {
             mavlite.process_message(rxmsg);
@@ -955,7 +955,7 @@ void AP_Frsky_SPort_Passthrough::set_sensor_id(AP_Int8 param_idx, uint8_t &senso
  * Message is chunked in sport packets pushed in the tx queue
  * for FrSky SPort Passthrough (OpenTX) protocol (X-receivers)
  */
-bool AP_Frsky_SPort_Passthrough::send_message(const AP_Frsky_MAVlite_Message &txmsg)
+bool AP_Frsky_SPort_Passthrough::send_message(const AP_Frsky_AGPILOTlite_Message &txmsg)
 {
     return mavlite_to_sport.process(_SPort_bidir.tx_packet_queue, txmsg);
 }

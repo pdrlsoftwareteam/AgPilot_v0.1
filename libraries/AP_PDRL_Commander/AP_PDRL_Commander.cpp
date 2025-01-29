@@ -279,7 +279,7 @@ void AP_PDRL_COMMANDER::handleHashToSign(mavlink_command_transfer_t* packet)
 
 
 			mavlink_msg_command_transfer_send(
-					MAVLINK_COMM_0,
+					AGPILOTLINK_COMM_0,
 					COMMAND_GET_SIGN_FROM_HASH,
 					COMMAND_TYPE_RESPONSE,
 					0,
@@ -443,7 +443,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		flag_Status[15] = 0x4F;
 		flag_Status[16] = AP::ap_oapathplanner()->get_autoFlag();
 		sendCommand(0,COMMAND_SET_FLIGHT_PAYLOAD_DETAILS,COMMAND_TYPE_GET,0,17,2,flag_Status);
-		//		gcs().send_text(MAV_SEVERITY_ERROR, "Sent flag status");
+		//		gcs().send_text(AGPILOT_SEVERITY_ERROR, "Sent flag status");
 
 	}
 	break;

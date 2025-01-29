@@ -14,9 +14,9 @@
  - bail out on a large angle error?
 --]]
 
-local MAV_SEVERITY_INFO = 6
-local MAV_SEVERITY_NOTICE = 5
-local MAV_SEVERITY_EMERGENCY = 0
+local AGPILOT_SEVERITY_INFO = 6
+local AGPILOT_SEVERITY_NOTICE = 5
+local AGPILOT_SEVERITY_EMERGENCY = 0
 
 local PARAM_TABLE_KEY = 8
 local PARAM_TABLE_PREFIX = "QUIK_"
@@ -183,12 +183,12 @@ local DEFAULT_SMAX = 50.0
 if param:get("Q_A_RAT_RLL_SMAX") then
    is_quadplane = true
    atc_prefix = "Q_A"
-   gcs:send_text(MAV_SEVERITY_EMERGENCY, "Quicktune for quadplane loaded")
+   gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, "Quicktune for quadplane loaded")
 elseif param:get("ATC_RAT_RLL_SMAX") then
    is_quadplane = false
-   gcs:send_text(MAV_SEVERITY_EMERGENCY, "Quicktune for multicopter loaded")
+   gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, "Quicktune for multicopter loaded")
 else
-   gcs:send_text(MAV_SEVERITY_EMERGENCY, "Quicktune unknown vehicle")
+   gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, "Quicktune unknown vehicle")
    return
 end
 
@@ -411,7 +411,7 @@ function limit_gain(pname, value)
       local reduction_pct = 100.0 * (saved_value - value) / saved_value
       if reduction_pct > max_reduction then
          local new_value = saved_value * (100 - max_reduction) * 0.01
-         gcs:send_text(MAV_SEVERITY_INFO, string.format("limiting %s %.3f -> %.3f", pname, value, new_value))
+         gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("limiting %s %.3f -> %.3f", pname, value, new_value))
          value = new_value
       end
    end
@@ -444,10 +444,10 @@ function update_slew_gain()
       slew_steps = slew_steps - 1
       logger.write('QUIK','SRate,Gain,Param', 'ffn', get_slew_rate(axis), P:get(), axis .. ax_stage)
       if slew_steps == 0 then
-         gcs:send_text(MAV_SEVERITY_INFO, string.format("%s %.4f", slew_parm, P:get()))
+         gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("%s %.4f", slew_parm, P:get()))
          slew_parm = nil
          if get_current_axis() == nil then
-            gcs:send_text(MAV_SEVERITY_NOTICE, string.format("Tuning: DONE"))
+            gcs:send_text(AGPILOT_SEVERITY_NOTICE, string.format("Tuning: DONE"))
             tune_done_time = get_time()
          end
       end
@@ -491,7 +491,7 @@ function update()
       return
    end
    if sw_pos == 1 and (not arming:is_armed() or not vehicle:get_likely_flying()) and get_time() > last_warning + 5 then
-      gcs:send_text(MAV_SEVERITY_EMERGENCY, string.format("Tuning: Must be flying to tune"))
+      gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, string.format("Tuning: Must be flying to tune"))
       last_warning = get_time()
       return
    end
@@ -500,7 +500,7 @@ function update()
       if need_restore then
          need_restore = false
          restore_all_params()
-         gcs:send_text(MAV_SEVERITY_EMERGENCY, string.format("Tuning: reverted"))
+         gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, string.format("Tuning: reverted"))
          tune_done_time = nil
       end
       reset_axes_done()
@@ -511,7 +511,7 @@ function update()
       if need_restore then
          need_restore = false
          save_all_params()
-         gcs:send_text(MAV_SEVERITY_NOTICE, string.format("Tuning: saved"))
+         gcs:send_text(AGPILOT_SEVERITY_NOTICE, string.format("Tuning: saved"))
       end
    end
    if sw_pos ~= 1 then
@@ -530,7 +530,7 @@ function update()
          if get_time() - tune_done_time > QUIK_AUTO_SAVE:get() then
             need_restore = false
             save_all_params()
-            gcs:send_text(MAV_SEVERITY_NOTICE, string.format("Tuning: saved"))
+            gcs:send_text(AGPILOT_SEVERITY_NOTICE, string.format("Tuning: saved"))
             tune_done_time = nil
          end
       end
@@ -539,7 +539,7 @@ function update()
 
    if not need_restore then
       -- we are just starting tuning, get current values
-      gcs:send_text(MAV_SEVERITY_NOTICE, string.format("Tuning: starting tune"))
+      gcs:send_text(AGPILOT_SEVERITY_NOTICE, string.format("Tuning: starting tune"))
       get_all_params()
       setup_SMAX()
    end
@@ -549,7 +549,7 @@ function update()
    end
 
    if not filters_done[axis] then
-      gcs:send_text(MAV_SEVERITY_INFO, string.format("Starting %s tune", axis))
+      gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("Starting %s tune", axis))
       setup_filters(axis)
    end
 
@@ -576,7 +576,7 @@ function update()
          local P_name = string.gsub(pname, "_D", "_P")
          local old_P = params[P_name]:get()
          local new_P = old_P * ratio
-         gcs:send_text(MAV_SEVERITY_INFO, string.format("adjusting %s %.3f -> %.3f", P_name, old_P, new_P))
+         gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("adjusting %s %.3f -> %.3f", P_name, old_P, new_P))
          adjust_gain_limited(P_name, new_P)
       end
       setup_slew_gain(pname, new_gain)
@@ -593,7 +593,7 @@ function update()
       logger.write('QUIK','SRate,Gain,Param', 'ffn', srate, P:get(), axis .. stage)
       if get_time() - last_gain_report > 3 then
          last_gain_report = get_time()
-         gcs:send_text(MAV_SEVERITY_INFO, string.format("%s %.4f sr:%.2f", pname, new_gain, srate))
+         gcs:send_text(AGPILOT_SEVERITY_INFO, string.format("%s %.4f sr:%.2f", pname, new_gain, srate))
       end
    end
 end
@@ -604,7 +604,7 @@ end
 function protected_wrapper()
   local success, err = pcall(update)
   if not success then
-     gcs:send_text(MAV_SEVERITY_EMERGENCY, "Internal Error: " .. err)
+     gcs:send_text(AGPILOT_SEVERITY_EMERGENCY, "Internal Error: " .. err)
      -- when we fault we run the update function again after 1s, slowing it
      -- down a bit so we don't flood the console with errors
      --return protected_wrapper, 1000

@@ -296,7 +296,7 @@ public:
         INIT,
         RC,
         BUTTON,
-        MAVLINK,
+        AGPILOTLINK,
         MISSION,
         SCRIPTING,
     };
@@ -627,7 +627,7 @@ protected:
 
     enum class Option {
         IGNORE_RECEIVER         = (1U << 0), // RC receiver modules
-        IGNORE_OVERRIDES        = (1U << 1), // MAVLink overrides
+        IGNORE_OVERRIDES        = (1U << 1), // AGPILOTLink overrides
         IGNORE_FAILSAFE         = (1U << 2), // ignore RC failsafe bits
         FPORT_PAD               = (1U << 3), // pad fport telem output
         LOG_DATA                = (1U << 4), // log rc input bytes

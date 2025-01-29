@@ -3,7 +3,7 @@
  */
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include "AC_WeatherVane.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_AHRS/AP_AHRS.h>
 
 #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
@@ -219,7 +219,7 @@ bool AC_WeatherVane::get_yaw_out(float &yaw_output, const int16_t pilot_yaw, con
     }
 
     if (!active_msg_sent) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Weathervane Active: %s", dir_string);
+        gcs().send_text(AGPILOT_SEVERITY_INFO, "Weathervane Active: %s", dir_string);
         active_msg_sent = true;
     }
 

@@ -1,5 +1,5 @@
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include "AC_PrecLand_Companion.h"
 
 // perform any required initialisation of backend
@@ -48,7 +48,7 @@ void AC_PrecLand_Companion::handle_msg(const mavlink_landing_target_t &packet, u
     _distance_to_target = packet.distance;
 
     if (packet.position_valid == 1) {
-        if (packet.frame == MAV_FRAME_BODY_FRD) {
+        if (packet.frame == AGPILOT_FRAME_BODY_FRD) {
             if (_distance_to_target > 0) {
                 _los_meas_body = Vector3f(packet.x, packet.y, packet.z);
                 _los_meas_body /= _distance_to_target;
@@ -60,7 +60,7 @@ void AC_PrecLand_Companion::handle_msg(const mavlink_landing_target_t &packet, u
             //we do not support this frame
             if (!_wrong_frame_msg_sent) {
                 _wrong_frame_msg_sent = true;
-                gcs().send_text(MAV_SEVERITY_INFO,"Plnd: Frame not supported ");
+                gcs().send_text(AGPILOT_SEVERITY_INFO,"Plnd: Frame not supported ");
             }
             return;
         }

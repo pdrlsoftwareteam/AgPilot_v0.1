@@ -2,7 +2,7 @@
 #if HAL_MOUNT_SERVO_ENABLED
 
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -28,7 +28,7 @@ void AP_Mount_Servo::update()
 {
     switch (get_mode()) {
         // move mount to a "retracted position" or to a position where a fourth servo can retract the entire mount into the fuselage
-        case MAV_MOUNT_MODE_RETRACT: {
+        case AGPILOT_MOUNT_MODE_RETRACT: {
             _angle_bf_output_deg = _params.retract_angles.get();
 
             // initialise _angle_rad to smooth transition if user changes to RC_TARGETTING
@@ -40,7 +40,7 @@ void AP_Mount_Servo::update()
         }
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             _angle_bf_output_deg = _params.neutral_angles.get();
 
             // initialise _angle_rad to smooth transition if user changes to RC_TARGETTING
@@ -52,7 +52,7 @@ void AP_Mount_Servo::update()
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING: {
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING: {
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 _angle_rad = mavt_target.angle_rad;
@@ -67,7 +67,7 @@ void AP_Mount_Servo::update()
         }
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's RC inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -81,21 +81,21 @@ void AP_Mount_Servo::update()
         }
 
         // point mount to a GPS location
-        case MAV_MOUNT_MODE_GPS_POINT: {
+        case AGPILOT_MOUNT_MODE_GPS_POINT: {
             if (get_angle_target_to_roi(_angle_rad)) {
                 update_angle_outputs(_angle_rad);
             }
             break;
         }
 
-        case MAV_MOUNT_MODE_HOME_LOCATION: {
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION: {
             if (get_angle_target_to_home(_angle_rad)) {
                 update_angle_outputs(_angle_rad);
             }
             break;
         }
 
-        case MAV_MOUNT_MODE_SYSID_TARGET: {
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET: {
             if (get_angle_target_to_sysid(_angle_rad)) {
                 update_angle_outputs(_angle_rad);
             }
@@ -108,7 +108,7 @@ void AP_Mount_Servo::update()
     }
 
     // move mount to a "retracted position" into the fuselage with a fourth servo
-    const bool mount_open = (get_mode() == MAV_MOUNT_MODE_RETRACT) ? 0 : 1;
+    const bool mount_open = (get_mode() == AGPILOT_MOUNT_MODE_RETRACT) ? 0 : 1;
     move_servo(_open_idx, mount_open, 0, 1);
 
     // write the results to the servos

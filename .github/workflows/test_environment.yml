@@ -68,7 +68,7 @@ jobs:
       - name: test install environment ${{matrix.os}}.${{matrix.name}}
         timeout-minutes: 30
         env:
-          DISABLE_MAVNATIVE: True
+          DISABLE_AGPILOTNATIVE: True
           DEBIAN_FRONTEND: noninteractive
           TZ: Europe/Paris
           SKIP_AP_GIT_CHECK: 1
@@ -97,7 +97,7 @@ jobs:
 
       - name: test build STIL ${{matrix.os}}.${{matrix.name}}
         env:
-          DISABLE_MAVNATIVE: True
+          DISABLE_AGPILOTNATIVE: True
           DEBIAN_FRONTEND: noninteractive
           TZ: Europe/Paris
         shell: 'script -q -e -c "bash {0}"'
@@ -110,7 +110,7 @@ jobs:
 
       - name: test build Chibios ${{matrix.os}}.${{matrix.name}}
         env:
-          DISABLE_MAVNATIVE: True
+          DISABLE_AGPILOTNATIVE: True
           DEBIAN_FRONTEND: noninteractive
           TZ: Europe/Paris
         shell: 'script -q -e -c "bash {0}"'

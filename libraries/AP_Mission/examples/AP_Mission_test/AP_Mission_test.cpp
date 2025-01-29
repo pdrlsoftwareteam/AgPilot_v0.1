@@ -11,11 +11,11 @@
 #include <AP_Compass/AP_Compass.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_AHRS/AP_AHRS_DCM.h>
-#include <GCS_MAVLink/GCS_Dummy.h>
+#include <GCS_AGPILOTLink/GCS_Dummy.h>
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 
-const struct AP_Param::GroupInfo        GCS_MAVLINK_Parameters::var_info[] = {
+const struct AP_Param::GroupInfo        GCS_AGPILOTLINK_Parameters::var_info[] = {
     AP_GROUPEND
 };
 
@@ -179,7 +179,7 @@ void MissionTest::init_mission()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.content.location = Location{
         12345678,
         23456789,
@@ -191,7 +191,7 @@ void MissionTest::init_mission()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -204,7 +204,7 @@ void MissionTest::init_mission()
     }
 
     // Command #2 : first waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -217,7 +217,7 @@ void MissionTest::init_mission()
     }
 
     // Command #3 : second waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         1234567890,
@@ -230,7 +230,7 @@ void MissionTest::init_mission()
     }
 
     // Command #4 : do-jump to first waypoint 3 times
-    cmd.id = MAV_CMD_DO_JUMP;
+    cmd.id = AGPILOT_CMD_DO_JUMP;
     cmd.content.jump.target = 2;
     cmd.content.jump.num_times = 1;
     if (!mission.add_cmd(cmd)) {
@@ -238,7 +238,7 @@ void MissionTest::init_mission()
     }
 
     // Command #5 : RTL
-    cmd.id = MAV_CMD_NAV_RETURN_TO_LAUNCH;
+    cmd.id = AGPILOT_CMD_NAV_RETURN_TO_LAUNCH;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -261,7 +261,7 @@ void MissionTest::init_mission_no_nav_commands()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -274,7 +274,7 @@ void MissionTest::init_mission_no_nav_commands()
     }
 
     // Command #1 : "do" command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -287,7 +287,7 @@ void MissionTest::init_mission_no_nav_commands()
     }
 
     // Command #2 : "do" command
-    cmd.id = MAV_CMD_DO_CHANGE_SPEED;
+    cmd.id = AGPILOT_CMD_DO_CHANGE_SPEED;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -300,13 +300,13 @@ void MissionTest::init_mission_no_nav_commands()
     }
 
     // Command #3 : "do" command
-    cmd.id = MAV_CMD_DO_SET_SERVO;
+    cmd.id = AGPILOT_CMD_DO_SET_SERVO;
     if (!mission.add_cmd(cmd)) {
         hal.console->printf("failed to add command\n");
     }
 
     // Command #4 : do-jump to first command 3 times
-    cmd.id = MAV_CMD_DO_JUMP;
+    cmd.id = AGPILOT_CMD_DO_JUMP;
     cmd.content.jump.target = 1;
     cmd.content.jump.num_times = 1;
     if (!mission.add_cmd(cmd)) {
@@ -324,7 +324,7 @@ void MissionTest::init_mission_endless_loop()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -337,7 +337,7 @@ void MissionTest::init_mission_endless_loop()
     }
 
     // Command #1 : do-jump command to itself
-    cmd.id = MAV_CMD_DO_JUMP;
+    cmd.id = AGPILOT_CMD_DO_JUMP;
     cmd.content.jump.target = 1;
     cmd.content.jump.num_times = 2;
     if (!mission.add_cmd(cmd)) {
@@ -345,7 +345,7 @@ void MissionTest::init_mission_endless_loop()
     }
 
     // Command #2 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -358,7 +358,7 @@ void MissionTest::init_mission_endless_loop()
     }
 
     // Command #3 : waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -382,7 +382,7 @@ void MissionTest::init_mission_jump_to_nonnav()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -395,7 +395,7 @@ void MissionTest::init_mission_jump_to_nonnav()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -408,7 +408,7 @@ void MissionTest::init_mission_jump_to_nonnav()
     }
 
     // Command #2 : do-roi command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -421,7 +421,7 @@ void MissionTest::init_mission_jump_to_nonnav()
     }
 
     // Command #3 : do-jump command to #2
-    cmd.id = MAV_CMD_DO_JUMP;
+    cmd.id = AGPILOT_CMD_DO_JUMP;
     cmd.content.jump.target = 2;
     cmd.content.jump.num_times = 2;
     if (!mission.add_cmd(cmd)) {
@@ -429,7 +429,7 @@ void MissionTest::init_mission_jump_to_nonnav()
     }
 
     // Command #4 : waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -454,7 +454,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -467,7 +467,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     }
 
     // Command #1 : First "do" command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -480,7 +480,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     }
 
     // Command #2 : Second "do" command
-    cmd.id = MAV_CMD_DO_CHANGE_SPEED;
+    cmd.id = AGPILOT_CMD_DO_CHANGE_SPEED;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -493,7 +493,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     }
 
     // Command #3 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -506,7 +506,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     }
 
     // Command #4 : Third "do" command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -519,7 +519,7 @@ void MissionTest::init_mission_starts_with_do_commands()
     }
 
     // Command #5 : waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -543,7 +543,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -556,7 +556,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -566,7 +566,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     };
 
     // Command #2 : "do" command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -579,7 +579,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     }
 
     // Command #3 : waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -592,7 +592,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     }
 
     // Command #4 : "do" command after last nav command (but not at end of mission)
-    cmd.id = MAV_CMD_DO_CHANGE_SPEED;
+    cmd.id = AGPILOT_CMD_DO_CHANGE_SPEED;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -605,7 +605,7 @@ void MissionTest::init_mission_ends_with_do_commands()
     }
 
     // Command #5 : "do" command at end of mission
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -628,7 +628,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     mission.clear();
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -641,7 +641,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -654,7 +654,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #2 : "do" command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -667,7 +667,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #3 : waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -680,7 +680,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #4 : "do" command after last nav command (but not at end of mission)
-    cmd.id = MAV_CMD_DO_CHANGE_SPEED;
+    cmd.id = AGPILOT_CMD_DO_CHANGE_SPEED;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -693,7 +693,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #5 : "do" command at end of mission
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -706,7 +706,7 @@ void MissionTest::init_mission_ends_with_jump_command()
     }
 
     // Command #6 : do-jump command to #2 two times
-    cmd.id = MAV_CMD_DO_JUMP;
+    cmd.id = AGPILOT_CMD_DO_JUMP;
     cmd.content.jump.target = 3;
     cmd.content.jump.num_times = 2;
     if (!mission.add_cmd(cmd)) {
@@ -743,7 +743,7 @@ void MissionTest::print_mission()
         }
 
         // print command contents
-        if (cmd.id == MAV_CMD_DO_JUMP) {
+        if (cmd.id == AGPILOT_CMD_DO_JUMP) {
             hal.console->printf("jump-to:%d num_times:%d\n", (int)cmd.content.jump.target, (int)cmd.content.jump.num_times);
         }else{
             hal.console->printf("p1:%d lat:%ld lng:%ld alt:%ld\n",(int)cmd.p1, (long)cmd.content.location.lat, (long)cmd.content.location.lng, (long)cmd.content.location.alt);
@@ -761,7 +761,7 @@ void MissionTest::run_resume_test()
     // create a mission
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -774,7 +774,7 @@ void MissionTest::run_resume_test()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -787,7 +787,7 @@ void MissionTest::run_resume_test()
     }
 
     // Command #2 : first waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -800,7 +800,7 @@ void MissionTest::run_resume_test()
     }
 
     // Command #3 : second waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         1234567890,
@@ -813,7 +813,7 @@ void MissionTest::run_resume_test()
     }
 
     // Command #4 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -826,7 +826,7 @@ void MissionTest::run_resume_test()
     }
 
     // Command #5 : RTL
-    cmd.id = MAV_CMD_NAV_RETURN_TO_LAUNCH;
+    cmd.id = AGPILOT_CMD_NAV_RETURN_TO_LAUNCH;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -881,7 +881,7 @@ void MissionTest::run_set_current_cmd_test()
     // create a mission
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -894,7 +894,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -907,7 +907,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #2 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -920,7 +920,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #3 : first waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -933,7 +933,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #4 : second waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         1234567890,
@@ -946,7 +946,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #5 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -959,7 +959,7 @@ void MissionTest::run_set_current_cmd_test()
     }
 
     // Command #6 : RTL
-    cmd.id = MAV_CMD_NAV_RETURN_TO_LAUNCH;
+    cmd.id = AGPILOT_CMD_NAV_RETURN_TO_LAUNCH;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -1002,7 +1002,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     // create a mission
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1015,7 +1015,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -1028,7 +1028,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #2 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1041,7 +1041,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #3 : first waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1054,7 +1054,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #4 : second waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         1234567890,
@@ -1067,7 +1067,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #5 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1080,7 +1080,7 @@ void MissionTest::run_set_current_cmd_while_stopped_test()
     }
 
     // Command #6 : RTL
-    cmd.id = MAV_CMD_NAV_RETURN_TO_LAUNCH;
+    cmd.id = AGPILOT_CMD_NAV_RETURN_TO_LAUNCH;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -1155,7 +1155,7 @@ void MissionTest::run_replace_cmd_test()
     // create a mission
 
     // Command #0 : home
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1168,7 +1168,7 @@ void MissionTest::run_replace_cmd_test()
     }
 
     // Command #1 : take-off to 10m
-    cmd.id = MAV_CMD_NAV_TAKEOFF;
+    cmd.id = AGPILOT_CMD_NAV_TAKEOFF;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -1181,7 +1181,7 @@ void MissionTest::run_replace_cmd_test()
     }
 
     // Command #2 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1194,7 +1194,7 @@ void MissionTest::run_replace_cmd_test()
     }
 
     // Command #3 : first waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1207,7 +1207,7 @@ void MissionTest::run_replace_cmd_test()
     }
 
     // Command #4 : second waypoint
-    cmd.id = MAV_CMD_NAV_WAYPOINT;
+    cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
     cmd.p1 = 0;
     cmd.content.location = Location{
         1234567890,
@@ -1220,7 +1220,7 @@ void MissionTest::run_replace_cmd_test()
     }
 
     // Command #6 : RTL
-    cmd.id = MAV_CMD_NAV_RETURN_TO_LAUNCH;
+    cmd.id = AGPILOT_CMD_NAV_RETURN_TO_LAUNCH;
     cmd.p1 = 0;
     cmd.content.location = Location{
         0,
@@ -1246,7 +1246,7 @@ void MissionTest::run_replace_cmd_test()
 
     // replace command #4 with a do-command
     // Command #4 : do command
-    cmd.id = MAV_CMD_DO_SET_ROI;
+    cmd.id = AGPILOT_CMD_DO_SET_ROI;
     cmd.p1 = 0;
     cmd.content.location = Location{
         12345678,
@@ -1281,7 +1281,7 @@ void MissionTest::run_max_cmd_test()
     // test adding many commands until it fails
     while (!failed_to_add) {
         // Command #0 : home
-        cmd.id = MAV_CMD_NAV_WAYPOINT;
+        cmd.id = AGPILOT_CMD_NAV_WAYPOINT;
         cmd.p1 = 0;
         cmd.content.location = Location{
             12345678,

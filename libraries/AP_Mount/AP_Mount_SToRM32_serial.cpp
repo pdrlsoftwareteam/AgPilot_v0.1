@@ -2,8 +2,8 @@
 
 #if HAL_MOUNT_STORM32SERIAL_ENABLED
 #include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS_MAVLink.h>
-#include <GCS_MAVLink/include/mavlink/v2.0/checksum.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
+#include <GCS_AGPILOTLink/include/mavlink/v2.0/checksum.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 
 // init - performs any required initialisation for this instance
@@ -14,7 +14,7 @@ void AP_Mount_SToRM32_serial::init()
     _port = serial_manager.find_serial(AP_SerialManager::SerialProtocol_Gimbal, 0);
     if (_port) {
         _initialised = true;
-        set_mode((enum MAV_MOUNT_MODE)_params.default_mode.get());
+        set_mode((enum AGPILOT_MOUNT_MODE)_params.default_mode.get());
     }
 
 }
@@ -35,7 +35,7 @@ void AP_Mount_SToRM32_serial::update()
     // update based on mount mode
     switch(get_mode()) {
         // move mount to a "retracted" position.  To-Do: remove support and replace with a relaxed mode?
-        case MAV_MOUNT_MODE_RETRACT: {
+        case AGPILOT_MOUNT_MODE_RETRACT: {
             const Vector3f &target = _params.retract_angles.get();
             _angle_rad.roll = ToRad(target.x);
             _angle_rad.pitch = ToRad(target.y);
@@ -45,7 +45,7 @@ void AP_Mount_SToRM32_serial::update()
         }
 
         // move mount to a neutral position, typically pointing forward
-        case MAV_MOUNT_MODE_NEUTRAL: {
+        case AGPILOT_MOUNT_MODE_NEUTRAL: {
             const Vector3f &target = _params.neutral_angles.get();
             _angle_rad.roll = ToRad(target.x);
             _angle_rad.pitch = ToRad(target.y);
@@ -55,7 +55,7 @@ void AP_Mount_SToRM32_serial::update()
         }
 
         // point to the angles given by a mavlink message
-        case MAV_MOUNT_MODE_MAVLINK_TARGETING:
+        case AGPILOT_MOUNT_MODE_AGPILOTLINK_TARGETING:
             switch (mavt_target.target_type) {
             case MountTargetType::ANGLE:
                 _angle_rad = mavt_target.angle_rad;
@@ -68,7 +68,7 @@ void AP_Mount_SToRM32_serial::update()
             break;
 
         // RC radio manual angle control, but with stabilization from the AHRS
-        case MAV_MOUNT_MODE_RC_TARGETING: {
+        case AGPILOT_MOUNT_MODE_RC_TARGETING: {
             // update targets using pilot's RC inputs
             MountTarget rc_target {};
             if (get_rc_rate_target(rc_target)) {
@@ -81,19 +81,19 @@ void AP_Mount_SToRM32_serial::update()
         }
 
         // point mount to a GPS point given by the mission planner
-        case MAV_MOUNT_MODE_GPS_POINT:
+        case AGPILOT_MOUNT_MODE_GPS_POINT:
             if (get_angle_target_to_roi(_angle_rad)) {
                 resend_now = true;
             }
             break;
 
-        case MAV_MOUNT_MODE_HOME_LOCATION:
+        case AGPILOT_MOUNT_MODE_HOME_LOCATION:
             if (get_angle_target_to_home(_angle_rad)) {
                 resend_now = true;
             }
             break;
 
-        case MAV_MOUNT_MODE_SYSID_TARGET:
+        case AGPILOT_MOUNT_MODE_SYSID_TARGET:
             if (get_angle_target_to_sysid(_angle_rad)) {
                 resend_now = true;
             }

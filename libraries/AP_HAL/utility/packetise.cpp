@@ -1,8 +1,8 @@
 /*
-  support for sending UDP packets on MAVLink packet boundaries.
+  support for sending UDP packets on AGPILOTLink packet boundaries.
  */
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 #if HAL_GCS_ENABLED
 
@@ -14,32 +14,32 @@
 uint16_t mavlink_packetise(ByteBuffer &writebuf, uint16_t n)
 {
     int16_t b = writebuf.peek(0);
-    if (b != MAVLINK_STX_MAVLINK1 && b != MAVLINK_STX) {
+    if (b != AGPILOTLINK_STX_AGPILOTLINK1 && b != AGPILOTLINK_STX) {
         /*
           we have a non-mavlink packet at the start of the
-          buffer. Look ahead for a MAVLink start byte, up to 256 bytes
+          buffer. Look ahead for a AGPILOTLink start byte, up to 256 bytes
           ahead
          */
         uint16_t limit = n>256?256:n;
         uint16_t i;
         for (i=0; i<limit; i++) {
             b = writebuf.peek(i);
-            if (b == MAVLINK_STX_MAVLINK1 || b == MAVLINK_STX) {
+            if (b == AGPILOTLINK_STX_AGPILOTLINK1 || b == AGPILOTLINK_STX) {
                 n = i;
                 break;
             }
         }
-        // if we didn't find a MAVLink marker then limit the send size to 256
+        // if we didn't find a AGPILOTLink marker then limit the send size to 256
         if (i == limit) {
             n = limit;
         }
         return n;
     }
 
-    // cope with both MAVLink1 and MAVLink2 packets
-    uint8_t min_length = (b == MAVLINK_STX_MAVLINK1)?8:12;
+    // cope with both AGPILOTLink1 and AGPILOTLink2 packets
+    uint8_t min_length = (b == AGPILOTLINK_STX_AGPILOTLINK1)?8:12;
 
-    // this looks like a MAVLink packet - try to write on
+    // this looks like a AGPILOTLink packet - try to write on
     // packet boundaries when possible
     if (n < min_length) {
         // we need to wait for more data to arrive
@@ -48,11 +48,11 @@ uint16_t mavlink_packetise(ByteBuffer &writebuf, uint16_t n)
 
     // the length of the packet is the 2nd byte
     int16_t len = writebuf.peek(1);
-    if (b == MAVLINK_STX) {
+    if (b == AGPILOTLINK_STX) {
         // This is Mavlink2. Check for signed packet with extra 13 bytes
         int16_t incompat_flags = writebuf.peek(2);
-        if (incompat_flags & MAVLINK_IFLAG_SIGNED) {
-            min_length += MAVLINK_SIGNATURE_BLOCK_LEN;
+        if (incompat_flags & AGPILOTLINK_IFLAG_SIGNED) {
+            min_length += AGPILOTLINK_SIGNATURE_BLOCK_LEN;
         }
     }
 
@@ -61,7 +61,7 @@ uint16_t mavlink_packetise(ByteBuffer &writebuf, uint16_t n)
         return 0;
     }
     if (n > len+min_length) {
-        // send just 1 packet at a time (so MAVLink packets
+        // send just 1 packet at a time (so AGPILOTLink packets
         // are aligned on UDP boundaries)
         n = len+min_length;
     }

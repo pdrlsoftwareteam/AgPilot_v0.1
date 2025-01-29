@@ -1,7 +1,7 @@
 #include "Copter.h"
 
 /*
-  mavlink motor test - implements the MAV_CMD_DO_MOTOR_TEST mavlink command so that the GCS/pilot can test an individual motor or flaps
+  mavlink motor test - implements the AGPILOT_CMD_DO_MOTOR_TEST mavlink command so that the GCS/pilot can test an individual motor or flaps
                        to ensure proper wiring, rotation.
  */
 
@@ -91,35 +91,35 @@ void Copter::motor_test_output()
 
 // mavlink_motor_test_check - perform checks before motor tests can begin
 //  return true if tests can continue, false if not
-bool Copter::mavlink_motor_control_check(const GCS_MAVLINK &gcs_chan, bool check_rc, const char* mode)
+bool Copter::mavlink_motor_control_check(const GCS_AGPILOTLINK &gcs_chan, bool check_rc, const char* mode)
 {
     // check board has initialised
     if (!ap.initialised) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: Board initialising", mode);
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL,"%s: Board initialising", mode);
         return false;
     }
 
     // check rc has been calibrated
     if (check_rc && !arming.rc_calibration_checks(true)) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: RC not calibrated", mode);
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL,"%s: RC not calibrated", mode);
         return false;
     }
 
     // ensure we are landed
     if (!ap.land_complete) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: vehicle not landed", mode);
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL,"%s: vehicle not landed", mode);
         return false;
     }
 
     // check if safety switch has been pushed
     if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: Safety switch", mode);
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL,"%s: Safety switch", mode);
         return false;
     }
 
     // check E-Stop is not active
     if (SRV_Channels::get_emergency_stop()) {
-        gcs_chan.send_text(MAV_SEVERITY_CRITICAL,"%s: Motor Emergency Stopped", mode);
+        gcs_chan.send_text(AGPILOT_SEVERITY_CRITICAL,"%s: Motor Emergency Stopped", mode);
         return false;
     }
 
@@ -128,8 +128,8 @@ bool Copter::mavlink_motor_control_check(const GCS_MAVLINK &gcs_chan, bool check
 }
 
 // mavlink_motor_test_start - start motor test - spin a single motor at a specified pwm
-//  returns MAV_RESULT_ACCEPTED on success, MAV_RESULT_FAILED on failure
-MAV_RESULT Copter::mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t motor_seq, uint8_t throttle_type, float throttle_value,
+//  returns AGPILOT_RESULT_ACCEPTED on success, AGPILOT_RESULT_FAILED on failure
+AGPILOT_RESULT Copter::mavlink_motor_test_start(const GCS_AGPILOTLINK &gcs_chan, uint8_t motor_seq, uint8_t throttle_type, float throttle_value,
                                          float timeout_sec, uint8_t motor_count)
 {
     if (motor_count == 0) {
@@ -142,10 +142,10 @@ MAV_RESULT Copter::mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t
            supplied
         */
         if (!mavlink_motor_control_check(gcs_chan, throttle_type != 1, "Motor Test")) {
-            return MAV_RESULT_FAILED;
+            return AGPILOT_RESULT_FAILED;
         } else {
             // start test
-            gcs().send_text(MAV_SEVERITY_INFO, "starting motor test");
+            gcs().send_text(AGPILOT_SEVERITY_INFO, "starting motor test");
             ap.motor_test = true;
 
             EXPECT_DELAY_MS(3000);
@@ -181,7 +181,7 @@ MAV_RESULT Copter::mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t
     }            
 
     // return success
-    return MAV_RESULT_ACCEPTED;
+    return AGPILOT_RESULT_ACCEPTED;
 }
 
 // motor_test_stop - stops the motor test
@@ -192,7 +192,7 @@ void Copter::motor_test_stop()
         return;
     }
 
-    gcs().send_text(MAV_SEVERITY_INFO, "finished motor test");    
+    gcs().send_text(AGPILOT_SEVERITY_INFO, "finished motor test");    
 
     // flag test is complete
     ap.motor_test = false;

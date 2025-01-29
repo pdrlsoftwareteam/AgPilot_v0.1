@@ -75,7 +75,7 @@ In addition, new tricks can be created and loaded from within these schedules fi
 ## Loading the script
 
 Put the plane_aerobatics.lua script on your microSD card in the
-APM/SCRIPTS directory. You can use MAVFtp to do this.
+APM/SCRIPTS directory. You can use AGPILOTFtp to do this.
 
 Then set
 

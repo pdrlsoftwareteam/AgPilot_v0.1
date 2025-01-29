@@ -6,7 +6,7 @@
  */
 #include "AP_LIBNPNT.h"
 #include <AP_KEYSTORE/AP_KEYSTORE.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <AP_PDRL_Commander/AP_NPNT_data_helper.h>
 #define  TODO 0
 
@@ -265,7 +265,7 @@ bool AP_LIBNPNT::getIsPAValid(bool silent)
 	if(libNpntStatus == STATUS_VERIFY_PA)
 		return true;
 	if(silent == false)
-		gcs().send_text(MAV_SEVERITY_ERROR, "Invalid permission artifacts.");
+		gcs().send_text(AGPILOT_SEVERITY_ERROR, "Invalid permission artifacts.");
 	return false;
 }
 
@@ -276,13 +276,13 @@ void AP_LIBNPNT::setIsPAValid(LIB_NPNT_STATUS val)
 
 void AP_LIBNPNT::showMessageTimebreach()
 {
-	gcs().send_text(MAV_SEVERITY_ERROR, "NPNT Time breach");
+	gcs().send_text(AGPILOT_SEVERITY_ERROR, "NPNT Time breach");
 	setIsPAValid(STATUS_NPNT_INV_TIME);
 }
 
 void AP_LIBNPNT::showMessageFencebreach()
 {
-	gcs().send_text(MAV_SEVERITY_ERROR, "NPNT Fence breach");
+	gcs().send_text(AGPILOT_SEVERITY_ERROR, "NPNT Fence breach");
 }
 
 void AP_LIBNPNT::sendPAvalidationResponse(mavlink_channel_t chan)

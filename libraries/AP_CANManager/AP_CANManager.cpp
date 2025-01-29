@@ -30,7 +30,7 @@
 #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
 #include <AP_EFI/AP_EFI_NWPMU.h>
 #include "AP_CANTester.h"
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_LINUX
 #include <AP_HAL_Linux/CANSocketIface.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -378,7 +378,7 @@ void AP_CANManager::log_text(AP_CANManager::LogLevel loglevel, const char *tag, 
 void AP_CANManager::log_retrieve(ExpandingString &str) const
 {
     if (_log_buf == nullptr) {
-        gcs().send_text(MAV_SEVERITY_ERROR, "Log buffer not available");
+        gcs().send_text(AGPILOT_SEVERITY_ERROR, "Log buffer not available");
         return;
     }
     str.append(_log_buf, _log_pos);
@@ -386,7 +386,7 @@ void AP_CANManager::log_retrieve(ExpandingString &str) const
 
 #if HAL_GCS_ENABLED
 /*
-  handle MAV_CMD_CAN_FORWARD mavlink long command
+  handle AGPILOT_CMD_CAN_FORWARD mavlink long command
  */
 bool AP_CANManager::handle_can_forward(mavlink_channel_t chan, const mavlink_command_long_t &packet, const mavlink_message_t &msg)
 {
@@ -451,7 +451,7 @@ void AP_CANManager::handle_can_frame(const mavlink_message_t &msg)
     }
 
     switch (msg.msgid) {
-    case MAVLINK_MSG_ID_CAN_FRAME: {
+    case AGPILOTLINK_MSG_ID_CAN_FRAME: {
         mavlink_can_frame_t p;
         mavlink_msg_can_frame_decode(&msg, &p);
         if (p.bus >= HAL_NUM_CAN_IFACES || hal.can[p.bus] == nullptr) {
@@ -465,7 +465,7 @@ void AP_CANManager::handle_can_frame(const mavlink_message_t &msg)
         frame_buffer->push(frame);
         break;
     }
-    case MAVLINK_MSG_ID_CANFD_FRAME: {
+    case AGPILOTLINK_MSG_ID_CANFD_FRAME: {
         mavlink_canfd_frame_t p;
         mavlink_msg_canfd_frame_decode(&msg, &p);
         if (p.bus >= HAL_NUM_CAN_IFACES || hal.can[p.bus] == nullptr) {
@@ -498,7 +498,7 @@ void AP_CANManager::process_frame_buffer(void)
         }
         const int16_t retcode = hal.can[frame.bus]->send(frame.frame,
                                                          AP_HAL::native_micros64() + timeout_us,
-                                                         frame.frame.isCanFDFrame()?AP_HAL::CANIface::IsMAVCAN:0);
+                                                         frame.frame.isCanFDFrame()?AP_HAL::CANIface::IsAGPILOTCAN:0);
         if (retcode == 0) {
             // no space in the CAN output slots, try again later
             break;
@@ -608,7 +608,7 @@ void AP_CANManager::can_frame_callback(uint8_t bus, const AP_HAL::CANFrame &fram
     if (can_forward.frame_counter++ == 100) {
         // check every 100 frames for disabling CAN_FRAME send
         // we stop sending after 5s if the client stops
-        // sending MAV_CMD_CAN_FORWARD requests
+        // sending AGPILOT_CMD_CAN_FORWARD requests
         if (AP_HAL::millis() - can_forward.last_callback_enable_ms > 5000) {
             hal.can[bus]->register_frame_callback(nullptr);
             return;

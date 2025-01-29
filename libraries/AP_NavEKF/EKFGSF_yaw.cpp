@@ -23,7 +23,7 @@
 
 #include "AP_NavEKF/EKFGSF_yaw.h"
 #include <AP_AHRS/AP_AHRS.h>
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 
 EKFGSF_yaw::EKFGSF_yaw() {};
 

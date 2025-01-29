@@ -20,7 +20,7 @@
 #include "AP_Proximity_TeraRangerTower.h"
 #include "AP_Proximity_TeraRangerTowerEvo.h"
 #include "AP_Proximity_RangeFinder.h"
-#include "AP_Proximity_MAV.h"
+#include "AP_Proximity_AGPILOT.h"
 #include "AP_Proximity_LightWareSF40C.h"
 #include "AP_Proximity_LightWareSF45B.h"
 #include "AP_Proximity_SITL.h"
@@ -29,7 +29,7 @@
 #include "AP_Proximity_DroneCAN.h"
 
 #include <AP_Logger/AP_Logger.h>
-#include "GCS_MAVLink/GCS.h"
+#include "GCS_AGPILOTLink/GCS.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -133,9 +133,9 @@ void AP_Proximity::init()
                 serial_instance++;
             }
             break;
-        case Type::MAV:
+        case Type::AGPILOT:
             state[instance].instance = instance;
-            drivers[instance] = new AP_Proximity_MAV(*this, state[instance], params[instance]);
+            drivers[instance] = new AP_Proximity_AGPILOT(*this, state[instance], params[instance]);
             break;
 
         case Type::TRTOWER:
@@ -235,7 +235,7 @@ float AP_Proximity::getDist(){
 	    get_horizontal_distances(dist_array);
 	    return dist_array.distance[0];
 //	    printf("prx dist: %f\n",dist_array.distance[0]);
-//		gcs().send_text(MAV_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
+//		gcs().send_text(AGPILOT_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
 
 }
 AP_Proximity::Type AP_Proximity::get_type(uint8_t instance) const

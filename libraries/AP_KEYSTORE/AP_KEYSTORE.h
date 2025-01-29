@@ -17,7 +17,7 @@
 //#include <AP_Vehicle/AP_Vehicle.h>
 //#include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_RTC/AP_RTC.h>
-//#include <GCS_MAVLink/GCS.h>
+//#include <GCS_AGPILOTLink/GCS.h>
 
 //#include <string.h>
 //#include <stdlib.h>

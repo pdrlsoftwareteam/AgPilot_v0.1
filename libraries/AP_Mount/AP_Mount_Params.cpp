@@ -1,5 +1,5 @@
 #include "AP_Mount_Params.h"
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 
 // table of user settable parameters
 const AP_Param::GroupInfo AP_Mount_Params::var_info[] = {
@@ -9,7 +9,7 @@ const AP_Param::GroupInfo AP_Mount_Params::var_info[] = {
     // @Param: _TYPE
     // @DisplayName: Mount Type
     // @Description: Mount Type
-    // @Values: 0:None, 1:Servo, 2:3DR Solo, 3:Alexmos Serial, 4:SToRM32 MAVLink, 5:SToRM32 Serial, 6:Gremsy, 7:BrushlessPWM, 8:Siyi, 9:Scripting
+    // @Values: 0:None, 1:Servo, 2:3DR Solo, 3:Alexmos Serial, 4:SToRM32 AGPILOTLink, 5:SToRM32 Serial, 6:Gremsy, 7:BrushlessPWM, 8:Siyi, 9:Scripting
     // @RebootRequired: True
     // @User: Standard
     AP_GROUPINFO_FLAGS("_TYPE", 1, AP_Mount_Params, type, 0, AP_PARAM_FLAG_ENABLE),
@@ -19,7 +19,7 @@ const AP_Param::GroupInfo AP_Mount_Params::var_info[] = {
     // @Description: Mount default operating mode on startup and after control is returned from autopilot
     // @Values: 0:Retracted,1:Neutral,2:MavLink Targeting,3:RC Targeting,4:GPS Point,6:Home Location
     // @User: Standard
-    AP_GROUPINFO("_DEFLT_MODE", 2, AP_Mount_Params, default_mode, MAV_MOUNT_MODE_RC_TARGETING),
+    AP_GROUPINFO("_DEFLT_MODE", 2, AP_Mount_Params, default_mode, AGPILOT_MOUNT_MODE_RC_TARGETING),
 
     // @Param: _RC_RATE
     // @DisplayName: Mount RC Rate

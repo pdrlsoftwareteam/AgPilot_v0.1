@@ -42,7 +42,7 @@ QGC WPL 110
 
 
 
-local MAV_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
+local AGPILOT_SEVERITY = {EMERGENCY=0, ALERT=1, CRITICAL=2, ERROR=3, WARNING=4, NOTICE=5, INFO=6, DEBUG=7}
 
 
 local ROTATION_PITCH_270 = 25
@@ -70,14 +70,14 @@ function sample_rangefinder_to_get_AGL()
     if (agl_samples_count <= 0) then
         agl_samples_count = 0 -- divide-by-zero sanity check in case it somehow wrapped or initialized wrong
         agl_samples_sum = 0
-        gcs:send_text(MAV_SEVERITY.INFO, string.format("LUA: AGL measurements started"))
+        gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("LUA: AGL measurements started"))
     end
 
     agl_samples_sum = agl_samples_sum + agl_corrected_for_attitude_m
     agl_samples_count = agl_samples_count + 1
 
     local agl_average = agl_samples_sum / agl_samples_count
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("LUA: AGL measurement %u: %.2fm, avg: %.2f", agl_samples_count, agl_corrected_for_attitude_m, agl_average))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("LUA: AGL measurement %u: %.2fm, avg: %.2f", agl_samples_count, agl_corrected_for_attitude_m, agl_average))
 end
 
 
@@ -85,11 +85,11 @@ function update_baro(new_agl_m)
     
     local current_baro_agl_m = baro:get_altitude()
     local alt_error_m = current_baro_agl_m - new_agl_m
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("LUA: AGL alt_error is: %.2f - %.2f = %.2f", current_baro_agl_m, new_agl_m, alt_error_m))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("LUA: AGL alt_error is: %.2f - %.2f = %.2f", current_baro_agl_m, new_agl_m, alt_error_m))
 
     local baro_alt_offset = param:get('BARO_ALT_OFFSET')
     local baro_alt_offset_new_value = baro_alt_offset + alt_error_m
-    gcs:send_text(MAV_SEVERITY.INFO, string.format("LUA: BARO_ALT_OFFSET changed from %.2f to %.2f", baro_alt_offset, baro_alt_offset_new_value))
+    gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("LUA: BARO_ALT_OFFSET changed from %.2f to %.2f", baro_alt_offset, baro_alt_offset_new_value))
     param:set('BARO_ALT_OFFSET', baro_alt_offset_new_value)
 end
 
@@ -115,7 +115,7 @@ function update()
     elseif ((tag == MISSION_TAG_CALIBRATE_BARO) and (age <= 3) and (agl_samples_count > 0)) then
         -- finished sampling, use the result to offset baro
         local agl_average_final_m = agl_samples_sum / agl_samples_count
-        gcs:send_text(MAV_SEVERITY.INFO, string.format("LUA: AGL measurements stopped: samples = %d, avg = %.2fm", agl_samples_count, agl_average_final_m))
+        gcs:send_text(AGPILOT_SEVERITY.INFO, string.format("LUA: AGL measurements stopped: samples = %d, avg = %.2fm", agl_samples_count, agl_average_final_m))
         update_baro(agl_average_final_m)
         agl_samples_count = 0
     else
@@ -126,7 +126,7 @@ function update()
 end
 
 
-gcs:send_text(MAV_SEVERITY.INFO, "LUA: SCRIPT START: Check AGL to calibrate Baro")
+gcs:send_text(AGPILOT_SEVERITY.INFO, "LUA: SCRIPT START: Check AGL to calibrate Baro")
 return update()
 
 

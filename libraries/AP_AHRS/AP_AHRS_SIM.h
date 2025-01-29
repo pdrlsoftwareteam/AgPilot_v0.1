@@ -27,7 +27,7 @@
 
 #include "AP_AHRS_Backend.h"
 
-#include <GCS_MAVLink/GCS.h>
+#include <GCS_AGPILOTLink/GCS.h>
 #include <SITL/SITL.h>
 
 #if HAL_NAVEKF3_AVAILABLE
@@ -111,7 +111,7 @@ public:
     bool get_relative_position_NE_origin(Vector2f &posNE) const override;
     bool get_relative_position_D_origin(float &posD) const override;
 
-    void send_ekf_status_report(class GCS_MAVLINK &link) const override;
+    void send_ekf_status_report(class GCS_AGPILOTLINK &link) const override;
 
     void get_control_limits(float &ekfGndSpdLimit, float &controlScaleXY) const override;
     bool get_innovations(Vector3f &velInnov, Vector3f &posInnov, Vector3f &magInnov, float &tasInnov, float &yawInnov) const override;

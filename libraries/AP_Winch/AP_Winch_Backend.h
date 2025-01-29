@@ -37,7 +37,7 @@ public:
     virtual float get_current_length() const = 0;
 
     // send status to ground station
-    virtual void send_status(const GCS_MAVLINK &channel) = 0;
+    virtual void send_status(const GCS_AGPILOTLINK &channel) = 0;
 
     // write log
     virtual void write_log() = 0;

@@ -76,7 +76,7 @@ allows for build and upload in one step for faster development:
 There are two methods of getting the secure bootloader onto the
 board. The simplest is to follow the above steps and then follow the
 usual method of updating the bootloader, which involves sending a
-MAVLink command to ask the firmware to flash the embedded bootloader
+AGPILOTLink command to ask the firmware to flash the embedded bootloader
 from ROMFS. The firmware generated using the above steps will have
 your secure bootloader included in ROMFS, so when the users asks for
 the bootloader to update it will flash the secure bootloader.
@@ -117,7 +117,7 @@ secure boot enabled. To do that you should replace
 Tools/bootloaders/BOARDNAME_bl.bin with the normal bootloader for your
 board .
 
-Then using MAVproxy connect to the autopilot and execute the following commands to remove all
+Then using AGPILOTproxy connect to the autopilot and execute the following commands to remove all
 public keys from the signed bootloader:
 
 ```
@@ -133,14 +133,14 @@ This opens a secure command session using your private_key.dat file to allow the
 ```
 Re-run the 'getpublickeys' command again to verify that all keys have been removed.
 
-Now exit MAVProxy and build a firmware using the normal bootloader but still using the --signed-fw option:
+Now exit AGPILOTProxy and build a firmware using the normal bootloader but still using the --signed-fw option:
 
 ```
    ./waf configure --board BOARDNAME --signed-fw
    ./waf copter --upload   (or whatever vehicle you desire)
 ```
 
-After loading the new firmware, connect to MAVProxy and run the command to flash, the new, non signing checking bootloader:
+After loading the new firmware, connect to AGPILOTProxy and run the command to flash, the new, non signing checking bootloader:
 
 ```
   flashbootloader
@@ -156,14 +156,14 @@ STM32H7 and STM32F7. You can use secure boot on older other boards if
 you change the hwdef.dat and hwdef-bl.dat to add more space for the
 bootloader.
 
-## Public key update over MAVLink
+## Public key update over AGPILOTLink
 
 If you have a private key corresponding to one of the public keys in
-the bootloader on a board then you can use the MAVLink2 SECURE_COMMAND
+the bootloader on a board then you can use the AGPILOTLink2 SECURE_COMMAND
 messages to change the public keys, or even remove all public keys to
 allow the use of unsigned firmwares.
 
-MAVProxy version 1.8.55 and later has a "securecommand" module which
+AGPILOTProxy version 1.8.55 and later has a "securecommand" module which
 gives you commands for:
 
  - generating a session key for remote update
@@ -174,5 +174,5 @@ gives you commands for:
 It is expected that future versions of MissionPlanner will include a
 plugin with the same functionality.
 
-Using SECURE_COMMAND in combination with MAVLink forwarding you can
+Using SECURE_COMMAND in combination with AGPILOTLink forwarding you can
 hand over management of a vehicle between vendors.

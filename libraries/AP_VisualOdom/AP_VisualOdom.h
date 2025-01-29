@@ -20,9 +20,9 @@
 
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
-#include <GCS_MAVLink/GCS_config.h>
+#include <GCS_AGPILOTLink/GCS_config.h>
 #if HAL_GCS_ENABLED
-#include <GCS_MAVLink/GCS_MAVLink.h>
+#include <GCS_AGPILOTLink/GCS_AGPILOTLink.h>
 #endif
 #include <AP_Math/AP_Math.h>
 
@@ -44,7 +44,7 @@ public:
     // external position backend types (used by _TYPE parameter)
     enum class VisualOdom_Type {
         None         = 0,
-        MAV          = 1,
+        AGPILOT          = 1,
         IntelT265    = 2,
         VOXL         = 3,
     };
