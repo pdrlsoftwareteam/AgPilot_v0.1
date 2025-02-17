@@ -159,6 +159,10 @@ public:
 
     /// update_wpnav - run the wp controller - should be called at 100hz or higher
     virtual bool update_wpnav();
+    virtual bool update_wpnav_oa(float Val);
+
+    //check wether to chaange mode on obstacle detected
+     float check_avoidance_status();
 
     // returns true if update_wpnav has been run very recently
     bool is_active() const;
@@ -206,6 +210,12 @@ public:
 
     // get target yaw in centi-degrees
     float get_yaw() const { return _pos_control.get_yaw_cd(); }
+
+    float getLastZoffsetCm(){ return _lastZOffset;}
+    void setSemiAutoOverrideAltitude(bool isSet = true, bool resetZoffset = false);
+    bool getSemiAutoOverrideAltitude(){return _semiAutoOverrideAltitude ;}
+    void resetWaypointZ(float zVal = 0);
+    void resetAutomode(bool val = false){ _reset_auto_mode = val;}
     /// advance_wp_target_along_track - move target location along track from origin to destination
     bool advance_wp_target_along_track(float dt);
 
@@ -284,4 +294,7 @@ protected:
     AP_Int8     _rangefinder_use;       // parameter that specifies if the range finder should be used for terrain following commands
     bool        _rangefinder_healthy;   // true if rangefinder distance is healthy (i.e. between min and maximum)
     float       _rangefinder_terrain_offset_cm; // latest rangefinder based terrain offset (e.g. terrain's height above EKF origin)
+    bool _semiAutoOverrideAltitude = false;
+    float _lastZOffset = 0;
+    bool _reset_auto_mode = false;
 };

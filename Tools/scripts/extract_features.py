@@ -68,10 +68,7 @@ class ExtractFeatures(object):
             ('AP_RANGEFINDER_{type}_ENABLED', r'AP_RangeFinder_(?P<type>.*)::get_reading\b',),
             ('AP_RANGEFINDER_{type}_ENABLED', r'AP_RangeFinder_(?P<type>.*)::model_dist_max_cm\b',),
             ('AP_RANGEFINDER_LIGHTWARE_SERIAL_ENABLED', r'AP_RangeFinder_LightWareSerial::get_reading\b',),
-            ('AP_RANGEFINDER_LWI2C_ENABLED', r'AP_RangeFinder_LightWareI2C::update\b',),
             ('AP_RANGEFINDER_MAXBOTIX_SERIAL_ENABLED', r'AP_RangeFinder_MaxsonarSerialLV::get_reading\b',),
-            ('AP_RANGEFINDER_TRI2C_ENABLED', r'AP_RangeFinder_TeraRangerI2C::update\b',),
-
             ('AP_GPS_{type}_ENABLED', r'AP_GPS_(?P<type>.*)::read\b',),
 
             ('AP_OPTICALFLOW_ENABLED', 'AP_OpticalFlow::AP_OpticalFlow',),

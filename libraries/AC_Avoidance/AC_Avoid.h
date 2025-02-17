@@ -39,7 +39,10 @@ public:
 
     // return true if any avoidance feature is enabled
     bool enabled() const { return _enabled != AC_AVOID_DISABLED; }
-
+    uint8_t get_manFlag()
+    {
+    	return _man_flag;
+    }
     // Adjusts the desired velocity so that the vehicle can stop
     // before the fence/object.
     // kP, accel_cmss are for the horizontal axis
@@ -80,7 +83,7 @@ public:
 
     // enable/disable proximity based avoidance
     void proximity_avoidance_enable(bool on_off) { _proximity_enabled = on_off; }
-    bool proximity_avoidance_enabled() const { return (_proximity_enabled && (_enabled & AC_AVOID_USE_PROXIMITY_SENSOR) > 0); }
+    bool proximity_avoidance_enabled() const { return (_proximity_enabled && (_enabled & AC_AVOID_USE_PROXIMITY_SENSOR) > 0) && !_man_flag ; }
     void proximity_alt_avoidance_enable(bool on_off) { _proximity_alt_enabled = on_off; }
 
     // helper functions
@@ -215,7 +218,8 @@ private:
     AP_Float _alt_min;          // alt below which Proximity based avoidance is turned off
     AP_Float _accel_max;        // maximum accelration while simple avoidance is active
     AP_Float _backup_deadzone;  // distance beyond AVOID_MARGIN parameter, after which vehicle will backaway from obstacles
-
+    AP_Int8 _man_flag;
+    AP_Float _min_alt_avoid;
     bool _proximity_enabled = true; // true if proximity sensor based avoidance is enabled (used to allow pilot to enable/disable)
     bool _proximity_alt_enabled = true; // true if proximity sensor based avoidance is enabled based on altitude
     uint32_t _last_limit_time;      // the last time a limit was active

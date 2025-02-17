@@ -1,6 +1,7 @@
 #pragma once
 
 #include <RC_Channel/RC_Channel.h>
+#include <SRV_Channel/SRV_Channel.h>
 #include <AP_Motors/AP_Motors.h>
 #include "mode.h"
 

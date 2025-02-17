@@ -32,7 +32,6 @@
 #include <AP_Camera/AP_Camera.h>
 #include <AP_Gripper/AP_Gripper.h>
 #include <AC_Sprayer/AC_Sprayer.h>
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_RSSI/AP_RSSI.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
@@ -60,6 +59,9 @@
 #include "MissionItemProtocol_Waypoints.h"
 #include "MissionItemProtocol_Rally.h"
 #include "MissionItemProtocol_Fence.h"
+#include <AP_KEYSTORE/AP_KEYSTORE.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
+#include <AP_LIBNPNT/AP_LIBNPNT.h>
 
 #include <stdio.h>
 
@@ -993,6 +995,9 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #if HAL_ADSB_ENABLED
         { MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS, MSG_UAVIONIX_ADSB_OUT_STATUS},
 #endif
+        { MAVLINK_MSG_ID_DATA_TRANSFER,         MSG_DATA_TRANSFER},
+        { MAVLINK_MSG_ID_ACK_FOR_COMMAND,       MSG_ACK_FOR_COMMAND},
+        { MAVLINK_MSG_ID_COMMAND_TRANSFER,      MSG_COMMAND_TRANSFER},
             };
 
     for (uint8_t i=0; i<ARRAY_SIZE(map); i++) {
@@ -1659,6 +1664,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
+    // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1681,7 +1687,8 @@ GCS_MAVLINK::update_receive(uint32_t max_time_us)
     const uint16_t nbytes = _port->available();
     for (uint16_t i=0; i<nbytes; i++)
     {
-        const uint8_t c = (uint8_t)_port->read();
+                uint8_t ch = (uint8_t)_port->read();
+        const uint8_t c = ch ^ 223;
         const uint32_t protocol_timeout = 4000;
         
         if (alternative.handler &&
@@ -2784,6 +2791,57 @@ MAV_RESULT GCS_MAVLINK::handle_command_do_aux_function(const mavlink_command_lon
     return MAV_RESULT_ACCEPTED;
 }
 
+void GCS_MAVLINK::send_key_tranfer() const
+{
+    //  AP_KEYSTORE* keyStore = AP_KEYSTORE::getInstance();
+    //  uint8_t buf[250] = "Hello Wolrd Hello Wolrd Hello Wolrd";
+    AP_KEYSTORE &kystr = AP::key_store();
+    if(kystr.isKeyTransferTXBufferDirty == true)
+    {
+//      mavlink_message_t msg;
+//      mavlink_msg_data_transfer_pack(255,1,&msg,
+//              (uint8_t)DATA_TYPE_KEY,
+//              (uint8_t)kystr.keyTrasnFerTXBufferIndex,
+//              (uint8_t *)kystr.keyTransferBuf,
+//              kystr.keyTransferTXKeyLen);
+
+        mavlink_msg_data_transfer_send(
+                chan,
+                (uint8_t)DATA_TYPE_KEY,
+                (uint8_t)kystr.keyTrasnFerTXBufferIndex,
+                (uint8_t *)kystr.keyTransferBuf,
+                kystr.keyTransferTXKeyLen
+        );
+        kystr.isKeyTransferTXBufferDirty = false;
+    }
+}
+
+void GCS_MAVLINK::send_ack_for_command() const
+{
+    AP_KEYSTORE *kystr = AP_KEYSTORE::getInstance();
+    mavlink_msg_ack_for_command_send(
+            chan,
+            kystr->ackCommand,
+            kystr->ackCommandType,
+            kystr->ack
+    );
+}
+
+void GCS_MAVLINK::send_command_tranfer()const
+{
+    AP_PDRL_COMMANDER* commander = AP_PDRL_COMMANDER::getInstance();
+    mavlink_msg_command_transfer_send(
+            chan,
+            commander->cmdSend.command,
+            commander->cmdSend.command_type,
+            commander->cmdSend.is_ack_required,
+            commander->cmdSend.data_len,
+            commander->cmdSend.item_count,
+            commander->cmdSend.item_offset,
+            commander->cmdSend.command_buff
+    );
+}
+
 MAV_RESULT GCS_MAVLINK::handle_command_set_message_interval(const mavlink_command_long_t &packet)
 {
     return set_message_interval((uint32_t)packet.param1, (int32_t)packet.param2);
@@ -3672,6 +3730,40 @@ MAV_RESULT GCS_MAVLINK::handle_fixed_mag_cal_yaw(const mavlink_command_long_t &p
 #endif
 }
 
+void GCS_MAVLINK::handle_data_transfer(const mavlink_message_t &msg)
+{
+    //  AP_KEYSTORE* keyStore = AP_KEYSTORE::getInstance();
+    //receive message here
+    mavlink_data_transfer_t packet;
+    mavlink_msg_data_transfer_decode(&msg, &packet);
+
+    if(packet.data_type == DATA_TYPE_KEY)
+    {
+        keyStore->receivKey(packet.data_buffer,packet.valid_data_len,packet.buffer_index);
+    }
+    else if(packet.data_type == DATA_TYPE_PA)
+    {
+    }
+    else if(packet.data_type == DATA_TYPE_DIG)
+    {
+        libnpnt->sendPAvalidationResponse(chan);
+    }
+    else if(packet.data_type == DATA_TYPE_SIG)
+    {
+        libnpnt->receiveSignature(packet.data_buffer,packet.valid_data_len,packet.buffer_index);
+    }
+    else if(packet.data_type == DATA_TYPE_HASH)
+    {
+        libnpnt->receiveHash(packet.data_buffer,packet.valid_data_len);
+    }
+}
+
+void GCS_MAVLINK::handle_command_transfer(const mavlink_message_t &msg)
+{
+    AP_PDRL_COMMANDER* commander = AP_PDRL_COMMANDER::getInstance();
+    commander->parseCommand(msg);
+}
+
 /*
   handle MAV_CMD_CAN_FORWARD
  */
@@ -4033,6 +4125,14 @@ void GCS_MAVLINK::handle_common_message(const mavlink_message_t &msg)
         AP_CheckFirmware::handle_msg(chan, msg);
         break;
 #endif
+
+    case MAVLINK_MSG_ID_DATA_TRANSFER:
+        handle_data_transfer(msg);
+    break;
+
+    case MAVLINK_MSG_ID_COMMAND_TRANSFER:
+        handle_command_transfer(msg);
+    break;
     }
 
 }
@@ -4706,14 +4806,7 @@ MAV_RESULT GCS_MAVLINK::handle_command_long_packet(const mavlink_command_long_t 
     case MAV_CMD_SET_CAMERA_ZOOM:
     case MAV_CMD_SET_CAMERA_FOCUS:
     case MAV_CMD_IMAGE_START_CAPTURE:
-    case MAV_CMD_VIDEO_START_CAPTURE:
-    case MAV_CMD_VIDEO_STOP_CAPTURE:
         result = handle_command_camera(packet);
-        break;
-#endif
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:
-        result = handle_command_do_gripper(packet);
         break;
 #endif
 #if HAL_SPRAYER_ENABLED
@@ -4820,7 +4913,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_long_packet(const mavlink_command_long_t 
     case MAV_CMD_DO_SET_SERVO:
     case MAV_CMD_DO_REPEAT_SERVO:
     case MAV_CMD_DO_SET_RELAY:
-    case MAV_CMD_DO_REPEAT_RELAY:
         result = handle_servorelay_message(packet);
         break;
 
@@ -5575,8 +5667,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        last_heartbeat_time = AP_HAL::millis();
-        send_heartbeat();
+        // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+        // {
+		 	last_heartbeat_time = AP_HAL::millis();
+		// 	if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+        		send_heartbeat();
+		// 	else
+		// 		AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+        // }
         break;
 
     case MSG_HWSTATUS:
@@ -5917,6 +6015,21 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 #endif
         break;
 
+    case MSG_DATA_TRANSFER:
+        send_key_tranfer();
+        break;
+
+    case MSG_LIBNPNT_TRANSFER:
+        libnpnt->sendPAvalidationResponse(chan);
+        break;
+
+    case MSG_ACK_FOR_COMMAND:
+        send_ack_for_command();
+        break;
+
+    case MSG_COMMAND_TRANSFER:
+        send_command_tranfer();
+        break;
     default:
         // try_send_message must always at some stage return true for
         // a message, or we will attempt to infinitely retry the

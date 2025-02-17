@@ -52,6 +52,7 @@ public:
     /// spraying - returns true if spraying is actually happening
     bool spraying() const { return _flags.spraying; }
 
+    bool get_status(){ return _flags.spraying;}
     /// test_pump - set to true to turn on pump as if travelling at 1m/s as a test
     void test_pump(bool true_false) { _flags.testing = true_false; }
 
@@ -64,7 +65,10 @@ public:
     void update();
 
     static const struct AP_Param::GroupInfo var_info[];
+    void setPulseCount(uint64_t value);
+    uint64_t getPulseCount();
 
+    uint64_t Pulse_count;
 private:
 
     // parameters

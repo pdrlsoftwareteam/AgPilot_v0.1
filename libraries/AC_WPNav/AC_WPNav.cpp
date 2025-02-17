@@ -1,5 +1,9 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AC_WPNav.h"
+#include "AP_RangeFinder/AP_RangeFinder.h"
+#include <AC_Avoidance/AP_OAPathPlanner.h>
+#include "GCS_MAVLink/GCS.h"
+#include "AP_Proximity/AP_Proximity.h"
 
 extern const AP_HAL::HAL& hal;
 
@@ -451,6 +455,18 @@ void AC_WPNav::get_wp_stopping_point(Vector3f& stopping_point) const
     stopping_point = stop.tofloat();
 }
 
+void AC_WPNav::setSemiAutoOverrideAltitude(bool isSet,bool resetZoffset)
+{
+    _semiAutoOverrideAltitude  = isSet;
+    if(resetZoffset == true)
+        _lastZOffset = 0;
+}
+
+void AC_WPNav::resetWaypointZ(float zVal)
+{
+	 _lastZOffset = zVal;
+}
+
 /// advance_wp_target_along_track - move target location along track from origin to destination
 bool AC_WPNav::advance_wp_target_along_track(float dt)
 {
@@ -507,6 +523,10 @@ bool AC_WPNav::advance_wp_target_along_track(float dt)
         // update target position, velocity and acceleration
         target_pos = _origin;
         s_finished = _scurve_this_leg.advance_target_along_track(_scurve_prev_leg, _scurve_next_leg, _wp_radius_cm, get_corner_acceleration(), _flags.fast_waypoint, _track_scalar_dt * vel_scaler_dt * dt, target_pos, target_vel, target_accel);
+    	if(!is_zero(_lastZOffset) && _reset_auto_mode)
+    	{
+    		target_pos.z = _lastZOffset;
+    	}
     } else {
         // splinetarget_vel
         target_vel = curr_target_vel;
@@ -540,7 +560,9 @@ bool AC_WPNav::advance_wp_target_along_track(float dt)
                 _flags.reached_destination = true;
             } else {
                 // regular waypoints also require the copter to be within the waypoint radius
-                const Vector3f dist_to_dest = curr_pos - _destination;
+            	Vector3f dist_to_dest = curr_pos - _destination;
+            	if(!is_zero(_lastZOffset) && _reset_auto_mode)
+            		dist_to_dest.z = 0;
                 if (dist_to_dest.length_squared() <= sq(_wp_radius_cm)) {
                     _flags.reached_destination = true;
                 }
@@ -585,6 +607,39 @@ int32_t AC_WPNav::get_wp_bearing_to_destination() const
 }
 
 /// update_wpnav - run the wp controller - should be called at 100hz or higher
+bool AC_WPNav::update_wpnav_oa(float speed_factor)
+{
+	bool ret = true;
+
+/// update_wpnav - run the wp controller - should be called at 100hz or higher
+	if (_check_wp_speed_change) {
+		if (!is_equal(_wp_speed_cms.get() * speed_factor, _last_wp_speed_cms)) {
+			set_speed_xy(_wp_speed_cms * speed_factor);
+			_last_wp_speed_cms = _wp_speed_cms * speed_factor;
+		}
+	}
+	if (!is_equal(_wp_speed_up_cms.get() * speed_factor, _last_wp_speed_up_cms)) {
+		set_speed_up(_wp_speed_up_cms * speed_factor);
+		_last_wp_speed_up_cms = _wp_speed_up_cms * speed_factor;
+	}
+	if (!is_equal(_wp_speed_down_cms.get() * speed_factor, _last_wp_speed_down_cms)) {
+		set_speed_down(_wp_speed_down_cms * speed_factor);
+		_last_wp_speed_down_cms = _wp_speed_down_cms * speed_factor;
+	}
+
+	// advance the target if necessary
+	if (!advance_wp_target_along_track(_pos_control.get_dt())) {
+		// To-Do: handle inability to advance along track (probably because of missing terrain data)
+		ret = false;
+	}
+
+	_pos_control.update_xy_controller();
+
+	_wp_last_update = AP_HAL::millis();
+
+	return ret;
+}
+/// update_wpnav - run the wp controller - should be called at 100hz or higher
 bool AC_WPNav::update_wpnav()
 {
     bool ret = true;
@@ -618,6 +673,62 @@ bool AC_WPNav::update_wpnav()
     return ret;
 }
 
+float AC_WPNav::check_avoidance_status()
+{
+AP_AHRS &ahrs = AP::ahrs();
+	float margin;
+	float distVal = 0;
+	if((ahrs.groundspeed()) <= 3)
+	{
+		margin = 7.0;//meter
+	}
+	else
+	{
+		margin = ahrs.groundspeed() + 5.0;
+	}
+	float maxMargin = margin + 5.0;
+	const float epsilon = 0.0001;
+	float dist = AP::rangefinder()->getDist();
+
+	if((fabs(dist - (-1.0)) > epsilon) || (int)AP::proximity()->get_type(0))
+	{
+		if ((fabs(dist - (-1.0)) > epsilon)) {
+			distVal = AP::rangefinder()->getDist();
+		}
+		else if((int)AP::proximity()->get_type(0) != 0){
+			distVal = AP::proximity()->getDist();
+		}
+	}
+
+	if(is_zero(distVal))
+	{
+		return 1;
+	}
+	float range_length = maxMargin - margin;
+
+	float interval_size = 0.1;
+
+	float num_intervals = range_length / interval_size;
+
+	float var;
+
+	if (distVal >= maxMargin) {
+		var = 1.0;
+	} else if (distVal <= margin) {
+		var = 0.0;
+	} else {
+		float interval_index = (distVal - margin) / interval_size;
+		var = interval_index / num_intervals;
+
+		if(ahrs.groundspeed() < 3.0){
+			var/=3;
+		}
+		else{
+			var/=6;
+		}
+	}
+	return var;
+}
 // returns true if update_wpnav has been run very recently
 bool AC_WPNav::is_active() const
 {

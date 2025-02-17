@@ -85,11 +85,7 @@ bool AP_Arming_Copter::rc_throttle_failsafe_checks(bool display_failure) const
         return true;
     }
 
-#if FRAME_CONFIG == HELI_FRAME
-    const char *rc_item = "Collective";
-#else
     const char *rc_item = "Throttle";
-#endif
 
     if (!rc().has_had_rc_receiver() && !rc().has_had_rc_override()) {
         check_failed(ARMING_CHECK_RC, display_failure, "RC not found");
@@ -203,61 +199,11 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
             return false;
         }
 
-        // acro balance parameter check
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-        if ((copter.g.acro_balance_roll > copter.attitude_control->get_angle_roll_p().kP()) || (copter.g.acro_balance_pitch > copter.attitude_control->get_angle_pitch_p().kP())) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Check ACRO_BAL_ROLL/PITCH");
-            return false;
-        }
-#endif
-
         // pilot-speed-up parameter check
         if (copter.g.pilot_speed_up <= 0) {
             check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Check PILOT_SPEED_UP");
             return false;
         }
-
-        #if FRAME_CONFIG == HELI_FRAME
-        if (copter.g2.frame_class.get() != AP_Motors::MOTOR_FRAME_HELI_QUAD &&
-            copter.g2.frame_class.get() != AP_Motors::MOTOR_FRAME_HELI_DUAL &&
-            copter.g2.frame_class.get() != AP_Motors::MOTOR_FRAME_HELI) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Invalid Heli FRAME_CLASS");
-            return false;
-        }
-
-        // check helicopter parameters
-        if (!copter.motors->parameter_check(display_failure)) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Heli motors checks failed");
-            return false;
-        }
-
-        char fail_msg[50];
-        // check input manager parameters
-        if (!copter.input_manager.parameter_check(fail_msg, ARRAY_SIZE(fail_msg))) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "%s", fail_msg);
-            return false;
-        }
-
-        // Inverted flight feature disabled for Heli Single and Dual frames
-        if (copter.g2.frame_class.get() != AP_Motors::MOTOR_FRAME_HELI_QUAD &&
-            rc().find_channel_for_option(RC_Channel::aux_func_t::INVERTED) != nullptr) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Inverted flight option not supported");
-            return false;
-        }
-        // Ensure an Aux Channel is configured for motor interlock
-        if (rc().find_channel_for_option(RC_Channel::aux_func_t::MOTOR_INTERLOCK) == nullptr) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Motor Interlock not configured");
-            return false;
-        }
-
-        #else
-        if (copter.g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI_QUAD ||
-            copter.g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI_DUAL ||
-            copter.g2.frame_class.get() == AP_Motors::MOTOR_FRAME_HELI) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "Invalid MultiCopter FRAME_CLASS");
-            return false;
-        }
-        #endif // HELI_FRAME
 
         // checks when using range finder for RTL
 #if MODE_RTL_ENABLED == ENABLED
@@ -623,25 +569,19 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
 
     // check throttle
     if (check_enabled(ARMING_CHECK_RC)) {
-         #if FRAME_CONFIG == HELI_FRAME
-        const char *rc_item = "Collective";
-        #else
         const char *rc_item = "Throttle";
-        #endif
         // check throttle is not too high - skips checks if arming from GCS/scripting in Guided,Guided_NoGPS or Auto 
-        if (!((method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::GUIDED_NOGPS || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
+        if (!((method == AP_Arming::Method::MAVLINK || method == AP_Arming::Method::SCRIPTING) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::AUTO))) {
             // above top of deadband is too always high
             if (copter.get_pilot_desired_climb_rate(copter.channel_throttle->get_control_in()) > 0.0f) {
                 check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
                 return false;
             }
             // in manual modes throttle must be at zero
-            #if FRAME_CONFIG != HELI_FRAME
-            if ((copter.flightmode->has_manual_throttle() || copter.flightmode->mode_number() == Mode::Number::DRIFT) && copter.channel_throttle->get_control_in() > 0) {
+            if (copter.flightmode->has_manual_throttle() && copter.channel_throttle->get_control_in() > 0) {
                 check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
                 return false;
             }
-            #endif
         }
     }
 
@@ -686,6 +626,13 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
     if (in_arm_motors) {
         return false;
     }
+   // return if motors have not been tested once after reboot.
+    if(copter.g2.req_motor_test == 1)
+    {
+    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming motors requires a motor test.");
+        return false;
+    }
+
     in_arm_motors = true;
 
     // return true if already armed
@@ -822,14 +769,6 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
         }
     }
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // save auto tuned parameters
-    if (copter.flightmode == &copter.mode_autotune) {
-        copter.mode_autotune.save_tuning_gains();
-    } else {
-        copter.mode_autotune.reset();
-    }
-#endif
 
     // we are not in the air
     copter.set_land_complete(true);

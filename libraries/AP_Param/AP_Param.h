@@ -107,7 +107,6 @@
 #define AP_PARAM_FRAME_PLANE        (1<<2)
 #define AP_PARAM_FRAME_SUB          (1<<3)
 #define AP_PARAM_FRAME_TRICOPTER    (1<<4)
-#define AP_PARAM_FRAME_HELI         (1<<5)
 #define AP_PARAM_FRAME_BLIMP        (1<<6)
 
 // a variant of offsetof() to work around C++ restrictions.
@@ -531,6 +530,8 @@ public:
     static void invalidate_count(void);
 
     static void set_hide_disabled_groups(bool value) { _hide_disabled_groups = value; }
+
+    static bool verifySha256Checksum();
 
     // set frame type flags. Used to unhide frame specific parameters
     static void set_frame_type_flags(uint16_t flags_to_set) {

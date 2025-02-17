@@ -64,8 +64,6 @@ enum class LogEvent : uint8_t {
     MOTORS_EMERGENCY_STOP_CLEARED = 55,
     MOTORS_INTERLOCK_DISABLED = 56,
     MOTORS_INTERLOCK_ENABLED = 57,
-    ROTOR_RUNUP_COMPLETE = 58, // Heli only
-    ROTOR_SPEED_BELOW_CRITICAL = 59, // Heli only
     EKF_ALT_RESET = 60,
     LAND_CANCELLED_BY_PILOT = 61,
     EKF_YAW_RESET = 62,
@@ -284,6 +282,8 @@ public:
     void WriteCritical(const char *name, const char *labels, const char *fmt, ...);
     void WriteCritical(const char *name, const char *labels, const char *units, const char *mults, const char *fmt, ...);
     void WriteV(const char *name, const char *labels, const char *units, const char *mults, const char *fmt, va_list arg_list, bool is_critical=false, bool is_streaming=false);
+    void createGeoFenceBreachLogFile();
+    void sendGeoFenceAndTimeBreachToLog();
 
     void Write_PID(uint8_t msg_type, const class AP_PIDInfo &info);
 

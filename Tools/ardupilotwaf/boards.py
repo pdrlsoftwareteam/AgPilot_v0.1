@@ -902,7 +902,7 @@ class chibios(Board):
         env.HAL_MAX_STACK_FRAME_SIZE = 'HAL_MAX_STACK_FRAME_SIZE=%d' % 1300 # set per Wframe-larger-than, ensure its same
         env.CFLAGS += cfg.env.CPU_FLAGS + [
             '-Wlogical-op',
-            '-Wframe-larger-than=1300',
+            '-Wframe-larger-than=1800',
             '-fsingle-precision-constant',
             '-Wno-attributes',
             '-fno-exceptions',
@@ -1095,7 +1095,6 @@ class chibios(Board):
 
     def build(self, bld):
         super(chibios, self).build(bld)
-        bld.ap_version_append_str('CHIBIOS_GIT_VERSION', bld.git_submodule_head_hash('ChibiOS', short=True))
         bld.load('chibios')
 
     def pre_build(self, bld):

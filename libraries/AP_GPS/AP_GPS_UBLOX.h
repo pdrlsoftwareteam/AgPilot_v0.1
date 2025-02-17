@@ -577,6 +577,12 @@ private:
         uint32_t loadMask;
     };
 
+    struct PACKED ubx_sec_uniquid {
+        uint8_t version;
+        uint8_t reserved1[3];
+        uint8_t uniqueId[5];
+    };
+
     struct PACKED ubx_tim_tm2 {
         uint8_t ch;
         uint8_t flags;
@@ -624,6 +630,7 @@ private:
         ubx_ack_ack ack;
         ubx_ack_nack nack;
         ubx_tim_tm2 tim_tm2;
+        ubx_sec_uniquid secmsg;
     } _buffer;
 
     enum class RELPOSNED {
@@ -649,6 +656,7 @@ private:
         CLASS_CFG = 0x06,
         CLASS_MON = 0x0A,
         CLASS_RXM = 0x02,
+        CLASS_SEC = 0x27,
         CLASS_TIM = 0x0d,
         MSG_ACK_NACK = 0x00,
         MSG_ACK_ACK = 0x01,
@@ -732,6 +740,7 @@ private:
         STEP_MON_HW2,
         STEP_RAW,
         STEP_RAWX,
+        STEP_SECMSG,
         STEP_VERSION,
         STEP_RTK_MOVBASE, // setup moving baseline
         STEP_TIM_TM2,
@@ -802,6 +811,7 @@ private:
     void        _request_next_config(void);
     void        _request_port(void);
     void        _request_version(void);
+    void        _request_uniqid(void);
     void        _save_cfg(void);
     void        _verify_rate(uint8_t msg_class, uint8_t msg_id, uint8_t rate);
     void        _check_new_itow(uint32_t itow);

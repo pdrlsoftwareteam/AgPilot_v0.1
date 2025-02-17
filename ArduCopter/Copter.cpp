@@ -81,6 +81,9 @@
 #undef FORCE_VERSION_H_INCLUDE
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
+AP_KEYSTORE *keyStore = AP_KEYSTORE::getInstance();
+AP_PDRL_Logger *pdrl_logger = AP_PDRL_Logger::getInstance();
+AP_LIBNPNT *libnpnt = AP_LIBNPNT::getInstance();
 
 #define SCHED_TASK(func, _interval_ticks, _max_time_micros, _prio) SCHED_TASK_CLASS(Copter, &copter, func, _interval_ticks, _max_time_micros, _prio)
 #define FAST_TASK(func) FAST_TASK_CLASS(Copter, &copter, func)
@@ -117,16 +120,10 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
     FAST_TASK(run_custom_controller),
 #endif
-#if FRAME_CONFIG == HELI_FRAME
-    FAST_TASK(heli_update_autorotation),
-#endif //HELI_FRAME
     // send outputs to the motors library immediately
     FAST_TASK(motors_output),
      // run EKF state estimator (expensive)
     FAST_TASK(read_AHRS),
-#if FRAME_CONFIG == HELI_FRAME
-    FAST_TASK(update_heli_control_dynamics),
-#endif //HELI_FRAME
     // Inertial Nav
     FAST_TASK(read_inertia),
     // check if ekf has reset target heading or position
@@ -182,9 +179,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_Baro,              &copter.barometer,             accumulate,    50,  90,  63),
 #if PRECISION_LANDING == ENABLED
     SCHED_TASK(update_precland,      400,     50,  69),
-#endif
-#if FRAME_CONFIG == HELI_FRAME
-    SCHED_TASK(check_dynamic_flight,  50,     75,  72),
 #endif
 #if LOGGING_ENABLED == ENABLED
     SCHED_TASK(loop_rate_logging, LOOP_RATE,    50,  75),
@@ -467,14 +461,6 @@ void Copter::throttle_loop()
     // check auto_armed status
     update_auto_armed();
 
-#if FRAME_CONFIG == HELI_FRAME
-    // update rotor speed
-    heli_update_rotor_speed_targets();
-
-    // update trad heli swash plate movement
-    heli_update_landing_swash();
-#endif
-
     // compensate for ground effect (if enabled)
     update_ground_effect_detector();
     update_ekf_terrain_height_stable();
@@ -554,9 +540,6 @@ void Copter::ten_hz_logging_loop()
         g2.beacon.log();
 #endif
     }
-#if FRAME_CONFIG == HELI_FRAME
-    Log_Write_Heli();
-#endif
 #if AP_WINCH_ENABLED
     if (should_log(MASK_LOG_ANY)) {
         g2.winch.write_log();
@@ -620,16 +603,15 @@ void Copter::one_hz_loop()
         Log_Write_Data(LogDataID::AP_STATE, ap.value);
     }
 
+    PdrlBootPlugin::handleChecksumStatus();
     if (!motors->armed()) {
         update_using_interlock();
 
         // check the user hasn't updated the frame class or type
         motors->set_frame_class_and_type((AP_Motors::motor_frame_class)g2.frame_class.get(), (AP_Motors::motor_frame_type)g.frame_type.get());
 
-#if FRAME_CONFIG != HELI_FRAME
         // set all throttle channel settings
         motors->update_throttle_range();
-#endif
     }
 
     // update assigned functions and enable auxiliary servos

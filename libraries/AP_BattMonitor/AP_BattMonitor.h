@@ -45,7 +45,7 @@ class AP_BattMonitor_LTC2946;
 class AP_BattMonitor_Torqeedo;
 class AP_BattMonitor_FuelLevel_Analog;
 class AP_BattMonitor_EFI;
-
+class AP_BattMonitor_XKC_Y25_NPN;
 
 class AP_BattMonitor
 {
@@ -69,6 +69,7 @@ class AP_BattMonitor
     friend class AP_BattMonitor_Torqeedo;
     friend class AP_BattMonitor_FuelLevel_Analog;
     friend class AP_BattMonitor_Synthetic_Current;
+    friend class AP_BattMonitor_XKC_Y25_NPN;
 
 public:
 
@@ -104,9 +105,10 @@ public:
         LTC2946                        = 22,
         Torqeedo                       = 23,
         FuelLevel_Analog               = 24,
-        Analog_Volt_Synthetic_Current  = 25,
-        INA239_SPI                     = 26,
-        EFI                            = 27,
+        Analog_Volt_Synthetic_Current  = 26,
+        INA239_SPI                     = 27,
+        EFI                            = 28,
+		XKC_Y25_NPN				   	   = 25,
     };
 
     FUNCTOR_TYPEDEF(battery_failsafe_handler_fn_t, void, const char *, const int8_t);
