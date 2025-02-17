@@ -626,6 +626,13 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
     if (in_arm_motors) {
         return false;
     }
+   // return if motors have not been tested once after reboot.
+    if(copter.g2.req_motor_test == 1)
+    {
+    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming motors requires a motor test.");
+        return false;
+    }
+
     in_arm_motors = true;
 
     // return true if already armed
