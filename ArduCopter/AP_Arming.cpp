@@ -341,6 +341,16 @@ bool AP_Arming_Copter::gps_checks(bool display_failure)
     return true;
 }
 
+bool AP_Arming_Copter::is_lease_valid() {
+    uint32_t lease_expiry = copter.g2.lease_due_date;
+    if (copter.g2.lease_enable == 0) {
+        return true;  // No lease restriction
+    }
+
+    uint32_t current_date = copter.gps.gps_time_to_date();
+    return (current_date <= lease_expiry);
+}
+
 //Check for lease
 //bool AP_Arming_Copter::is_lease_valid() {
 //    uint32_t lease_expiry = g.lease_due_date;
@@ -402,6 +412,14 @@ bool AP_Arming_Copter::mandatory_gps_checks(bool display_failure)
 {
     // check if flight mode requires GPS
     bool mode_requires_gps = copter.flightmode->requires_GPS();
+
+    if (copter.position_ok()) {
+    	if(!is_lease_valid())
+    	{
+    		check_failed(display_failure, "Lease Expired! Cannot arm.");
+    		return false;
+    	}
+    }
 
     // always check if inertial nav has started and is ready
     const auto &ahrs = AP::ahrs();

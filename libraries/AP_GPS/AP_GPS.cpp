@@ -2173,10 +2173,11 @@ uint32_t AP_GPS::gps_time_to_date() {
     struct tm date;
     gmtime_r((time_t*)&unix_time, &date);
 
-    // Convert to YYYYMMDD format
-    uint32_t yyyymmdd = (date.tm_year + 1900) * 10000 + (date.tm_mon + 1) * 100 + date.tm_mday;
-    printf("Date: %d \n", yyyymmdd);  // Print formatted date string
-    return yyyymmdd;
+    // Convert to YYMMDD format (last 2 digits of the year)
+    uint32_t yymmdd = (date.tm_year % 100) * 10000 + (date.tm_mon + 1) * 100 + date.tm_mday;
+
+    printf("Date: %06u\n", yymmdd);  // Print formatted date string
+    return yymmdd;
 }
 
 // Function to convert GPS time to UTC date

@@ -850,13 +850,13 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     // @Group: AROT_
     // @Path: ../libraries/AC_Autorotation/AC_Autorotation.cpp
-    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
+//    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
 #if MODE_ZIGZAG_ENABLED == ENABLED
     // @Group: ZIGZ_
     // @Path: mode_zigzag.cpp
-//    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
+    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
 #endif
 
 #if MODE_AUTO_ENABLED == ENABLED
@@ -1005,9 +1005,9 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     
 	AP_GROUPINFO("AUTO_OBS_AVOID", 4, ParametersG2, auto_obs_avoid, 1),
 
-	AP_GROUPINFO("LEASE_ENABLE", 13, ParametersG2, lease_enable, 0),
+	AP_GROUPINFO("LEASE_ENABLE", 13, ParametersG2, lease_enable, 1),
 
-	AP_GROUPINFO("LEASE_DUE_DATE", 38, ParametersG2, lease_due_date, 0),
+	AP_GROUPINFO("LEASE_DUE_DATE", 37, ParametersG2, lease_due_date, 250217),
 
 
     // ID 62 is reserved for the SHOW_... parameters from the Skybrush fork at
