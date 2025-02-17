@@ -29,6 +29,7 @@ protected:
     bool pre_arm_ekf_attitude_check();
     bool proximity_checks(bool display_failure) const override;
     bool arm_checks(AP_Arming::Method method) override;
+    bool is_lease_valid() ;
 
     // mandatory checks that cannot be bypassed.  This function will only be called if ARMING_CHECK is zero or arming forced
     bool mandatory_checks(bool display_failure) override;

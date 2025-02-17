@@ -2153,6 +2153,25 @@ bool AP_GPS::get_error_codes(uint8_t instance, uint32_t &error_codes) const
     return drivers[instance]->get_error_codes(error_codes);
 }
 
+// Function to convert GPS time to date
+uint32_t AP_GPS::gps_time_to_date() {
+
+    const uint64_t gps_epoch = 315964800;
+    uint16_t gps_week = time_week(0);
+    uint32_t gps_ms = time_week_ms(0);
+
+    uint64_t gps_time_seconds = gps_week * 7 * 24 * 3600 + gps_ms / 1000;
+
+    uint64_t unix_time = gps_epoch + gps_time_seconds;
+
+    struct tm date;
+    gmtime_r((time_t*)&unix_time, &date);
+
+    uint32_t yymmdd = (date.tm_year % 100) * 10000 + (date.tm_mon + 1) * 100 + date.tm_mday;
+
+    return yymmdd;
+}
+
 // get the difference between WGS84 and AMSL. A positive value means
 // the AMSL height is higher than WGS84 ellipsoid height
 bool AP_GPS::get_undulation(uint8_t instance, float &undulation) const

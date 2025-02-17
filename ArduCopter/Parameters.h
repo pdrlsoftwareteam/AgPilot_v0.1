@@ -625,6 +625,8 @@ public:
     AP_Float auto_man_thr_fact;  // activate semi auto mode add a2sAndres
     AP_Int8 auto_obs_avoid;
     AP_Int8 req_motor_test;
+    AP_Int8 lease_enable;
+    AP_Int32 lease_due_date;
     bool _spray_enabled;
 };
 

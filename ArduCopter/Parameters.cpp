@@ -767,7 +767,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 #if MODE_SMARTRTL_ENABLED == ENABLED
     // @Group: SRTL_
     // @Path: ../libraries/AP_SmartRTL/AP_SmartRTL.cpp
-    AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AP_SmartRTL),
+//    AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AP_SmartRTL),
 #endif
 
 #if AP_WINCH_ENABLED
@@ -850,7 +850,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     // @Group: AROT_
     // @Path: ../libraries/AC_Autorotation/AC_Autorotation.cpp
-    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
+//    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
 #if MODE_ZIGZAG_ENABLED == ENABLED
@@ -1005,7 +1005,27 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     
 	AP_GROUPINFO("AUTO_OBS_AVOID", 4, ParametersG2, auto_obs_avoid, 1),
 
+	// @Param: MOT_TEST
+	// @DisplayName: Mandatory Motor Test on Reboot
+	// @Description: This parameter enables a mandatory one-time motor test after every drone reboot. The motor test ensures that all motors are functioning correctly before flight. The test is performed automatically upon startup and does not repeat unless the drone is rebooted again.
+	// @Values: 0:Disabled, 1:Enabled
+	// @User: Advanced
 	AP_GROUPINFO("MOT_TEST", 13, ParametersG2, req_motor_test, 1),
+
+	// @Param: LEASE_ENABLE
+	// @DisplayName: Enable Drone Lease Check
+	// @Description: Enables or disables the lease expiration check. When enabled, the system checks the GPS date against the lease due date and prevents arming if the lease has expired.
+	// @Values: 0:Disabled, 1:Enabled
+	// @User: Advanced
+	AP_GROUPINFO("LEASE_ENABLE", 21, ParametersG2, lease_enable, 0),
+
+	// @Param: LEASE_DUE_DATE
+	// @DisplayName: Drone Lease Expiry Date
+	// @Description: This parameter defines the lease expiry date for the drone. The system checks the GPS date, and if the current date exceeds the lease due date, arming is restricted to prevent unauthorized usage.
+	// @Values: 0:No Restriction, YYMMDD: Lease Expiry Date
+	// @User: Advanced
+	AP_GROUPINFO("LEASE_DUE_DATE", 37, ParametersG2, lease_due_date, 250228),
+
 
     // ID 62 is reserved for the SHOW_... parameters from the Skybrush fork at
     // https://github.com/skybrush-io/ardupilot
