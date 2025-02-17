@@ -78,7 +78,7 @@ bool AP_RangeFinder_Benewake_CAN::handle_frame_H30(AP_HAL::CANFrame &frame)
     const uint16_t target1_cm = be16toh_ptr(&frame.data[0]);
     if (target1_cm == 0) {
         // no target gives 0
-        return false;
+        //return false;
     }
     //uint16_t target2 = be16toh_ptr(&frame.data[2]);
     //uint16_t target3 = be16toh_ptr(&frame.data[4]);

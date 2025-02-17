@@ -34,6 +34,7 @@
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_InternalError/AP_InternalError.h>
 #include <AP_Filesystem/AP_Filesystem.h>
+#include <AP_LIBNPNT/AP_LIBNPNT.h>
 #include <stdio.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     #include <SITL/SITL.h>
@@ -1410,6 +1411,49 @@ bool AP_Param::is_read_only(void) const
         return read_only;
     }
     return false;
+}
+
+bool AP_Param::verifySha256Checksum()
+{
+    // Start section lockParamCount
+    int lockParamCount = 5;
+    const char pname[lockParamCount][17] = {
+    		"FRAME_CLASS\0",
+			"FRAME_TYPE\0",
+			"LOIT_SPEED\0",
+			"FENCE_ALT_MAX\0",
+			"FENCE_RADIUS\0"
+
+    };
+    // End section lockParamCount
+
+   enum ap_var_type ptype;
+
+//    frame_type = (AP_Int8 *)AP_Param::find(pname[0], &ptype);
+//    frame_class = (AP_Int8 *)AP_Param::find(pname[1], &ptype);
+//    uint16_t combined_value = (*frame_type << 8) | (*frame_class);  // Combine frame_type and frame_class
+//    PdrlBootPlugin::calculateCodeCksm();
+//    PdrlBootPlugin::startSha2();
+//    PdrlBootPlugin::updateToSha2((uint8_t*)&combined_value, sizeof(int16_t));
+//    PdrlBootPlugin::finishSha2(DATA_CHKSM);
+//    return PdrlBootPlugin::isDataChecksumMatch();
+
+//	   AP_Param * combined_value = 0;
+   	EXPECT_DELAY_MS(1000);
+	PdrlBootPlugin::calculateCodeCksm();
+	PdrlBootPlugin::startSha2();
+		for(int i=0;i<lockParamCount;i++)
+		{
+			AP_Param *vp = AP_Param::find(pname[i], &ptype);
+			if(vp != NULL)
+			{
+				float uVal = vp->cast_to_float(ptype);
+				double roundedNum = round(uVal * 10000) / 10000;
+				PdrlBootPlugin::updateToSha2((uint8_t*)&roundedNum, sizeof(roundedNum));
+			}
+		}
+	PdrlBootPlugin::finishSha2(DATA_CHKSM);
+	return PdrlBootPlugin::isDataChecksumMatch();
 }
 
 // set a AP_Param variable to a specified value

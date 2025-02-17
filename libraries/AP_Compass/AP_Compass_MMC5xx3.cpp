@@ -115,7 +115,7 @@ bool AP_Compass_MMC5XX3::init()
 
     set_dev_id(compass_instance, dev->get_bus_id());
 
-    printf("Found a MMC5983 on 0x%x as compass %u\n", dev->get_bus_id(), compass_instance);
+    printf("Found a MMC5983 on 0x%x as compass %u\n", unsigned(dev->get_bus_id()), compass_instance);
 
     set_rotation(compass_instance, rotation);
 
@@ -140,6 +140,13 @@ void AP_Compass_MMC5XX3::timer()
     const uint16_t zero_offset = 32768U; // 16 bit mode
     const uint16_t sensitivity = 4096U; // counts per Gauss, 16 bit mode
     constexpr float counts_to_milliGauss = 1.0e3f / sensitivity;
+
+    uint32_t now = AP_HAL::millis();
+    if (now - last_sample_ms > 500) {
+        // seems to be stuck or on first sample, reset state machine
+        state = MMCState::STATE_SET;
+        last_sample_ms = now;
+    }
 
     /*
       we use the SET/RESET method to remove bridge offset every
@@ -249,6 +256,12 @@ void AP_Compass_MMC5XX3::timer()
             // low pass changes to the offset
             offset = offset * 0.5f + new_offset * 0.5f;
         }
+        // sensor is not FRD
+        last_sample_ms = AP_HAL::millis();
+        // sensor is not FRD
+//        field.y = -field.y;
+        field.x = -field.x;
+        field.z = -field.z;
 
         accumulate_sample(field, compass_instance);
 
@@ -288,6 +301,13 @@ void AP_Compass_MMC5XX3::timer()
                        float((data1[4] << 8) + data1[5]) - zero_offset};
         field *= counts_to_milliGauss;
         field -= offset;
+        // sensor is not FRD
+        last_sample_ms = AP_HAL::millis();
+        // sensor is not FRD
+//        field.y = -field.y;
+        field.x = -field.x;
+        field.z = -field.z;
+
         accumulate_sample(field, compass_instance);
 
         // we stay in STATE_MEASURE for measure_count_limit cycles
@@ -310,4 +330,3 @@ void AP_Compass_MMC5XX3::read()
 }
 
 #endif  // AP_COMPASS_MMC5XX3_ENABLED
-

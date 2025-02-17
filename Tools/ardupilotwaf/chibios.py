@@ -283,7 +283,6 @@ class set_app_descriptor(Task.Task):
         img2 = bytearray(img[offset+desc_len:])
         crc1 = to_unsigned(crc32(img1))
         crc2 = to_unsigned(crc32(img2))
-        githash = to_unsigned(int('0x' + os.environ.get('GIT_VERSION', self.generator.bld.git_head_hash(short=True)),16))
         if self.generator.bld.env.AP_SIGNED_FIRMWARE:
             sig = bytearray([0 for i in range(76)])
             if self.generator.bld.env.PRIVATE_KEY:
@@ -328,7 +327,6 @@ class generate_apj(Task.Task):
             "flash_free": int(self.env.FLASH_TOTAL) - len(intf_img),
             "extflash_total": int(self.env.EXT_FLASH_SIZE_MB * 1024 * 1024),
             "extflash_free": int(self.env.EXT_FLASH_SIZE_MB * 1024 * 1024) - len(extf_img),
-            "git_identity": self.generator.bld.git_head_hash(short=True),
             "board_revision": 0,
             "USBID": self.env.USBID
         }

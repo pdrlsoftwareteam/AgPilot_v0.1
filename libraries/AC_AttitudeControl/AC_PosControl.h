@@ -25,7 +25,7 @@
 #define POSCONTROL_SPEED_UP                     250.0f  // default climb rate in cm/s
 
 #define POSCONTROL_ACCEL_Z                      250.0f  // default vertical acceleration in cm/s/s.
-#define POSCONTROL_JERK_Z                       5.0f    // default vertical jerk m/s/s/s
+#define POSCONTROL_JERK_Z                       10.0f    // default vertical jerk m/s/s/s
 
 #define POSCONTROL_THROTTLE_CUTOFF_FREQ_HZ      2.0f    // low-pass filter on acceleration error (unit: Hz)
 

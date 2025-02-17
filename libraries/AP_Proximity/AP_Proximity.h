@@ -74,7 +74,7 @@ public:
 
     // update state of all proximity sensors. Should be called at high rate from main loop
     void update();
-
+    float getDist();
     // return the number of proximity sensor backends
     uint8_t num_sensors() const { return num_instances; }
 

@@ -108,7 +108,16 @@ SECTIONS
     {
         . = ALIGN(8);
     } > flash
+    .checksum : ALIGN(4)
+    {
+        . = ALIGN(4);
+    } > flash
 
+/*  .keystore : ALIGN(4)
+    {
+        . = ALIGN(4);
+    } > keystr
+*/
     /* Legacy symbol, not used anywhere.*/
     . = ALIGN(4);
     PROVIDE(_etext = .);

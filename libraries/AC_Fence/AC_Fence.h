@@ -53,6 +53,8 @@ public:
     // get singleton instance
     static AC_Fence *get_singleton() { return _singleton; }
 
+    bool checkTimeBreach();
+    
     /// enable - allows fence to be enabled/disabled.
     void enable(bool value);
 

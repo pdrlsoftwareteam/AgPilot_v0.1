@@ -10,9 +10,7 @@
 #if AP_GRIPPER_ENABLED
  # include <AP_Gripper/AP_Gripper.h>
 #endif
-#if MODE_FOLLOW_ENABLED == ENABLED
- # include <AP_Follow/AP_Follow.h>
-#endif
+
 #if WEATHERVANE_ENABLED == ENABLED
  #include <AC_AttitudeControl/AC_WeatherVane.h>
 #endif
@@ -167,20 +165,6 @@ public:
         k_param_single_servo_2,         // remove
         k_param_single_servo_3,         // remove
         k_param_single_servo_4,         // 78 - remove
-
-        //
-        // 80: Heli
-        //
-        k_param_heli_servo_1 = 80,  // remove
-        k_param_heli_servo_2,       // remove
-        k_param_heli_servo_3,       // remove
-        k_param_heli_servo_4,       // remove
-        k_param_heli_pitch_ff,      // remove
-        k_param_heli_roll_ff,       // remove
-        k_param_heli_yaw_ff,        // remove
-        k_param_heli_stab_col_min,  // remove
-        k_param_heli_stab_col_max,  // remove
-        k_param_heli_servo_rsc,     // 89 = full! - remove
 
         //
         // 90: misc2
@@ -461,22 +445,8 @@ public:
     AP_Float        fs_ekf_thresh;
     AP_Int16        gcs_pid_mask;
 
-#if MODE_THROW_ENABLED == ENABLED
-    AP_Enum<ModeThrow::PreThrowMotorState>         throw_motor_start;
-#endif
 
     AP_Int16                rc_speed; // speed of fast RC Channels in Hz
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    // Acro parameters
-    AP_Float                acro_balance_roll;
-    AP_Float                acro_balance_pitch;
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED
-    // Acro parameters
-    AP_Int8                 acro_trainer;
-#endif
 
     // Note: keep initializers here in the same order as they are declared
     // above.
@@ -513,11 +483,6 @@ public:
     AP_Gripper gripper;
 #endif
 
-#if MODE_THROW_ENABLED == ENABLED
-    // Throw mode parameters
-    AP_Int8 throw_nextmode;
-    AP_Enum<ModeThrow::ThrowType> throw_type;
-#endif
 
     // ground effect compensation enable/disable
     AP_Int8 gndeffect_comp_enabled;
@@ -545,10 +510,6 @@ public:
 
     // developer options
     AP_Int32 dev_options;
-
-#if MODE_ACRO_ENABLED == ENABLED
-    AP_Float acro_thr_mid;
-#endif
 
     // frame class
     AP_Int8 frame_class;
@@ -579,24 +540,9 @@ public:
     ToyMode toy_mode;
 #endif
 
-#if MODE_FLOWHOLD_ENABLED
-    // we need a pointer to the mode for the G2 table
-    void *mode_flowhold_ptr;
-#endif
-
-#if MODE_FOLLOW_ENABLED == ENABLED
-    // follow
-    AP_Follow follow;
-#endif
-
 #ifdef USER_PARAMS_ENABLED
     // User custom parameters
     UserParameters user_parameters;
-#endif
-
-#if AUTOTUNE_ENABLED == ENABLED
-    // we need a pointer to autotune for the G2 table
-    void *autotune_ptr;
 #endif
 
 #if AP_SCRIPTING_ENABLED
@@ -632,20 +578,7 @@ public:
     void *mode_zigzag_ptr;
 #endif
 
-    // command model parameters
-#if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
-    AC_CommandModel command_model_acro_rp;
-#endif
-
-#if MODE_ACRO_ENABLED == ENABLED || MODE_DRIFT_ENABLED == ENABLED
-    AC_CommandModel command_model_acro_y;
-#endif
-
     AC_CommandModel command_model_pilot;
-
-#if MODE_ACRO_ENABLED == ENABLED
-    AP_Int8 acro_options;
-#endif
 
 #if MODE_AUTO_ENABLED == ENABLED
     AP_Int32 auto_options;
@@ -678,12 +611,8 @@ public:
 
     // ramp time of throttle during take-off
     AP_Float takeoff_throttle_slew_time;
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
+#if HAL_WITH_ESC_TELEM
     AP_Int16 takeoff_rpm_min;
-#endif
-
-#if WEATHERVANE_ENABLED == ENABLED
-    AC_WeatherVane weathervane;
 #endif
 
     // payload place parameters
@@ -691,6 +620,12 @@ public:
     AP_Float pldp_range_finder_minimum_m;
     AP_Float pldp_delay_s;
     AP_Float pldp_descent_speed_ms;
+    // Auto Manual Alt param
+    AP_Int8 auto_man_alt;  // activate semi auto mode add a2sAndres
+    AP_Float auto_man_thr_fact;  // activate semi auto mode add a2sAndres
+    AP_Int8 auto_obs_avoid;
+    AP_Int8 req_motor_test;
+    bool _spray_enabled;
 };
 
 extern const AP_Param::Info        var_info[];
