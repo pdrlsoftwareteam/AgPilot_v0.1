@@ -50,6 +50,9 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
 
+#include "ctime"
+//#include <iostream>
+
 #define GPS_RTK_INJECT_TO_ALL 127
 #ifndef GPS_MAX_RATE_MS
 #define GPS_MAX_RATE_MS 200 // maximum value of rate_ms (i.e. slowest update rate) is 5hz or 200ms
@@ -2153,6 +2156,58 @@ bool AP_GPS::get_error_codes(uint8_t instance, uint32_t &error_codes) const
     return drivers[instance]->get_error_codes(error_codes);
 }
 
+// Function to convert GPS time to date
+uint32_t AP_GPS::gps_time_to_date() {
+    // GPS epoch start in Unix time (seconds since 1970-01-01)
+    const uint64_t gps_epoch = 315964800;
+    uint16_t gps_week = time_week(0);
+    uint32_t gps_ms = time_week_ms(0);
+
+    // Convert GPS week and milliseconds to seconds since GPS epoch
+    uint64_t gps_time_seconds = gps_week * 7 * 24 * 3600 + gps_ms / 1000;
+
+    // Convert to Unix time
+    uint64_t unix_time = gps_epoch + gps_time_seconds;
+
+    // Convert Unix time to tm structure
+    struct tm date;
+    gmtime_r((time_t*)&unix_time, &date);
+
+    // Convert to YYYYMMDD format
+    uint32_t yyyymmdd = (date.tm_year + 1900) * 10000 + (date.tm_mon + 1) * 100 + date.tm_mday;
+    printf("Date: %d \n", yyyymmdd);  // Print formatted date string
+    return yyyymmdd;
+}
+
+// Function to convert GPS time to UTC date
+//void AP_GPS::gps_time_to_date(uint16_t gps_week, uint32_t gps_ms, struct tm &date) {
+//    // GPS epoch start in Unix time (seconds since 1970-01-01)
+//    const uint64_t gps_epoch = 315964800;
+//
+//    // Convert GPS week and milliseconds to seconds since GPS epoch
+//    uint64_t gps_time_seconds = gps_week * 7 * 24 * 3600 + gps_ms / 1000;
+//
+//    // Convert to Unix time
+//    uint64_t unix_time = gps_epoch + gps_time_seconds;
+//
+//    // Convert Unix time to tm structure
+//    time_t rawtime = unix_time;
+//    gmtime_r(&rawtime, &date);
+//}
+
+//int main() {
+//    uint16_t gps_week = 2234;  // Example GPS week
+//    uint32_t gps_ms = 123456;  // Example milliseconds
+//
+//    struct tm date;
+//    gps_time_to_date(gps_week, gps_ms, date);
+//
+//    // Print the date
+//    std::cout << "Date: " << asctime(&date);
+//
+//    return 0;
+//}
+
 // get the difference between WGS84 and AMSL. A positive value means
 // the AMSL height is higher than WGS84 ellipsoid height
 bool AP_GPS::get_undulation(uint8_t instance, float &undulation) const
@@ -2193,6 +2248,7 @@ void AP_GPS::Write_GPS(uint8_t i)
         yaw           : yaw_deg,
         used          : (uint8_t)(AP::gps().primary_sensor() == i)
     };
+
     AP::logger().WriteBlock(&pkt, sizeof(pkt));
 
     /* write auxiliary accuracy information as well */

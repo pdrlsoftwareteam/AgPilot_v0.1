@@ -551,6 +551,9 @@ public:
     // get iTOW, if supported, zero otherwie
     uint32_t get_itow(uint8_t instance) const;
 
+    // calc date
+    uint32_t gps_time_to_date();
+
     bool get_error_codes(uint8_t instance, uint32_t &error_codes) const;
     bool get_error_codes(uint32_t &error_codes) const { return get_error_codes(primary_instance, error_codes); }
 

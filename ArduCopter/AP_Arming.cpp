@@ -341,6 +341,22 @@ bool AP_Arming_Copter::gps_checks(bool display_failure)
     return true;
 }
 
+//Check for lease
+//bool AP_Arming_Copter::is_lease_valid() {
+//    uint32_t lease_expiry = g.lease_due_date;
+//    if (lease_enable == 0) {
+//        return true;  // No lease restriction
+//    }
+//
+//    if (!AP::ahrs().get_gps()) {
+//        return true;  // No GPS, assume lease valid
+//    }
+//
+//    uint32_t current_date = AP::ahrs().get_gps()->date;
+//    return (current_date <= lease_expiry);
+//}
+
+
 // check ekf attitude is acceptable
 bool AP_Arming_Copter::pre_arm_ekf_attitude_check()
 {
