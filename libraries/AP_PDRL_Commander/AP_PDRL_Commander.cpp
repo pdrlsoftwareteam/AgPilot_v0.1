@@ -306,6 +306,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_SET_SPRAY_STATUS:
 		break;
 
+	case COMMAND_SEND_PARAM_ACK:
+		break;
+
+	case COMMAND_GET_SPRAYED_AREA:
+		break;
+
 	case COMMAND_GET_DRONE_ID:
 		//load varibles with required data
 		sendDroneID();

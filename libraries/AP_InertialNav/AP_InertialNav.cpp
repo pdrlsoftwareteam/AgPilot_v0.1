@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Baro/AP_Baro.h>
 #include "AP_InertialNav.h"
-
+#include "AP_BattMonitor/AP_BattMonitor.h"
 /*
   A wrapper around the AP_InertialNav class which uses the NavEKF
   filter if available, and falls back to the AP_InertialNav filter
@@ -39,6 +39,8 @@ void AP_InertialNav::update(bool high_vibes)
         _velocity_cm = velNED * 100; // convert to cm/s
         _velocity_cm.z = -_velocity_cm.z; // convert from NED to NEU
     }
+
+    AP::battery().set_val(_relpos_cm.xy());
 }
 
 /**

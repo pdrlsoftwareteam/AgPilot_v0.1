@@ -19,7 +19,7 @@
 #include "GCS.h"
 #include <AP_Logger/AP_Logger.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-
+#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
 extern const AP_HAL::HAL& hal;
 
 // queue of pending parameter requests and replies
@@ -267,13 +267,66 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     strncpy(key, (char *)packet.param_id, AP_MAX_NAME_SIZE);
     key[AP_MAX_NAME_SIZE] = 0;
 
+    char ParamName[59][17]={
+                "CAN_P1_DRIVER","CAN_P2_DRIVER","CAN_D1_PROTOCOL","CAN_D2_PROTOCOL","GPS_TYPE",
+                "NTF_LED_TYPES","BATT_MONITOR","BATT_CAPACITY","BATT_SERIAL_NUM","BATT_LOW_TIMER",
+                "BATT_FS_VOLTSRC","BATT_ARM_VOLT","BATT_ARM_MAH","BATT_OPTIONS","BATT_VOLT_PIN",
+                "BATT_CURR_PIN","BATT_AMP_OFFSET","BATT_VLT_OFFSET","BATT2_MONITOR","BRD_SAFETY_DEFLT",
+                "BATT2_VOLT_PIN","BATT2_CURR_PIN","FRAME_TYPE","FRAME_CLASS","FENCE_ALT_MAX",
+                "FENCE_RADIUS","LOIT_SPEED","RNGFND1_TYPE","RNGFND1_MIN_CM","RNGFND1_MAX_CM",
+                "RNGFND1_GNDCLEAR","RNGFND1_ORIENT","RNGFND2_TYPE","RNGFND2_MIN_CM","RNGFND2_MAX_CM",
+                "RNGFND2_ORIENT","RNGFND3_TYPE","RNGFND3_MIN_CM","RNGFND3_MAX_CM","RNGFND3_ORIENT",
+                "PRX1_TYPE","AVOID_ENABLE","AVOID_ANGLE_MAX","AVOID_DIST_MAX","AVOID_MARGIN",
+                "AVOID_BEHAVE","AVOID_ALT_MIN","AVOID_ACCEL_MAX","AVOID_BACKUP_DZ","SPRAY_ENABLE",
+                "SERVO9_FUNCTION","SERVO12_FUNCTION","SERVO1_FUNCTION","SERVO2_FUNCTION","SERVO3_FUNCTION",
+                "SERVO4_FUNCTION","SERVO5_FUNCTION","SERVO6_FUNCTION","FLTMODE_CH"
+    		 };
+//	packet.param_id[AP_MAX_NAME_SIZE] = '\0';
+	printf("Param req: %s\n",key);
+
+    for(int8_t i=0;i<59;i++)
+    {
+        if(!strcmp(key,ParamName[i]))
+        {
+        	printf("Found Param: %s\n",key);
+
     // find existing param so we can get the old value
     uint16_t parameter_flags = 0;
     vp = AP_Param::find(key, &var_type, &parameter_flags);
     if (vp == nullptr || isnan(packet.param_value) || isinf(packet.param_value)) {
         return;
     }
+            float old_value = vp->cast_to_float(var_type);
+			const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
 
+			if (std::fabs(old_value - packet.param_value) < EPSILON)
+			{
+				printf("value same: %s\t%f\n", key,old_value);
+//				gcs().send_text(MAV_SEVERITY_WARNING,"value same: %s\t%f\n", key,old_value);
+				AP_PDRL_COMMANDER::getInstance()->sendCommand(0,COMMAND_SEND_PARAM_ACK,COMMAND_TYPE_GET,1,strlen(key),2,(uint8_t*)key);
+				return;
+			}
+
+    		uint8_t dataBuff[100]= {0};
+    		memcpy(dataBuff,ParamName[i],strlen(ParamName[i]));
+    		dataBuff[strlen(ParamName[i])] = '\0';
+//            gcs().send_text(MAV_SEVERITY_WARNING, "Param force write denied %s", (char *)packet.param_id);
+			printf("Param force write denied: %s\n", key);
+//			gcs().send_text(MAV_SEVERITY_WARNING,"Param force write denied: %s\n", key);
+			AP_PDRL_COMMANDER::getInstance()->sendCommand(0,COMMAND_SEND_PARAM_ACK,COMMAND_TYPE_GET,0,strlen(key),2,(uint8_t*)key);
+			return;
+        }
+    }
+	printf("Param Write successful: %s\n",(char *)packet.param_id);
+//	gcs().send_text(MAV_SEVERITY_WARNING,"Param Write successful: %s\n",key);
+	AP_PDRL_COMMANDER::getInstance()->sendCommand(0,COMMAND_SEND_PARAM_ACK,COMMAND_TYPE_GET,1,strlen(key),2,(uint8_t*)key);
+
+    // find existing param so we can get the old value
+    uint16_t parameter_flags = 0;
+    vp = AP_Param::find(key, &var_type, &parameter_flags);
+    if (vp == nullptr || isnan(packet.param_value) || isinf(packet.param_value)) {
+        return;
+    }
     float old_value = vp->cast_to_float(var_type);
 
     if (parameter_flags & AP_PARAM_FLAG_INTERNAL_USE_ONLY) {
