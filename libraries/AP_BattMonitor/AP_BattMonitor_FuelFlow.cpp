@@ -151,6 +151,7 @@ void AP_BattMonitor_FuelFlow::read()
 				AP::sprayer()->setPulseCount(0);
 
 				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
+
 				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
 			}
 			if(pcount > 10)

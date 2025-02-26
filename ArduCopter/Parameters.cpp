@@ -733,7 +733,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 #if AP_GRIPPER_ENABLED
     // @Group: GRIP_
     // @Path: ../libraries/AP_Gripper/AP_Gripper.cpp
-    AP_SUBGROUPINFO(gripper, "GRIP_", 13, ParametersG2, AP_Gripper),
+//    AP_SUBGROUPINFO(gripper, "GRIP_", 13, ParametersG2, AP_Gripper),
 #endif
 
     // @Param: FRAME_CLASS
@@ -1005,6 +1005,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     
 	AP_GROUPINFO("AUTO_OBS_AVOID", 4, ParametersG2, auto_obs_avoid, 1),
 
+	AP_GROUPINFO("MOT_TEST", 13, ParametersG2, req_motor_test, 1),
 
     // ID 62 is reserved for the SHOW_... parameters from the Skybrush fork at
     // https://github.com/skybrush-io/ardupilot
