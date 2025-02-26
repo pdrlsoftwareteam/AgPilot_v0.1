@@ -267,7 +267,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     strncpy(key, (char *)packet.param_id, AP_MAX_NAME_SIZE);
     key[AP_MAX_NAME_SIZE] = 0;
 
-    char ParamName[60][17]={
+    char ParamName[59][17]={
                 "CAN_P1_DRIVER","CAN_P2_DRIVER","CAN_D1_PROTOCOL","CAN_D2_PROTOCOL","GPS_TYPE",
                 "NTF_LED_TYPES","BATT_MONITOR","BATT_CAPACITY","BATT_SERIAL_NUM","BATT_LOW_TIMER",
                 "BATT_FS_VOLTSRC","BATT_ARM_VOLT","BATT_ARM_MAH","BATT_OPTIONS","BATT_VOLT_PIN",
@@ -284,7 +284,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
 //	packet.param_id[AP_MAX_NAME_SIZE] = '\0';
 	printf("Param req: %s\n",key);
 
-    for(int8_t i=0;i<78;i++)
+    for(int8_t i=0;i<59;i++)
     {
         if(!strcmp(key,ParamName[i]))
         {
