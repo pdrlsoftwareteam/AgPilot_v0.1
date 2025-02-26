@@ -496,6 +496,16 @@ void AP_BattMonitor::read()
     checkPoweringOff();
 }
 
+void AP_BattMonitor::set_val(Vector2f Loc)
+{
+	Current_Loc = Loc;
+}
+
+Vector2f AP_BattMonitor::get_val()
+{
+	return Current_Loc;
+}
+
 // healthy - returns true if monitor is functioning
 bool AP_BattMonitor::healthy(uint8_t instance) const {
     return instance < _num_instances && state[instance].healthy;

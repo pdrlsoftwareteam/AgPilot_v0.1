@@ -48,7 +48,7 @@ void AP_PDRL_COMMANDER::getUniqueBoardID(char buf[100])
 	memcpy(serialid, (const void *)UDID_START, 12);
 
 	// this format is chosen to match the format used by HAL_PX4
-	snprintf(buf, 31, "AG0001%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+	snprintf(buf, 30, "AG000%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 			(unsigned)serialid[3], (unsigned)serialid[2], (unsigned)serialid[1], (unsigned)serialid[0],
 			(unsigned)serialid[7], (unsigned)serialid[6], (unsigned)serialid[5], (unsigned)serialid[4],
 			(unsigned)serialid[11], (unsigned)serialid[10], (unsigned)serialid[9],(unsigned)serialid[8]);
@@ -304,6 +304,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	switch(command)
 	{
 	case COMMAND_SET_SPRAY_STATUS:
+		break;
+
+	case COMMAND_SEND_PARAM_ACK:
+		break;
+
+	case COMMAND_GET_SPRAYED_AREA:
 		break;
 
 	case COMMAND_GET_DRONE_ID:
