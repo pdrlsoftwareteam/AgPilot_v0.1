@@ -624,6 +624,7 @@ public:
     AP_Int8 auto_man_alt;  // activate semi auto mode add a2sAndres
     AP_Float auto_man_thr_fact;  // activate semi auto mode add a2sAndres
     AP_Int8 auto_obs_avoid;
+    AP_Int8 req_motor_test;
     bool _spray_enabled;
 };
 
