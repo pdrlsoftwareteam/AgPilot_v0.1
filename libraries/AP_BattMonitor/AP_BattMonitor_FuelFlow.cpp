@@ -9,6 +9,8 @@
 #include "AC_Sprayer/AC_Sprayer.h"
 #include "AP_AHRS/AP_AHRS.h"
 #include "AP_Arming/AP_Arming.h"
+#include "AP_BattMonitor.h"
+
 
 /*
   "battery" monitor for liquid fuel flow systems that give a pulse on
@@ -119,7 +121,6 @@ void AP_BattMonitor_FuelFlow::read()
 		litres = state.pulse_count * _curr_amp_per_volt * 0.001f;
 		litres_pec_sec = litres / irq_dt;
 	}
-
 	_state.last_time_micros = now_us;
 
 	// map amps to litres/hour
@@ -134,11 +135,11 @@ void AP_BattMonitor_FuelFlow::read()
 
 
 	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
-	// AP_AHRS &ahrs = AP::ahrs();
-	// float gndSpeed = ahrs.groundspeed();
+
 	static uint64_t time_ms = AP_HAL::millis();
 
 	if ((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed()) {
+
 
 		// Accumulate pulse count and count if within the 3-second window
 		if (AP_HAL::millis() - time_ms < 3000) {
@@ -146,11 +147,10 @@ void AP_BattMonitor_FuelFlow::read()
 			cnt++;
 		} else {
 			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (cnt > 0 && pcount < 10) {
-				static int gcs_count = 0;
+			if (cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
 
-				gcs().send_text(MAV_SEVERITY_WARNING, "Pani Samplay %d", gcs_count++);
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
 				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
 			}
 			if(pcount > 10)
@@ -162,6 +162,79 @@ void AP_BattMonitor_FuelFlow::read()
 			pcount = 0;
 			cnt = 0;
 		}
+	}
+
+	//Spray area calculation
+	static uint64_t dist_tm = AP_HAL::millis();
+	//	const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
+	if((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed())
+	{
+
+		//	    static uint64_t spray_time_temp = AP_HAL::millis();  // Track spray start time
+		//	    static bool is_spraying = false;      // Track if sprayer is running
+
+		static Vector2f current_Loc = AP::battery().get_val(),previous_Loc = AP::battery().get_val();
+		current_Loc = AP::battery().get_val();
+
+		if (AP_HAL::millis() - dist_tm > 200)
+		{
+			AP::battery().spray_dist += sqrt(pow(previous_Loc.x/100 - current_Loc.x/100, 2) + pow(previous_Loc.y/100 - current_Loc.y/100, 2));
+			previous_Loc = current_Loc;
+			current_Loc = AP::battery().get_val();
+			AP::battery().spray_area_sqm = AP::battery().spray_dist*3.5;
+			AP::battery().spray_area_acre = AP::battery().spray_area_sqm*0.000247105;
+			dist_tm = AP_HAL::millis();
+		}
+	}
+
+	static uint64_t spray_tm = AP_HAL::millis();
+	if(AP::arming().is_armed())
+	{
+		if(AP::sprayer()->spraying() || AP::sprayer()->running())
+		{
+			if (AP_HAL::millis() - spray_tm > 200)
+			{
+				AP::battery().spray_time += AP_HAL::millis() - spray_tm;
+				spray_tm = AP_HAL::millis();
+			}
+		}
+		else
+		{
+			spray_tm = AP_HAL::millis();
+		}
+	}
+
+	static uint64_t flight_time_temp = AP_HAL::millis();
+	static bool first_arm = true;
+	if(AP::arming().is_armed())
+	{
+		if(first_arm)
+		{
+			AP::battery().flight_time = 0;
+			AP::battery().flight_dist = 0;
+			AP::battery().spray_time = 0;  // Reset spray time
+			AP::battery().spray_area_sqm = 0;
+			AP::battery().spray_area_acre = 0;
+			AP::battery().spray_dist = 0;
+			first_arm = 0;
+		}
+		static Vector2f flight_current_Loc = AP::battery().get_val(),flight_previous_Loc = AP::battery().get_val();
+
+		if (AP_HAL::millis() - flight_time_temp > 200)
+		{
+			AP::battery().flight_dist += sqrt(pow(flight_previous_Loc.x/100 - flight_current_Loc.x/100, 2) + pow(flight_previous_Loc.y/100 - flight_current_Loc.y/100, 2));
+			flight_previous_Loc = flight_current_Loc;
+			flight_current_Loc = AP::battery().get_val();
+			AP::battery().flight_time += AP_HAL::millis() - flight_time_temp;
+			flight_time_temp = AP_HAL::millis();
+		}
+	}
+	else if(!AP::arming().is_armed())
+	{
+		first_arm = 1;
+		flight_time_temp = AP_HAL::millis();
+		spray_tm = AP_HAL::millis();
+		dist_tm = AP_HAL::millis();
 	}
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
