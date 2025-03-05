@@ -105,16 +105,15 @@ bool AP_Compass_MMC5XX3::init()
     if (!dev->write_register(REG_CONTROL1, 0)) {
         return false;
     }
-
-
-    /* register the compass instance in the frontend */
-    dev->set_device_type(DEVTYPE_MMC5983);
-    if (!register_compass(dev->get_bus_id(), compass_instance)) {
-        return false;
-    }
     auto get_six_digit_id = [](int32_t id) -> int32_t {
         return (id >= 1000000) ? id / 10 : id; // Trim last digit if 7-digit
     };
+
+    /* register the compass instance in the frontend */
+    dev->set_device_type(DEVTYPE_MMC5983);
+    if (!register_compass(get_six_digit_id((uint32_t)dev->get_bus_id()), compass_instance)) {
+        return false;
+    }
 
     set_dev_id(compass_instance, get_six_digit_id((uint32_t)dev->get_bus_id()));
 
