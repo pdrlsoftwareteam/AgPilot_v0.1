@@ -112,8 +112,11 @@ bool AP_Compass_MMC5XX3::init()
     if (!register_compass(dev->get_bus_id(), compass_instance)) {
         return false;
     }
+    auto get_six_digit_id = [](int32_t id) -> int32_t {
+        return (id >= 1000000) ? id / 10 : id; // Trim last digit if 7-digit
+    };
 
-    set_dev_id(compass_instance, dev->get_bus_id());
+    set_dev_id(compass_instance, get_six_digit_id((uint32_t)dev->get_bus_id()));
 
     printf("Found a MMC5983 on 0x%x as compass %u\n", unsigned(dev->get_bus_id()), compass_instance);
 

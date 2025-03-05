@@ -37,6 +37,7 @@
 [submodule "modules/bhumi_mavlink"]
 	path = modules/bhumi_mavlink
 	url = https://github.com/pdrlsoftwareteam/bhumi_mavlink.git
+	branch = main
 [submodule "modules/mbedtls"]
 	path = modules/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git

@@ -832,29 +832,39 @@ void Compass::init()
 // load them as they come up the first time
 Compass::Priority Compass::_update_priority_list(int32_t dev_id)
 {
+    auto get_six_digit_id = [](int32_t id) -> int32_t {
+        if (id >= 1000000) { // If it's a 7-digit number
+            return id / 10;  // Remove the last digit
+        }
+        return id; // Keep as is if 6 or fewer digits
+    };
+
+    int32_t dev_id_six = get_six_digit_id(dev_id);
+
     // Check if already in priority list
-    for (Priority i(0); i<COMPASS_MAX_INSTANCES; i++) {
-        if (_priority_did_list[i] == dev_id) {
+    for (Priority i(0); i < COMPASS_MAX_INSTANCES; i++) {
+        if (get_six_digit_id(_priority_did_list[i]) == dev_id_six) {
             if (i >= _compass_count) {
-                _compass_count = uint8_t(i)+1;
+                _compass_count = uint8_t(i) + 1;
             }
             return i;
         }
     }
 
     // We are not in priority list, let's add at first empty
-    for (Priority i(0); i<COMPASS_MAX_INSTANCES; i++) {
+    for (Priority i(0); i < COMPASS_MAX_INSTANCES; i++) {
         if (_priority_did_stored_list[i] == 0) {
             _priority_did_stored_list[i].set_and_save(dev_id);
             _priority_did_list[i] = dev_id;
             if (i >= _compass_count) {
-                _compass_count = uint8_t(i)+1;
+                _compass_count = uint8_t(i) + 1;
             }
             return i;
         }
     }
     return Priority(COMPASS_MAX_INSTANCES);
 }
+
 #endif
 
 
@@ -1547,11 +1557,16 @@ bool Compass::is_replacement_mag(uint32_t devid) {
 #endif
 
     // Check that its not previously setup mag
-    for (StateIndex i(0); i<COMPASS_MAX_INSTANCES; i++) {
-        if ((uint32_t)_state[i].expected_dev_id == devid) {
+    auto get_six_digit_id = [](int32_t id) -> int32_t {
+        return (id >= 1000000) ? id / 10 : id; // Trim last digit if 7-digit
+    };
+
+    for (StateIndex i(0); i < COMPASS_MAX_INSTANCES; i++) {
+        if (get_six_digit_id((uint32_t)_state[i].expected_dev_id) == get_six_digit_id(devid)) {
             return false;
         }
     }
+
 #endif
     return true;
 }
@@ -1565,12 +1580,17 @@ void Compass::remove_unreg_dev_id(uint32_t devid)
     }
 
 #if COMPASS_MAX_UNREG_DEV > 0
-    for (uint8_t i = 0; i<COMPASS_MAX_UNREG_DEV; i++) {
-        if ((uint32_t)extra_dev_id[i] == devid) {
+    auto get_six_digit_id = [](int32_t id) -> int32_t {
+        return (id >= 1000000) ? id / 10 : id; // Trim last digit if 7-digit
+    };
+
+    for (uint8_t i = 0; i < COMPASS_MAX_UNREG_DEV; i++) {
+        if (get_six_digit_id((uint32_t)extra_dev_id[i]) == get_six_digit_id(devid)) {
             extra_dev_id[i].set_and_save(0);
             return;
         }
     }
+
 #endif
 #endif
 }

@@ -283,6 +283,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     		 };
 //	packet.param_id[AP_MAX_NAME_SIZE] = '\0';
 	printf("Param req: %s\n",key);
+	gcs().send_text(MAV_SEVERITY_WARNING,"Kunal: %s: %f", key,packet.param_value);
 
     for(int8_t i=0;i<59;i++)
     {
