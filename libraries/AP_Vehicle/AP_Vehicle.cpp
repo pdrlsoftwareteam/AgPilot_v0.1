@@ -299,7 +299,7 @@ void AP_Vehicle::setup()
     // initialisation
     AP_Param::invalidate_count();
 
-    gcs().send_text(MAV_SEVERITY_INFO, "ArduPilot Ready");
+    gcs().send_text(MAV_SEVERITY_INFO, "AgPilot Ready");
 }
 
 void AP_Vehicle::loop()
