@@ -122,6 +122,58 @@ const AP_Param::param_defaults_struct AP_Param::param_defaults_data = {
 };
 #endif
 
+#define PARAM_COUNT 482
+
+const char *ignored_params[PARAM_COUNT] = {
+    "ADSB_EMIT_TYPE", "ADSB_ICAO_ID", "ADSB_ICAO_SPECL", "ADSB_LEN_WIDTH", "ADSB_LIST_ALT",
+    "ADSB_LIST_MAX", "ADSB_LIST_RADIUS", "ADSB_LOG", "ADSB_OFFSET_LAT", "ADSB_OFFSET_LON",
+    "ADSB_OPTIONS", "ADSB_RF_CAPABLE", "ADSB_RF_SELECT", "ADSB_SQUAWK", "ADSB_TYPE",
+    "AHRS_COMP_BETA", "AHRS_EKF_TYPE", "AHRS_GPS_GAIN", "AHRS_GPS_MINSATS", "AHRS_GPS_USE",
+    "AHRS_ORIENTATION", "AHRS_RP_P", "AHRS_TRIM_X", "AHRS_TRIM_Y", "AHRS_TRIM_Z",
+    "AHRS_WIND_MAX", "AHRS_YAW_P", "ANGLE_MAX", "ARMING_MIS_ITEMS", "ARMING_OPTIONS",
+    "ARMING_RUDDER", "ARSPD_ENABLE", "BARO1_WCF_ENABLE", "BARO2_WCF_ENABLE", "BARO3_DEVID",
+    "BARO3_GND_PRESS", "BARO3_WCF_ENABLE", "BARO_EXT_BUS", "BARO_FIELD_ELV", "BARO_FLTR_RNG",
+    "BARO_GND_TEMP", "BARO_OPTIONS", "BARO_PRIMARY", "BARO_PROBE_EXT", "BATT4_MONITOR",
+    "BATT5_MONITOR", "BATT6_MONITOR", "BATT7_MONITOR", "BATT8_MONITOR", "BATT9_MONITOR",
+    "BATT_SERIAL_NUM", "BCN_TYPE", "BRD_BOOT_DELAY", "BRD_IO_ENABLE", "BRD_PWM_VOLT_SEL",
+    "BRD_RTC_TYPES", "BRD_RTC_TZ_MIN", "BRD_SAFETYOPTION", "BRD_SAFETY_MASK", "BRD_SBUS_OUT",
+    "BRD_SD_MISSION", "BRD_SD_SLOWDOWN", "BRD_SERIAL_NUM", "BRD_VSERVO_MIN", "BTN_ENABLE",
+    "CAM1_TYPE", "CAM2_TYPE", "CAM_AUTO_ONLY", "CAM_MAX_ROLL", "CAM_RC_TYPE",
+    "CAN_D1_UC_ESC_BM", "CAN_D1_UC_ESC_OF", "CAN_D1_UC_NODE", "CAN_D1_UC_NTF_RT", "CAN_D1_UC_OPTION",
+    "CAN_D1_UC_POOL", "CAN_D1_UC_SRV_BM", "CAN_D1_UC_SRV_RT", "CAN_LOGLEVEL", "CAN_SLCAN_CPORT",
+    "CAN_SLCAN_SDELAY", "CAN_SLCAN_SERNUM", "CAN_SLCAN_TIMOUT", "CHUTE_ENABLED", "CIRCLE_OPTIONS",
+    "CIRCLE_RADIUS", "CIRCLE_RATE", "CUST_ROT_ENABLE", "DEV_OPTIONS", "DISARM_DELAY",
+    "EAHRS_TYPE", "EFI_TYPE", "EK2_ENABLE", "EK3_ABIAS_P_NSE", "EK3_ACC_BIAS_LIM",
+    "EK3_ACC_P_NSE", "EK3_AFFINITY", "EK3_ALT_M_NSE", "EK3_BCN_DELAY", "EK3_BCN_I_GTE",
+    "EK3_BCN_M_NSE", "EK3_BETA_MASK", "EK3_CHECK_SCALE", "EK3_DRAG_BCOEF_X", "EK3_DRAG_BCOEF_Y",
+    "EK3_DRAG_MCOEF", "EK3_DRAG_M_NSE", "EK3_EAS_I_GATE", "EK3_EAS_M_NSE", "EK3_ENABLE",
+    "EK3_ERR_THRESH", "EK3_FLOW_DELAY", "EK3_FLOW_I_GATE", "EK3_FLOW_M_NSE", "EK3_FLOW_USE",
+    "EK3_GBIAS_P_NSE", "EK3_GLITCH_RAD", "EK3_GND_EFF_DZ", "EK3_GPS_CHECK", "EK3_GPS_VACC_MAX",
+    "EK3_GSF_RST_MAX", "EK3_GSF_RUN_MASK", "EK3_GSF_USE_MASK", "EK3_GYRO_P_NSE", "EK3_HGT_DELAY",
+    "EK3_HGT_I_GATE", "EK3_HRT_FILT", "EK3_IMU_MASK", "EK3_LOG_LEVEL", "EK3_MAGB_P_NSE",
+    "EK3_MAGE_P_NSE", "EK3_MAG_CAL", "EK3_MAG_EF_LIM", "EK3_MAG_I_GATE", "EK3_MAG_MASK",
+    "EK3_MAG_M_NSE", "EK3_MAX_FLOW", "EK3_NOAID_M_NSE", "EK3_OGNM_TEST_SF", "EK3_OGN_HGT_MASK",
+    "EK3_POSNE_M_NSE", "EK3_POS_I_GATE", "EK3_PRIMARY", "EK3_RNG_I_GATE", "EK3_RNG_M_NSE",
+    "EK3_RNG_USE_HGT", "EK3_RNG_USE_SPD", "EK3_SRC1_POSXY", "EK3_SRC1_POSZ", "EK3_SRC1_VELXY",
+    "EK3_SRC1_VELZ", "EK3_SRC1_YAW", "EK3_SRC2_POSXY", "EK3_SRC2_POSZ", "EK3_SRC2_VELXY",
+    "EK3_SRC2_VELZ", "EK3_SRC2_YAW", "EK3_SRC3_POSXY", "EK3_SRC3_POSZ", "EK3_SRC3_VELXY",
+    "EK3_SRC3_VELZ", "EK3_SRC3_YAW", "EK3_SRC_OPTIONS", "EK3_TAU_OUTPUT", "EK3_TERR_GRAD",
+    "EK3_VELD_M_NSE", "EK3_VELNE_M_NSE", "EK3_VEL_I_GATE", "EK3_VIS_VERR_MAX", "EK3_VIS_VERR_MIN",
+    "EK3_WENC_VERR", "EK3_WIND_PSCALE", "EK3_WIND_P_NSE", "EK3_YAW_I_GATE", "EK3_YAW_M_NSE",
+    "ESC_TLM_MAV_OFS", "FRSKY_DNLINK1_ID", "FRSKY_DNLINK2_ID", "FRSKY_DNLINK_ID", "FRSKY_OPTIONS",
+    "FRSKY_UPLINK_ID", "FS_CRASH_CHECK", "FS_DR_TIMEOUT", "FS_GCS_TIMEOUT", "GEN_TYPE",
+    "GND_EFFECT_COMP", "GPS1_CAN_OVRIDE", "GPS2_CAN_OVRIDE", "GPS_AUTO_CONFIG", "GPS_AUTO_SWITCH",
+    "GPS_BLEND_MASK", "GPS_BLEND_TC", "GPS_CAN_NODEID1", "GPS_CAN_NODEID2", "GPS_COM_PORT",
+    "GPS_COM_PORT2", "GPS_DELAY_MS", "GPS_DELAY_MS2", "GPS_DRV_OPTIONS", "GPS_GNSS_MODE",
+    "GPS_GNSS_MODE2", "GPS_HDOP_GOOD", "GPS_INJECT_TO", "GPS_MB1_TYPE", "GPS_MB2_TYPE",
+    "GPS_MIN_DGPS", "GPS_MIN_ELEV", "GPS_NAVFILTER", "GPS_POS1_X", "GPS_POS1_Y",
+    "GPS_POS1_Z", "GPS_POS2_X", "GPS_POS2_Y", "GPS_POS2_Z", "GPS_RATE_MS",
+    "GPS_RATE_MS2", "GPS_RAW_DATA", "GPS_SAVE_CFG", "GPS_SBAS_MODE", "GPS_SBP_LOGMASK"
+};
+
+
+
+
 // storage object
 StorageAccess AP_Param::_storage(StorageManager::StorageParam);
 
@@ -2493,6 +2545,65 @@ float AP_Param::get_default_value(const AP_Param *vp, const struct Info &info)
 }
 
 
+#define MAX_PARAMS 500  // Adjust based on expected parameter count
+#define MAX_NAME_LENGTH 17  // Maximum parameter name length
+
+char param_list[MAX_PARAMS][MAX_NAME_LENGTH];  // Array to store parameter names
+int param_count = 0;
+
+void AP_Param::read_param_file(const char *filename) {
+    // Open the file using ArduPilot's AP::FS()
+    int file_apfs = AP::FS().open(filename, O_RDONLY, true);
+    if (file_apfs == -1) {
+    	printf("Failed to open parameter file: %s\n", filename);
+        return;
+    }
+
+    char line[MAX_NAME_LENGTH];  // Buffer to hold each parameter name
+    while (AP::FS().fgets(line, sizeof(line) - 1, file_apfs)) {
+        // Remove newline characters
+        for (int i = 0; i < MAX_NAME_LENGTH; i++) {
+            if (line[i] == '\n' || line[i] == '\r') {
+                line[i] = '\0';
+                break;
+            }
+        }
+
+        // Store the parameter in the array
+        if (param_count < MAX_PARAMS) {
+            strncpy(param_list[param_count], line, MAX_NAME_LENGTH);
+            param_list[param_count][MAX_NAME_LENGTH - 1] = '\0';  // Ensure null termination
+            param_count++;
+        } else {
+            printf("Parameter list full, ignoring: %s\n", line);
+        }
+    }
+
+    // Close the file
+    AP::FS().close(file_apfs);
+
+    // Print stored parameters (for verification)
+    printf("Loaded %d parameters from file:\n", param_count);
+    for (int i = 0; i < param_count; i++) {
+        printf("%s\n", param_list[i]);
+    }
+}
+
+
+
+// Function to check if a parameter should be skipped
+bool AP_Param::is_param_in_list(const char *name) const {
+    for (int i = 0; i < PARAM_COUNT; i++) {
+        if (strcmp(ignored_params[i], name) == 0) {
+        	printf("skip %s parameter\n", name);
+            return true;  // Parameter exists in the list, skip it
+        }
+    }
+    printf("sent %s parameter\n", name);
+    return false;
+}
+
+
 void AP_Param::send_parameter(const char *name, enum ap_var_type var_type, uint8_t idx) const
 {
     if (idx != 0 && var_type == AP_PARAM_VECTOR3F) {
@@ -2502,6 +2613,11 @@ void AP_Param::send_parameter(const char *name, enum ap_var_type var_type, uint8
         // invalid
         return;
     }
+
+    if (is_param_in_list(name)) {
+         return;
+     }
+
     if (var_type != AP_PARAM_VECTOR3F) {
         // nice and simple for scalar types
         GCS_SEND_PARAM(name, var_type, cast_to_float(var_type));

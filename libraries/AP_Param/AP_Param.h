@@ -740,6 +740,8 @@ private:
 
     // send a parameter to all GCS instances
     void send_parameter(const char *name, enum ap_var_type param_header_type, uint8_t idx) const;
+    bool is_param_in_list(const char *name) const;
+    void read_param_file(const char *filename);
 
     static StorageAccess        _storage;
     static StorageAccess        _storage_bak;
