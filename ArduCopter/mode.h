@@ -310,6 +310,12 @@ public:
     GCS_Copter &gcs();
     uint16_t get_pilot_speed_dn(void);
     // end pass-through functions
+    Vector2f Next = {0,0};
+    Vector2f Prev = {0,0};
+    typedef struct {
+        float x;
+        float y;
+    } Point;
 };
 
 
@@ -375,6 +381,7 @@ public:
         NAV_SCRIPT_TIME,
         NAV_ATTITUDE_TIME,
     };
+    bool Check_Range();
 
     // set submode.  returns true on success, false on failure
     void set_submode(SubMode new_submode);

@@ -203,8 +203,8 @@ void AP_PDRL_COMMANDER::sendLogFileSignature(mavlink_command_transfer_t *rcvedPa
 void AP_PDRL_COMMANDER::sendSprayStatus()
 {
 
-	if(AP::arming().is_armed())
-	{
+//	if(AP::arming().is_armed())
+//	{
 		uint8_t dataBuff[100] = {0};
 		// send spray status only if the sprayer is enabled
 		dataBuff[0] = AP::sprayer()->spraying() || AP::sprayer()->running();
@@ -218,7 +218,7 @@ void AP_PDRL_COMMANDER::sendSprayStatus()
 		dataBuff[0] = 0;
 		sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
 
-	}
+//	}
 
 }
 
@@ -377,15 +377,15 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_SET_OPERATOR_ID:
 	{
 		// Start section oemName
-		char oemName[] = "3z91vt18";
+		char oemName[] = "5ft7dnhk";
 		// End section oemName
 
-		strcpy(oemName,"m");
-		// if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-		// {
-		//     lastUnlock = AP_HAL::millis();
-		//     isUnlocked = true;
-		// }
+		//		 strcpy(oemName,"m");
+		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+		{
+			lastUnlock = AP_HAL::millis();
+			isUnlocked = true;
+		}
 	}
 	break;
 
@@ -466,6 +466,28 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	break;
 
 	case COMMAND_GET_PERMISSION_ARTIFACTS:
+	{
+	    AC_Sprayer *sprayer = AP::sprayer();
+	    if (sprayer == nullptr) {
+	    	uint8_t spray_ack[100] = {0};
+			gcs().send_text(MAV_SEVERITY_INFO,"Sprayer Not Init");
+			sendCommand(0,COMMAND_GET_PERMISSION_ARTIFACTS,COMMAND_TYPE_GET,0,1,1,spray_ack);
+	    	break;
+	    }
+
+		if(packet.command_buff[0])
+		{
+			static int call=1;
+			gcs().send_text(MAV_SEVERITY_INFO,"Got Sprayer ON command %d",call++);
+			printf("Got Sprayer ON command\n");
+	        sprayer->run(true);
+		}
+		else
+		{
+			printf("Got Sprayer OFF command\n");
+	        sprayer->run(false);
+		}
+	}
 		break;
 
 	case COMMAND_GET_SIGN_FROM_HASH:

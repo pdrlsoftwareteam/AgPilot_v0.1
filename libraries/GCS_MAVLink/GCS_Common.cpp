@@ -1666,7 +1666,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1988,22 +1988,6 @@ void GCS_MAVLINK::send_raw_imu()
 
 void GCS_MAVLINK::send_spray_flight_detail()
 {
-	int32_t rel_alt;
-	// get position
-	const AP_AHRS &ahrs = AP::ahrs();
-	Location loc;
-	ahrs.get_location(loc);
-	if(loc.alt == 0 && loc.lat == 0 && loc.lng == 0)
-	{
-		return;
-	}
-	if (!loc.get_alt_cm(Location::AltFrame::ABOVE_HOME, rel_alt)) {
-		return;
-	}
-
-	printf("global_position_int_relative_alt: %2f\trel_alt: %d\n",
-				global_position_int_relative_alt()*0.001, // millimeters above home
-				rel_alt);
 	mavlink_msg_spray_flight_detail_send(
 			chan,
 			AP_HAL::millis(),
@@ -2013,7 +1997,8 @@ void GCS_MAVLINK::send_spray_flight_detail()
 			AP::battery().flight_dist,
 			AP::battery().spray_area_sqm,
 			AP::battery().spray_area_acre,
-			global_position_int_relative_alt()*0.001
+			global_position_int_relative_alt()*0.001,
+			AP::battery().consumed_liquid
 	);
 }
 void GCS_MAVLINK::send_scaled_imu(uint8_t instance, void (*send_fn)(mavlink_channel_t chan, uint32_t time_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag, int16_t temperature))
@@ -5699,14 +5684,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        // {
+        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+        {
 		 	last_heartbeat_time = AP_HAL::millis();
-		// 	if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-		// 	else
-		// 		AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        // }
+			else
+				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+        }
         break;
 
     case MSG_HWSTATUS:

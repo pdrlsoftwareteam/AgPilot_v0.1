@@ -28,12 +28,12 @@
 extern const AP_HAL::HAL& hal;
 
 #define FUELFLOW_MIN_PULSE_DELTA_US 10
-
+static bool is_flowing = false;
 /// Constructor
 AP_BattMonitor_FuelFlow::AP_BattMonitor_FuelFlow(AP_BattMonitor &mon,
 		AP_BattMonitor::BattMonitor_State &mon_state,
 		AP_BattMonitor_Params &params) :
-    												AP_BattMonitor_Analog(mon, mon_state, params)
+    																AP_BattMonitor_Analog(mon, mon_state, params)
 {
 	_state.voltage = 1.0; // show a fixed voltage of 1v
 
@@ -131,48 +131,67 @@ void AP_BattMonitor_FuelFlow::read()
 
 	// map consumed_wh using fixed voltage of 1
 	_state.consumed_wh = _state.consumed_mah;
-		_state.time_remaining += state.pulse_count;
+	_state.time_remaining += state.pulse_count;
 
+    if (state.pulse_count > 0)
+        is_flowing = false;
+    else
+    	is_flowing = true;
+
+
+    if (is_flowing && AP::sprayer()->spraying()) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "FuelFlow: Tank Empty!");
+        is_flowing = true;
+    }
+
+	AP::battery().consumed_liquid = _state.consumed_mah;
 
 	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
 
 	static uint64_t time_ms = AP_HAL::millis();
 
-	if ((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed()) {
+	if ((AP::sprayer()->spraying() /*|| AP::sprayer()->running()*/)) {
 
+		// Accumulate pulse count and count if within the 2.5-second window
+		if (AP_HAL::millis() - time_ms < 2500) {
 
-		// Accumulate pulse count and count if within the 3-second window
-		if (AP_HAL::millis() - time_ms < 3000) {
 			pcount += state.pulse_count;
 			cnt++;
+
 		} else {
-			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
+
+			// Check tank status at the end of the 3-second window, checking with 3 pulses for better result
+			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
+
 				AP::sprayer()->setPulseCount(0);
+				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 
-				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
+			}
 
-				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
-			}
-			if(pcount > 10)
-			{
-				AP::sprayer()->setPulseCount(pcount);
-			}
 			// Reset tracking variables
 			time_ms = AP_HAL::millis();
 			pcount = 0;
 			cnt = 0;
+
 		}
+
+		AP::sprayer()->setPulseCount(state.pulse_count);
 	}
+	else
+	{
+		time_ms = AP_HAL::millis();
+		pcount = 0;
+		cnt = 0;
+		AP::sprayer()->setPulseCount(state.pulse_count);
+	}
+
 
 	//Spray area calculation
 	static uint64_t dist_tm = AP_HAL::millis();
 	//	const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
 	if((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed())
 	{
-
-		//	    static uint64_t spray_time_temp = AP_HAL::millis();  // Track spray start time
-		//	    static bool is_spraying = false;      // Track if sprayer is running
 
 		static Vector2f current_Loc = AP::battery().get_val(),previous_Loc = AP::battery().get_val();
 		current_Loc = AP::battery().get_val();
@@ -218,6 +237,8 @@ void AP_BattMonitor_FuelFlow::read()
 			AP::battery().spray_area_acre = 0;
 			AP::battery().spray_dist = 0;
 			first_arm = 0;
+			_state.consumed_mah = 0;
+			AP::battery().consumed_liquid = 0;
 		}
 		static Vector2f flight_current_Loc = AP::battery().get_val(),flight_previous_Loc = AP::battery().get_val();
 
@@ -232,10 +253,13 @@ void AP_BattMonitor_FuelFlow::read()
 	}
 	else if(!AP::arming().is_armed())
 	{
+		time_ms = AP_HAL::millis();
 		first_arm = 1;
 		flight_time_temp = AP_HAL::millis();
 		spray_tm = AP_HAL::millis();
 		dist_tm = AP_HAL::millis();
+		pcount = 0;
+		cnt = 0;
 	}
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
