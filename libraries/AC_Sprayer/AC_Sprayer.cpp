@@ -51,6 +51,13 @@ const AP_Param::GroupInfo AC_Sprayer::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("PUMP_MIN",   4, AC_Sprayer, _pump_min_pct, AC_SPRAYER_DEFAULT_PUMP_MIN),
 
+    // @Param: ENABLE
+    // @DisplayName: Sprayer enable/disable
+    // @Description: Allows you to enable (1) or disable (0) the sprayer
+    // @Values: 0:Disabled,1:Enabled
+    // @User: Standard
+	AP_GROUPINFO("FLOW_CALIB", 5, AC_Sprayer, _fuel_flow_calibrate, AC_SPRAYER_DEFAULT_FLOW_CALIBRATION),
+
     AP_GROUPEND
 };
 

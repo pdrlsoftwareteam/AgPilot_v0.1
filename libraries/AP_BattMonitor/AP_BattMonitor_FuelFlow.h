@@ -16,6 +16,8 @@ public:
     /// Read the battery voltage and current.  Should be called at 10hz
     void read() override;
 
+    void handle_calibration();
+
     /// returns true if battery monitor provides consumed energy info
     bool has_consumed_energy() const override { return true; }
 
@@ -26,6 +28,10 @@ public:
 
 	uint64_t pcount = 0;
 	uint16_t cnt = 0;
+
+	bool calibration_active = false;  // Tracks if calibration is currently active
+	float calibration_start_mah = 0;  // Stores the initial consumed_mah at calibration start
+
 
 private:
     void irq_handler(uint8_t pin, bool pin_state, uint32_t timestamp);
