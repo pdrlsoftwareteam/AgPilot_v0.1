@@ -68,25 +68,24 @@ void AP_BattMonitor_FuelFlow::handle_calibration()
     bool calib_active = AP::sprayer()->fuelFlow_Calib();
 
     if (calib_active && !calibration_active) {
-        // Calibration just started: Reset tracking variables
+        // Calibration just started
         calibration_active = true;
         calibration_start_mah = _state.consumed_mah;
-        gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Started: Resetting consumed liquid tracking");
+        gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Started: Resetting consumed liquid");
     }
 
     if (!calib_active && calibration_active) {
-        // Calibration just stopped: Calculate and update BATT2_AMP_PERVLT
+        // Calibration just stopped
         calibration_active = false;
         float calibrated_mah = _state.consumed_mah - calibration_start_mah; // Total consumed during calibration
-
+//        float batt_cap = _params._pack_capacity;
         if (calibrated_mah > 0) {
-            _curr_amp_per_volt.set_and_save((3000.0f / calibrated_mah) * _curr_amp_per_volt.get());
+            _curr_amp_per_volt.set_and_save((2000.0f / calibrated_mah) * _curr_amp_per_volt.get());
 
-            // Send message for debugging
             gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Stopped: Updated AMP_PERVLT = %.6f", _curr_amp_per_volt.get());
             _state.consumed_mah = 0;
         } else {
-        	gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow Calibration Stopped: No fuel detected, calibration unchanged");
+        	gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow Calibration Stopped: No fuel detected");
         }
     }
 }
@@ -123,6 +122,10 @@ void AP_BattMonitor_FuelFlow::read()
 		return;
 	}
 	float dt = (now_us - _state.last_time_micros) * 1.0e-6f;
+
+	if (dt < 1 && irq_state.pulse_count == 0 && AP::sprayer()->spraying()) {
+		gcs().send_text(MAV_SEVERITY_CRITICAL, "FuelFlow: Tank Empty!");
+	}
 
 	if (dt < 1 && irq_state.pulse_count == 0) {
 		// we allow for up to 1 second with no pulses to cope with low
@@ -161,14 +164,12 @@ void AP_BattMonitor_FuelFlow::read()
 
 	// map consumed_wh using fixed voltage of 1
 	_state.consumed_wh = _state.consumed_mah;
-		_state.time_remaining += state.pulse_count;
+	_state.time_remaining += state.pulse_count;
 
 		handle_calibration();
 
 		if(AP::sprayer()->spraying())
-		{
-			gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
-		}
+		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
 
 //	    if (state.pulse_count > 0)
 //	        is_flowing = false;
@@ -178,7 +179,6 @@ void AP_BattMonitor_FuelFlow::read()
 //
 //	    if (is_flowing && AP::sprayer()->spraying()) {
 //	        gcs().send_text(MAV_SEVERITY_CRITICAL, "FuelFlow: Tank Empty!");
-//	        gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f%% remaining", fuel_percentage);
 //	        is_flowing = true;
 //	    }
 
@@ -191,106 +191,106 @@ void AP_BattMonitor_FuelFlow::read()
 
 	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
 
-	static uint64_t time_ms = AP_HAL::millis();
-
-	if ((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed()) {
-
-
-		// Accumulate pulse count and count if within the 3-second window
-		if (AP_HAL::millis() - time_ms < 3000) {
-			pcount += state.pulse_count;
-			cnt++;
-		} else {
-			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
-				AP::sprayer()->setPulseCount(0);
-
-//				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
-
-//				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
-			}
-			if(pcount > 10)
-			{
-				AP::sprayer()->setPulseCount(pcount);
-			}
-			// Reset tracking variables
-			time_ms = AP_HAL::millis();
-			pcount = 0;
-			cnt = 0;
-		}
-	}
-
-	//Spray area calculation
-	static uint64_t dist_tm = AP_HAL::millis();
-	//	const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
-	if((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed())
-	{
-
-		//	    static uint64_t spray_time_temp = AP_HAL::millis();  // Track spray start time
-		//	    static bool is_spraying = false;      // Track if sprayer is running
-
-		static Vector2f current_Loc = AP::battery().get_val(),previous_Loc = AP::battery().get_val();
-		current_Loc = AP::battery().get_val();
-
-		if (AP_HAL::millis() - dist_tm > 200)
-		{
-			AP::battery().spray_dist += sqrt(pow(previous_Loc.x/100 - current_Loc.x/100, 2) + pow(previous_Loc.y/100 - current_Loc.y/100, 2));
-			previous_Loc = current_Loc;
-			current_Loc = AP::battery().get_val();
-			AP::battery().spray_area_sqm = AP::battery().spray_dist*3.5;
-			AP::battery().spray_area_acre = AP::battery().spray_area_sqm*0.000247105;
-			dist_tm = AP_HAL::millis();
-		}
-	}
-
-	static uint64_t spray_tm = AP_HAL::millis();
-	if(AP::arming().is_armed())
-	{
-		if(AP::sprayer()->spraying() || AP::sprayer()->running())
-		{
-			if (AP_HAL::millis() - spray_tm > 200)
-			{
-				AP::battery().spray_time += AP_HAL::millis() - spray_tm;
-				spray_tm = AP_HAL::millis();
-			}
-		}
-		else
-		{
-			spray_tm = AP_HAL::millis();
-		}
-	}
-
-	static uint64_t flight_time_temp = AP_HAL::millis();
-	static bool first_arm = true;
-	if(AP::arming().is_armed())
-	{
-		if(first_arm)
-		{
-			AP::battery().flight_time = 0;
-			AP::battery().flight_dist = 0;
-			AP::battery().spray_time = 0;  // Reset spray time
-			AP::battery().spray_area_sqm = 0;
-			AP::battery().spray_area_acre = 0;
-			AP::battery().spray_dist = 0;
-			first_arm = 0;
-		}
-		static Vector2f flight_current_Loc = AP::battery().get_val(),flight_previous_Loc = AP::battery().get_val();
-
-		if (AP_HAL::millis() - flight_time_temp > 200)
-		{
-			AP::battery().flight_dist += sqrt(pow(flight_previous_Loc.x/100 - flight_current_Loc.x/100, 2) + pow(flight_previous_Loc.y/100 - flight_current_Loc.y/100, 2));
-			flight_previous_Loc = flight_current_Loc;
-			flight_current_Loc = AP::battery().get_val();
-			AP::battery().flight_time += AP_HAL::millis() - flight_time_temp;
-			flight_time_temp = AP_HAL::millis();
-		}
-	}
-	else if(!AP::arming().is_armed())
-	{
-		first_arm = 1;
-		flight_time_temp = AP_HAL::millis();
-		spray_tm = AP_HAL::millis();
-		dist_tm = AP_HAL::millis();
-	}
+//	static uint64_t time_ms = AP_HAL::millis();
+//
+//	if ((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed()) {
+//
+//
+//		// Accumulate pulse count and count if within the 3-second window
+//		if (AP_HAL::millis() - time_ms < 3000) {
+//			pcount += state.pulse_count;
+//			cnt++;
+//		} else {
+//			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
+//			if (cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
+//				AP::sprayer()->setPulseCount(0);
+//
+////				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
+//
+////				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
+//			}
+//			if(pcount > 10)
+//			{
+//				AP::sprayer()->setPulseCount(pcount);
+//			}
+//			// Reset tracking variables
+//			time_ms = AP_HAL::millis();
+//			pcount = 0;
+//			cnt = 0;
+//		}
+//	}
+//
+//	//Spray area calculation
+//	static uint64_t dist_tm = AP_HAL::millis();
+//	//	const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
+//	if((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed())
+//	{
+//
+//		//	    static uint64_t spray_time_temp = AP_HAL::millis();  // Track spray start time
+//		//	    static bool is_spraying = false;      // Track if sprayer is running
+//
+//		static Vector2f current_Loc = AP::battery().get_val(),previous_Loc = AP::battery().get_val();
+//		current_Loc = AP::battery().get_val();
+//
+//		if (AP_HAL::millis() - dist_tm > 200)
+//		{
+//			AP::battery().spray_dist += sqrt(pow(previous_Loc.x/100 - current_Loc.x/100, 2) + pow(previous_Loc.y/100 - current_Loc.y/100, 2));
+//			previous_Loc = current_Loc;
+//			current_Loc = AP::battery().get_val();
+//			AP::battery().spray_area_sqm = AP::battery().spray_dist*3.5;
+//			AP::battery().spray_area_acre = AP::battery().spray_area_sqm*0.000247105;
+//			dist_tm = AP_HAL::millis();
+//		}
+//	}
+//
+//	static uint64_t spray_tm = AP_HAL::millis();
+//	if(AP::arming().is_armed())
+//	{
+//		if(AP::sprayer()->spraying() || AP::sprayer()->running())
+//		{
+//			if (AP_HAL::millis() - spray_tm > 200)
+//			{
+//				AP::battery().spray_time += AP_HAL::millis() - spray_tm;
+//				spray_tm = AP_HAL::millis();
+//			}
+//		}
+//		else
+//		{
+//			spray_tm = AP_HAL::millis();
+//		}
+//	}
+//
+//	static uint64_t flight_time_temp = AP_HAL::millis();
+//	static bool first_arm = true;
+//	if(AP::arming().is_armed())
+//	{
+//		if(first_arm)
+//		{
+//			AP::battery().flight_time = 0;
+//			AP::battery().flight_dist = 0;
+//			AP::battery().spray_time = 0;  // Reset spray time
+//			AP::battery().spray_area_sqm = 0;
+//			AP::battery().spray_area_acre = 0;
+//			AP::battery().spray_dist = 0;
+//			first_arm = 0;
+//		}
+//		static Vector2f flight_current_Loc = AP::battery().get_val(),flight_previous_Loc = AP::battery().get_val();
+//
+//		if (AP_HAL::millis() - flight_time_temp > 200)
+//		{
+//			AP::battery().flight_dist += sqrt(pow(flight_previous_Loc.x/100 - flight_current_Loc.x/100, 2) + pow(flight_previous_Loc.y/100 - flight_current_Loc.y/100, 2));
+//			flight_previous_Loc = flight_current_Loc;
+//			flight_current_Loc = AP::battery().get_val();
+//			AP::battery().flight_time += AP_HAL::millis() - flight_time_temp;
+//			flight_time_temp = AP_HAL::millis();
+//		}
+//	}
+//	else if(!AP::arming().is_armed())
+//	{
+//		first_arm = 1;
+//		flight_time_temp = AP_HAL::millis();
+//		spray_tm = AP_HAL::millis();
+//		dist_tm = AP_HAL::millis();
+//	}
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
