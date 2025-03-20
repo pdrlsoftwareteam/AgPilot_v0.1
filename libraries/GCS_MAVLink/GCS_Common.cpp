@@ -1666,7 +1666,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1988,22 +1988,6 @@ void GCS_MAVLINK::send_raw_imu()
 
 void GCS_MAVLINK::send_spray_flight_detail()
 {
-	int32_t rel_alt;
-	// get position
-	const AP_AHRS &ahrs = AP::ahrs();
-	Location loc;
-	ahrs.get_location(loc);
-	if(loc.alt == 0 && loc.lat == 0 && loc.lng == 0)
-	{
-		return;
-	}
-	if (!loc.get_alt_cm(Location::AltFrame::ABOVE_HOME, rel_alt)) {
-		return;
-	}
-
-	printf("global_position_int_relative_alt: %2f\trel_alt: %d\n",
-				global_position_int_relative_alt()*0.001, // millimeters above home
-				rel_alt);
 	mavlink_msg_spray_flight_detail_send(
 			chan,
 			AP_HAL::millis(),
@@ -5699,14 +5683,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        // {
+        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+        {
 		 	last_heartbeat_time = AP_HAL::millis();
-		// 	if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-		// 	else
-		// 		AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        // }
+			else
+				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+        }
         break;
 
     case MSG_HWSTATUS:
@@ -5889,7 +5873,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_SPRAY_FLIGHT_DETAIL:
         CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
-        send_spray_flight_detail();
+//        send_spray_flight_detail();
         break;
 
     case MSG_RAW_IMU:

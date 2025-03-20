@@ -138,31 +138,36 @@ void AP_BattMonitor_FuelFlow::read()
 
 	static uint64_t time_ms = AP_HAL::millis();
 
-	if ((AP::sprayer()->spraying() || AP::sprayer()->running()) && AP::arming().is_armed()) {
+	if ((AP::sprayer()->spraying()) && AP::arming().is_armed()) {
+	
 
-
-		// Accumulate pulse count and count if within the 3-second window
-		if (AP_HAL::millis() - time_ms < 3000) {
+	// Accumulate pulse count and count if within the 3-second window
+		if (AP_HAL::millis() - time_ms < 2500) {
 			pcount += state.pulse_count;
 			cnt++;
 		} else {
 			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
+			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
+				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 
-				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Level Updated %d", (uint16_t)pcount);
-
-				gcs().send_text(MAV_SEVERITY_INFO, "Tank Empty");
-			}
-			if(pcount > 10)
-			{
-				AP::sprayer()->setPulseCount(pcount);
 			}
 			// Reset tracking variables
 			time_ms = AP_HAL::millis();
 			pcount = 0;
 			cnt = 0;
 		}
+
+		AP::sprayer()->setPulseCount(state.pulse_count);
+	}
+	else
+	{
+		// Reset tracking variables
+		time_ms = AP_HAL::millis();
+		pcount = 0;
+		cnt = 0;
+		AP::sprayer()->setPulseCount(0);
 	}
 
 	//Spray area calculation
@@ -236,6 +241,10 @@ void AP_BattMonitor_FuelFlow::read()
 		flight_time_temp = AP_HAL::millis();
 		spray_tm = AP_HAL::millis();
 		dist_tm = AP_HAL::millis();
+		// Reset tracking variables
+		time_ms = AP_HAL::millis();
+		pcount = 0;
+		cnt = 0;
 	}
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
