@@ -62,6 +62,34 @@ void AP_BattMonitor_FuelFlow::irq_handler(uint8_t pin, bool pin_state, uint32_t 
 	irq_state.last_pulse_us = timestamp;
 }
 
+void AP_BattMonitor_FuelFlow::handle_calibration()
+{
+    bool calib_active = AP::sprayer()->fuelFlow_Calib();
+
+    if (calib_active && !calibration_active) {
+        // Calibration just started
+        calibration_active = true;
+        calibration_start_mah = _state.consumed_mah;
+        gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Started: Resetting consumed liquid");
+    }
+
+    if (!calib_active && calibration_active) {
+        // Calibration just stopped
+        calibration_active = false;
+        float calibrated_mah = _state.consumed_mah - calibration_start_mah; // Total consumed during calibration
+//        float batt_cap = _params._pack_capacity;
+        if (calibrated_mah > 0) {
+            _curr_amp_per_volt.set_and_save((2000.0f / calibrated_mah) * _curr_amp_per_volt.get());
+
+            gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Stopped: Updated AMP_PERVLT = %.6f", _curr_amp_per_volt.get());
+            _state.consumed_mah = 0;
+        } else {
+        	gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow Calibration Stopped: No fuel detected");
+        }
+    }
+}
+
+
 /*
   read - read the "voltage" and "current"
  */
@@ -93,6 +121,10 @@ void AP_BattMonitor_FuelFlow::read()
 		return;
 	}
 	float dt = (now_us - _state.last_time_micros) * 1.0e-6f;
+
+//	if (dt < 1 && irq_state.pulse_count == 0 && AP::sprayer()->spraying()) {
+//		gcs().send_text(MAV_SEVERITY_CRITICAL, "FuelFlow: Tank Empty!");
+//	}
 
 	if (dt < 1 && irq_state.pulse_count == 0) {
 		// we allow for up to 1 second with no pulses to cope with low
@@ -133,7 +165,17 @@ void AP_BattMonitor_FuelFlow::read()
 	_state.consumed_wh = _state.consumed_mah;
 		_state.time_remaining += state.pulse_count;
 
+		handle_calibration();
 
+		float consumed_diff = _state.consumed_mah - last_consumed_mah;
+
+		if((consumed_diff < 3.0f) && (AP::sprayer()->spraying()) && (_state.consumed_mah > 30.0f))
+			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
+
+		last_consumed_mah = _state.consumed_mah;
+
+		if(AP::sprayer()->spraying())
+		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
 	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
 
 	static uint64_t time_ms = AP_HAL::millis();
@@ -150,7 +192,7 @@ void AP_BattMonitor_FuelFlow::read()
 			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
 				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
-				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
 
 			}
 			// Reset tracking variables
