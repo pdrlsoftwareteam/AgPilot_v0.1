@@ -165,11 +165,12 @@ void AP_BattMonitor_FuelFlow::read()
 	_state.consumed_wh = _state.consumed_mah;
 		_state.time_remaining += state.pulse_count;
 
+//		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: state.pulse_count %ld", state.pulse_count);
 		handle_calibration();
 
 		float consumed_diff = _state.consumed_mah - last_consumed_mah;
 
-		if((consumed_diff < 3.0f) && (AP::sprayer()->spraying()) && (_state.consumed_mah > 30.0f))
+		if((consumed_diff < 1.50f) && (AP::sprayer()->spraying()) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0)
 			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 
 		last_consumed_mah = _state.consumed_mah;
