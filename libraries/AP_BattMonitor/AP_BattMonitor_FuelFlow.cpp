@@ -170,48 +170,25 @@ void AP_BattMonitor_FuelFlow::read()
 
 		float consumed_diff = _state.consumed_mah - last_consumed_mah;
 
-		if((consumed_diff < 1.50f) && (AP::sprayer()->spraying()) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0)
-			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
+		if (AP::sprayer()->spraying()) {
+			if((consumed_diff < 1.50f) && (_state.consumed_mah > 30.0f) && state.pulse_count <= 1){
+				AP::sprayer()->setPulseCount(0);
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
+			}
+			else
+				AP::sprayer()->setPulseCount(1);
+		}
+		else
+			AP::sprayer()->setPulseCount(0);
+
+//		if((consumed_diff < 1.50f) && (AP::sprayer()->spraying()) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0)
+//			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 
 		last_consumed_mah = _state.consumed_mah;
 
-		if(AP::sprayer()->spraying())
-		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
-	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
+//		if(AP::sprayer()->spraying())
+//		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
 
-	static uint64_t time_ms = AP_HAL::millis();
-
-	if ((AP::sprayer()->spraying()) && AP::arming().is_armed()) {
-	
-
-	// Accumulate pulse count and count if within the 3-second window
-		if (AP_HAL::millis() - time_ms < 2500) {
-			pcount += state.pulse_count;
-			cnt++;
-		} else {
-			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
-				AP::sprayer()->setPulseCount(0);
-				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
-				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
-
-			}
-			// Reset tracking variables
-			time_ms = AP_HAL::millis();
-			pcount = 0;
-			cnt = 0;
-		}
-
-		AP::sprayer()->setPulseCount(state.pulse_count);
-	}
-	else
-	{
-		// Reset tracking variables
-		time_ms = AP_HAL::millis();
-		pcount = 0;
-		cnt = 0;
-		AP::sprayer()->setPulseCount(0);
-	}
 
 	//Spray area calculation
 	static uint64_t dist_tm = AP_HAL::millis();
@@ -284,10 +261,6 @@ void AP_BattMonitor_FuelFlow::read()
 		flight_time_temp = AP_HAL::millis();
 		spray_tm = AP_HAL::millis();
 		dist_tm = AP_HAL::millis();
-		// Reset tracking variables
-		time_ms = AP_HAL::millis();
-		pcount = 0;
-		cnt = 0;
 	}
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
