@@ -1694,6 +1694,8 @@ void ModeAuto::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 	// this is the delay, stored in seconds
 	loiter_time_max = cmd.p1;
 
+	mission.do_sprayer_in_auto(cmd.p2);
+
 	// set next destination if necessary
 	if (!set_next_wp(cmd, target_loc)) {
 		// failure to set next destination can only be because of missing terrain data

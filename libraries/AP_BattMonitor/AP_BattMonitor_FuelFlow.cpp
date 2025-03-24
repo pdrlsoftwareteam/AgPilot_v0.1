@@ -175,8 +175,8 @@ void AP_BattMonitor_FuelFlow::read()
 
 		last_consumed_mah = _state.consumed_mah;
 
-		if(AP::sprayer()->spraying())
-		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
+//		if(AP::sprayer()->spraying())
+//		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: %0.2f consumed", _state.consumed_mah);
 	// Save history and check tank status only if the sprayer is enabled and ground speed is not zero
 
 	static uint64_t time_ms = AP_HAL::millis();
@@ -192,8 +192,8 @@ void AP_BattMonitor_FuelFlow::read()
 			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
 			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
-				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
-				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
+//				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
+//				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
 
 			}
 			// Reset tracking variables
