@@ -545,6 +545,11 @@ public:
     UserParameters user_parameters;
 #endif
 
+#if AUTOTUNE_ENABLED == ENABLED
+    // we need a pointer to autotune for the G2 table
+    void *autotune_ptr;
+#endif
+
 #if AP_SCRIPTING_ENABLED
     AP_Scripting scripting;
 #endif // AP_SCRIPTING_ENABLED

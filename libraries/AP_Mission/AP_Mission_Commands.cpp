@@ -203,7 +203,7 @@ bool AP_Mission::start_command_do_sprayer(const AP_Mission::Mission_Command& cmd
     } else {
         sprayer->run(false);
     }
-
+	Spray_wp = cmd.p1;
     return true;
 #else
     return false;
