@@ -401,6 +401,7 @@ public:
         uint16_t index;             // this commands position in the command list
         uint16_t id;                // mavlink command id
         uint16_t p1;                // general purpose parameter 1
+        uint16_t p2;                // general purpose parameter 2
         Content content;
 
         // for items which store in location, we offer a few more bits

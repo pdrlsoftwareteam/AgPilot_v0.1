@@ -1694,7 +1694,8 @@ void ModeAuto::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 	// this is the delay, stored in seconds
 	loiter_time_max = cmd.p1;
 
-	mission.do_sprayer_in_auto(cmd.p2);
+	mission.do_sprayer_in_auto(LOWBYTE(cmd.p1));
+	gcs().send_text(MAV_SEVERITY_INFO, "do_sprayer_in_auto - %d",LOWBYTE(cmd.p1));
 
 	// set next destination if necessary
 	if (!set_next_wp(cmd, target_loc)) {
