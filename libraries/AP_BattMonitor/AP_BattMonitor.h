@@ -131,6 +131,7 @@ public:
     uint32_t spray_time;
     uint32_t flight_time;
     float flight_dist;
+    float consumed_liquid;
 
 
     static AP_BattMonitor *get_singleton() {
