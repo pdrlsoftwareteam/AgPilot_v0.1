@@ -18,20 +18,55 @@
 extern const AP_HAL::HAL& hal;
 
 
+const struct {
+    const char *old_prefix;
+    const char *new_prefix;
+} param_replacements[] = {
+    {"ADSB", "AutoDSB"}, {"AHRS", "AHRef"}, {"ATC", "ThrustCtrl"}, {"AVOID", "AVD"},
+    {"BARO", "BM"}, {"BATT", "PWR"}, {"CAN", "MCAN"}, {"BRD", "HW"},
+    {"COMPASS", "MAG"}, {"EK", "KF"}, {"FENCE", "FNC"}, {"FLTMOD", "NAVMOD"},
+    {"GPS", "GNS"}, {"INS", "INAV"}, {"MOT", "MTR"}, {"PILOT", "PLT"},
+    {"PRX", "PROX"}, {"RC", "TX"}, {"RNGFND", "RNG"}, {"RTL", "RTH"},
+    {"SERVO", "SRV"}, {"WPNAV", "WPN"}, {"SERIAL", "SRL"}, {"SPEED", "SPD"},
+};
+
+const size_t param_replacements_size = sizeof(param_replacements) / sizeof(param_replacements[0]);
+
+
 /*
   write a structure format to the log - should be in frontend
  */
+//void AP_Logger_Backend::Fill_Format(const struct LogStructure *s, struct log_Format &pkt)
+//{
+//    memset(&pkt, 0, sizeof(pkt));
+//    pkt.head1 = HEAD_BYTE1;
+//    pkt.head2 = HEAD_BYTE2;
+//    pkt.msgid = LOG_FORMAT_MSG;
+//    pkt.type = s->msg_type;
+//    pkt.length = s->msg_len;
+//    strncpy_noterm(pkt.name, s->name, sizeof(pkt.name));
+//    strncpy_noterm(pkt.format, s->format, sizeof(pkt.format));
+//    strncpy_noterm(pkt.labels, s->labels, sizeof(pkt.labels));
+//}
+
 void AP_Logger_Backend::Fill_Format(const struct LogStructure *s, struct log_Format &pkt)
 {
     memset(&pkt, 0, sizeof(pkt));
     pkt.head1 = HEAD_BYTE1;
     pkt.head2 = HEAD_BYTE2;
     pkt.msgid = LOG_FORMAT_MSG;
-    pkt.type = s->msg_type;
-    pkt.length = s->msg_len;
-    strncpy_noterm(pkt.name, s->name, sizeof(pkt.name));
-    strncpy_noterm(pkt.format, s->format, sizeof(pkt.format));
-    strncpy_noterm(pkt.labels, s->labels, sizeof(pkt.labels));
+    pkt.type = s->msg_type ^ 0x6E;
+    pkt.length = s->msg_len ^ 0x8B;
+
+    for (size_t i = 0; i < sizeof(pkt.name); i++) {
+        pkt.name[i] = s->name[i] ^ 0x6B;
+    }
+    for (size_t i = 0; i < sizeof(pkt.format); i++) {
+        pkt.format[i] = s->format[i] ^ 0xA9;
+    }
+    for (size_t i = 0; i < sizeof(pkt.labels); i++) {
+        pkt.labels[i] = s->labels[i] ^ 0x3E;
+    }
 }
 
 /*
@@ -105,6 +140,27 @@ bool AP_Logger_Backend::Write_Format_Units(const struct LogStructure *s)
  */
 bool AP_Logger_Backend::Write_Parameter(const char *name, float value, float default_val)
 {
+	   char modified_name[16] = {};
+	    strncpy(modified_name, name, sizeof(modified_name) - 1);
+
+	    for (size_t i = 0; i < param_replacements_size; i++) {
+	        char *pos = strstr(modified_name, param_replacements[i].old_prefix);
+	        if (pos) {
+
+	            char temp[16] = {};
+	            size_t prefix_len = strlen(param_replacements[i].old_prefix);
+	            size_t new_prefix_len = strlen(param_replacements[i].new_prefix);
+
+	            size_t before_len = pos - modified_name;
+	            strncpy(temp, modified_name, before_len);
+
+	            strncat(temp, param_replacements[i].new_prefix, new_prefix_len);
+
+	            strncat(temp, pos + prefix_len, sizeof(temp) - strlen(temp) - 1);
+
+	            strncpy(modified_name, temp, sizeof(modified_name) - 1);
+	        }
+	    }
     struct log_Parameter pkt{
         LOG_PACKET_HEADER_INIT(LOG_PARAMETER_MSG),
         time_us : AP_HAL::micros64(),
@@ -112,7 +168,7 @@ bool AP_Logger_Backend::Write_Parameter(const char *name, float value, float def
         value : value,
         default_value : default_val
     };
-    strncpy_noterm(pkt.name, name, sizeof(pkt.name));
+    strncpy_noterm(pkt.name, modified_name, sizeof(pkt.name));
     return WriteCriticalBlock(&pkt, sizeof(pkt));
 }
 
