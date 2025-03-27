@@ -1506,7 +1506,7 @@ void AP_PDRL_Logger::logStrToFile(char* logBuff,size_t len)
     	month+=1;
         snprintf(datetimeBuf, sizeof(datetimeBuf), "%04u-%02u-%02u %02u:%02u:%02u.%03u",
                  year, month, day, hour, min, sec, ms);
-      //  gcs().send_text(MAV_SEVERITY_INFO, "Using RTC Time: %s", datetimeBuf);
+        gcs().send_text(MAV_SEVERITY_INFO, "Using RTC Time: %s", datetimeBuf);
     }
     else
     {

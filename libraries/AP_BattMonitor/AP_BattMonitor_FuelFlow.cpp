@@ -166,7 +166,7 @@ void AP_BattMonitor_FuelFlow::read()
 		_state.time_remaining += state.pulse_count;
 
 //		gcs().send_text(MAV_SEVERITY_WARNING, "FuelFlow: state.pulse_count %ld", state.pulse_count);
-		handle_calibration();
+//		handle_calibration();
 
 		float consumed_diff = _state.consumed_mah - last_consumed_mah;
 
@@ -193,7 +193,7 @@ void AP_BattMonitor_FuelFlow::read()
 			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
 //				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
-//				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
+				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty from manish");
 
 			}
 			// Reset tracking variables
