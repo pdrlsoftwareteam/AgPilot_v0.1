@@ -7,6 +7,7 @@
 #include <GCS_MAVLink/GCS_MAVLink.h>
 #include "AP_BattMonitor_Params.h"
 #include "AP_BattMonitor_config.h"
+#include <AP_InertialNav/AP_InertialNav.h>  // Inertial Navigation library
 
 // maximum number of battery monitors
 #ifndef AP_BATT_MONITOR_MAX_INSTANCES
@@ -117,6 +118,20 @@ public:
 
     /* Do not allow copies */
     CLASS_NO_COPY(AP_BattMonitor);
+
+    Vector2f Current_Loc;
+    void set_val(Vector2f Loc);
+    Vector2f get_val();
+//	float calculated_area = 0;
+//	float Cal
+
+    float spray_dist;
+    float spray_area_acre;
+    float spray_area_sqm;
+    uint32_t spray_time;
+    uint32_t flight_time;
+    float flight_dist;
+
 
     static AP_BattMonitor *get_singleton() {
         return _singleton;

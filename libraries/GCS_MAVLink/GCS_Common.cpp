@@ -918,6 +918,8 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_SCALED_IMU,            MSG_SCALED_IMU},
         { MAVLINK_MSG_ID_SCALED_IMU2,           MSG_SCALED_IMU2},
         { MAVLINK_MSG_ID_SCALED_IMU3,           MSG_SCALED_IMU3},
+		{ MAVLINK_MSG_ID_SPRAY_FLIGHT_DETAIL, 	MSG_SPRAY_FLIGHT_DETAIL},
+
         { MAVLINK_MSG_ID_SCALED_PRESSURE,       MSG_SCALED_PRESSURE},
         { MAVLINK_MSG_ID_SCALED_PRESSURE2,      MSG_SCALED_PRESSURE2},
         { MAVLINK_MSG_ID_SCALED_PRESSURE3,      MSG_SCALED_PRESSURE3},
@@ -1664,7 +1666,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1984,6 +1986,20 @@ void GCS_MAVLINK::send_raw_imu()
 #endif
 }
 
+void GCS_MAVLINK::send_spray_flight_detail()
+{
+	mavlink_msg_spray_flight_detail_send(
+			chan,
+			AP_HAL::millis(),
+			AP::battery().flight_time/1000,
+			AP::battery().spray_time/1000,
+			AP::battery().spray_dist,
+			AP::battery().flight_dist,
+			AP::battery().spray_area_sqm,
+			AP::battery().spray_area_acre,
+			global_position_int_relative_alt()*0.001
+	);
+}
 void GCS_MAVLINK::send_scaled_imu(uint8_t instance, void (*send_fn)(mavlink_channel_t chan, uint32_t time_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag, int16_t temperature))
 {
 #if AP_INERTIALSENSOR_ENABLED
@@ -5667,14 +5683,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        // {
+        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+        {
 		 	last_heartbeat_time = AP_HAL::millis();
-		// 	if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-		// 	else
-		// 		AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        // }
+			else
+				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+        }
         break;
 
     case MSG_HWSTATUS:
@@ -5853,6 +5869,11 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_RC_CHANNELS_RAW:
         CHECK_PAYLOAD_SIZE(RC_CHANNELS_RAW);
         send_rc_channels_raw();
+        break;
+
+    case MSG_SPRAY_FLIGHT_DETAIL:
+        CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
+//        send_spray_flight_detail();
         break;
 
     case MSG_RAW_IMU:

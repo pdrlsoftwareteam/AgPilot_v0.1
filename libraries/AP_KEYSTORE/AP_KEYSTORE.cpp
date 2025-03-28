@@ -14,7 +14,7 @@ extern const AP_HAL::HAL& hal;
 AP_KEYSTORE* AP_KEYSTORE::m_pInstance = 0;
 
 // Start section pdrlPublicKey
-const char* pdrlPublicKey = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2fPAsXTphWBfgbiPdLaI\nl9S7X4k1N2fKZY7M0mVFG98f+F7SliIJksS40ioftF7Xs6EpiHyJSP3RbZdwU8wb\ni1wkRTGDXeckl7j18S1lWgUtAPMBL+IAQbezyilnzoXVYyCVyriQpfDwoOLWGkQL\n1lyMrmU+gTXBNBd49uqfwTKlibp6gptR6xkezAVH+bMsrQrYWsD1Jb6X7nnpyDNR\nxUJXwtTvw+NbxNMg+wm5vfciYKpqGdjfSqVNHVr/NYxSr+FhvGdonyFwWI1z2PW5\nB4Dbe+5qlK/zXSCOHjSYqXScqg4YKpXJvwI+yTHZ/Rg3/bdvPYoqznz42ZFuBHJL\ncQIDAQAB\n-----END PUBLIC KEY-----\n\0";
+//const char* pdrlPublicKey = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2fPAsXTphWBfgbiPdLaI\nl9S7X4k1N2fKZY7M0mVFG98f+F7SliIJksS40ioftF7Xs6EpiHyJSP3RbZdwU8wb\ni1wkRTGDXeckl7j18S1lWgUtAPMBL+IAQbezyilnzoXVYyCVyriQpfDwoOLWGkQL\n1lyMrmU+gTXBNBd49uqfwTKlibp6gptR6xkezAVH+bMsrQrYWsD1Jb6X7nnpyDNR\nxUJXwtTvw+NbxNMg+wm5vfciYKpqGdjfSqVNHVr/NYxSr+FhvGdonyFwWI1z2PW5\nB4Dbe+5qlK/zXSCOHjSYqXScqg4YKpXJvwI+yTHZ/Rg3/bdvPYoqznz42ZFuBHJL\ncQIDAQAB\n-----END PUBLIC KEY-----\n\0";
 // End section pdrlPublicKey
 
 //const AP_Param::GroupInfo AP_KEYSTORE::var_info[] = {

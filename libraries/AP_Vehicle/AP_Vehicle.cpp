@@ -299,7 +299,7 @@ void AP_Vehicle::setup()
     // initialisation
     AP_Param::invalidate_count();
 
-    gcs().send_text(MAV_SEVERITY_INFO, "ArduPilot Ready");
+    gcs().send_text(MAV_SEVERITY_INFO, "AgPilot Ready");
 }
 
 void AP_Vehicle::loop()
@@ -465,7 +465,7 @@ void AP_Vehicle::scheduler_delay_callback()
         if (AP_BoardConfig::in_config_error()) {
             gcs().send_text(MAV_SEVERITY_CRITICAL, "Config Error: fix problem then reboot");
         } else {
-            gcs().send_text(MAV_SEVERITY_INFO, "Initialising ArduPilot");
+            gcs().send_text(MAV_SEVERITY_INFO, "Initialising AgPilot");
         }
     }
 
