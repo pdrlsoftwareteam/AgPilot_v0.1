@@ -441,6 +441,8 @@ void SRV_Channels::calc_pwm(void)
             channels[i].calc_pwm(functions[channels[i].function.get()].output_scaled);
         }
     }
+//    printf("%d %d %d %d %d %d\n",channels[0].get_output_pwm(),channels[1].get_output_pwm(),channels[2].get_output_pwm(),
+//    		channels[3].get_output_pwm(),channels[4].get_output_pwm(),channels[5].get_output_pwm());
 }
 
 // set output value for a specific function channel as a pwm value
