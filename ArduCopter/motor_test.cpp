@@ -29,6 +29,10 @@ void Copter::motor_test_output()
     uint32_t now = AP_HAL::millis();
     if ((now - motor_test_start_ms) >= motor_test_timeout_ms) {
         if (motor_test_count > 1) {
+            if (now - motor_test_start_ms < motor_test_timeout_ms*1.5) {
+                // output zero for 50% of the test time
+                motors->output_min();
+            } else {
                 // move onto next motor
                 motor_test_seq++;
                 motor_test_count--;
@@ -37,6 +41,7 @@ void Copter::motor_test_output()
                     motors->armed(true);
                     hal.util->set_soft_armed(true);
                 }
+            }
             return;
         }
         // stop motor test
@@ -77,9 +82,7 @@ void Copter::motor_test_output()
         // sanity check throttle values
         if (pwm >= RC_Channel::RC_MIN_LIMIT_PWM && pwm <= RC_Channel::RC_MAX_LIMIT_PWM) {
             // turn on motor Sequentially to specified pwm value
-            for (uint8_t i = 0; i <= motor_test_seq; i++) {
-                motors->output_test_seq(i, pwm);
-            }
+            motors->output_test_seq(motor_test_seq, pwm);
         } else {
             motor_test_stop();
         }
@@ -197,12 +200,6 @@ void Copter::motor_test_stop()
     // disarm motors
     motors->armed(false);
     hal.util->set_soft_armed(false);
-
-    // motors tested
-    if(g2.req_motor_test == 1)
-    {
-    	g2.req_motor_test.set(0);
-    }
 
     // reset timeout
     motor_test_start_ms = 0;
