@@ -379,9 +379,8 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_SET_OPERATOR_ID:
 	{
 		// Start section oemName
-		char oemName[] = "woGhn2QD";
+		char oemName[] = "5ft7dnhk";
 		// End section oemName
-
 				 strcpy(oemName,"m");
 //		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
 //		{
@@ -469,28 +468,28 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_GET_PERMISSION_ARTIFACTS:
 	{
-	    AC_Sprayer *sprayer = AP::sprayer();
-	    if (sprayer == nullptr) {
+		AC_Sprayer *sprayer = AP::sprayer();
+		if (sprayer == nullptr) {
 	    	uint8_t spray_ack[100] = {0};
 			gcs().send_text(MAV_SEVERITY_INFO,"Sprayer Not Init");
 			sendCommand(0,COMMAND_GET_PERMISSION_ARTIFACTS,COMMAND_TYPE_GET,0,1,1,spray_ack);
-	    	break;
-	    }
+			break;
+		}
 
 		if(packet.command_buff[0])
 		{
 			static int call=1;
 			gcs().send_text(MAV_SEVERITY_INFO,"Got Sprayer ON command %d",call++);
 			printf("Got Sprayer ON command\n");
-	        sprayer->run(true);
+			sprayer->run(true);
 		}
 		else
 		{
 			printf("Got Sprayer OFF command\n");
-	        sprayer->run(false);
+			sprayer->run(false);
 		}
 	}
-		break;
+	break;
 
 	case COMMAND_GET_SIGN_FROM_HASH:
 		handleHashToSign(&packet);
