@@ -207,7 +207,7 @@ void AP_PDRL_COMMANDER::sendSprayStatus()
 //	{
 		uint8_t dataBuff[100] = {0};
 		// send spray status only if the sprayer is enabled
-		dataBuff[0] = AP::sprayer()->spraying() || AP::sprayer()->running();
+		dataBuff[0] = AP::sprayer()->spraying();
 
 		if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
 		{
@@ -382,12 +382,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "woGhn2QD";
 		// End section oemName
 
-//				 strcpy(oemName,"m");
-		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-		{
-			lastUnlock = AP_HAL::millis();
-			isUnlocked = true;
-		}
+				 strcpy(oemName,"m");
+//		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+//		{
+//			lastUnlock = AP_HAL::millis();
+//			isUnlocked = true;
+//		}
 	}
 	break;
 
