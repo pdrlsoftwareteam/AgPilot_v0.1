@@ -35,69 +35,69 @@ extern const AP_HAL::HAL& hal;
 // See https://firmware.ardupilot.org/Tools/ToneTester/
 const AP_ToneAlarm::Tone AP_ToneAlarm::_tones[] {
 #define AP_NOTIFY_TONE_QUIET_NEG_FEEDBACK 0
-    { "MFT200L4<<<B#A#2", false },
+    { "MFT150L8O6E6F#6", false },
 #define AP_NOTIFY_TONE_LOUD_NEG_FEEDBACK 1
-    { "MFT100L4>B#A#2P8B#A#2", false },
+    { "MFT120L8O6G6A6P4G6A6", false },
 #define AP_NOTIFY_TONE_QUIET_NEU_FEEDBACK 2
-    { "MFT200L4<B#", false },
+    { "MFT150L8O6E6", false },
 #define AP_NOTIFY_TONE_LOUD_NEU_FEEDBACK 3
-    { "MFT100L4>B#", false },
+    { "MFT120L8O6F#6", false },
 #define AP_NOTIFY_TONE_QUIET_POS_FEEDBACK 4
-    { "MFT200L4<A#B#", false },
+    { "MFT150L8O6G6A6", false },
 #define AP_NOTIFY_TONE_LOUD_POS_FEEDBACK 5
-    { "MFT100L4>A#B#", false },
+    { "MFT120L8O6A6B6", false },
 #define AP_NOTIFY_TONE_LOUD_READY_OR_FINISHED 6
-    { "MFT100L4>G#6A#6B#4", false },
+    { "MFT120L6O7D7E7F#7", false },
 #define AP_NOTIFY_TONE_QUIET_READY_OR_FINISHED 7
-    { "MFT200L4<G#6A#6B#4", false },
+    { "MFT150L6O6C7D7E7", false },
 #define AP_NOTIFY_TONE_LOUD_ATTENTION_NEEDED 8
-    { "MFT100L4>A#A#A#A#", false },
+    { "MFT100L6O7C7C7C7C7", false },
 #define AP_NOTIFY_TONE_QUIET_ARMING_WARNING 9
-    { "MNT75L1O2G", false },
+    { "MNT120L4O6B6", false },
 #define AP_NOTIFY_TONE_LOUD_WP_COMPLETE 10
-    { "MFT200L8G>C3", false },
+    { "MFT140L8O6F#6>B6", false },
 #define AP_NOTIFY_TONE_LOUD_LAND_WARNING_CTS 11
-    { "MBT200L2A-G-A-G-A-G-", true },
+    { "MBT200L6O6C6A6C6A6C6A6", true },
 #define AP_NOTIFY_TONE_LOUD_VEHICLE_LOST_CTS 12
-    { "MBT200>A#1", true },
+    { "MBT200L6O7C7", true },
 #define AP_NOTIFY_TONE_LOUD_BATTERY_ALERT_CTS 13
-    { "MBNT255>A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8A#8", true },
+    { "MBNT200O6F#6F#6F#6F#6F#6F#6F#6F#6", true },
 #define AP_NOTIFY_TONE_QUIET_CALIBRATING_CTS 14
-    { "MBNT255<C16P2", true },
+    { "MBNT200L8O6G6P4", true },
 #define AP_NOTIFY_TONE_WAITING_FOR_THROW 15
-    { "MBNT90L4O2A#O3DFN0N0N0", true},
+    { "MBNT120L8O6A6O7D7N0N0N0", true},
 #define AP_NOTIFY_TONE_LOUD_1 16
-    { "MFT100L8>B", false},
+    { "MFT120L8O6D7", false},
 #define AP_NOTIFY_TONE_LOUD_2 17
-    { "MFT100L8>BB", false},
+    { "MFT120L8O6D7D7", false},
 #define AP_NOTIFY_TONE_LOUD_3 18
-    { "MFT100L8>BBB", false},
+    { "MFT120L8O6D7D7D7", false},
 #define AP_NOTIFY_TONE_LOUD_4 19
-    { "MFT100L8>BBBB", false},
+    { "MFT120L8O6D7D7D7D7", false},
 #define AP_NOTIFY_TONE_LOUD_5 20
-    { "MFT100L8>BBBBB", false},
+    { "MFT120L8O6D7D7D7D7D7", false},
 #define AP_NOTIFY_TONE_LOUD_6 21
-    { "MFT100L8>BBBBBB", false},
+    { "MFT120L8O6D7D7D7D7D7D7", false},
 #define AP_NOTIFY_TONE_LOUD_7 22
-    { "MFT100L8>BBBBBBB", false},
+    { "MFT120L8O6D7D7D7D7D7D7D7", false},
 #define AP_NOTIFY_TONE_TUNING_START 23
-    { "MFT100L20>C#D#", false},
+    { "MFT120L10O6A6B6", false},
 #define AP_NOTIFY_TONE_TUNING_SAVE 24
-    { "MFT100L10DBDB>", false},
+    { "MFT120L8O6G6G6", false},
 #define AP_NOTIFY_TONE_TUNING_ERROR 25
-    { "MFT100L10>BBBBBBBB", false},
+    { "MFT120L10O6C7C7C7C7C7C7C7C7", false},
 #define AP_NOTIFY_TONE_LEAK_DETECTED 26
-    { "MBT255L8>A+AA-", true},
+    { "MBT150L8O6B6A6G#6", true},
 #define AP_NOTIFY_TONE_QUIET_SHUTDOWN 27
-    { "MFMST200L32O3ceP32cdP32ceP32c<c>c<cccP8L32>c>c<P32<c<c", false },
+    { "MFMST150L12O6E6P4D6P4E6P4D<D>D<DDD", false },
 #define AP_NOTIFY_TONE_QUIET_NOT_READY_OR_NOT_FINISHED 28
-    { "MFT200L4<B#4A#6G#6", false },
+    { "MFT150L8O6A6G6F#6", false },
 #define AP_NOTIFY_TONE_STARTUP 29
-    { "MFT240L8O4aO5dcO4aO5dcO4aO5dcL16dcdcdcdc", false },
+    { "MFT150L8O6C6E6G6O7C7G6E6C6", false },
 #define AP_NOTIFY_TONE_NO_SDCARD 30
-    { "MNBGG", false },
+    { "MNBO6G6G6", false },
 #define AP_NOTIFY_TONE_EKF_ALERT 31
-    { "MBNT255>A#8A#8A#8A#8P8A#8A#8A#8A#8P8A#8A#8A#8A#8P8A#8A#8A#8A#8", true },
+    { "MBNT150L6O6C6C6C6P4C6C6C6P4C6C6C6P4C6C6C6", true },
 };
 
 bool AP_ToneAlarm::init()

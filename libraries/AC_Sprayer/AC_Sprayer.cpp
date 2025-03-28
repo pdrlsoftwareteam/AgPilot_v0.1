@@ -51,6 +51,8 @@ const AP_Param::GroupInfo AC_Sprayer::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("PUMP_MIN",   4, AC_Sprayer, _pump_min_pct, AC_SPRAYER_DEFAULT_PUMP_MIN),
 
+	AP_GROUPINFO("FLOW_CALIB", 5, AC_Sprayer, _fuel_flow_calibrate, AC_SPRAYER_DEFAULT_FLOW_CALIBRATION),
+
     AP_GROUPEND
 };
 
@@ -173,6 +175,16 @@ void AC_Sprayer::setPulseCount(uint64_t value)
 uint64_t AC_Sprayer::getPulseCount()
 {
     return Pulse_count;
+}
+
+bool AC_Sprayer::getTankstatus()
+{
+	return Tank_status;
+}
+
+void AC_Sprayer::setTankstatus(bool val)
+{
+	Tank_status = val;
 }
 
 namespace AP {

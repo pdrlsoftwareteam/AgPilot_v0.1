@@ -500,7 +500,7 @@ SRV_Channels::move_servo(SRV_Channel::Aux_servo_function_t function,
         if (c.function == function) {
             float v2 = c.get_reversed()? (1-v) : v;
             uint16_t pwm = c.servo_min + v2 * (c.servo_max - c.servo_min);
-            c.set_output_pwm(pwm);
+            c.set_output_pwm(pwm,true);
         }
     }
 }

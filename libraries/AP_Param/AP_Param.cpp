@@ -1416,14 +1416,10 @@ bool AP_Param::is_read_only(void) const
 bool AP_Param::verifySha256Checksum()
 {
     // Start section lockParamCount
-    int lockParamCount = 5;
+    int lockParamCount = 2;
     const char pname[lockParamCount][17] = {
     		"FRAME_CLASS\0",
-			"FRAME_TYPE\0",
-			"LOIT_SPEED\0",
-			"FENCE_ALT_MAX\0",
-			"FENCE_RADIUS\0"
-
+			"FRAME_TYPE\0"
     };
     // End section lockParamCount
 

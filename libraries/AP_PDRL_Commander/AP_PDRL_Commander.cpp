@@ -217,6 +217,8 @@ void AP_PDRL_COMMANDER::sendSprayStatus()
 		}
 		dataBuff[0] = 0;
 		sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
+		if(!AP::sprayer()->getTankstatus())
+			AP::sprayer()->setPulseCount(1);
 
 //	}
 

@@ -182,10 +182,9 @@ void ModeAuto::run()
 	case SubMode::NAVGUIDED:
 	case SubMode::NAV_SCRIPT_TIME:
 #if NAV_GUIDED == ENABLED || AP_SCRIPTING_ENABLED
-nav_guided_run();
+		nav_guided_run();
 #endif
-break;
-
+		break;
 	case SubMode::LOITER:
 		loiter_run();
 		break;
@@ -291,7 +290,7 @@ bool ModeAuto::nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &a
 		return true;
 	}
 #endif
-return false;
+	return false;
 }
 
 // lua scripts use this to indicate when they have complete the command
@@ -470,7 +469,7 @@ bool ModeAuto::Check_Range()
 	Vector2f closest_point;
 	closest_point.x = Prev.x + t * line_vec_x;
 	closest_point.y = Prev.y + t * line_vec_y;
-
+  
 	// Calculate the distance from current_Loc to the closest point
 	float distance = sqrtf((current_Loc.x - closest_point.x) * (current_Loc.x - closest_point.x) +
 			(current_Loc.y - closest_point.y) * (current_Loc.y - closest_point.y));
@@ -1097,8 +1096,6 @@ void ModeAuto::wp_run()
 	{
 		AP::sprayer()->run(false);
 	}
-	//    printf("before: %d\n",AP::sprayer()->get_status());
-	//    printf("after running: %d\tspraying: %d\n",AP::sprayer()->running(),AP::sprayer()->running());
 
 	if (g2.auto_man_alt != 1) {
 		motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
