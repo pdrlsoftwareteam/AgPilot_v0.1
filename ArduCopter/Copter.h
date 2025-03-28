@@ -190,6 +190,7 @@ public:
     friend class Mode;
     friend class ModeAltHold;
     friend class ModeAuto;
+    friend class ModeAutoTune;
     friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
@@ -891,6 +892,9 @@ private:
     ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
+#endif
+#if AUTOTUNE_ENABLED == ENABLED
+    ModeAutoTune mode_autotune;
 #endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;

@@ -1,3 +1,4 @@
+
 /// @file   AC_Sprayer.h
 /// @brief  Crop sprayer library
 
@@ -24,6 +25,7 @@
 #define AC_SPRAYER_DEFAULT_SPEED_MIN        100     ///< we must be travelling at least 1m/s to begin spraying
 #define AC_SPRAYER_DEFAULT_TURN_ON_DELAY    100     ///< delay between when we reach the minimum speed and we begin spraying.  This reduces the likelihood of constantly turning on/off the pump
 #define AC_SPRAYER_DEFAULT_SHUT_OFF_DELAY   1000    ///< shut-off delay in milli seconds.  This reduces the likelihood of constantly turning on/off the pump
+#define AC_SPRAYER_DEFAULT_FLOW_CALIBRATION 0
 
 #ifndef HAL_SPRAYER_ENABLED
 #define HAL_SPRAYER_ENABLED 1
@@ -52,6 +54,8 @@ public:
     /// spraying - returns true if spraying is actually happening
     bool spraying() const { return _flags.spraying; }
 
+    bool fuelFlow_Calib() const { return _fuel_flow_calibrate; }
+
     bool get_status(){ return _flags.spraying;}
     /// test_pump - set to true to turn on pump as if travelling at 1m/s as a test
     void test_pump(bool true_false) { _flags.testing = true_false; }
@@ -67,8 +71,11 @@ public:
     static const struct AP_Param::GroupInfo var_info[];
     void setPulseCount(uint64_t value);
     uint64_t getPulseCount();
+    bool getTankstatus();
+    void setTankstatus(bool val);
 
     uint64_t Pulse_count;
+    bool Tank_status = 0;
 private:
 
     // parameters
@@ -77,6 +84,7 @@ private:
     AP_Int8         _pump_min_pct;          ///< minimum pump rate (expressed as a percentage from 0 to 100)
     AP_Int16        _spinner_pwm;           ///< pwm rate of spinner
     AP_Float        _speed_min;             ///< minimum speed in cm/s above which the sprayer will be started
+    AP_Int8			_fuel_flow_calibrate;
 
     /// flag bitmask
     struct sprayer_flags_type {

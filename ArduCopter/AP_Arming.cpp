@@ -627,11 +627,11 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
         return false;
     }
    // return if motors have not been tested once after reboot.
-    if(copter.g2.req_motor_test == 1)
-    {
-    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming motors requires a motor test.");
-        return false;
-    }
+//    if(copter.g2.req_motor_test == 1)
+//    {
+//    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming motors requires a motor test.");
+//        return false;
+//    }
 
     in_arm_motors = true;
 
@@ -769,6 +769,14 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
         }
     }
 
+#if AUTOTUNE_ENABLED == ENABLED
+    // save auto tuned parameters
+    if (copter.flightmode == &copter.mode_autotune) {
+        copter.mode_autotune.save_tuning_gains();
+    } else {
+        copter.mode_autotune.reset();
+    }
+#endif
 
     // we are not in the air
     copter.set_land_complete(true);

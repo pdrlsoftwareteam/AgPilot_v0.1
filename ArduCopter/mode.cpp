@@ -74,6 +74,12 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
+#if AUTOTUNE_ENABLED == ENABLED
+        case Mode::Number::AUTOTUNE:
+            ret = &mode_autotune;
+            break;
+#endif
+
 #if MODE_POSHOLD_ENABLED == ENABLED
         case Mode::Number::POSHOLD:
             ret = &mode_poshold;
