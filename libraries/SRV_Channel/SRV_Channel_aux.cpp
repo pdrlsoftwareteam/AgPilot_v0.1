@@ -647,6 +647,24 @@ void SRV_Channels::set_default_function(uint8_t chan, SRV_Channel::Aux_servo_fun
     }
 }
 
+void SRV_Channels::set_function(uint8_t chan, SRV_Channel::Aux_servo_function_t function)
+{
+    if (chan < NUM_SERVO_CHANNELS) {
+        const SRV_Channel::Aux_servo_function_t old = channels[chan].function;
+        channels[chan].function.set_and_save(function);
+        if (old != channels[chan].function && channels[chan].function == function) {
+            function_mask.set((uint16_t)function);
+        }
+    }
+}
+
+int SRV_Channels::get_function(uint8_t chan)
+{
+    if (chan < NUM_SERVO_CHANNELS) {
+    	return static_cast<int>(static_cast<SRV_Channel::Aux_servo_function_t>(channels[chan].function));
+    }
+    return 0;
+}
 void SRV_Channels::set_esc_scaling_for(SRV_Channel::Aux_servo_function_t function)
 {
     uint8_t chan;

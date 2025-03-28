@@ -361,7 +361,8 @@ public:
 
     // set the default function for a channel
     static void set_default_function(uint8_t chan, SRV_Channel::Aux_servo_function_t function);
-
+    static void set_function(uint8_t chan, SRV_Channel::Aux_servo_function_t function);
+    static int get_function(uint8_t chan);
     // set output value for a function channel as a pwm value
     static void set_output_pwm(SRV_Channel::Aux_servo_function_t function, uint16_t value);
 
