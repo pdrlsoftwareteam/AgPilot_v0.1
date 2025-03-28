@@ -266,8 +266,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
     char key[AP_MAX_NAME_SIZE+1];
     strncpy(key, (char *)packet.param_id, AP_MAX_NAME_SIZE);
     key[AP_MAX_NAME_SIZE] = 0;
-
-    char ParamName[8][17]={
+    char ParamName[6][17]={
                 /*"CAN_P1_DRIVER","CAN_P2_DRIVER","CAN_D1_PROTOCOL","CAN_D2_PROTOCOL","NTF_LED_TYPES",
                 "BATT_MONITOR","BATT_CAPACITY","BATT_SERIAL_NUM","BATT_LOW_TIMER","BATT_FS_VOLTSRC",
                 "BATT_ARM_VOLT","BATT_ARM_MAH","BATT_OPTIONS","BATT_VOLT_PIN","BATT_CURR_PIN",
@@ -277,13 +276,13 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
                 "RNGFND1_ORIENT","RNGFND2_MIN_CM","RNGFND2_MAX_CM","RNGFND2_ORIENT","RNGFND3_MIN_CM",
                 "RNGFND3_MAX_CM","RNGFND3_ORIENT","PRX1_TYPE","AVOID_ENABLE","AVOID_ANGLE_MAX",
                 "AVOID_BEHAVE","AVOID_ALT_MIN","AVOID_ACCEL_MAX","AVOID_BACKUP_DZ","SPRAY_ENABLE",
-                "SERVO9_FUNCTION","SERVO12_FUNCTION",*/"FRAME_TYPE","FRAME_CLASS","SERVO1_FUNCTION","SERVO2_FUNCTION","SERVO3_FUNCTION",
+                "SERVO9_FUNCTION","SERVO12_FUNCTION",*/"SERVO1_FUNCTION","SERVO2_FUNCTION","SERVO3_FUNCTION",
                 "SERVO4_FUNCTION","SERVO5_FUNCTION","SERVO6_FUNCTION"
     		 };
 //	packet.param_id[AP_MAX_NAME_SIZE] = '\0';
 	printf("Param req: %s\n",key);
-
-    for(int8_t i=0;i<8/*53*/;i++)
+  
+    for(int8_t i=0;i<6/*53*/;i++)
     {
         if(!strcmp(key,ParamName[i]))
         {

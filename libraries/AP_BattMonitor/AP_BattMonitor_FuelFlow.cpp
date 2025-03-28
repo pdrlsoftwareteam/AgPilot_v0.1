@@ -158,6 +158,7 @@ void AP_BattMonitor_FuelFlow::read()
 
 	// map consumed_wh using fixed voltage of 1
 	_state.consumed_wh = _state.consumed_mah;
+
 	_state.time_remaining += state.pulse_count;
 
 	AP::battery().consumed_liquid = _state.consumed_mah;
@@ -179,6 +180,16 @@ void AP_BattMonitor_FuelFlow::read()
 			AP::sprayer()->setPulseCount(1);
 			AP::sprayer()->setTankstatus(0);
 		}
+
+		AP::sprayer()->setPulseCount(state.pulse_count);
+	}
+	else
+	{
+		// Reset tracking variables
+		time_ms = AP_HAL::millis();
+		pcount = 0;
+		cnt = 0;
+		AP::sprayer()->setPulseCount(0);
 	}
 	else
 	{
