@@ -142,12 +142,12 @@ void AP_BattMonitor_FuelFlow::read()
 	
 
 	// Accumulate pulse count and count if within the 3-second window
-		if (AP_HAL::millis() - time_ms < 2500) {
+		if (AP_HAL::millis() - time_ms < 3000) {
 			pcount += state.pulse_count;
 			cnt++;
 		} else {
 			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
+			if (AP::arming().is_armed() && cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
 				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
 				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
