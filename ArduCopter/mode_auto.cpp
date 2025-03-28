@@ -41,7 +41,7 @@ bool ModeAuto::init(bool ignore_checks)
 		else
 		{
 			// Reset to the current altitude if not using terrain altitude
-			wp_nav->resetWaypointZ(copter.current_loc.alt);
+					wp_nav->resetWaypointZ(copter.current_loc.alt);
 		}
 
 	}
@@ -185,7 +185,6 @@ void ModeAuto::run()
 		nav_guided_run();
 #endif
 		break;
-
 	case SubMode::LOITER:
 		loiter_run();
 		break;
@@ -470,7 +469,7 @@ bool ModeAuto::Check_Range()
 	Vector2f closest_point;
 	closest_point.x = Prev.x + t * line_vec_x;
 	closest_point.y = Prev.y + t * line_vec_y;
-
+  
 	// Calculate the distance from current_Loc to the closest point
 	float distance = sqrtf((current_Loc.x - closest_point.x) * (current_Loc.x - closest_point.x) +
 			(current_Loc.y - closest_point.y) * (current_Loc.y - closest_point.y));
@@ -1096,13 +1095,7 @@ void ModeAuto::wp_run()
 	else
 	{
 		AP::sprayer()->run(false);
-		//		printf("cmd.p1: %d\tSpray: %d\n",AP_Mission::get_singleton()->Send_spray_wp(),AP::sprayer()->running());
 	}
-//    if(g2._spray_enabled)
-//    {
-//        AP::sprayer()->run(true);
-//        g2._spray_enabled = false;
-//    }
 
 	if (g2.auto_man_alt != 1) {
 		motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);

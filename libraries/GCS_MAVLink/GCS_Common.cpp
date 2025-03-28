@@ -5882,7 +5882,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_SPRAY_FLIGHT_DETAIL:
         CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
-        //send_spray_flight_detail();
+//        send_spray_flight_detail();
         break;
 
     case MSG_RAW_IMU:
