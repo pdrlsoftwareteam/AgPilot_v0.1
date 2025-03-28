@@ -520,6 +520,11 @@ public:
     	reason = val;
     }
 
+    int16_t  Spray_wp;
+    bool Send_spray_wp(){
+    	return Spray_wp;
+    };
+
     ///
     /// public command methods
     ///

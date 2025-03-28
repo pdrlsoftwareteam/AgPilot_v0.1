@@ -5281,7 +5281,7 @@ class AutoTest(ABC):
         self.context_push()
         self.context_collect("STATUSTEXT")
         while True:
-            want = "Initialising ArduPilot"
+            want = "Initialising AgPilot"
             if time.time() - start_time > 30:
                 raise NotAchievedException("Did not get %s" % want)
             # we still need to parse the incoming messages:
