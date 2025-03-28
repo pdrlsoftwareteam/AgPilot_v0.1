@@ -41,6 +41,7 @@ void Copter::motor_test_output()
                     motors->armed(true);
                     hal.util->set_soft_armed(true);
                 }
+            	printf("motor_test_seq: %d\tmotor_test_count: %d\n",motor_test_seq,motor_test_count);
             }
             return;
         }
@@ -79,10 +80,23 @@ void Copter::motor_test_output()
                 return;
         }
 
+        int frame_class = (AP_Motors::motor_frame_class)g2.frame_class.get();
+        int size = 2 + 2 * frame_class;
+        int arr[size];
+
+        // Fill the array dynamically
+        arr[0] = 1;
+        for (int i = 1, val = 2 + 2 * frame_class; i < size; i++, val--) {
+            arr[i] = val;
+        }
+
+
         // sanity check throttle values
         if (pwm >= RC_Channel::RC_MIN_LIMIT_PWM && pwm <= RC_Channel::RC_MAX_LIMIT_PWM) {
             // turn on motor Sequentially to specified pwm value
-            motors->output_test_seq(motor_test_seq, pwm);
+        	    motors->output_test_seq(arr[motor_test_seq - 1], pwm);
+
+
         } else {
             motor_test_stop();
         }
@@ -132,6 +146,7 @@ bool Copter::mavlink_motor_control_check(const GCS_MAVLINK &gcs_chan, bool check
 MAV_RESULT Copter::mavlink_motor_test_start(const GCS_MAVLINK &gcs_chan, uint8_t motor_seq, uint8_t throttle_type, float throttle_value,
                                          float timeout_sec, uint8_t motor_count)
 {
+	printf("motor_seq: %d\tmotor_count: %d\n",motor_seq,motor_count);
     if (motor_count == 0) {
         motor_count = 1;
     }
