@@ -127,6 +127,12 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // Precision Landing with companion computer or IRLock sensor
+#ifndef AUTOTUNE_ENABLED
+ # define AUTOTUNE_ENABLED  ENABLED
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// Precision Landing with companion computer or IRLock sensor
 #ifndef PRECISION_LANDING
  # define PRECISION_LANDING ENABLED
 #endif

@@ -310,6 +310,12 @@ public:
     GCS_Copter &gcs();
     uint16_t get_pilot_speed_dn(void);
     // end pass-through functions
+    Vector2f Next = {0,0};
+    Vector2f Prev = {0,0};
+    typedef struct {
+        float x;
+        float y;
+    } Point;
 };
 
 
@@ -375,6 +381,7 @@ public:
         NAV_SCRIPT_TIME,
         NAV_ATTITUDE_TIME,
     };
+    bool Check_Range();
 
     // set submode.  returns true on success, false on failure
     void set_submode(SubMode new_submode);
@@ -603,6 +610,62 @@ private:
         uint32_t start_ms;  // system time that nav attitude time command was received (used for timeout)
     } nav_attitude_time;
 };
+
+#if AUTOTUNE_ENABLED == ENABLED
+/*
+  wrapper class for AC_AutoTune
+ */
+
+
+class AutoTune : public AC_AutoTune_Multi
+
+{
+public:
+    bool init() override;
+    void run() override;
+
+protected:
+    bool position_ok() override;
+    float get_pilot_desired_climb_rate_cms(void) const override;
+    void get_pilot_desired_rp_yrate_cd(float &roll_cd, float &pitch_cd, float &yaw_rate_cds) override;
+    void init_z_limits() override;
+    void log_pids() override;
+};
+
+class ModeAutoTune : public Mode {
+
+    // ParametersG2 sets a pointer within our autotune object:
+    friend class ParametersG2;
+
+public:
+    // inherit constructor
+    using Mode::Mode;
+    Number mode_number() const override { return Number::AUTOTUNE; }
+
+    bool init(bool ignore_checks) override;
+    void exit() override;
+    void run() override;
+
+    bool requires_GPS() const override { return false; }
+    bool has_manual_throttle() const override { return false; }
+    bool allows_arming(AP_Arming::Method method) const override { return false; }
+    bool is_autopilot() const override { return false; }
+
+    void save_tuning_gains();
+    void reset();
+
+protected:
+
+    const char *name() const override { return "AUTOTUNE"; }
+    const char *name4() const override { return "ATUN"; }
+
+private:
+
+    AutoTune autotune;
+
+};
+#endif
+
 
 class ModeBrake : public Mode {
 
