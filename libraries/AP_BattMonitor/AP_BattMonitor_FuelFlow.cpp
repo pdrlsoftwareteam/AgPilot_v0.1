@@ -185,14 +185,6 @@ void AP_BattMonitor_FuelFlow::read()
 	}
 	else
 	{
-		// Reset tracking variables
-		time_ms = AP_HAL::millis();
-		pcount = 0;
-		cnt = 0;
-		AP::sprayer()->setPulseCount(0);
-	}
-	else
-	{
 		AP::sprayer()->setPulseCount(0);
 		AP::sprayer()->setTankstatus(0);
 	}

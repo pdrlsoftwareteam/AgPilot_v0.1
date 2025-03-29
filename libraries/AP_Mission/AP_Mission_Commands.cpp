@@ -210,6 +210,26 @@ bool AP_Mission::start_command_do_sprayer(const AP_Mission::Mission_Command& cmd
 #endif // HAL_SPRAYER_ENABLED
 }
 
+bool AP_Mission::start_command_do_sprayer_in_auto(uint16_t doOn)
+{
+#if HAL_SPRAYER_ENABLED
+    AC_Sprayer *sprayer = AP::sprayer();
+    if (sprayer == nullptr) {
+        return false;
+    }
+
+    if (doOn == 1) {
+        sprayer->run(true);
+    } else {
+        sprayer->run(false);
+    }
+	Spray_wp = doOn;
+    return true;
+#else
+    return false;
+#endif // HAL_SPRAYER_ENABLED
+}
+
 bool AP_Mission::start_command_do_scripting(const AP_Mission::Mission_Command& cmd)
 {
 #if AP_SCRIPTING_ENABLED
