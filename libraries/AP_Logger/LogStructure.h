@@ -118,8 +118,8 @@ const struct MultiplierStructure log_Multipliers[] = {
 
 // once the logging code is all converted we will remove these from
 // this header
-#define HEAD_BYTE1  0xA3    // Decimal 163
-#define HEAD_BYTE2  0x95    // Decimal 149
+#define HEAD_BYTE1  0xB5    // Decimal 163
+#define HEAD_BYTE2  0xA2    // Decimal 149
 
 #include <AP_Beacon/LogStructure.h>
 #include <AP_DAL/LogStructure.h>
