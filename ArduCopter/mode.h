@@ -316,6 +316,7 @@ public:
         float x;
         float y;
     } Point;
+    bool should_spray;;
 };
 
 
