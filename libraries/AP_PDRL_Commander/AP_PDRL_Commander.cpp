@@ -381,6 +381,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		// Start section oemName
 		char oemName[] = "5ft7dnhk";
 		// End section oemName
+
 				 strcpy(oemName,"m");
 //		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
 //		{

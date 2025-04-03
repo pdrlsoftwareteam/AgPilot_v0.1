@@ -165,30 +165,38 @@ void AP_BattMonitor_FuelFlow::read()
 //	handle_calibration();
 
 	float consumed_diff = _state.consumed_mah - last_consumed_mah;
+	static int count_check = 0;
 
 	if(AP::sprayer()->spraying())
 	{
-		if((consumed_diff < 1.50f) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0 )
+		last_consumed_mah = _state.consumed_mah;
+		if((consumed_diff < float(_ml_flow)) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0 )
 		{
+			count_check++;
+		}
+		else
+		{
+			count_check = 0;
+			AP::sprayer()->setPulseCount(1);
+			AP::sprayer()->setTankstatus(0);
+		}
+		if(count_check >= _pulse_cnt)
+		{
+			count_check = 0;
 			AP::sprayer()->setPulseCount(0);
 			AP::sprayer()->setTankstatus(1);
 			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 		}
-		else
-		{
-			AP::sprayer()->setPulseCount(1);
-			AP::sprayer()->setTankstatus(0);
-		}
-
 		AP::sprayer()->setPulseCount(state.pulse_count);
 	}
 	else
 	{
+		count_check = 0;
+		last_consumed_mah = 0;
 		AP::sprayer()->setPulseCount(0);
 		AP::sprayer()->setTankstatus(0);
 	}
 
-	last_consumed_mah = _state.consumed_mah;
 
 	//Spray area calculation
 	static uint64_t dist_tm = AP_HAL::millis();
@@ -262,6 +270,5 @@ void AP_BattMonitor_FuelFlow::read()
 		dist_tm = AP_HAL::millis();
 		AP::sprayer()->setTankstatus(0);
 	}
-
 }
 #endif  // AP_BATTERY_FUELFLOW_ENABLED
