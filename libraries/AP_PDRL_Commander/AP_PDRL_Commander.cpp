@@ -207,7 +207,7 @@ void AP_PDRL_COMMANDER::sendSprayStatus()
 //	{
 		uint8_t dataBuff[100] = {0};
 		// send spray status only if the sprayer is enabled
-		dataBuff[0] = AP::sprayer()->spraying() || AP::sprayer()->running();
+		dataBuff[0] = AP::sprayer()->spraying();
 
 		if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
 		{

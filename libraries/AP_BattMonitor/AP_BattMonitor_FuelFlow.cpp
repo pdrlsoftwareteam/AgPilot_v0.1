@@ -147,7 +147,7 @@ void AP_BattMonitor_FuelFlow::read()
 			cnt++;
 		} else {
 			// Check tank status at the end of the 3-second window, checking with 10 pulses for better result
-			if (AP::arming().is_armed() && cnt > 2 && pcount < (uint16_t)_pulse_cnt) {
+			if (AP::arming().is_armed() && cnt > 0 && pcount < (uint16_t)_pulse_cnt) {
 				AP::sprayer()->setPulseCount(0);
 				gcs().send_text(MAV_SEVERITY_INFO, "Tank Level Updated %d", (uint16_t)pcount);
 				gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
@@ -223,6 +223,8 @@ void AP_BattMonitor_FuelFlow::read()
 			AP::battery().spray_area_acre = 0;
 			AP::battery().spray_dist = 0;
 			first_arm = 0;
+			_state.consumed_mah = 0;
+			AP::battery().consumed_liquid = 0;
 		}
 		static Vector2f flight_current_Loc = AP::battery().get_val(),flight_previous_Loc = AP::battery().get_val();
 
@@ -241,7 +243,6 @@ void AP_BattMonitor_FuelFlow::read()
 		flight_time_temp = AP_HAL::millis();
 		spray_tm = AP_HAL::millis();
 		dist_tm = AP_HAL::millis();
-		// Reset tracking variables
 		time_ms = AP_HAL::millis();
 		pcount = 0;
 		cnt = 0;

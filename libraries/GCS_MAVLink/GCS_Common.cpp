@@ -1997,8 +1997,17 @@ void GCS_MAVLINK::send_spray_flight_detail()
 			AP::battery().flight_dist,
 			AP::battery().spray_area_sqm,
 			AP::battery().spray_area_acre,
-			global_position_int_relative_alt()*0.001
+			global_position_int_relative_alt()*0.001,
+			AP::battery().consumed_liquid
 	);
+	printf("flight_time: %d\tspray_time: %d\tspray_dist: %.2f\tflight_dist: %.2f\tspray_area_sqm: %.2f\tspray_area_acre: %.2f\talt: %.2f\n",
+			AP::battery().flight_time/1000,
+			AP::battery().spray_time/1000,
+			AP::battery().spray_dist,
+			AP::battery().flight_dist,
+			AP::battery().spray_area_sqm,
+			AP::battery().spray_area_acre,
+			global_position_int_relative_alt()*0.001);
 }
 void GCS_MAVLINK::send_scaled_imu(uint8_t instance, void (*send_fn)(mavlink_channel_t chan, uint32_t time_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag, int16_t temperature))
 {
@@ -5873,7 +5882,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_SPRAY_FLIGHT_DETAIL:
         CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
-//        send_spray_flight_detail();
+        send_spray_flight_detail();
         break;
 
     case MSG_RAW_IMU:
