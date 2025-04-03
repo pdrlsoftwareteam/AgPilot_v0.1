@@ -129,6 +129,7 @@ protected:
     AP_Int8  _volt_pin;                 /// board pin used to measure battery voltage
     AP_Int8  _curr_pin;                 /// board pin used to measure battery current
     AP_Int16 _pulse_cnt;
+    AP_Float _ml_flow;
 };
 
 #endif  // AP_BATTERY_ANALOG_ENABLED

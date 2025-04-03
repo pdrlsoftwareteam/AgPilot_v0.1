@@ -3,7 +3,6 @@
 // land_init - initialise land controller
 bool ModeLand::init(bool ignore_checks)
 {
-	g2._spray_enabled = false;
     // check if we have GPS and decide which LAND we're going to do
     control_position = copter.position_ok();
 
