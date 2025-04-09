@@ -1,7 +1,4 @@
-- Changed sd card directories name APM to PDRL.
-- Changed compass field direction in mmc5xx3 compass driver.
-- Added tank empty functionality using fuelflow sensor.
-- Changed vehicle type in firmware "ArduCopter" to "BhuMI v0.1".
-- Added new parameters to defaults.parm file.
-- Added/adjusted servo1-6 parameter to simplify motor pin connection.
-- Created new build board type as AeroFC.
+autotune added
+safty switch pin changed.
+parameters changed to read-write mode.
+spraying parameters added to defaut.param file.
