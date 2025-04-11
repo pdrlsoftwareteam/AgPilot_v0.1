@@ -28,6 +28,7 @@ public:
 	bool calibration_active = false;  // Tracks if calibration is currently active
 	float calibration_start_mah = 0;  // Stores the initial consumed_mah at calibration start
 	float last_consumed_mah = 100.0f;
+//	uint32_t last_processed_pulse_us = 0;
 
 private:
     void irq_handler(uint8_t pin, bool pin_state, uint32_t timestamp);

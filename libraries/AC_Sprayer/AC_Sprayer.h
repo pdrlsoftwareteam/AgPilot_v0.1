@@ -54,6 +54,8 @@ public:
     /// spraying - returns true if spraying is actually happening
     bool spraying() const { return _flags.spraying; }
 
+    float get_pump_rate() const { return _pump_pct_1ms; }
+
     bool fuelFlow_Calib() const { return _fuel_flow_calibrate; }
 
     bool get_status(){ return _flags.spraying;}

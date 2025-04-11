@@ -79,6 +79,7 @@ void AP_BattMonitor_FuelFlow::handle_calibration()
 		float calibrated_mah = _state.consumed_mah - calibration_start_mah; // Total consumed during calibration
 		//        float batt_cap = _params._pack_capacity;
 		if (calibrated_mah > 0) {
+			gcs().send_text(MAV_SEVERITY_INFO, "AMP_PERVLT before calibration = %.6f", _curr_amp_per_volt.get());
 			_curr_amp_per_volt.set_and_save((2000.0f / calibrated_mah) * _curr_amp_per_volt.get());
 
 			gcs().send_text(MAV_SEVERITY_INFO, "FuelFlow Calibration Stopped: Updated AMP_PERVLT = %.6f", _curr_amp_per_volt.get());
@@ -135,6 +136,44 @@ void AP_BattMonitor_FuelFlow::read()
 	irq_state.total_us = 0;
 	hal.scheduler->restore_interrupts(irqstate);
 
+//	// Optional: Suppress repeated processing
+//	if (irq_state.last_pulse_us == last_processed_pulse_us) {
+//	    // We already processed this pulse
+//	    return;
+//	}
+//	last_processed_pulse_us = irq_state.last_pulse_us;
+
+static uint32_t last_processed_pulse_us = 0;
+static uint32_t last_valid_pulse_time_us = 0;
+
+// Get spray rate in percentage (0 to 100), convert to fraction (0.0 to 1.0)
+float spray_rate_percent = AP::sprayer()->get_pump_rate();
+float spray_rate = spray_rate_percent / 100.0f;
+
+// Prevent division by zero or too small value
+if (spray_rate < 0.01f) {
+    spray_rate = 0.01f;
+}
+
+// Base interval: at 100% spray rate, allow 100ms between pulses
+uint32_t min_interval_us = (uint32_t)(100000.0f / spray_rate);
+
+// Apply a lower bound to avoid overly frequent pulses due to glitches
+if (min_interval_us < FUELFLOW_MIN_PULSE_DELTA_US) {
+    min_interval_us = FUELFLOW_MIN_PULSE_DELTA_US;
+}
+
+// Reject if it's the same pulse or too soon since the last valid one
+if (irq_state.last_pulse_us == last_processed_pulse_us ||
+    (irq_state.last_pulse_us - last_valid_pulse_time_us) < min_interval_us) {
+    return; // Skip this pulse
+}
+
+// Accept this pulse
+last_processed_pulse_us = irq_state.last_pulse_us;
+last_valid_pulse_time_us = irq_state.last_pulse_us;
+
+
 	/*
       this driver assumes that BATTx_AMP_PERVLT is set to give the
       number of millilitres per pulse.
@@ -145,6 +184,12 @@ void AP_BattMonitor_FuelFlow::read()
 		litres = 0;
 		litres_pec_sec = 0;
 	} else {
+//		float spray_rate =  AP::sprayer()->get_pump_rate()/100; // 0.0 to 1.0
+//		float correction_factor = 1.0f;
+//		if (spray_rate < 0.3f)
+//		    correction_factor = 0.7f;  // hypothetical correction for low spray rate
+
+//		litres = state.pulse_count * _curr_amp_per_volt * correction_factor * 0.001f;
 		litres = state.pulse_count * _curr_amp_per_volt * 0.001f;
 		litres_pec_sec = litres / irq_dt;
 	}
@@ -162,7 +207,10 @@ void AP_BattMonitor_FuelFlow::read()
 	_state.time_remaining += state.pulse_count;
 	AP::battery().consumed_liquid = _state.consumed_mah;
 
-//	handle_calibration();
+//	GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "pulse count:%ld at %0.0f flowrate", state.pulse_count, AP::sprayer()->get_pump_rate());
+//	GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "FuelFlow: Consumed liquid: %0.0f", _state.consumed_mah);
+
+	handle_calibration();
 
 	float consumed_diff = _state.consumed_mah - last_consumed_mah;
 	static int count_check = 0;
