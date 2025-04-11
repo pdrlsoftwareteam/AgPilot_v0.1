@@ -51,6 +51,7 @@ private:
 	uint8_t ret = 0;
 	uint8_t lastOffset = 0;
 	uint64_t CurrentLogFileSize = 0;
+	uint64_t CurrentPostLogFileSize = 0;
 	static AP_PDRL_COMMANDER* m_pInstance;
 	bool isUnlocked = false;
 	uint32_t lastUnlock = 0;
@@ -82,6 +83,7 @@ public:
 	void sendKey();
 	void sendLogFile(mavlink_command_transfer_t *rcvedPacket);
 	void sendLogFileSignature(mavlink_command_transfer_t *rcvedPacket);
+	void sendPostLogFileSignature(mavlink_command_transfer_t *rcvedPacket);
 	void sendSprayStatus();
 	void sendCommand(
 			uint16_t item_offset,

@@ -216,6 +216,12 @@ void Copter::motor_test_stop()
     motors->armed(false);
     hal.util->set_soft_armed(false);
 
+    // motors tested
+    if(g2.req_motor_test == 1)
+    {
+    	g2.req_motor_test.set(0);
+    }
+
     // reset timeout
     motor_test_start_ms = 0;
     motor_test_timeout_ms = 0;
