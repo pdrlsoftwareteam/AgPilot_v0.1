@@ -1220,6 +1220,41 @@ size_t AP_PDRL_Logger::getFileSignature(uint8_t *currentHashFileName,unsigned ch
 }
 
 
+size_t AP_PDRL_Logger::getPostFileSignature(uint8_t *currentHashFileName,unsigned char* signatureBuff,size_t sigBuffSize)
+{
+    int  outPutFile_fd = AP::FS().open((char *)currentHashFileName, O_RDWR);
+    if(outPutFile_fd == -1)
+    {
+    	char str[] = "File opened denied or File not found";
+    	sigBuffSize = sizeof(str);
+    	memcpy(signatureBuff,str,sizeof(str));
+        return -1;
+    }
+    static mbedtls_sha256_context sha;
+    char tmpBuff[1024] = {0};
+    unsigned char tmpHashBuffer[32];
+    int readBy;
+
+    mbedtls_sha256_init(&sha);
+    mbedtls_sha256_starts(&sha, 0);
+
+    while((readBy = AP::FS().read(outPutFile_fd,tmpBuff, sizeof(tmpBuff))) > 0)
+    {
+        EXPECT_DELAY_MS(100);
+        mbedtls_sha256_update(&sha,(unsigned char*)tmpBuff,readBy);
+    }
+    AP::FS().close(outPutFile_fd);
+
+    mbedtls_sha256_finish(&sha,tmpHashBuffer);
+
+    unsigned char dataBuffer[256] = {0};
+    size_t outPutLen = 0;
+    size_t outLen = encryptHashUsingPublicKey(tmpHashBuffer,dataBuffer,sizeof(dataBuffer));
+
+    mbedtls_base64_encode(signatureBuff,sigBuffSize,&outPutLen,dataBuffer,outLen);
+    return outPutLen;
+}
+
 int AP_PDRL_Logger::checkTimeBreach(uint64_t *currentTime)
 {
 	*currentTime = (*currentTime) + 19800000000;
