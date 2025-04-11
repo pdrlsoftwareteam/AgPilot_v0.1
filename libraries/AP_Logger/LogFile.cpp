@@ -136,6 +136,18 @@ bool AP_Logger_Backend::Write_Parameter(const AP_Param *ap,
     return Write_Parameter(name, ap->cast_to_float(type), default_val);
 }
 
+/*
+  write a Fw version to the log
+ */
+bool AP_Logger_Backend::Log_Firmware_Version()
+{
+    uint8_t major_version = 0; // could come from a define or config
+    float minor_version = 0.1;
+    char name[16] = "AgPilot_version";
+    return Write_Parameter(name, minor_version, major_version);
+}
+
+
 // Write an RCIN packet
 void AP_Logger::Write_RCIN(void)
 {

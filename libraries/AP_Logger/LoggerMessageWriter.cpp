@@ -119,7 +119,7 @@ void LoggerMessageWriter_DFLogStart::process()
                 return; // call me again!
             }
         }
-
+        _logger_backend->Log_Firmware_Version();
         _params_done = true;
         stage = Stage::UNITS;
         }

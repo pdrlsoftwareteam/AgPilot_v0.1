@@ -140,6 +140,8 @@ public:
                              float default_val);
     bool Write_VER();
 
+    bool Log_Firmware_Version();
+
     uint32_t num_dropped(void) const {
         return _dropped;
     }
