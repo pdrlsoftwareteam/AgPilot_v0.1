@@ -544,6 +544,17 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
         return false;
     }
 
+    // check if safety switch has been pushed
+    AP_BoardConfig *boardconfig = AP_BoardConfig::get_singleton();
+    uint16_t safety_options = boardconfig->get_safety_enable();
+    if(safety_options)
+    {
+        if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
+            check_failed(true, "Safety Switch");
+            return false;
+        }
+    }
+
     // succeed if arming checks are disabled
     if (checks_to_perform == 0) {
         return true;
@@ -585,12 +596,6 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
         }
     }
 
-    // check if safety switch has been pushed
-    if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
-        check_failed(true, "Safety Switch");
-        return false;
-    }
-
     // superclass method should always be the last thing called; it
     // has side-effects which would need to be cleaned up if one of
     // our arm checks failed
@@ -629,7 +634,7 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
    // return if motors have not been tested once after reboot.
     if(copter.g2.req_motor_test == 1)
     {
-    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming: Motors requires a motor test.");
+    	gcs().send_text(MAV_SEVERITY_ERROR, "Arming motors requires a motor test.");
         return false;
     }
 
