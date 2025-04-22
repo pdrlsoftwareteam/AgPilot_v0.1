@@ -95,6 +95,7 @@ public:
 			uint8_t* command_buff);
 	void handleHashToSign(mavlink_command_transfer_t* packet);
 	void parseCommand(const mavlink_message_t &msg);
+	void sendSdcardStatus();
 };
 
 #endif /* KEYSTORE_HPP_ */

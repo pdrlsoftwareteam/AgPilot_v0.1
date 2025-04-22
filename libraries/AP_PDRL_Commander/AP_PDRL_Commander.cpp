@@ -12,6 +12,7 @@
 #include "AP_AHRS/AP_AHRS.h"
 #include "AP_BattMonitor/AP_BattMonitor_FuelFlow.h"
 #include "AP_Arming/AP_Arming.h"
+#include "AP_Logger/AP_Logger.h"
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
 #include "hal.h"
 #include "hwdef.h"
@@ -537,5 +538,21 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_PDRL_ENUM_END:
 		break;
+
+	case COMMAND_GET_SDCARD_STATUS:
+	    sendSdcardStatus();
+	    break;
 	}
 }
+
+void AP_PDRL_COMMANDER::sendSdcardStatus()
+{
+    const char* Status = "SD card Detected";
+    if (!AP::logger().CardInserted()) {
+        Status = "No SD card Detected";
+    }
+    uint8_t len = strlen(Status);
+    sendCommand(0, COMMAND_GET_SDCARD_STATUS, COMMAND_TYPE_GET, 0, len, 1, (uint8_t*)Status);
+}
+
+
