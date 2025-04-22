@@ -170,7 +170,7 @@ void AP_BattMonitor_FuelFlow::read()
 	if(AP::sprayer()->spraying())
 	{
 		last_consumed_mah = _state.consumed_mah;
-		if((consumed_diff < float(_ml_flow)) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0 )
+		if((consumed_diff < 1.50f) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0 )
 		{
 			AP::sprayer()->setPulseCount(0);
 			AP::sprayer()->setTankstatus(1);
