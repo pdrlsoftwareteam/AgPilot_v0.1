@@ -60,7 +60,7 @@ PB14 HEATER INPUT PULLUP GPIO(0)
 # safety button and LED. These do not use the same names
 # as those for FMU-only boards as we want to handle them specially
 # inside the iofirmware
-PB5 SAFETY_INPUT INPUT PULLDOWN
+PB5 SAFETY_INPUT INPUT PULLUP
 PB13 SAFETY_LED OUTPUT HIGH OPENDRAIN
 
 # amber LED

@@ -33,7 +33,7 @@ extern const AP_HAL::HAL& hal;
 AP_BattMonitor_FuelFlow::AP_BattMonitor_FuelFlow(AP_BattMonitor &mon,
 		AP_BattMonitor::BattMonitor_State &mon_state,
 		AP_BattMonitor_Params &params) :
-    																				AP_BattMonitor_Analog(mon, mon_state, params)
+    																						AP_BattMonitor_Analog(mon, mon_state, params)
 {
 	_state.voltage = 1.0; // show a fixed voltage of 1v
 
@@ -163,6 +163,24 @@ void AP_BattMonitor_FuelFlow::read()
 
 	AP::battery().consumed_liquid = _state.consumed_mah;
 
+	static bool send_flag = 0;
+	static float width_val = 0;
+	if(!send_flag)
+	{
+		gcs().send_text(MAV_SEVERITY_INFO,"Spray Width set to %f",(float)_width);
+		send_flag = true;
+		width_val = _width;
+	}
+
+
+	const float EPSILON = 1e-3f;  // define an appropriate epsilon value
+
+	if (fabsf(width_val - _width) > EPSILON)
+	{
+	    gcs().send_text(MAV_SEVERITY_INFO, "Spray Width set to %f", (float)_width);
+	    width_val = _width;
+	}
+
 	handle_calibration();
 
 	float consumed_diff = _state.consumed_mah - last_consumed_mah;
@@ -192,7 +210,7 @@ void AP_BattMonitor_FuelFlow::read()
 
 	//Spray area calculation
 	static uint64_t dist_tm = AP_HAL::millis();
-	//	const float EPSILON = 1e-5;  // Small threshold for floating-point comparison
+
 	if(AP::sprayer()->spraying() && AP::arming().is_armed())
 	{
 
@@ -204,7 +222,7 @@ void AP_BattMonitor_FuelFlow::read()
 			AP::battery().spray_dist += sqrt(pow(previous_Loc.x/100 - current_Loc.x/100, 2) + pow(previous_Loc.y/100 - current_Loc.y/100, 2));
 			previous_Loc = current_Loc;
 			current_Loc = AP::battery().get_val();
-			AP::battery().spray_area_sqm = AP::battery().spray_dist*3.5;
+			AP::battery().spray_area_sqm = AP::battery().spray_dist*_width;
 			AP::battery().spray_area_acre = AP::battery().spray_area_sqm*0.000247105;
 			dist_tm = AP_HAL::millis();
 		}
