@@ -201,6 +201,32 @@ void AP_PDRL_COMMANDER::sendLogFileSignature(mavlink_command_transfer_t *rcvedPa
 	return;
 }
 
+void AP_PDRL_COMMANDER::sendPostLogFileSignature(mavlink_command_transfer_t *rcvedPacket)
+{
+	uint8_t dataBuff[100]= {0};
+	uint8_t offsetCnt = rcvedPacket->item_offset;
+
+	if(offsetCnt != 0)
+	{
+		memcpy(dataBuff,keyStore->temp5kBuff+(offsetCnt*100),100);
+		sendCommand(offsetCnt,COMMAND_GET_DRONE_PRIVATE_KEY,COMMAND_TYPE_GET,0,100,(uint64_t)CurrentLogFileSize,dataBuff);
+		return;
+	}
+	AP_PDRL_Logger *m_AP_PDRL_Logger = AP_PDRL_Logger::getInstance();
+
+	memset(keyStore->temp5kBuff,0,sizeof(keyStore->temp5kBuff));
+    CurrentLogFileSize = m_AP_PDRL_Logger->getPostFileSignature(rcvedPacket->command_buff,keyStore->temp5kBuff,sizeof(keyStore->temp5kBuff));
+	if(CurrentLogFileSize == (uint64_t)-1)
+	{
+		sendCommand(0,COMMAND_GET_DRONE_PRIVATE_KEY,COMMAND_TYPE_GET,0,0,0,dataBuff);
+		return;
+	}
+
+	memcpy(dataBuff,keyStore->temp5kBuff,100);
+	sendCommand(offsetCnt,COMMAND_GET_DRONE_PRIVATE_KEY,COMMAND_TYPE_GET,0,100,(uint64_t)CurrentLogFileSize,dataBuff);
+	return;
+}
+
 void AP_PDRL_COMMANDER::sendSprayStatus()
 {
 
@@ -338,7 +364,10 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		break;
 
 	case COMMAND_GET_DRONE_PRIVATE_KEY:
-		break;
+	{
+		sendPostLogFileSignature(&packet);
+	}
+	break;
 
 	case COMMAND_GET_DRONE_PUBLIC_KEY:
 	{
@@ -383,12 +412,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "5ft7dnhk";
 		// End section oemName
 
-				 strcpy(oemName,"m");
-//		if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-//		{
-//			lastUnlock = AP_HAL::millis();
-//			isUnlocked = true;
-//		}
+//		strcpy(oemName,"m");
+				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+				{
+					lastUnlock = AP_HAL::millis();
+					isUnlocked = true;
+				}
 	}
 	break;
 
@@ -472,7 +501,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	{
 		AC_Sprayer *sprayer = AP::sprayer();
 		if (sprayer == nullptr) {
-	    	uint8_t spray_ack[100] = {0};
+			uint8_t spray_ack[100] = {0};
 			gcs().send_text(MAV_SEVERITY_INFO,"Sprayer Not Init");
 			sendCommand(0,COMMAND_GET_PERMISSION_ARTIFACTS,COMMAND_TYPE_GET,0,1,1,spray_ack);
 			break;
@@ -480,8 +509,6 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 		if(packet.command_buff[0])
 		{
-			static int call=1;
-			gcs().send_text(MAV_SEVERITY_INFO,"Got Sprayer ON command %d",call++);
 			printf("Got Sprayer ON command\n");
 			sprayer->run(true);
 		}

@@ -104,6 +104,8 @@ public:
 	int makeJsonAndSignLogFile(char* outFilepath);
 	int makeJsonAndSignLogFileLatest();
 	size_t getFileSignature(uint8_t *currentHashFileName,unsigned char* signatureBuff,size_t sigBuffSize);
+	size_t getPostFileSignature(uint8_t *currentHashFileName,unsigned char* signatureBuff,size_t sigBuffSize);
+
 	int checkTimeBreach(uint64_t *currentTime);
 	int setTakeOffLolation(MAV_LANDED_STATE landState);
 	int setLandLolation(MAV_LANDED_STATE landState);
