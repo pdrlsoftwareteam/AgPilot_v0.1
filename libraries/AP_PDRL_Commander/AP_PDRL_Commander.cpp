@@ -547,12 +547,14 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 void AP_PDRL_COMMANDER::sendSdcardStatus()
 {
-    const char* Status = "SD card Detected";
-    if (!AP::logger().CardInserted()) {
-        Status = "No SD card Detected";
+    sdcard_stop();
+    bool detect = sdcard_retry();
+    char Status[100] = "SD card Detected";
+    if (!detect) {
+        memcpy(Status,"No SD card Detected\0",20);
     }
-    uint8_t len = strlen(Status);
-    sendCommand(0, COMMAND_GET_SDCARD_STATUS, COMMAND_TYPE_GET, 0, len, 1, (uint8_t*)Status);
+    //gcs().send_text(MAV_SEVERITY_INFO, "%s",Status);
+    sendCommand(0, COMMAND_GET_SDCARD_STATUS, COMMAND_TYPE_GET, 0, 100, 1, (uint8_t*)Status);
 }
 
 
