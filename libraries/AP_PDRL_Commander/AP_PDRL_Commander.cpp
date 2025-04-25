@@ -12,7 +12,8 @@
 #include "AP_AHRS/AP_AHRS.h"
 #include "AP_BattMonitor/AP_BattMonitor_FuelFlow.h"
 #include "AP_Arming/AP_Arming.h"
-#include "AP_Logger/AP_Logger.h"
+#include "AP_HAL_ChibiOS/sdcard.h"
+
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
 #include "hal.h"
 #include "hwdef.h"
@@ -547,10 +548,8 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 void AP_PDRL_COMMANDER::sendSdcardStatus()
 {
-    sdcard_stop();
-    bool detect = sdcard_retry();
     char Status[100] = "SD card Detected";
-    if (!detect) {
+    if (!sdcard_is_inserted()) {
         memcpy(Status,"No SD card Detected\0",20);
     }
     //gcs().send_text(MAV_SEVERITY_INFO, "%s",Status);
