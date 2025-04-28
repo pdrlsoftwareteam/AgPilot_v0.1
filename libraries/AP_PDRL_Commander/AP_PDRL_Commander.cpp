@@ -536,12 +536,14 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_GET_SIG_VALIDATION_RESULT:
 		break;
 
-	case COMMAND_PDRL_ENUM_END:
-		break;
-
 	case COMMAND_GET_SDCARD_STATUS:
 	    sendSdcardStatus();
 	    break;
+
+	case COMMAND_PDRL_ENUM_END:
+		break;
+
+
 	}
 }
 
