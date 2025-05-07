@@ -137,9 +137,6 @@ const AP_Param::GroupInfo AP_RangeFinder_Params::var_info[] = {
     // @Values: 0:Forward, 1:Forward-Right, 2:Right, 3:Back-Right, 4:Back, 5:Back-Left, 6:Left, 7:Forward-Left, 24:Up, 25:Down
     // @User: Advanced
     AP_GROUPINFO("ORIENT", 53, AP_RangeFinder_Params, orientation, AP_RANGEFINDER_DEFAULT_ORIENTATION),
-    AP_GROUPINFO("MSGBYTE", 54, AP_RangeFinder_Params, msgByte, 0x00000021),
-    AP_GROUPINFO("MSGID", 55, AP_RangeFinder_Params, msgId, 0x00),
-
 
     AP_GROUPEND
 };

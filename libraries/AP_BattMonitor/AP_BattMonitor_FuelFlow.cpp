@@ -148,6 +148,7 @@ void AP_BattMonitor_FuelFlow::read()
 		litres = state.pulse_count * _curr_amp_per_volt * 0.001f;
 		litres_pec_sec = litres / irq_dt;
 	}
+
 	_state.last_time_micros = now_us;
 
 	// map amps to litres/hour

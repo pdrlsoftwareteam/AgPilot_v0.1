@@ -83,9 +83,11 @@ public:
         USD1_CAN = 33,
         Benewake_CAN = 34,
         TeraRanger_Serial = 35,
-        Lua_Scripting = 36,
-		RADAR_OBSTACLE = 37,
-		DEBUG = 95,
+		Radar_H30 = 36,
+		NEW_ALTIMETER = 37,
+		UAV_R21_FRONT = 38,
+		UAV_R21_BACK = 39,
+        Lua_Scripting = 40,
         SIM = 100,
     };
 
