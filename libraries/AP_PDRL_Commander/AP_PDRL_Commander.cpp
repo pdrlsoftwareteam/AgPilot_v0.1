@@ -413,12 +413,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "5ft7dnhk";
 		// End section oemName
 
-//		strcpy(oemName,"m");
-				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-				{
-					lastUnlock = AP_HAL::millis();
-					isUnlocked = true;
-				}
+		strcpy(oemName,"m");
+//				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+//				{
+//					lastUnlock = AP_HAL::millis();
+//					isUnlocked = true;
+//				}
 	}
 	break;
 
@@ -541,7 +541,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		break;
 
 	case COMMAND_GET_SDCARD_STATUS:
-	    sendSdcardStatus();
+//	    sendSdcardStatus();
 	    break;
 	}
 }
@@ -549,7 +549,8 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 void AP_PDRL_COMMANDER::sendSdcardStatus()
 {
     char Status[100] = "SD card Detected";
-    if (!sdcard_is_inserted()) {
+    if (!sdcard_is_inserted()) { //if (!sdcard_is_inserted()) {
+
         memcpy(Status,"No SD card Detected\0",20);
     }
     //gcs().send_text(MAV_SEVERITY_INFO, "%s",Status);

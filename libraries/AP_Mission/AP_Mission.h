@@ -480,6 +480,8 @@ public:
         return _cmd_total;
     }
 
+    void log_all_mission_commands() const;
+
     /// num_commands_max - returns maximum number of commands that can be stored
     uint16_t num_commands_max() const {
         return _commands_max;
