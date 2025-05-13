@@ -2727,75 +2727,85 @@ void AP_Mission::log_all_mission_commands() const
     const char *filename = "missionWP.wp";
     int fd = AP::FS().open(filename, O_CREAT | O_WRONLY | O_TRUNC);
     if (fd < 0) {
-//        AP::logger().Write_Message(LogError, "Failed to open mission.waypoints");
+        gcs().send_text(MAV_SEVERITY_ERROR, "Failed to open %s for writing", filename);
         return;
     }
 
-    // Write header
-    const char *header = "PDRL WPL 110\n";
+    // Standard QGC-compatible header
+    const char *header = "QGC WPL 110\n";
     AP::FS().write(fd, header, strlen(header));
 
     Mission_Command cmd;
     for (uint16_t i = 0; i < _cmd_total; ++i) {
         if (!read_cmd_from_storage(i, cmd)) {
+            gcs().send_text(MAV_SEVERITY_WARNING, "Skipping unreadable command %u", i);
             continue;
         }
 
-        // Default values
+        // Extract full parameter set
         float param1 = cmd.p1;
-        float param2 = 0;
-        float param3 = 0;
-        float param4 = 0;
+        float param2 = cmd.p1;
+        float param3 = cmd.p1;
+        float param4 = cmd.p1;
+
         double latitude = 0;
         double longitude = 0;
         float altitude = 0;
-        uint8_t frame = 3; // MAV_FRAME_GLOBAL_RELATIVE_ALT
-        uint8_t autocontinue = 1;
 
-        // Fill values if it's a location command
         if (stored_in_location(cmd.id)) {
             latitude = cmd.content.location.lat * 1.0e-7;
             longitude = cmd.content.location.lng * 1.0e-7;
-            altitude = cmd.content.location.alt * 0.01f;  // cm to m
+            altitude = cmd.content.location.alt * 0.01f;
         }
+
+        uint8_t current = (cmd.index == 0) ? 1 : 0;
+        uint8_t frame = 0; //cmd.frame;               // Use real frame
+        uint8_t autocontinue = 0;//cmd.autocontinue; // Use actual flag if supported
 
         char line[128];
         snprintf(line, sizeof(line),
-                 "%d\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\t%.6f\t%.7f\t%.7f\t%.2f\t%d\n",
-                 cmd.index,               // seq
-                 (cmd.index == 0 ? 1 : 0),// current WP
-                 frame,                   // MAV_FRAME
-                 cmd.id,                  // MAV_CMD
+                 "%u\t%u\t%u\t%u\t%.6f\t%.6f\t%.6f\t%.6f\t%.7f\t%.7f\t%.2f\t%u\n",
+                 cmd.index,
+                 current,
+                 frame,
+                 cmd.id,
                  param1, param2, param3, param4,
                  latitude, longitude, altitude,
                  autocontinue);
 
-        gcs().send_text(MAV_SEVERITY_INFO,"writing mission wps");
         AP::FS().write(fd, line, strlen(line));
     }
 
     AP::FS().close(fd);
-//    AP::logger().Write_Message(LogInfo, "Mission saved to mission.waypoints");
+    gcs().send_text(MAV_SEVERITY_NOTICE, "Mission saved to %s", filename);
 }
+
 
 void AP_Mission::read_mission_from_file()
 {
     const char *filename = "missionWP.wp";
     int fd = AP::FS().open(filename, O_RDONLY);
     if (fd < 0) {
-        gcs().send_text(MAV_SEVERITY_INFO, "Failed to open mission file for reading");
+        gcs().send_text(MAV_SEVERITY_ERROR, "Failed to open mission file: %s", filename);
+        return;
+    }
+
+    if (!this->clear()) {
+        gcs().send_text(MAV_SEVERITY_ERROR, "Failed to clear current mission");
+        AP::FS().close(fd);
         return;
     }
 
     char line[128];
-    gcs().send_text(MAV_SEVERITY_INFO, "Reading mission waypoints");
+    uint16_t index = 0;
+    gcs().send_text(MAV_SEVERITY_INFO, "Loading mission from %s", filename);
 
     while (AP::FS().fgets(line, sizeof(line), fd)) {
-        if (strncmp(line, "PDRL WPL", 8) == 0) {
-            continue;
+        if (strncmp(line, "QGC WPL 110", 11) == 0) {
+            continue; // skip QGC header
         }
 
-        // Declare waypoint fields
+        // Fields to parse
         int seq = 0, current = 0, frame = 0, command = 0, autocontinue = 0;
         float p1 = 0, p2 = 0, p3 = 0, p4 = 0, alt = 0;
         double lat = 0, lon = 0;
@@ -2817,29 +2827,54 @@ void AP_Mission::read_mission_from_file()
                 case 9: lon = strtod(token, nullptr); break;
                 case 10: alt = atof(token); break;
                 case 11: autocontinue = atoi(token); break;
-                default: break;
             }
-
             token = strtok(nullptr, " \t");
             field++;
         }
 
-        if (field == 12) {
-        	(void)current;
-        	(void)autocontinue;
-            gcs().send_text(MAV_SEVERITY_INFO,
-                            "WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
-                            "p1=%.2f p2=%.2f p3=%.2f p4=%.2f",
-                            seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
-
-            hal.console->printf("WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
-                                "p1=%.2f p2=%.2f p3=%.2f p4=%.2f\n",
-                                seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
-        } else {
-            gcs().send_text(MAV_SEVERITY_INFO, "Invalid line (expected 12 fields): %s", line);
+        if (field != 12 || seq != index) {
+            gcs().send_text(MAV_SEVERITY_ERROR, "Malformed line or sequence mismatch at index %u", index);
+            this->clear(); // remove partial mission
+            AP::FS().close(fd);
+            return;
         }
+
+        mavlink_mission_item_int_t item{};
+        item.seq = seq;
+        item.command = command;
+        item.frame = frame;
+        item.current = current;
+        item.autocontinue = autocontinue;
+        item.param1 = p1;
+        item.param2 = p2;
+        item.param3 = p3;
+        item.param4 = p4;
+        item.z = alt;
+
+        // Convert lat/lon only if the command uses location
+        if (cmd_has_location(command)) {
+            item.x = static_cast<int32_t>(lat * 1.0e7);
+            item.y = static_cast<int32_t>(lon * 1.0e7);
+        } else {
+            item.x = static_cast<int32_t>(lat);
+            item.y = static_cast<int32_t>(lon);
+        }
+
+        item.target_system = mavlink_system.sysid;
+        item.target_component = mavlink_system.compid;
+        item.mission_type = 0; // 0 = mission (could be changed if you support other types)
+
+        if (!this->set_item(index, item)) {
+            gcs().send_text(MAV_SEVERITY_ERROR, "Failed to set mission item %u", index);
+            this->clear();
+            AP::FS().close(fd);
+            return;
+        }
+
+        index++;
     }
 
+    gcs().send_text(MAV_SEVERITY_NOTICE, "Mission loaded: %u items", index);
     AP::FS().close(fd);
 }
 
