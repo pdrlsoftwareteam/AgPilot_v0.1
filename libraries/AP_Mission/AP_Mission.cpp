@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
 const AP_Param::GroupInfo AP_Mission::var_info[] = {
 
     // @Param: TOTAL
@@ -2779,45 +2780,67 @@ void AP_Mission::log_all_mission_commands() const
 
 void AP_Mission::read_mission_from_file()
 {
-//    const char *filename = "missionWP.wp";
-//    int fd = AP::FS().open(filename, O_RDONLY);
-//    if (fd < 0) {
-//        gcs().send_text(MAV_SEVERITY_INFO, "Failed to open mission file for reading");
-//        return;
-//    }
-//
-//    char line[128];
-//    gcs().send_text(MAV_SEVERITY_INFO, "Reading mission waypoints");
-//
-//    while (AP::FS().fgets(line, sizeof(line), fd)) {
-//        if (strncmp(line, "PDRL WPL", 8) == 0) {
-//            continue;
-//        }
-//
-//        int seq, current, frame, command, autocontinue;
-//        float p1, p2, p3, p4, alt;
-//        double lat, lon;
-//
-//        int parsed = sscanf(line, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%lf\t%lf\t%f\t%d",
-//                                   &seq, &current, &frame, &command,
-//                                   &p1, &p2, &p3, &p4,
-//                                   &lat, &lon, &alt, &autocontinue);
-//
-//        if (parsed == 12) {
-//            gcs().send_text(MAV_SEVERITY_INFO,
-//                            "WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
-//                            "p1=%.2f p2=%.2f p3=%.2f p4=%.2f",
-//                            seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
-//
-//            hal.console->printf("WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
-//                                "p1=%.2f p2=%.2f p3=%.2f p4=%.2f\n",
-//                                seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
-//        } else {
-//            gcs().send_text(MAV_SEVERITY_INFO, "Invalid line: %s", line);
-//        }
-//    }
-//
-//    AP::FS().close(fd);
+    const char *filename = "missionWP.wp";
+    int fd = AP::FS().open(filename, O_RDONLY);
+    if (fd < 0) {
+        gcs().send_text(MAV_SEVERITY_INFO, "Failed to open mission file for reading");
+        return;
+    }
+
+    char line[128];
+    gcs().send_text(MAV_SEVERITY_INFO, "Reading mission waypoints");
+
+    while (AP::FS().fgets(line, sizeof(line), fd)) {
+        if (strncmp(line, "PDRL WPL", 8) == 0) {
+            continue;
+        }
+
+        // Declare waypoint fields
+        int seq = 0, current = 0, frame = 0, command = 0, autocontinue = 0;
+        float p1 = 0, p2 = 0, p3 = 0, p4 = 0, alt = 0;
+        double lat = 0, lon = 0;
+
+        char *token = strtok(line, " \t");
+        int field = 0;
+
+        while (token != nullptr) {
+            switch (field) {
+                case 0: seq = atoi(token); break;
+                case 1: current = atoi(token); break;
+                case 2: frame = atoi(token); break;
+                case 3: command = atoi(token); break;
+                case 4: p1 = atof(token); break;
+                case 5: p2 = atof(token); break;
+                case 6: p3 = atof(token); break;
+                case 7: p4 = atof(token); break;
+                case 8: lat = strtod(token, nullptr); break;
+                case 9: lon = strtod(token, nullptr); break;
+                case 10: alt = atof(token); break;
+                case 11: autocontinue = atoi(token); break;
+                default: break;
+            }
+
+            token = strtok(nullptr, " \t");
+            field++;
+        }
+
+        if (field == 12) {
+        	(void)current;
+        	(void)autocontinue;
+            gcs().send_text(MAV_SEVERITY_INFO,
+                            "WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
+                            "p1=%.2f p2=%.2f p3=%.2f p4=%.2f",
+                            seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
+
+            hal.console->printf("WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
+                                "p1=%.2f p2=%.2f p3=%.2f p4=%.2f\n",
+                                seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
+        } else {
+            gcs().send_text(MAV_SEVERITY_INFO, "Invalid line (expected 12 fields): %s", line);
+        }
+    }
+
+    AP::FS().close(fd);
 }
 
 // singleton instance

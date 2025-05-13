@@ -4197,8 +4197,8 @@ void GCS_MAVLINK::handle_common_mission_message(const mavlink_message_t &msg)
     // GCS request the full list of commands, we return just the number and leave the GCS to then request each command individually
     case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:       // MAV ID: 43
     {
-    	AP_Mission *mission = AP::mission();
-    	mission->read_mission_from_file();
+//    	AP_Mission *mission = AP::mission();
+//    	mission->read_mission_from_file();
         handle_mission_request_list(msg);
         break;
     }
