@@ -11,6 +11,10 @@
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <stdio.h>  // for sprintf
+#include <AP_HAL_ChibiOS/hwdef/common/stdio.h>
+#include <cstdio>  // required for sscanf
+#include <stdint.h>
+#include <stddef.h>
 
 const AP_Param::GroupInfo AP_Mission::var_info[] = {
 
@@ -2717,47 +2721,104 @@ void AP_Mission::format_conversion(uint8_t tag_byte, const Mission_Command &cmd,
     }
 #endif
 }
-
 void AP_Mission::log_all_mission_commands() const
 {
-    // Open the file in append mode
-    int logFileFd = AP::FS().open("Mission.txt", O_APPEND | O_CREAT | O_WRONLY);
-    if (logFileFd < 0) {
-        hal.console->printf("Failed to open Mission.txt\n");
+    const char *filename = "missionWP.wp";
+    int fd = AP::FS().open(filename, O_CREAT | O_WRONLY | O_TRUNC);
+    if (fd < 0) {
+//        AP::logger().Write_Message(LogError, "Failed to open mission.waypoints");
         return;
     }
 
-    char lineBuf[128];
-    Mission_Command cmd;
+    // Write header
+    const char *header = "PDRL WPL 110\n";
+    AP::FS().write(fd, header, strlen(header));
 
+    Mission_Command cmd;
     for (uint16_t i = 0; i < _cmd_total; ++i) {
         if (!read_cmd_from_storage(i, cmd)) {
-            snprintf(lineBuf, sizeof(lineBuf), "Failed to read command at index %u\n", i);
-            AP::FS().write(logFileFd, lineBuf, strlen(lineBuf));
             continue;
         }
 
-        // Write command ID and p1
-        snprintf(lineBuf, sizeof(lineBuf), "Index: %u, ID: %u, p1: %u\n", cmd.index, cmd.id, cmd.p1);
-        AP::FS().write(logFileFd, lineBuf, strlen(lineBuf));
+        // Default values
+        float param1 = cmd.p1;
+        float param2 = 0;
+        float param3 = 0;
+        float param4 = 0;
+        double latitude = 0;
+        double longitude = 0;
+        float altitude = 0;
+        uint8_t frame = 3; // MAV_FRAME_GLOBAL_RELATIVE_ALT
+        uint8_t autocontinue = 1;
 
-        // If command has a location, write lat/lon/alt
+        // Fill values if it's a location command
         if (stored_in_location(cmd.id)) {
-            snprintf(lineBuf, sizeof(lineBuf),
-                     "  Lat: %.7f, Lng: %.7f, Alt: %.2f\n",
-                     (double)cmd.content.location.lat * 1e-7,
-                     (double)cmd.content.location.lng * 1e-7,
-                     (double)cmd.content.location.alt);
-            AP::FS().write(logFileFd, lineBuf, strlen(lineBuf));
-        } else {
-            snprintf(lineBuf, sizeof(lineBuf), "  (non-location command)\n");
-            AP::FS().write(logFileFd, lineBuf, strlen(lineBuf));
+            latitude = cmd.content.location.lat * 1.0e-7;
+            longitude = cmd.content.location.lng * 1.0e-7;
+            altitude = cmd.content.location.alt * 0.01f;  // cm to m
         }
+
+        char line[128];
+        snprintf(line, sizeof(line),
+                 "%d\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\t%.6f\t%.7f\t%.7f\t%.2f\t%d\n",
+                 cmd.index,               // seq
+                 (cmd.index == 0 ? 1 : 0),// current WP
+                 frame,                   // MAV_FRAME
+                 cmd.id,                  // MAV_CMD
+                 param1, param2, param3, param4,
+                 latitude, longitude, altitude,
+                 autocontinue);
+
+        gcs().send_text(MAV_SEVERITY_INFO,"writing mission wps");
+        AP::FS().write(fd, line, strlen(line));
     }
 
-    AP::FS().close(logFileFd);
+    AP::FS().close(fd);
+//    AP::logger().Write_Message(LogInfo, "Mission saved to mission.waypoints");
 }
 
+void AP_Mission::read_mission_from_file()
+{
+//    const char *filename = "missionWP.wp";
+//    int fd = AP::FS().open(filename, O_RDONLY);
+//    if (fd < 0) {
+//        gcs().send_text(MAV_SEVERITY_INFO, "Failed to open mission file for reading");
+//        return;
+//    }
+//
+//    char line[128];
+//    gcs().send_text(MAV_SEVERITY_INFO, "Reading mission waypoints");
+//
+//    while (AP::FS().fgets(line, sizeof(line), fd)) {
+//        if (strncmp(line, "PDRL WPL", 8) == 0) {
+//            continue;
+//        }
+//
+//        int seq, current, frame, command, autocontinue;
+//        float p1, p2, p3, p4, alt;
+//        double lat, lon;
+//
+//        int parsed = sscanf(line, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%lf\t%lf\t%f\t%d",
+//                                   &seq, &current, &frame, &command,
+//                                   &p1, &p2, &p3, &p4,
+//                                   &lat, &lon, &alt, &autocontinue);
+//
+//        if (parsed == 12) {
+//            gcs().send_text(MAV_SEVERITY_INFO,
+//                            "WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
+//                            "p1=%.2f p2=%.2f p3=%.2f p4=%.2f",
+//                            seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
+//
+//            hal.console->printf("WP %d: cmd=%d frame=%d lat=%.7f lon=%.7f alt=%.2f "
+//                                "p1=%.2f p2=%.2f p3=%.2f p4=%.2f\n",
+//                                seq, command, frame, lat, lon, alt, p1, p2, p3, p4);
+//        } else {
+//            gcs().send_text(MAV_SEVERITY_INFO, "Invalid line: %s", line);
+//        }
+//    }
+//
+//    AP::FS().close(fd);
+}
 
 // singleton instance
 AP_Mission *AP_Mission::_singleton;
