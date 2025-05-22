@@ -20,7 +20,6 @@
 
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Mission/AP_Mission.h>
-
 #include "GCS.h"
 
 MAV_MISSION_RESULT MissionItemProtocol_Waypoints::append_item(const mavlink_mission_item_int_t &mission_item_int)

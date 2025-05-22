@@ -23,6 +23,7 @@
 #include "hwdef/common/flash.h"
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <stdio.h>
+#include <PDRL_FwBackup/PDRLFwBackup.h>
 
 using namespace ChibiOS;
 
@@ -38,7 +39,7 @@ extern const AP_HAL::HAL& hal;
 
 #ifndef HAL_STORAGE_BACKUP_FOLDER
 // location of backup file
-#define HAL_STORAGE_BACKUP_FOLDER "/PDRL/STRG_BAK"
+#define HAL_STORAGE_BACKUP_FOLDER "/Flash_Backup"
 #endif
 
 #ifndef HAL_STORAGE_BACKUP_COUNT
@@ -187,7 +188,7 @@ void Storage::_save_backup(void)
     }
 
     // create and write fram data to file
-    ret = asprintf(&fname, "%s/STRG%d.bak", _storage_bak_directory, curr_bak);
+    ret = asprintf(&fname, "%s/flash_bkp%d.bin", _storage_bak_directory, curr_bak);
     if (fname == nullptr || (ret <= 0)) {
         return;
     }
@@ -198,9 +199,68 @@ void Storage::_save_backup(void)
         //finally dump the fram data
         AP::FS().write(fd, _buffer, CH_STORAGE_SIZE);
         AP::FS().close(fd);
+//        PDRL_Fw_Backup::getInstance()->readFirmware();
     }
 #endif
 }
+
+void Storage::_load_backup_and_restore_flash(void)
+{
+#ifdef USE_POSIX
+    int ret;
+    const char* _storage_bak_directory = HAL_STORAGE_BACKUP_FOLDER;
+    unsigned curr_bak = 0;
+
+    // Retry mounting the filesystem
+    uint32_t start_millis = AP_HAL::millis();
+    while (!AP::FS().retry_mount() && (AP_HAL::millis() - start_millis) < 1000) {
+        hal.scheduler->delay(1);
+    }
+
+    // Read the last backup index
+    char* fname = nullptr;
+    ret = asprintf(&fname, "%s/last_storage_bak", _storage_bak_directory);
+    if (fname == nullptr || ret <= 0) {
+        return;
+    }
+
+    int fd = AP::FS().open(fname, O_RDONLY);
+    if (fd != -1) {
+        char buf[10] = {};
+        if (AP::FS().read(fd, buf, sizeof(buf) - 1) > 0) {
+            curr_bak = (unsigned)strtol(buf, nullptr, 10);
+        }
+        AP::FS().close(fd);
+    } else {
+        free(fname);
+        return;
+    }
+    free(fname);
+    fname = nullptr;
+
+    // Read the actual backup data
+    ret = asprintf(&fname, "%s/flash_bkp%u.bin", _storage_bak_directory, curr_bak);
+    if (fname == nullptr || ret <= 0) {
+        return;
+    }
+
+    fd = AP::FS().open(fname, O_RDONLY);
+    free(fname);
+    fname = nullptr;
+
+    if (fd != -1) {
+        // Read backup into _buffer
+        ssize_t read_bytes = AP::FS().read(fd, _buffer, CH_STORAGE_SIZE);
+        AP::FS().close(fd);
+
+        if (read_bytes == CH_STORAGE_SIZE) {
+            // Now write _buffer back to flash
+//            _write_to_flash(_buffer, CH_STORAGE_SIZE);
+        }
+    }
+#endif
+}
+
 
 /*
   mark some lines as dirty. Note that there is no attempt to avoid

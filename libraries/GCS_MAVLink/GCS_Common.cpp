@@ -1666,7 +1666,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+//    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1689,8 +1689,8 @@ GCS_MAVLINK::update_receive(uint32_t max_time_us)
     const uint16_t nbytes = _port->available();
     for (uint16_t i=0; i<nbytes; i++)
     {
-                uint8_t ch = (uint8_t)_port->read();
-        const uint8_t c = ch ^ 223;
+                uint8_t c = (uint8_t)_port->read();
+//        const uint8_t c = ch ^ 223;
         const uint32_t protocol_timeout = 4000;
         
         if (alternative.handler &&
@@ -5692,14 +5692,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        {
+//        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+//        {
 		 	last_heartbeat_time = AP_HAL::millis();
-			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+//			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-			else
-				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        }
+//			else
+//				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+//        }
         break;
 
     case MSG_HWSTATUS:

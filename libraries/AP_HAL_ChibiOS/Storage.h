@@ -66,6 +66,7 @@ private:
         SDCard,
     };
     StorageBackend _initialisedType = StorageBackend::None;
+    void _load_backup_and_restore_flash(void);
     void _storage_create(void);
     void _storage_open(void);
     void _save_backup(void);
