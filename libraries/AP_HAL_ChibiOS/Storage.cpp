@@ -546,5 +546,27 @@ bool Storage::get_storage_ptr(void *&ptr, size_t &size)
     return true;
 }
 
+bool Storage::set_storage_data(const void* new_data, size_t new_size)
+{
+//    if (_initialisedType == StorageBackend::None || new_data == nullptr) {
+//        return false;
+//    }
+    _load_backup_and_restore_flash();
+    return true;
+
+    size_t buffer_size = sizeof(_buffer);
+    if (new_size > buffer_size) {
+        return false;  // Prevent buffer overflow
+    }
+
+    memcpy(_buffer, new_data, new_size);
+    if (new_size < buffer_size) {
+        memset(_buffer + new_size, 0, buffer_size - new_size);  // Optional: clear rest of buffer
+    }
+
+    return true;
+}
+
+
 
 #endif // HAL_USE_EMPTY_STORAGE
