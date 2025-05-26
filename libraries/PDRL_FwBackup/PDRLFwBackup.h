@@ -32,6 +32,8 @@ public:
 	void encode_decode_flash_buffer();
 	void test_base64_codec();
 	void load_backup_and_restore_flash(void);
+	void flash_erase();
+	void test_sector_erase();
 };
 
 #endif /* LIBRARIES_PDRL_FWBACKUP_PDRLFWBACKUP_H_ */

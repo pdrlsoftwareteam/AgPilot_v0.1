@@ -13,9 +13,14 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL_ChibiOS/Storage.h>
 #include <stdio.h>
+#include "PDRLFlashProgramHelper.h"
 
+//#include <AP_FlashIface/AP_FlashIface.h>
+#include <AP_FlashIface/AP_FlashIface_JEDEC.h>
+PDRL_FlashProgramHelper jedec_dev;
 PDRLFwBackup *PDRLFwBackup::m_PDRLFwBackup = 0;
 extern const AP_HAL::HAL& hal;
+
 PDRLFwBackup::PDRLFwBackup() {
 	// TODO Auto-generated constructor stub
 
@@ -381,4 +386,76 @@ void PDRLFwBackup::encode_decode_flash_buffer()
     delete[] decoded;
 }
 
+void PDRLFwBackup::flash_erase()
+{
+	jedec_dev.init();
+//	test_sector_erase();
+}
+
+#define DELAY_MILLIS(x)         do { hal.scheduler->delay(x); } while(0)
+#define DELAY_MICROS(x)         do { hal.scheduler->delay_microseconds(x); } while(0)
+
+void PDRLFwBackup::test_sector_erase()
+{
+    uint8_t *data = new uint8_t[jedec_dev.get_page_size()];
+    if (data == nullptr) {
+        hal.console->printf("Failed to allocate data for program");
+    }
+    uint8_t *rdata = new uint8_t[jedec_dev.get_page_size()];
+    if (rdata == nullptr) {
+        hal.console->printf("Failed to allocate data for read");
+    }
+
+    // fill program data with its own adress
+    for (uint32_t i = 0; i < jedec_dev.get_page_size(); i++) {
+        data[i] = i;
+    }
+    hal.console->printf("Writing Page #1\n");
+    uint32_t delay_us, timeout_us;
+    uint64_t start_time_us = AP_HAL::micros64();
+    if (!jedec_dev.start_program_page(0, data, delay_us, timeout_us)) {
+        hal.console->printf("Page write command failed\n");
+        return;
+    }
+    while (true) {
+        DELAY_MICROS(delay_us);
+        if (AP_HAL::micros64() > (start_time_us+delay_us)) {
+            if (!jedec_dev.is_device_busy()) {
+                hal.console->printf("Page Program Successful, elapsed %ld us\n", (unsigned long)(AP_HAL::micros64() - start_time_us));
+                break;
+            } else {
+                hal.console->printf("Typical page program time reached, Still Busy?!\n");
+            }
+        }
+        if (AP_HAL::micros64() > (start_time_us+timeout_us)) {
+            hal.console->printf("Page Program Timed out, elapsed %lld us\n", (unsigned long long)(AP_HAL::micros64() - start_time_us));
+            return;
+        }
+    }
+    if (!jedec_dev.read(0, rdata, jedec_dev.get_page_size())) {
+        hal.console->printf("Failed to read Flash page\n");
+    } else {
+        if (memcmp(data, rdata, jedec_dev.get_page_size()) != 0) {
+            hal.console->printf("Program Data Mismatch!\n");
+        } else {
+            hal.console->printf("Program Data Verified Good!\n");
+        }
+    }
+
+    // Now test XIP mode here as well
+    uint8_t *chip_data = nullptr;
+    if (!jedec_dev.start_xip_mode((void**)&chip_data)) {
+        hal.console->printf("Failed to setup XIP mode\n");
+    }
+    if (chip_data == nullptr) {
+        hal.console->printf("Invalid address!\n");
+    }
+    // Here comes the future!
+    if (memcmp(data, chip_data, jedec_dev.get_page_size()) != 0) {
+        hal.console->printf("Program Data Mismatch in XIP mode!\n");
+    } else {
+        hal.console->printf("Program Data Verified Good in XIP mode!\n");
+    }
+    jedec_dev.stop_xip_mode();
+}
 
