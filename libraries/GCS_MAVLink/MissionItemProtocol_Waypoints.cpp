@@ -53,13 +53,13 @@ bool MissionItemProtocol_Waypoints::clear_all_items()
 MAV_MISSION_RESULT MissionItemProtocol_Waypoints::complete(const GCS_MAVLINK &_link)
 {
     _link.send_text(MAV_SEVERITY_INFO, "Flight plan received");
-    static bool once = true;
-    if(once){
-    PDRLFwBackup::getInstance()->save_flash_backup();
-    once = false;
-    }
-    else
-    	PDRLFwBackup::getInstance()->load_backup_and_restore_flash();
+//    static bool once = true;
+//    if(once){
+    PDRLFwBackup::getInstance()->test_func();
+//    once = false;
+//    }
+//    else
+//    	PDRLFwBackup::getInstance()->load_backup_and_restore_flash();
 //    PDRLFwBackup::getInstance()->encode_decode_flash_buffer();
     AP::logger().Write_EntireMission();
     return MAV_MISSION_ACCEPTED;

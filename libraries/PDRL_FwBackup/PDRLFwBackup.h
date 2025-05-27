@@ -18,6 +18,9 @@ class PDRLFwBackup {
 	void *flashptr = nullptr;
 	size_t flashsize = 0;
 	void *flashptrBkp = nullptr;
+
+	uint8_t *flash[2];
+	bool erase_ok = 0;
 public:
 	static PDRLFwBackup *m_PDRLFwBackup;
 	static PDRLFwBackup *getInstance();
@@ -32,6 +35,8 @@ public:
 	void encode_decode_flash_buffer();
 	void test_base64_codec();
 	void load_backup_and_restore_flash(void);
+	void test_func();
+	void _save_flash_to_backup(void);
 };
 
 #endif /* LIBRARIES_PDRL_FWBACKUP_PDRLFWBACKUP_H_ */
