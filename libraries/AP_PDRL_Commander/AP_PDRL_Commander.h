@@ -96,6 +96,9 @@ public:
 	void handleHashToSign(mavlink_command_transfer_t* packet);
 	void parseCommand(const mavlink_message_t &msg);
 	void sendSdcardStatus();
+	void set_gps_unique_id(const uint8_t *id);
+
+	uint8_t gps_unique_id[16] = {0};
 };
 
 #endif /* KEYSTORE_HPP_ */

@@ -67,6 +67,8 @@ class ParamGetSetCb;
 class ParamExecuteOpcodeCb;
 class AP_PoolAllocator;
 class AP_UAVCAN_DNA_Server;
+class HardwareUniqueIDCb;
+class GetNodeInfoCb1;
 
 #if AP_DRONECAN_HIMARK_SERVO_ENABLED
 class HimarkServoInfoCb;
@@ -404,6 +406,8 @@ private:
     static void handle_hobbywing_GetEscID(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingESCIDCb &cb);
     static void handle_hobbywing_StatusMsg1(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingStatus1Cb &cb);
     static void handle_hobbywing_StatusMsg2(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingStatus2Cb &cb);
+    static void handle_hardwareVersion_GetUniqueID(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HardwareUniqueIDCb &cb);
+    static void trampoline_handleNodeInfo1(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb1& resp);
 #endif // AP_DRONECAN_HOBBYWING_ESC_ENABLED
 
 #if AP_DRONECAN_HIMARK_SERVO_ENABLED
