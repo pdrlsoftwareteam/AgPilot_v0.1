@@ -56,10 +56,6 @@ class AP_UAVCAN_DNA_Server
     uint8_t rcvd_unique_id_offset;
     uint32_t last_alloc_msg_ms;
 
-    //Methods to handle and report Node IDs seen on the bus
-    void addToSeenNodeMask(uint8_t node_id);
-    bool isNodeSeen(uint8_t node_id);
-
     //Generates 6Byte long hash from the specified unique_id
     void getHash(NodeData &node_data, const uint8_t unique_id[], uint8_t size) const;
 
@@ -101,6 +97,9 @@ class AP_UAVCAN_DNA_Server
 public:
     AP_UAVCAN_DNA_Server(AP_UAVCAN *ap_uavcan, StorageAccess _storage);
 
+    //Methods to handle and report Node IDs seen on the bus
+    void addToSeenNodeMask(uint8_t node_id);
+    bool isNodeSeen(uint8_t node_id);
 
     // Do not allow copies
     CLASS_NO_COPY(AP_UAVCAN_DNA_Server);

@@ -187,10 +187,8 @@ const AP_Param::GroupInfo AP_UAVCAN::var_info[] = {
 // set this to 1 to minimise resend of stale msgs
 #define CAN_PERIODIC_TX_TIMEOUT_MS 2
 
-UC_CLIENT_CALL_REGISTRY_BINDER(GetNodeInfoCb1, uavcan::protocol::GetNodeInfo);
-
-static uavcan::ServiceClient<uavcan::protocol::GetNodeInfo, GetNodeInfoCb1>* getNodeInfo_client[HAL_MAX_CAN_PROTOCOL_DRIVERS];
-
+UC_CLIENT_CALL_REGISTRY_BINDER(GetNodeInfoCb, uavcan::protocol::GetNodeInfo);
+static uavcan::ServiceClient<uavcan::protocol::GetNodeInfo, GetNodeInfoCb>* getNodeInfo_client[HAL_MAX_CAN_PROTOCOL_DRIVERS];
 
 // publisher interfaces
 static uavcan::Publisher<uavcan::equipment::actuator::ArrayCommand>* act_out_array[HAL_MAX_CAN_PROTOCOL_DRIVERS];
@@ -199,11 +197,6 @@ static uavcan::Publisher<uavcan::equipment::indication::LightsCommand>* rgb_led[
 static uavcan::Publisher<uavcan::equipment::indication::BeepCommand>* buzzer[HAL_MAX_CAN_PROTOCOL_DRIVERS];
 static uavcan::Publisher<ardupilot::indication::SafetyState>* safety_state[HAL_MAX_CAN_PROTOCOL_DRIVERS];
 static uavcan::Publisher<uavcan::equipment::safety::ArmingStatus>* arming_status[HAL_MAX_CAN_PROTOCOL_DRIVERS];
-
-//static uavcan::Publisher<uavcan::protocol::HardwareVersion>* hardware_uniqid[HAL_MAX_CAN_PROTOCOL_DRIVERS];
-//UC_REGISTRY_BINDER(HardwareUniqueIDCb, uavcan::protocol::HardwareVersion);
-//static uavcan::Subscriber<uavcan::protocol::HardwareVersion, HardwareUniqueIDCb> *hardwareVersion_GetUniqueId_listener[HAL_MAX_CAN_PROTOCOL_DRIVERS];
-
 #if AP_DRONECAN_SEND_GPS
 static uavcan::Publisher<uavcan::equipment::gnss::Fix2>* gnss_fix2[HAL_MAX_CAN_PROTOCOL_DRIVERS];
 static uavcan::Publisher<uavcan::equipment::gnss::Auxiliary>* gnss_auxiliary[HAL_MAX_CAN_PROTOCOL_DRIVERS];
@@ -236,11 +229,6 @@ static uavcan::protocol::param::ExecuteOpcode::Request param_save_req[HAL_MAX_CA
 
 
 // subscribers
-
-// handler hardware ID
-UC_REGISTRY_BINDER(HardwareUniqueIDCb, uavcan::protocol::GetNodeInfo);
-static uavcan::Subscriber<uavcan::protocol::GetNodeInfo, HardwareUniqueIDCb> *hardwareVersion_GetUniqueId_listener[HAL_MAX_CAN_PROTOCOL_DRIVERS];
-
 
 // handler SafteyButton
 UC_REGISTRY_BINDER(ButtonCb, ardupilot::indication::Button);
@@ -503,15 +491,6 @@ void AP_UAVCAN::init(uint8_t driver_index, bool enable_filters)
     arming_status[driver_index]->setTxTimeout(uavcan::MonotonicDuration::fromMSec(20));
     arming_status[driver_index]->setPriority(uavcan::TransferPriority::OneHigherThanLowest);
 
-//    hardware_uniqid[driver_index] = new uavcan::Publisher<uavcan::protocol::HardwareVersion>(*_node);
-//    hardware_uniqid[driver_index]->setTxTimeout(uavcan::MonotonicDuration::fromMSec(20));
-//    hardware_uniqid[driver_index]->setPriority(uavcan::TransferPriority::OneHigherThanLowest);
-//
-//    hardwareVersion_GetUniqueId_listener[driver_index] = new uavcan::Subscriber<uavcan::protocol::HardwareVersion, HardwareUniqueIDCb>(*_node);
-//    if (hardwareVersion_GetUniqueId_listener[driver_index]) {
-//    	hardwareVersion_GetUniqueId_listener[driver_index]->start(HardwareUniqueIDCb(this, &handle_hardwareVersion_GetUniqueID));
-//    }
-
 #if AP_DRONECAN_SEND_GPS
     gnss_fix2[driver_index] = new uavcan::Publisher<uavcan::equipment::gnss::Fix2>(*_node);
     gnss_fix2[driver_index]->setTxTimeout(uavcan::MonotonicDuration::fromMSec(20));
@@ -557,18 +536,6 @@ void AP_UAVCAN::init(uint8_t driver_index, bool enable_filters)
         actuator_status_listener[driver_index]->start(ActuatorStatusCb(this, &handle_actuator_status));
     }
 
-    hardwareVersion_GetUniqueId_listener[driver_index] = new uavcan::Subscriber<uavcan::protocol::GetNodeInfo, HardwareUniqueIDCb>(*_node);
-    if (hardwareVersion_GetUniqueId_listener[driver_index]) {
-    	hardwareVersion_GetUniqueId_listener[driver_index]->start(HardwareUniqueIDCb(this, &handle_hardwareVersion_GetUniqueID));
-    }
-
-    //Setup GetNodeInfo Client
-    getNodeInfo_client[driver_index] = new uavcan::ServiceClient<uavcan::protocol::GetNodeInfo, GetNodeInfoCb1>(*_node, GetNodeInfoCb1(this, &trampoline_handleNodeInfo1));
-    if (getNodeInfo_client[driver_index] == nullptr) {
-        AP_BoardConfig::allocation_error("AP_UAVCAN_DNA: getNodeInfo_client[%d]", driver_index);
-    }
-
-
 #if AP_DRONECAN_VOLZ_FEEDBACK_ENABLED
     actuator_status_Volz_listener[driver_index] = new uavcan::Subscriber<com::volz::servo::ActuatorStatus, ActuatorStatusVolzCb>(*_node);
     if (actuator_status_Volz_listener[driver_index]) {
@@ -586,12 +553,6 @@ void AP_UAVCAN::init(uint8_t driver_index, bool enable_filters)
         debug_listener[driver_index]->start(DebugCb(this, &handle_debug));
     }
     
-    if (getNodeInfo_client[driver_index] != nullptr ) {
-    	uavcan::protocol::GetNodeInfo::Request request;
-    	getNodeInfo_client[driver_index]->call(node_id, request);
-    	//            nodeInfo_resp_rcvd = false;
-    }
-
     _led_conf.devices_count = 0;
 
     /*
@@ -609,6 +570,12 @@ void AP_UAVCAN::init(uint8_t driver_index, bool enable_filters)
         _node->setModeOfflineAndPublish();
         debug_uavcan(AP_CANManager::LOG_ERROR, "UAVCAN: couldn't create thread\n\r");
         return;
+    }
+
+    //Setup GetNodeInfo Client
+    getNodeInfo_client[driver_index] = new uavcan::ServiceClient<uavcan::protocol::GetNodeInfo, GetNodeInfoCb>(*_node, GetNodeInfoCb(this,  &AP_UAVCAN::trampoline_handleNodeHwInfo));
+    if (getNodeInfo_client[driver_index] == nullptr) {
+//        AP_BoardConfig::allocation_error("AP_UAVCAN_DNA: getNodeInfo_client[%d]", driver_index);
     }
 
     _initialized = true;
@@ -680,7 +647,7 @@ void AP_UAVCAN::loop(void)
         send_parameter_request();
         send_parameter_save_request();
         _dna_server->verify_nodes();
-
+//        verify_nodes();
 #if AP_OPENDRONEID_ENABLED
         AP::opendroneid().dronecan_send(this);
 #endif
@@ -699,6 +666,73 @@ void AP_UAVCAN::loop(void)
 #endif
     }
 }
+
+//Trampoline call for handleNodeInfo member call
+void AP_UAVCAN::trampoline_handleNodeHwInfo(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb& resp)
+{
+    uint8_t unique_id[16] = {0};
+    char name[50] = {0};
+
+    //copy the unique id from message to uint8_t array
+    auto &r = resp.rsp->getResponse();
+    uavcan::copy(r.hardware_version.unique_id.begin(),
+                 r.hardware_version.unique_id.end(),
+                 unique_id);
+    strncpy_noterm(name, r.name.c_str(), sizeof(name)-1);
+
+//    ap_uavcan->_dna_server->handleNodeInfo(node_id, unique_id, name,
+//                              r.software_version.major,
+//                              r.software_version.minor,
+//                              r.software_version.vcs_commit);
+}
+
+void AP_UAVCAN::verify_nodes()
+{
+//    uint32_t now = uavcan::SystemClock::instance().getMonotonic().toMSec();
+//    if ((now - last_verification_request) < 5000) {
+//        return;
+//    }
+
+//    uint8_t log_count = AP::logger().get_log_start_count();
+//    if (log_count != last_logging_count) {
+//        last_logging_count = log_count;
+//        logged.clearall();
+//    }
+
+    //Check if we got acknowledgement from previous request
+    //except for requests using our own node_id
+    if (curr_verifying_node == self_node_id_temp[_driver_index]) {
+        nodeInfo_resp_rcvd = true;
+    }
+
+    if (!nodeInfo_resp_rcvd) {
+        /* Also notify GCS about this
+        Reason for this could be either the node was disconnected
+        Or a node with conflicting ID appeared and is sending response
+        at the same time. */
+        /* Only report if the node was verified, otherwise ignore
+        as this could be just Bootloader to Application transition. */
+        if (_dna_server->isNodeIDVerified(curr_verifying_node)) {
+            // remove verification flag for this node
+//            verified_mask.clear(curr_verifying_node);
+        }
+    }
+
+//    last_verification_request = now;
+    //Find the next registered Node ID to be verified.
+    for (uint8_t i = 0; i <= 125; i++) {
+        curr_verifying_node = (curr_verifying_node + 1) % (125 + 1);
+        if (_dna_server->isNodeSeen(curr_verifying_node)) {
+            break;
+        }
+    }
+//    if (getNodeInfo_client[driver_index] != nullptr && isNodeIDOccupied(curr_verifying_node)) {
+        uavcan::protocol::GetNodeInfo::Request request;
+        getNodeInfo_client[_driver_index]->call(127, request);
+        nodeInfo_resp_rcvd = false;
+//    }
+}
+
 
 
 ///// SRV output /////
@@ -1321,20 +1355,6 @@ void AP_UAVCAN::send_RTCMStream(const uint8_t *data, uint32_t len)
     _rtcm_stream.buf->write(data, len);
 }
 
-void AP_UAVCAN::handle_hardwareVersion_GetUniqueID(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HardwareUniqueIDCb &cb)
-{
-    const auto &msg = *cb.msg;
-    (void)msg;
-//    if (msg.payload.size() == 2 &&
-//        msg.payload[0] == node_id) {
-//        // throttle channel is 2nd payload byte
-//        const uint8_t thr_channel = msg.payload[1];
-//        if (thr_channel > 0 && thr_channel <= HOBBYWING_MAX_ESC) {
-//            ap_uavcan->hobbywing.thr_chan[thr_channel-1] = node_id;
-//        }
-//    }
-}
-
 /*
   handle Button message
  */
@@ -1765,19 +1785,6 @@ void AP_UAVCAN::logging(void)
                                 _srv_send_count,
                                 _fail_send_count);
 #endif // HAL_LOGGING_ENABLED
-}
-
-void AP_UAVCAN::trampoline_handleNodeInfo1(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb1& resp)
-{
-    uint8_t unique_id[16] = {0};
-    char name[50] = {0};
-
-    //copy the unique id from message to uint8_t array
-    auto &r = resp.rsp->getResponse();
-    uavcan::copy(r.hardware_version.unique_id.begin(),
-                 r.hardware_version.unique_id.end(),
-                 unique_id);
-    strncpy_noterm(name, r.name.c_str(), sizeof(name)-1);
 }
 
 #if AP_DRONECAN_HOBBYWING_ESC_ENABLED

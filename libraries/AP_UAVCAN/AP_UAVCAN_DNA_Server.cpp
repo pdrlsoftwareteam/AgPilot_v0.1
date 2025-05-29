@@ -29,7 +29,6 @@
 #include <AP_Logger/AP_Logger.h>
 #include "AP_UAVCAN_Clock.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
 extern const AP_HAL::HAL& hal;
 
 #define NODEDATA_MAGIC 0xAC01
@@ -271,33 +270,6 @@ bool AP_UAVCAN_DNA_Server::init()
                  _node->getHardwareVersion().unique_id.end(),
                  own_unique_id);
 
-//    auto begin = _node->getHardwareVersion().unique_id.begin();
-//    auto end = _node->getHardwareVersion().unique_id.end();
-//    uint8_t mcu_unique_id[16] = {0};
-//
-//    auto src = end;
-//    for (uint8_t* dst = mcu_unique_id; src != begin;) {
-//        --src;
-//        *dst++ = *src;
-//    }
-//
-//
-//    char uid_str[3 * 16] = {0};  // "XX XX ... XX" + null terminator
-//    char* p = uid_str;
-//
-//    for (auto it = _node->getHardwareVersion().unique_id.begin(); it != _node->getHardwareVersion().unique_id.end(); ++it) {
-//        snprintf(p, 4, "%02X", *it);
-//        p += 2;
-//        if (it + 1 != _node->getHardwareVersion().unique_id.end()) {
-//            *p++ = ' ';
-//        }
-//    }
-
-
-    // Example: log or store it
-//    printf("Hardware Unique ID: %s\n", uid_str);
-
-    AP_PDRL_COMMANDER::getInstance()->set_gps_unique_id(own_unique_id);
     server_state = HEALTHY;
 
     //Setup publisher for this driver index

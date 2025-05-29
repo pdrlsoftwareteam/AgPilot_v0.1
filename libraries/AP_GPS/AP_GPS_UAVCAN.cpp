@@ -719,6 +719,7 @@ bool AP_GPS_UAVCAN::do_config()
         return false;
     }
     uint8_t node_id = _detected_modules[_detected_module].node_id;
+    node_id_start = node_id;
     
     switch(cfg_step) {
         case STEP_SET_TYPE:
@@ -891,6 +892,11 @@ void AP_GPS_UAVCAN::handle_param_save_response(AP_UAVCAN* ap_uavcan, const uint8
     // this is ok as we are sending from UAVCAN thread context
     Debug("AP_GPS_UAVCAN: sending reboot command %d\n", node_id);
     ap_uavcan->send_reboot_request(node_id);
+}
+
+uint8_t AP_GPS_UAVCAN::get_node_id()
+{
+    return node_id_start;
 }
 
 #if AP_DRONECAN_SEND_GPS

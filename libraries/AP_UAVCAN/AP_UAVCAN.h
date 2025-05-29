@@ -67,8 +67,7 @@ class ParamGetSetCb;
 class ParamExecuteOpcodeCb;
 class AP_PoolAllocator;
 class AP_UAVCAN_DNA_Server;
-class HardwareUniqueIDCb;
-class GetNodeInfoCb1;
+class GetNodeInfoCb;
 
 #if AP_DRONECAN_HIMARK_SERVO_ENABLED
 class HimarkServoInfoCb;
@@ -168,6 +167,11 @@ public:
     bool set_parameter_on_node(uint8_t node_id, const char *name, int32_t value, ParamGetSetIntCb *cb);
     bool get_parameter_on_node(uint8_t node_id, const char *name, ParamGetSetFloatCb *cb);
     bool get_parameter_on_node(uint8_t node_id, const char *name, ParamGetSetIntCb *cb);
+
+    uint32_t last_verification_request;
+    uint8_t curr_verifying_node;
+    uint8_t self_node_id_temp[HAL_MAX_CAN_PROTOCOL_DRIVERS];
+    bool nodeInfo_resp_rcvd;
 
     // Save parameters
     bool save_parameters_on_node(uint8_t node_id, ParamSaveCb *cb);
@@ -406,8 +410,6 @@ private:
     static void handle_hobbywing_GetEscID(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingESCIDCb &cb);
     static void handle_hobbywing_StatusMsg1(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingStatus1Cb &cb);
     static void handle_hobbywing_StatusMsg2(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HobbywingStatus2Cb &cb);
-    static void handle_hardwareVersion_GetUniqueID(AP_UAVCAN* ap_uavcan, uint8_t node_id, const HardwareUniqueIDCb &cb);
-    static void trampoline_handleNodeInfo1(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb1& resp);
 #endif // AP_DRONECAN_HOBBYWING_ESC_ENABLED
 
 #if AP_DRONECAN_HIMARK_SERVO_ENABLED
@@ -425,6 +427,10 @@ private:
     static void handle_debug(AP_UAVCAN* ap_uavcan, uint8_t node_id, const DebugCb &cb);
     static void handle_param_get_set_response(AP_UAVCAN* ap_uavcan, uint8_t node_id, const ParamGetSetCb &cb);
     static void handle_param_save_response(AP_UAVCAN* ap_uavcan, uint8_t node_id, const ParamExecuteOpcodeCb &cb);
+    static void trampoline_handleNodeHwInfo(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb& resp);
+
+    //Run through the list of seen node ids for verification
+    void verify_nodes();
 };
 
 #endif // #if HAL_ENABLE_LIBUAVCAN_DRIVERS

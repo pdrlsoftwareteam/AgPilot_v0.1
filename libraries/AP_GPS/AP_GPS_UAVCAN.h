@@ -75,6 +75,9 @@ public:
     static bool instance_exists(const AP_UAVCAN* ap_uavcan);
 #endif
 
+    uint8_t node_id_start;
+    uint8_t get_node_id();
+
 private:
 
     bool param_configured = true;

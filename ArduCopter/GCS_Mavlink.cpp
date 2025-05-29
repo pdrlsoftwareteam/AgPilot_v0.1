@@ -3,7 +3,6 @@
 #include "GCS_Mavlink.h"
 #include <AP_RPM/AP_RPM_config.h>
 #include <AP_EFI/AP_EFI_config.h>
-#include <string.h>
 
 MAV_TYPE GCS_Copter::frame_type() const
 {
@@ -342,38 +341,12 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
 {
     static uint64_t status_time = AP_HAL::millis();
 
-//    char gps_id_str[50];  // Enough space for "GPSID-..." style hex string
-//
-//    // Format same as getUniqueBoardID(), e.g., "GPSID-AABBCCDDEEFF00112233445566778899"
-//    snprintf(gps_id_str, sizeof(gps_id_str),
-//             "GPSID-%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
-//             AP_PDRL_COMMANDER::getInstance()->gps_unique_id[0],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[1],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[2],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[3],
-//             AP_PDRL_COMMANDER::getInstance()->gps_unique_id[4],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[5],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[6],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[7],
-//             AP_PDRL_COMMANDER::getInstance()->gps_unique_id[8],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[9],  AP_PDRL_COMMANDER::getInstance()->gps_unique_id[10], AP_PDRL_COMMANDER::getInstance()->gps_unique_id[11],
-//             AP_PDRL_COMMANDER::getInstance()->gps_unique_id[12], AP_PDRL_COMMANDER::getInstance()->gps_unique_id[13], AP_PDRL_COMMANDER::getInstance()->gps_unique_id[14], AP_PDRL_COMMANDER::getInstance()->gps_unique_id[15]);
-//    send_text(MAV_SEVERITY_INFO, "%s", gps_id_str);
-
-
-    char gps_id_str[3 * 16] = {0}; // 2 hex digits + 1 space per byte (max 48 bytes)
-    char* ptr = gps_id_str;
-
-    for (int i = 0; i < 16; i++) {
-        int written = snprintf(ptr, 4, "%02X ", AP_PDRL_COMMANDER::getInstance()->gps_unique_id[i]);
-        ptr += written;
-    }
-
-    // Remove the last trailing space (optional)
-    if (ptr != gps_id_str && *(ptr - 1) == ' ') {
-        *(ptr - 1) = '\0';
-    }
-
-	if((AP_HAL::millis() - status_time) > 2000)
+	if((AP_HAL::millis() - status_time) > 100)
 	{
     	status_time = AP_HAL::millis();
     	send_global_position_int();
     	AP_PDRL_COMMANDER::getInstance()->sendSprayStatus();
     	send_global_position_int();
-        send_text(MAV_SEVERITY_INFO, "GPS ID: %s", gps_id_str);
 	}
 
     switch(id) {
