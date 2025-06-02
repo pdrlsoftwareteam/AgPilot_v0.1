@@ -10,6 +10,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Common/AP_Common.h>
+#include <GCS_MAVLink/GCS.h>
 
 class PDRLFwBackup {
 //	HAL_Semaphore backup_semaphore;
@@ -18,6 +19,7 @@ class PDRLFwBackup {
 	void *flashptr = nullptr;
 	size_t flashsize = 0;
 	void *flashptrBkp = nullptr;
+	uint8_t fw_buffer[HAL_STORAGE_SIZE] __attribute__((aligned(4)));
 
 	uint8_t *flash[2];
 	bool erase_ok = 0;
@@ -37,6 +39,9 @@ public:
 	void load_backup_and_restore_flash(void);
 	void test_func();
 	void _save_flash_to_backup(void);
+	void receiveFlashBuffer(unsigned char *bufPtr,uint16_t validDataLen,uint8_t bufferIndex);
+	void sendPAvalidationResponse(mavlink_channel_t chan);
+	void verify_flash_backup(void);
 };
 
 #endif /* LIBRARIES_PDRL_FWBACKUP_PDRLFWBACKUP_H_ */

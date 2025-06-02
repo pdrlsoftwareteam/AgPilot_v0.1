@@ -46,7 +46,7 @@ void PDRLFwBackup::save_flash_backup(void)
 	// allow for fallback to microSD based storage
 	// create the backup directory if need be
 	int ret;
-	const char* _storage_bak_directory = "/Flash_Backup";
+	const char* _storage_bak_directory = "/Flash_Backup_received";
 	get_flash_buffer();
 
 	if (hal.util->was_watchdog_armed()) {
@@ -386,14 +386,14 @@ void PDRLFwBackup::encode_decode_flash_buffer()
 
 void PDRLFwBackup::test_func()
 {
-	_save_flash_to_backup();
-//	PDRL_FlashHelper::getInsstance()->flashtester();
+//	_save_flash_to_backup();
+	PDRL_FlashHelper::getInstance()->restore_flash();
 }
 
 void PDRLFwBackup::_save_flash_to_backup(void)
 {
 #ifdef USE_POSIX
-    const char* _storage_bak_directory = "/Flash_Backup";;
+    const char* _storage_bak_directory = "/Flash_Backup";
 
     // Allocate heap memory for backup
     uint8_t* backup_buffer = (uint8_t*)malloc(CH_STORAGE_SIZE);
@@ -403,7 +403,7 @@ void PDRLFwBackup::_save_flash_to_backup(void)
     }
 	uint32_t flash_sector_size = PDRL_FlashHelper::getInstance()->flash_sector_size;
     PDRL_FlashHelper::getInstance()->flash_read(0, 0, &backup_buffer[0], flash_sector_size);
-    PDRL_FlashHelper::getInstance()->flash_read(1, 0, &backup_buffer[flash_sector_size], flash_sector_size);
+//    PDRL_FlashHelper::getInstance()->flash_read(1, 0, &backup_buffer[flash_sector_size], flash_sector_size);
 
     // Read and update backup index
     unsigned curr_bak = 0;
@@ -450,4 +450,117 @@ void PDRLFwBackup::_save_flash_to_backup(void)
     free(backup_buffer);
 #endif
 }
+
+void PDRLFwBackup::receiveFlashBuffer(unsigned char *bufPtr,uint16_t validDataLen,uint8_t bufferIndex)
+{
+	memcpy(fw_buffer+(bufferIndex*250),bufPtr,validDataLen);
+//	gcs().send_message(MSG_DATA_TRANSFER);
+}
+
+void PDRLFwBackup::sendPAvalidationResponse(mavlink_channel_t chan)
+{
+//	return;
+//	uint8_t txBUff[250] = {0};
+//
+//	const char* response = "data is OK";
+//	strncpy((char*)txBUff, response, sizeof(txBUff) - 1);  // prevent overflow
+//
+//	mavlink_msg_data_transfer_send(
+//		chan,
+//		1,                    // seq
+//		0,                    // total_seq
+//		txBUff,               // payload
+//		strlen(response)      // length
+//	);
+//
+
+    mavlink_msg_ack_for_command_send(
+            chan,
+            227,
+            1,
+            1
+    );
+}
+
+void PDRLFwBackup::verify_flash_backup(void)
+{
+#ifdef USE_POSIX
+	// allow for fallback to microSD based storage
+	// create the backup directory if need be
+	int ret;
+	const char* _storage_bak_directory = "/Flash_Backup_received";
+
+	if (hal.util->was_watchdog_armed()) {
+		// we are under watchdog reset
+		// ain't got no time...
+		return;
+	}
+
+	EXPECT_DELAY_MS(3000);
+
+	// Try to mount the FS, retrying up to 1 second
+	uint32_t start_millis = AP_HAL::millis();
+	while (!AP::FS().retry_mount() && (AP_HAL::millis() - start_millis) < 1000) {
+		hal.scheduler->delay(1);
+	}
+
+	ret = AP::FS().mkdir(_storage_bak_directory);
+	if (ret == -1 && errno != EEXIST) {
+		return;
+	}
+
+	char* fname = nullptr;
+	unsigned curr_bak = 0;
+	ret = asprintf(&fname, "%s/last_storage_bak", _storage_bak_directory);
+	if (fname == nullptr || (ret <= 0)) {
+		return;
+	}
+	int fd = AP::FS().open(fname, O_RDONLY);
+	if (fd != -1) {
+		char buf[10];
+		memset(buf, 0, sizeof(buf));
+		if (AP::FS().read(fd, buf, sizeof(buf)-1) > 0) {
+			// only record last 100 backups
+			curr_bak = (strtol(buf, NULL, 10) + 1) % 100;
+		}
+		AP::FS().close(fd);
+	}
+
+	fd = AP::FS().open(fname, O_WRONLY | O_CREAT | O_TRUNC);
+	free(fname);
+	fname = nullptr;
+	if (fd != -1) {
+		char buf[10];
+		snprintf(buf, sizeof(buf), "%u\r\n", (unsigned)curr_bak);
+		const ssize_t to_write = strlen(buf);
+		const ssize_t written = AP::FS().write(fd, buf, to_write);
+		AP::FS().close(fd);
+		if (written < to_write) {
+			return;
+		}
+	} else {
+		return;
+	}
+
+	// === FIRMWARE BUFFER WRITE SECTION ===
+	// Assume fw_buffer is defined in class or globally, e.g.:
+	// uint8_t fw_buffer[4096];  // Example static buffer
+	// Calculate its size:
+	size_t fw_buffer_size = sizeof(fw_buffer);
+
+	ret = asprintf(&fname, "%s/flash_bkp%d.bin", _storage_bak_directory, curr_bak);
+	if (fname == nullptr || (ret <= 0)) {
+		return;
+	}
+	fd = AP::FS().open(fname, O_WRONLY | O_CREAT | O_TRUNC);
+	free(fname);
+	fname = nullptr;
+	if (fd != -1) {
+		AP::FS().write(fd, fw_buffer, fw_buffer_size);
+		AP::FS().close(fd);
+		gcs().send_text(MAV_SEVERITY_INFO, "fw_buffer backup completed...");
+	}
+#endif
+}
+
 

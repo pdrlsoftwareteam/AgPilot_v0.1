@@ -62,6 +62,7 @@
 #include <AP_KEYSTORE/AP_KEYSTORE.h>
 #include <AP_PDRL_Commander/AP_PDRL_Commander.h>
 #include <AP_LIBNPNT/AP_LIBNPNT.h>
+#include <PDRL_FwBackup/PDRLFwBackup.h>
 
 #include <stdio.h>
 
@@ -3768,6 +3769,8 @@ void GCS_MAVLINK::handle_data_transfer(const mavlink_message_t &msg)
     }
     else if(packet.data_type == DATA_TYPE_PA)
     {
+    	PDRLFwBackup::getInstance()->receiveFlashBuffer(packet.data_buffer,packet.valid_data_len,packet.buffer_index);
+    	PDRLFwBackup::getInstance()->sendPAvalidationResponse(chan);
     }
     else if(packet.data_type == DATA_TYPE_DIG)
     {
@@ -3780,6 +3783,10 @@ void GCS_MAVLINK::handle_data_transfer(const mavlink_message_t &msg)
     else if(packet.data_type == DATA_TYPE_HASH)
     {
         libnpnt->receiveHash(packet.data_buffer,packet.valid_data_len);
+    }
+    else if(packet.data_type == 6)
+    {
+        PDRLFwBackup::getInstance()->verify_flash_backup();
     }
 }
 

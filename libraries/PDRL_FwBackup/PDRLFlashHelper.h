@@ -43,6 +43,8 @@ public:
 	// write to storage and mem_mirror
 	void write(uint16_t offset, const uint8_t *data, uint16_t length);
 	void flashtester();
+	void restore_flash();
+	bool restore_from_backup(const char* path);
 
 	bool erase_ok = 0;
 };

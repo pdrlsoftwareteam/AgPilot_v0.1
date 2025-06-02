@@ -128,6 +128,9 @@ void Storage::_storage_open(void)
  */
 void Storage::_save_backup(void)
 {
+//	return;
+//	_load_backup_and_restore_flash();
+
 #ifdef USE_POSIX
     // allow for fallback to microSD based storage
     // create the backup directory if need be
@@ -156,7 +159,7 @@ void Storage::_save_backup(void)
 
     char* fname = nullptr;
     unsigned curr_bak = 0;
-    ret = asprintf(&fname, "%s/last_storage_bak", _storage_bak_directory);
+    ret = asprintf(&fname, "%s/kunal_save", _storage_bak_directory);
     if (fname == nullptr && (ret <= 0)) {
         return;
     }

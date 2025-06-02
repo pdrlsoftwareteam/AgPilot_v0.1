@@ -11,9 +11,14 @@
 #include <AP_FlashStorage/AP_FlashStorage.h>
 #include <stdio.h>
 #include <AP_HAL/utility/sparse-endian.h>
+#include <AP_Filesystem/AP_Filesystem.h>
 
 PDRL_FlashHelper *PDRL_FlashHelper::m_PDRL_FlashHelper = 0;
 extern const AP_HAL::HAL& hal;
+
+#define HAL_STORAGE_BACKUP_DIR "/Flash_Backup"
+#define HAL_STORAGE_BACKUP_CNT 100
+
 PDRL_FlashHelper* PDRL_FlashHelper::getInstance()
 {
 	if(m_PDRL_FlashHelper == 0)
@@ -168,5 +173,69 @@ void PDRL_FlashHelper::flashtester()
 		hal.console->printf("TEST PASSED");
 		hal.scheduler->delay(20000);
 	}
+}
+
+void PDRL_FlashHelper::restore_flash()
+{
+	unsigned curr_bak = 0;
+	char path[64];
+
+	// open last_storage_bak
+	char index_path[64];
+	snprintf(index_path, sizeof(index_path), "%s/last_storage_bak", HAL_STORAGE_BACKUP_DIR);
+
+	int fd = AP::FS().open(index_path, O_RDONLY);
+	if (fd != -1) {
+	    char buf[10];
+	    memset(buf, 0, sizeof(buf));
+	    if (AP::FS().read(fd, buf, sizeof(buf)-1) > 0) {
+	        curr_bak = strtol(buf, NULL, 10) % HAL_STORAGE_BACKUP_CNT;
+	    }
+	    AP::FS().close(fd);
+	}
+
+	snprintf(path, sizeof(path), "%s/flash_bkp%d.bin", HAL_STORAGE_BACKUP_DIR, curr_bak);
+	restore_from_backup(path);
+	hal.storage->init();
+
+}
+
+bool PDRL_FlashHelper::restore_from_backup(const char* path)
+{
+    int fd = AP::FS().open(path, O_RDONLY);
+    if (fd < 0) {
+        hal.console->printf("Failed to open backup file: %s\n", path);
+        return false;
+    }
+
+    size_t total_size = flash_sector_size;
+    uint8_t *buffer = (uint8_t *)malloc(total_size);
+    if (buffer == nullptr) {
+        hal.console->printf("Failed to allocate memory for backup restore\n");
+        AP::FS().close(fd);
+        return false;
+    }
+
+    ssize_t total_read = AP::FS().read(fd, buffer, total_size);
+    AP::FS().close(fd);
+
+    if (total_read != (ssize_t)total_size) {
+        hal.console->printf("Backup file size mismatch: read %d bytes\n", (int)total_read);
+        free(buffer);
+        return false;
+    }
+
+    flash_erase(0);
+//    flash_erase(1);
+
+    bool ok = flash_write(0, 0, &buffer[0], flash_sector_size);
+//    ok &= flash_write(1, 0, &buffer[flash_sector_size], flash_sector_size);
+
+    if (!ok) {
+        hal.console->printf("Failed to restore flash content from %s\n", path);
+    }
+
+    free(buffer);
+    return ok;
 }
 
