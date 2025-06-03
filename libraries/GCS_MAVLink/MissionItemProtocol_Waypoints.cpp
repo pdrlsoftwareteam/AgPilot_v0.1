@@ -55,7 +55,8 @@ MAV_MISSION_RESULT MissionItemProtocol_Waypoints::complete(const GCS_MAVLINK &_l
     _link.send_text(MAV_SEVERITY_INFO, "Flight plan received");
 //    static bool once = true;
 //    if(once){
-//    PDRLFwBackup::getInstance()->save_flash_backup();
+//    PDRLFwBackup::getInstance()->_save_flash_to_backup();
+    PDRLFwBackup::getInstance()->mainFwBackup();
 //    once = false;
 //    }
 //    else

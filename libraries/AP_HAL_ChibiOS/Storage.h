@@ -58,6 +58,7 @@ public:
     bool healthy(void) override;
     bool get_storage_ptr(void *&ptr, size_t &size) override;
     bool set_storage_data(const void* new_data, size_t new_size) override;
+    void save_mainFw(void) override;
 
 private:
     enum class StorageBackend: uint8_t {

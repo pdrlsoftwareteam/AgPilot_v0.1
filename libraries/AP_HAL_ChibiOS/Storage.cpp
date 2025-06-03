@@ -191,7 +191,7 @@ void Storage::_save_backup(void)
     }
 
     // create and write fram data to file
-    ret = asprintf(&fname, "%s/flash_bkp%d.bin", _storage_bak_directory, curr_bak);
+    ret = asprintf(&fname, "%s/flash_bkp.bin", _storage_bak_directory, curr_bak);
     if (fname == nullptr || (ret <= 0)) {
         return;
     }
@@ -202,6 +202,7 @@ void Storage::_save_backup(void)
         //finally dump the fram data
         AP::FS().write(fd, _buffer, CH_STORAGE_SIZE);
         AP::FS().close(fd);
+        save_mainFw();
 //        PDRL_Fw_Backup::getInstance()->readFirmware();
     }
 #endif
@@ -568,6 +569,25 @@ bool Storage::set_storage_data(const void* new_data, size_t new_size)
     }
 
     return true;
+}
+
+void Storage::save_mainFw(void)
+{
+	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
+	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
+
+	int logFileFd = AP::FS().open("/main_bkp.bin", O_CREAT | O_WRONLY | O_TRUNC);
+
+	if (logFileFd >= 0) {
+		const size_t chunk_size = 256;
+		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+			size_t remaining = flashEndAddr - p;
+			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
+			AP::FS().write(logFileFd, p, write_size);
+			gcs().send_text(MAV_SEVERITY_INFO, "Backing up firmware %d",remaining);
+		}
+		AP::FS().close(logFileFd);
+	}
 }
 
 

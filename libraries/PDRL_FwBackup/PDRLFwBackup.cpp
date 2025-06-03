@@ -392,6 +392,7 @@ void PDRLFwBackup::test_func()
 
 void PDRLFwBackup::_save_flash_to_backup(void)
 {
+	backup_semaphore.take(1);
 #ifdef USE_POSIX
     const char* _storage_bak_directory = "/Flash_Backup";
 
@@ -449,6 +450,7 @@ void PDRLFwBackup::_save_flash_to_backup(void)
     free(fname);
     free(backup_buffer);
 #endif
+    backup_semaphore.give();
 }
 
 void PDRLFwBackup::receiveFlashBuffer(unsigned char *bufPtr,uint16_t validDataLen,uint8_t bufferIndex)
@@ -459,21 +461,6 @@ void PDRLFwBackup::receiveFlashBuffer(unsigned char *bufPtr,uint16_t validDataLe
 
 void PDRLFwBackup::sendPAvalidationResponse(mavlink_channel_t chan)
 {
-//	return;
-//	uint8_t txBUff[250] = {0};
-//
-//	const char* response = "data is OK";
-//	strncpy((char*)txBUff, response, sizeof(txBUff) - 1);  // prevent overflow
-//
-//	mavlink_msg_data_transfer_send(
-//		chan,
-//		1,                    // seq
-//		0,                    // total_seq
-//		txBUff,               // payload
-//		strlen(response)      // length
-//	);
-//
-
     mavlink_msg_ack_for_command_send(
             chan,
             227,
@@ -548,7 +535,7 @@ void PDRLFwBackup::verify_flash_backup(void)
 	// Calculate its size:
 	size_t fw_buffer_size = sizeof(fw_buffer);
 
-	ret = asprintf(&fname, "%s/flash_bkp%d.bin", _storage_bak_directory, curr_bak);
+	ret = asprintf(&fname, "%s/flash_bkp.bin", _storage_bak_directory);
 	if (fname == nullptr || (ret <= 0)) {
 		return;
 	}
@@ -563,4 +550,23 @@ void PDRLFwBackup::verify_flash_backup(void)
 #endif
 }
 
+void PDRLFwBackup::mainFwBackup(void)
+{
+	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
+	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
 
+	backup_semaphore.take_nonblocking();
+	int logFileFd = AP::FS().open("/firmware_image.bin", O_CREAT | O_WRONLY | O_TRUNC);
+
+	if (logFileFd >= 0) {
+		const size_t chunk_size = 256;
+		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+			size_t remaining = flashEndAddr - p;
+			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
+			AP::FS().write(logFileFd, p, write_size);
+			gcs().send_text(MAV_SEVERITY_INFO, "Backing up firmware %d",remaining);
+		}
+		AP::FS().close(logFileFd);
+	}
+	backup_semaphore.give();
+}

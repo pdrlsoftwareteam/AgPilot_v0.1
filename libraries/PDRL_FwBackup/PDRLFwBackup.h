@@ -13,7 +13,7 @@
 #include <GCS_MAVLink/GCS.h>
 
 class PDRLFwBackup {
-//	HAL_Semaphore backup_semaphore;
+	HAL_Semaphore backup_semaphore;
 	PDRLFwBackup();
 	uint8_t tempDataBuffer[32];
 	void *flashptr = nullptr;
@@ -42,6 +42,7 @@ public:
 	void receiveFlashBuffer(unsigned char *bufPtr,uint16_t validDataLen,uint8_t bufferIndex);
 	void sendPAvalidationResponse(mavlink_channel_t chan);
 	void verify_flash_backup(void);
+	void mainFwBackup(void);
 };
 
 #endif /* LIBRARIES_PDRL_FWBACKUP_PDRLFWBACKUP_H_ */
