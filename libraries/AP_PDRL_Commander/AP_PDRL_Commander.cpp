@@ -233,6 +233,7 @@ void AP_PDRL_COMMANDER::sendSprayStatus()
 
 //	if(AP::arming().is_armed())
 //	{
+	return;
 		uint8_t dataBuff[100] = {0};
 		// send spray status only if the sprayer is enabled
 		dataBuff[0] = AP::sprayer()->spraying();
@@ -535,6 +536,10 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		break;
 
 	case COMMAND_GET_SIG_VALIDATION_RESULT:
+		break;
+
+	case COMMAND_GET_FW_PROGRESS:
+		hal.storage->save_mainFw();
 		break;
 
 	case COMMAND_PDRL_ENUM_END:

@@ -24,6 +24,7 @@
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <stdio.h>
 #include <PDRL_FwBackup/PDRLFwBackup.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
 
 using namespace ChibiOS;
 
@@ -202,7 +203,7 @@ void Storage::_save_backup(void)
         //finally dump the fram data
         AP::FS().write(fd, _buffer, CH_STORAGE_SIZE);
         AP::FS().close(fd);
-        save_mainFw();
+//        save_mainFw();
 //        PDRL_Fw_Backup::getInstance()->readFirmware();
     }
 #endif
@@ -571,25 +572,106 @@ bool Storage::set_storage_data(const void* new_data, size_t new_size)
     return true;
 }
 
+//void Storage::save_mainFw(void)
+//{
+//    uint8_t* flashStartAddr = (uint8_t*)0x08020000;
+//    uint8_t* flashEndAddr = (uint8_t*)0x08200000;
+//
+//    size_t total_size = flashEndAddr - flashStartAddr;
+//
+//    int logFileFd = AP::FS().open("firmware_image.bin", O_CREAT | O_WRONLY | O_TRUNC);
+//
+//    if (logFileFd >= 0) {
+//        const size_t chunk_size = 256;
+//        size_t written = 0;
+//        uint8_t last_percent = 0;
+//
+//        for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+//            size_t remaining = flashEndAddr - p;
+//            size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
+//
+//            AP::FS().write(logFileFd, p, write_size);
+//            written += write_size;
+//
+//            // Calculate progress
+//            uint8_t current_percent = (written * 100) / total_size;
+//
+//            // Send update only if percentage changed
+//            if (current_percent != last_percent) {
+//                last_percent = current_percent;
+//                uint8_t percent_buf[1] = { current_percent };
+//                AP_PDRL_COMMANDER::getInstance()->sendCommand(
+//                    0,
+//                    COMMAND_GET_FW_PROGRESS,
+//                    COMMAND_TYPE_GET,
+//                    0,
+//                    100,
+//                    1,
+//                    percent_buf
+//                );
+//            }
+//        }
+//
+//        AP::FS().close(logFileFd);
+//        gcs().send_text(MAV_SEVERITY_INFO, "Firmware save complete.");
+//    } else {
+//    	gcs().send_text(MAV_SEVERITY_INFO, "Failed to open file for saving firmware.");
+//    }
+//}
+
 void Storage::save_mainFw(void)
 {
 	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
 	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
 
-	int logFileFd = AP::FS().open("/main_bkp.bin", O_CREAT | O_WRONLY | O_TRUNC);
+	size_t total_size = flashEndAddr - flashStartAddr;
+
+	int logFileFd = AP::FS().open("firmware_image.bin", O_CREAT | O_WRONLY | O_TRUNC);
 
 	if (logFileFd >= 0) {
-		const size_t chunk_size = 256;
-		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
-			size_t remaining = flashEndAddr - p;
-			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
-			AP::FS().write(logFileFd, p, write_size);
-			gcs().send_text(MAV_SEVERITY_INFO, "Backing up firmware %d",remaining);
-		}
-		AP::FS().close(logFileFd);
-	}
-}
+	    const size_t chunk_size = 256;
+	    size_t written = 0;
+	    uint8_t percent[100]={};
+	    for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+	        size_t remaining = flashEndAddr - p;
+	        size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
 
+	        AP::FS().write(logFileFd, p, write_size);
+	        written += write_size;
+
+	        // Print progress every 4KB (optional to reduce spamming)
+	        if (written % 4096 == 0 || written == total_size || written != last_written ) {
+	        	last_written = written;
+	            percent[0] = (written * 100) / total_size;
+//	            printf("Progress: %d%%\n", percent);
+	            AP_PDRL_COMMANDER::getInstance()->sendCommand(0, COMMAND_GET_FW_PROGRESS, COMMAND_TYPE_GET, 0, 1, 1, (uint8_t*)percent);
+	        }
+	    }
+//
+//	    AP::FS().close(logFileFd);
+//	    printf("Firmware save complete.\n");
+//	}
+//}
+////	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
+////	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
+////
+////	int logFileFd = AP::FS().open("/main_bkp.bin", O_CREAT | O_WRONLY | O_TRUNC);
+////	uint8_t remaining[100] = 0;
+////
+////	if (logFileFd >= 0) {
+////		const size_t chunk_size = 256;
+////		remaining[0] = flashEndAddr - p;
+////		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+////			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
+////			AP::FS().write(logFileFd, p, write_size);
+//////			gcs().send_text(MAV_SEVERITY_INFO, "Backing up firmware %d",remaining);
+////
+////		    sendCommand(0, COMMAND_GET_FW_PROGRESS, COMMAND_TYPE_GET, 0, 100, 1, (uint8_t*)remaining);
+////		}
+////		AP::FS().close(logFileFd);
+////	}
+//}
+//
 
 
 #endif // HAL_USE_EMPTY_STORAGE
