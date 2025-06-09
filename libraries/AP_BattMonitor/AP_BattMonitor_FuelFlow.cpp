@@ -33,7 +33,7 @@ extern const AP_HAL::HAL& hal;
 AP_BattMonitor_FuelFlow::AP_BattMonitor_FuelFlow(AP_BattMonitor &mon,
 		AP_BattMonitor::BattMonitor_State &mon_state,
 		AP_BattMonitor_Params &params) :
-    																						AP_BattMonitor_Analog(mon, mon_state, params)
+    																								AP_BattMonitor_Analog(mon, mon_state, params)
 {
 	_state.voltage = 1.0; // show a fixed voltage of 1v
 
@@ -178,19 +178,18 @@ void AP_BattMonitor_FuelFlow::read()
 
 	if (fabsf(width_val - _width) > EPSILON)
 	{
-	    gcs().send_text(MAV_SEVERITY_INFO, "Spray Width set to %f", (float)_width);
-	    width_val = _width;
+		gcs().send_text(MAV_SEVERITY_INFO, "Spray Width set to %f", (float)_width);
+		width_val = _width;
 	}
 
 	handle_calibration();
 
 	float consumed_diff = _state.consumed_mah - last_consumed_mah;
 	static int count_check = 0;
-
 	if(AP::sprayer()->spraying())
 	{
 		last_consumed_mah = _state.consumed_mah;
-		if((consumed_diff < float(_ml_flow)) && (_state.consumed_mah > 30.0f) && state.pulse_count == 0 )
+		if((consumed_diff < float(_ml_flow)) && (_state.consumed_mah > 30.0f) && state.pulse_count <= _pulse_cnt )
 		{
 			count_check++;
 		}
@@ -200,14 +199,14 @@ void AP_BattMonitor_FuelFlow::read()
 			AP::sprayer()->setPulseCount(1);
 			AP::sprayer()->setTankstatus(0);
 		}
-		if(count_check >= _pulse_cnt)
+		if(count_check >= 1)
 		{
 			count_check = 0;
 			AP::sprayer()->setPulseCount(0);
 			AP::sprayer()->setTankstatus(1);
 			gcs().send_text(MAV_SEVERITY_WARNING, "Tank Empty");
 		}
-		AP::sprayer()->setPulseCount(state.pulse_count);
+		//		AP::sprayer()->setPulseCount(state.pulse_count);
 	}
 	else
 	{
@@ -219,28 +218,37 @@ void AP_BattMonitor_FuelFlow::read()
 
 	//Spray area calculation
 	static uint64_t dist_tm = AP_HAL::millis();
+	static Vector2f previous_Loc = AP::battery().get_val();
+	static Vector2f current_Loc = previous_Loc;
 
-	if(AP::sprayer()->spraying() && AP::arming().is_armed())
+	if (AP::arming().is_armed())
 	{
+	    if (AP_HAL::millis() - dist_tm > 200)
+	    {
+	        dist_tm = AP_HAL::millis();
 
-		static Vector2f current_Loc = AP::battery().get_val(),previous_Loc = AP::battery().get_val();
-		current_Loc = AP::battery().get_val();
+	        // Update location every 200 ms
+	        previous_Loc = current_Loc;
+	        current_Loc = AP::battery().get_val();
 
-		if (AP_HAL::millis() - dist_tm > 200)
-		{
-			AP::battery().spray_dist += sqrt(pow(previous_Loc.x/100 - current_Loc.x/100, 2) + pow(previous_Loc.y/100 - current_Loc.y/100, 2));
-			previous_Loc = current_Loc;
-			current_Loc = AP::battery().get_val();
-			AP::battery().spray_area_sqm = AP::battery().spray_dist*_width;
-			AP::battery().spray_area_acre = AP::battery().spray_area_sqm*0.000247105;
-			dist_tm = AP_HAL::millis();
-		}
+	        // Only calculate area if actively spraying
+	        if (AP::sprayer()->spraying() && AP::sprayer()->getPulseCount() > 0)
+	        {
+	            float dx = (previous_Loc.x - current_Loc.x) / 100.0f;
+	            float dy = (previous_Loc.y - current_Loc.y) / 100.0f;
+	            float distance = sqrtf(dx * dx + dy * dy);
+
+	            AP::battery().spray_dist += distance;
+	            AP::battery().spray_area_sqm = AP::battery().spray_dist * _width;
+	            AP::battery().spray_area_acre = AP::battery().spray_area_sqm * 0.000247105f;
+	        }
+	    }
 	}
 
 	static uint64_t spray_tm = AP_HAL::millis();
 	if(AP::arming().is_armed())
 	{
-		if(AP::sprayer()->spraying())
+		if(AP::sprayer()->spraying() && AP::sprayer()->getPulseCount() > 0)
 		{
 			if (AP_HAL::millis() - spray_tm > 200)
 			{
