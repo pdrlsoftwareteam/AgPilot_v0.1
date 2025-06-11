@@ -56,6 +56,8 @@ public:
 
     void _timer_tick(void) override;
     bool healthy(void) override;
+    int save_FramBkp()override;
+    int save_mainFw_direct(int) override;
     bool get_storage_ptr(void *&ptr, size_t &size) override;
 
 private:
