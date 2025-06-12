@@ -556,7 +556,17 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		start = packet.command_buff[0]?1:0;
 		break;
 	}
-	case COMMAND_GET_FW_ACK:
+	case COMMAND_GET_FRAM_WRITE:
+	{
+		if(hal.storage->load_backup_from_sdcard())
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"FRAM write finished");
+		}
+		else
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"FRAM write failed");
+		}
+	}
 		break;
 
 	case COMMAND_PDRL_ENUM_END:

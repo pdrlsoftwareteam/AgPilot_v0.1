@@ -778,9 +778,9 @@ void AP_Vehicle::check_task(void)
 	if(AP_PDRL_COMMANDER::getInstance()->start && !progress)
 	{
 		progress = true;
-		if(hal.storage->save_mainFw_direct(chunk_offset * 32) > 0)
+		if(hal.storage->save_mainFw_direct(chunk_offset * 8) > 0)
 		{
-			gcs().send_text(MAV_SEVERITY_INFO,"backup finished : %f",chunk_offset*1.6667);
+			gcs().send_text(MAV_SEVERITY_INFO,"backup finished : %f",chunk_offset * 0.418410);
 			chunk_offset+=1;
 			progress = false;
 		}
@@ -793,16 +793,16 @@ void AP_Vehicle::check_task(void)
 		}
 	}
 
-	if(chunk_offset == 60)
+	if(chunk_offset == 239)
 	{
-//		if(hal.storage->save_FramBkp() > 0)
-//		{
-//			gcs().send_text(MAV_SEVERITY_INFO,"FRAM backup finished : %f",100.0);
-//		}
-//		else
-//		{
-//			gcs().send_text(MAV_SEVERITY_INFO,"Failed FRAM backup");
-//		}
+		if(hal.storage->save_FramBkp() > 0)
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"FRAM backup finished : %f",100.0);
+		}
+		else
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"Failed FRAM backup");
+		}
 		gcs().send_text(MAV_SEVERITY_INFO,"backup finished : %f",100.0);
 		gcs().send_text(MAV_SEVERITY_INFO,"backup finished : %f",100.0);
 		AP_PDRL_COMMANDER::getInstance()->start = 0;
