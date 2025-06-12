@@ -58,6 +58,7 @@ public:
     bool healthy(void) override;
     int save_FramBkp()override;
     int save_mainFw_direct(int) override;
+    bool load_backup_from_sdcard(void) override;
     bool get_storage_ptr(void *&ptr, size_t &size) override;
 
 private:

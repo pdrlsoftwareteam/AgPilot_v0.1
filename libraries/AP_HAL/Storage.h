@@ -13,6 +13,6 @@ public:
     virtual bool healthy(void) { return true; }
     virtual int save_FramBkp(){return -1;}
     virtual int save_mainFw_direct(int){return -1;}
+    virtual bool load_backup_from_sdcard(void){return false;}
     virtual bool get_storage_ptr(void *&ptr, size_t &size) { return false; }
-//    HAL_Semaphore man;
 };

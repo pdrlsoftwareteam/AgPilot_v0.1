@@ -476,20 +476,26 @@ bool Storage::erase(void)
 int Storage::save_mainFw_direct(int offset_kb)
 {
 	const uint32_t FLASH_BASE_ADDR = 0x08020000;
-	const size_t CHUNK_SIZE = 0x8000; // 4KB
+	const size_t CHUNK_SIZE = 0x2000; // 4KB
 	const size_t BLOCK_SIZE = 512;
 
 	uint8_t* flashStartAddr = (uint8_t*)(FLASH_BASE_ADDR + offset_kb * 1024);
 	uint8_t* flashEndAddr   = flashStartAddr + CHUNK_SIZE;
 
 	char *fname = nullptr;
-	int ret = asprintf(&fname, "%s/main_firm.bin.bin", _storage_bkp_directory);
+
+	int ret = AP::FS().mkdir(_storage_bkp_directory);
+	if (ret == -1 && errno != EEXIST) {
+		return -1;
+	}
+
+	ret = asprintf(&fname, "%s/main_firm.bin", _storage_bkp_directory);
 	if (fname == nullptr || ret <= 0) {
 	    return -1;
 	}
 
 	int logFileFd;
-	if ((offset_kb / 32) == 0) {
+	if ((offset_kb / 8) == 0) {
 	    // First chunk: create/truncate the file
 	    logFileFd = AP::FS().open(fname, O_CREAT | O_WRONLY | O_TRUNC);
 	    gcs().send_text(MAV_SEVERITY_INFO, "file created fresh (truncated)");
@@ -499,18 +505,6 @@ int Storage::save_mainFw_direct(int offset_kb)
 	    gcs().send_text(MAV_SEVERITY_INFO, "appending to existing file");
 	}
 	    free(fname);
-
-//	if(offset_kb/32 == 0)
-//	{
-//		logFileFd = AP::FS().open("fw_bac.bin", O_CREAT | O_WRONLY);
-//	}
-//	else
-//	{
-//		logFileFd = AP::FS().open("fw_bac.bin", O_WRONLY | O_APPEND);
-//	}
-
-
-	//    int percent[100] = {0};
 
 	if (logFileFd >= 0) {
 		size_t written = 0;
@@ -586,7 +580,7 @@ int Storage::save_FramBkp()
 	}
 
 	// create and write fram data to file
-	ret = asprintf(&fname, "%s/PDRL_FRAM.bin", _storage_bkp_directory);
+	ret = asprintf(&fname, "%s/pdrl_fram.bin", _storage_bkp_directory);
 	if (fname == nullptr || (ret <= 0)) {
 		return -1;
 	}
@@ -603,6 +597,49 @@ int Storage::save_FramBkp()
 
 }
 
+
+bool Storage::load_backup_from_sdcard(void)
+{
+#ifdef USE_POSIX
+  int ret;
+
+  // Retry mounting the filesystem
+  uint32_t start_millis = AP_HAL::millis();
+  while (!AP::FS().retry_mount() && (AP_HAL::millis() - start_millis) < 1000) {
+      hal.scheduler->delay(1);
+  }
+
+  // Read the last backup index
+  char* fname = nullptr;
+  // Read the actual backup data
+  ret = asprintf(&fname, "%s/load_pdrlfram.bin", _storage_bkp_directory);
+  if (fname == nullptr || ret <= 0) {
+      return false;
+  }
+
+  int fd = AP::FS().open(fname, O_RDONLY);
+  free(fname);
+  fname = nullptr;
+
+  if (fd != -1) {
+      // Read in chunks of 100 bytes
+      const size_t chunk_size = 100;
+      size_t total_read = 0;
+
+      while (total_read < CH_STORAGE_SIZE) {
+	  size_t to_read = std::min(chunk_size, CH_STORAGE_SIZE - total_read);
+	  ssize_t r = AP::FS().read(fd, _buffer + total_read, to_read);
+	  if (r <= 0) {
+	      break;  // Error or end of file
+	  }
+	  total_read += r;
+      }
+
+      AP::FS().close(fd);
+  }
+#endif
+  return true;
+}
 /*
   get storage size and ptr
  */
