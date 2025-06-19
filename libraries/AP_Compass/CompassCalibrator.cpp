@@ -117,6 +117,8 @@ void CompassCalibrator::start(bool retry, float delay, uint16_t offset_max, uint
     cal_settings.start_time_ms = AP_HAL::millis();
     cal_settings.compass_idx = compass_idx;
     cal_settings.tolerance = tolerance;
+    compass_calibrating = true;
+    cal_state.completion_pct = 0.0f;
 
     // Request status change to Waiting to start
     _requested_status = Status::WAITING_TO_START;
@@ -134,6 +136,7 @@ void CompassCalibrator::new_sample(const Vector3f& sample)
 
 bool CompassCalibrator::failed() {
     WITH_SEMAPHORE(state_sem);
+    compass_calibrating = false;
     return (cal_state.status == Status::FAILED ||
             cal_state.status == Status::BAD_ORIENTATION || 
             cal_state.status == Status::BAD_RADIUS);
@@ -142,6 +145,7 @@ bool CompassCalibrator::failed() {
 
 bool CompassCalibrator::running() {
     WITH_SEMAPHORE(state_sem); 
+    compass_calibrating = true;
     return (cal_state.status == Status::RUNNING_STEP_ONE || cal_state.status == Status::RUNNING_STEP_TWO);
 }
 
@@ -360,11 +364,13 @@ void CompassCalibrator::update_cal_status()
             break;
         case Status::SUCCESS:
             cal_state.completion_pct = 100.0f;
+            compass_calibrating = false;
             break;
         case Status::FAILED:
         case Status::BAD_ORIENTATION:
         case Status::BAD_RADIUS:
             cal_state.completion_pct = 0.0f;
+            compass_calibrating = false;
             break;
     };
 }

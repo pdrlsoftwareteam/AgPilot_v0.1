@@ -24,7 +24,7 @@ public:
     bool _x_axis_sample_count_finished = false;
     bool _y_axis_sample_count_finished = false;
     bool _z_axis_sample_count_finished = false;
-
+    bool compass_calibrating = false;
      static const uint16_t MAX_SAMPLES_PER_AXIS = 130;
 
     // Update point sample

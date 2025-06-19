@@ -47,15 +47,6 @@ static SPIConfig lowspeed;
 static SPIConfig highspeed;
 #endif
 
-
-bool sdcard_is_inserted()
-{
-#if HAL_USE_MMC_SPI
-    return device.get() != nullptr && sdcard_running;
-#else
-    return false;
-#endif
-}
 /*
   initialise microSD card if avaialble. This is called during
   AP_BoardConfig initialisation. The parameter BRD_SD_SLOWDOWN

@@ -1417,10 +1417,7 @@ bool AP_Param::verifySha256Checksum()
 {
     // Start section lockParamCount
     int lockParamCount = 2;
-    const char pname[lockParamCount][17] = {
-    		"FRAME_CLASS\0",
-			"FRAME_TYPE\0"
-    };
+    const char pname[lockParamCount][17] = {};
     // End section lockParamCount
 
    enum ap_var_type ptype;

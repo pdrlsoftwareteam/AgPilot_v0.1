@@ -24,7 +24,6 @@ public:
 
     void init(void) override {}
     void handle_calibration();
-
 	bool calibration_active = false;  // Tracks if calibration is currently active
 	float calibration_start_mah = 0;  // Stores the initial consumed_mah at calibration start
 	float last_consumed_mah = 100.0f;

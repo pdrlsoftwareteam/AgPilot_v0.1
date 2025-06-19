@@ -2355,7 +2355,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal()
     EXPECT_DELAY_MS(20000);
     // record we are calibrating
     _calibrating_accel = true;
-
+    accel_calibrating = true;
     // flash leds to tell user to keep the IMU still
     AP_Notify::flags.initialising = true;
 
@@ -2478,7 +2478,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal()
 
     // record calibration complete
     _calibrating_accel = false;
-
+    accel_calibrating = false;
     // throw away any existing samples that may have the wrong
     // orientation. We do this by throwing samples away for 0.5s,
     // which is enough time for the filters to settle

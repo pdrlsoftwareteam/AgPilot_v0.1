@@ -5694,7 +5694,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
         if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
         {
-		 	last_heartbeat_time = AP_HAL::millis();
+		last_heartbeat_time = AP_HAL::millis();
 			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
 			else
@@ -5881,8 +5881,11 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         break;
 
     case MSG_SPRAY_FLIGHT_DETAIL:
-        CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
-        send_spray_flight_detail();
+    	if(!AP::ins().accel_calibrating)
+    	{
+            CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
+            send_spray_flight_detail();
+    	}
         break;
 
     case MSG_RAW_IMU:

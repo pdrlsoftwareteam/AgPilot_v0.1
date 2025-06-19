@@ -530,14 +530,14 @@ const AP_Param::GroupInfo Compass::var_info[] = {
     // @Description: Compass device id with 1st order priority, set automatically if 0. Reboot required after change.
     // @RebootRequired: True
     // @User: Advanced
-    AP_GROUPINFO("PRIO1_ID",  36, Compass, _priority_did_stored_list._priv_instance[0], 97539),
+    AP_GROUPINFO("PRIO1_ID",  36, Compass, _priority_did_stored_list._priv_instance[0], 0),
 
     // @Param: PRIO2_ID
     // @DisplayName: Compass device id with 2nd order priority
     // @Description: Compass device id with 2nd order priority, set automatically if 0. Reboot required after change.
     // @RebootRequired: True
     // @User: Advanced
-    AP_GROUPINFO("PRIO2_ID", 37, Compass, _priority_did_stored_list._priv_instance[1], 1257473),
+    AP_GROUPINFO("PRIO2_ID", 37, Compass, _priority_did_stored_list._priv_instance[1], 0),
 #endif // COMPASS_MAX_INSTANCES
 
 #if COMPASS_MAX_INSTANCES > 2

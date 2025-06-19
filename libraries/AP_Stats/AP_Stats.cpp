@@ -29,7 +29,7 @@ const AP_Param::GroupInfo AP_Stats::var_info[] = {
     // @Units: s
     // @ReadOnly: True
     // @User: Standard
-    AP_GROUPINFO("_RUNTIME",    2, AP_Stats, params.runtime, 0),
+//    AP_GROUPINFO("_RUNTIME",    2, AP_Stats, params.runtime, 0),
 
     // @Param: _RESET
     // @DisplayName: Statistics Reset Time
@@ -87,10 +87,10 @@ void AP_Stats::update_flighttime()
 
 void AP_Stats::update_runtime()
 {
-    const uint32_t now = AP_HAL::millis();
-    const uint32_t delta = (now - _last_runtime_ms)/1000;
-    runtime += delta;
-    _last_runtime_ms += delta*1000;
+	    const uint32_t now = AP_HAL::millis();
+	    const uint32_t delta = (now - _last_runtime_ms)/1000;
+	    runtime += delta;
+	    _last_runtime_ms += delta*1000;
 }
 
 void AP_Stats::update()

@@ -651,6 +651,9 @@ private:
     bool _backends_detected:1;
 
     // are gyros or accels currently being calibrated
+public:
+    bool accel_calibrating;
+private:
     bool _calibrating_accel;
     bool _calibrating_gyro;
 
