@@ -5694,11 +5694,11 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
         if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
         {
-		 	last_heartbeat_time = AP_HAL::millis();
-			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+		last_heartbeat_time = AP_HAL::millis();
+		if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-			else
-				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+		else
+	 	AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
         }
         break;
 
