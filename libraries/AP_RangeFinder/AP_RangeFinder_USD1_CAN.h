@@ -7,11 +7,11 @@
 #define AP_RANGEFINDER_USD1_CAN_ENABLED (HAL_MAX_CAN_PROTOCOL_DRIVERS && AP_RANGEFINDER_BACKEND_DEFAULT_ENABLED)
 #endif
 
-#if AP_RANGEFINDER_USD1_CAN_ENABLED
+//#if AP_RANGEFINDER_USD1_CAN_ENABLED
 
 class AP_RangeFinder_USD1_CAN :  public AP_RangeFinder_Backend {
 public:
-    AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint8_t mlowerByte = 0, uint8_t muppertByte = 0, uint8_t msensId = 0);
+	AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint32_t msensId = 0);
 
     void update() override;
     
@@ -22,8 +22,11 @@ protected:
 public:
     float _distance_sum;
     uint32_t _distance_count;
-    uint8_t _sensId = 0;
+    uint32_t _sensId;
     uint8_t _lowerByte=0, _upperByte=0;
+    uint8_t _arr[4];
+    uint32_t _msg_byte;
+
     HAL_Semaphore *_msem;
 };
 
@@ -34,6 +37,7 @@ class AP_CANDataDistribuer : public CANSensor
 	AP_RangeFinder_USD1_CAN *rngfndInst[3];
 	uint8_t totalDeviceHandled = 0;
 public:
+	uint32_t now_us = AP_HAL::millis();
 	static AP_CANDataDistribuer* getInstance(){
 		if(instance == nullptr)
 			instance = new AP_CANDataDistribuer();
@@ -56,4 +60,4 @@ public:
 };
 
 
-#endif  // AP_RANGEFINDER_USD1_CAN_ENABLED
+//#endif  // AP_RANGEFINDER_USD1_CAN_ENABLED
