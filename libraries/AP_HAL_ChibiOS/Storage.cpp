@@ -601,45 +601,56 @@ int Storage::save_FramBkp()
 bool Storage::load_backup_from_sdcard(void)
 {
 #ifdef USE_POSIX
-  int ret;
+    // Retry mounting the filesystem for up to 1 second
+    uint32_t start_millis = AP_HAL::millis();
+    while (!AP::FS().retry_mount() && (AP_HAL::millis() - start_millis) < 1000) {
+        hal.scheduler->delay(1);
+    }
 
-  // Retry mounting the filesystem
-  uint32_t start_millis = AP_HAL::millis();
-  while (!AP::FS().retry_mount() && (AP_HAL::millis() - start_millis) < 1000) {
-      hal.scheduler->delay(1);
-  }
+    // Construct the full path of the backup file
+    char* fname = nullptr;
+    int ret = asprintf(&fname, "%s/load_pdrlfram.bin", _storage_bkp_directory);
+    if (fname == nullptr || ret <= 0) {
+        return false;
+    }
 
-  // Read the last backup index
-  char* fname = nullptr;
-  // Read the actual backup data
-  ret = asprintf(&fname, "%s/load_pdrlfram.bin", _storage_bkp_directory);
-  if (fname == nullptr || ret <= 0) {
-      return false;
-  }
+    int fd = AP::FS().open(fname, O_RDONLY);
+    free(fname);
+    fname = nullptr;
 
-  int fd = AP::FS().open(fname, O_RDONLY);
-  free(fname);
-  fname = nullptr;
+    if (fd == -1) {
+        return false; // File not found or cannot open
+    }
 
-  if (fd != -1) {
-      // Read in chunks of 100 bytes
-      const size_t chunk_size = 100;
-      size_t total_read = 0;
+    // Lock buffer before writing
+    WITH_SEMAPHORE(sem);
 
-      while (total_read < CH_STORAGE_SIZE) {
-	  size_t to_read = std::min(chunk_size, CH_STORAGE_SIZE - total_read);
-	  ssize_t r = AP::FS().read(fd, _buffer + total_read, to_read);
-	  if (r <= 0) {
-	      break;  // Error or end of file
-	  }
-	  total_read += r;
-      }
+    const size_t chunk_size = 100;
+    size_t total_read = 0;
 
-      AP::FS().close(fd);
-  }
+    while (total_read < CH_STORAGE_SIZE) {
+        size_t to_read = std::min(chunk_size, CH_STORAGE_SIZE - total_read);
+        ssize_t r = AP::FS().read(fd, _buffer + total_read, to_read);
+        if (r <= 0) {
+            AP::FS().close(fd);
+            return false; // Read error or EOF
+        }
+        total_read += r;
+    }
+
+    AP::FS().close(fd);
+
+    // Optionally mark all lines dirty to flush them later
+    for (uint16_t i = 0; i < CH_STORAGE_NUM_LINES; i++) {
+        _dirty_mask.set(i);
+    }
+
+    return true;
+#else
+    return false;
 #endif
-  return true;
 }
+
 /*
   get storage size and ptr
  */
