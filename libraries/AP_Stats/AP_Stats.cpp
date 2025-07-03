@@ -29,7 +29,7 @@ const AP_Param::GroupInfo AP_Stats::var_info[] = {
     // @Units: s
     // @ReadOnly: True
     // @User: Standard
-    AP_GROUPINFO("_RUNTIME",    2, AP_Stats, params.runtime, 0),
+//    AP_GROUPINFO("_RUNTIME",    2, AP_Stats, params.runtime, 0),
 
     // @Param: _RESET
     // @DisplayName: Statistics Reset Time

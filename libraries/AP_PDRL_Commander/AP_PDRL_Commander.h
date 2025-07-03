@@ -96,6 +96,14 @@ public:
 	void handleHashToSign(mavlink_command_transfer_t* packet);
 	void parseCommand(const mavlink_message_t &msg);
 	void sendSdcardStatus();
+	void sendcmd();
+	bool start = 0;
 };
+
+namespace AP {
+AP_PDRL_COMMANDER *pdrl_commander();
+};
+
+
 
 #endif /* KEYSTORE_HPP_ */

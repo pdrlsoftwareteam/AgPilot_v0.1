@@ -12,8 +12,9 @@
 #include "AP_AHRS/AP_AHRS.h"
 #include "AP_BattMonitor/AP_BattMonitor_FuelFlow.h"
 #include "AP_Arming/AP_Arming.h"
+#include "AP_Logger/AP_Logger.h"
+#include "AP_Scheduler/AP_Scheduler.h"
 #include "AP_HAL_ChibiOS/sdcard.h"
-
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
 #include "hal.h"
 #include "hwdef.h"
@@ -216,7 +217,7 @@ void AP_PDRL_COMMANDER::sendPostLogFileSignature(mavlink_command_transfer_t *rcv
 	AP_PDRL_Logger *m_AP_PDRL_Logger = AP_PDRL_Logger::getInstance();
 
 	memset(keyStore->temp5kBuff,0,sizeof(keyStore->temp5kBuff));
-    CurrentLogFileSize = m_AP_PDRL_Logger->getPostFileSignature(rcvedPacket->command_buff,keyStore->temp5kBuff,sizeof(keyStore->temp5kBuff));
+	CurrentLogFileSize = m_AP_PDRL_Logger->getPostFileSignature(rcvedPacket->command_buff,keyStore->temp5kBuff,sizeof(keyStore->temp5kBuff));
 	if(CurrentLogFileSize == (uint64_t)-1)
 	{
 		sendCommand(0,COMMAND_GET_DRONE_PRIVATE_KEY,COMMAND_TYPE_GET,0,0,0,dataBuff);
@@ -231,24 +232,24 @@ void AP_PDRL_COMMANDER::sendPostLogFileSignature(mavlink_command_transfer_t *rcv
 void AP_PDRL_COMMANDER::sendSprayStatus()
 {
 
-//	if(AP::arming().is_armed())
-//	{
-		uint8_t dataBuff[100] = {0};
-		// send spray status only if the sprayer is enabled
-		dataBuff[0] = AP::sprayer()->spraying();
+	//	if(AP::arming().is_armed())
+	//	{
+	uint8_t dataBuff[100] = {0};
+	// send spray status only if the sprayer is enabled
+	dataBuff[0] = AP::sprayer()->spraying();
 
-		if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
-		{
-			sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
-			//		printf("Sent Spray Status: %d\n",dataBuff[0]);
-			return;
-		}
-		dataBuff[0] = 0;
+	if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
+	{
 		sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
-		if(!AP::sprayer()->getTankstatus())
-			AP::sprayer()->setPulseCount(1);
+		//		printf("Sent Spray Status: %d\n",dataBuff[0]);
+		return;
+	}
+	dataBuff[0] = 0;
+	sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
+	//		if(!AP::sprayer()->getTankstatus())
+	//			AP::sprayer()->setPulseCount(1);
 
-//	}
+	//	}
 
 }
 
@@ -325,6 +326,17 @@ void AP_PDRL_COMMANDER::handleHashToSign(mavlink_command_transfer_t* packet)
 	m_AP_PDRL_Logger->freeHashBuffer();
 }
 
+void AP_PDRL_COMMANDER::sendcmd(void)
+{
+//	uint8_t percent[10] = {0};
+//	percent[0]=40;
+//	gcs().send_text(MAV_SEVERITY_INFO,"backup starts****");
+//	for(int i=0;i<50;i++)
+//	{
+//		sendCommand(0,COMMAND_GET_FLIGHT_START_TIME,COMMAND_TYPE_GET,0,1,1,(uint8_t*)percent);
+//	}
+//	gcs().send_text(MAV_SEVERITY_INFO,"backup finished****");
+}
 void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 {
 	//handle receive commands
@@ -413,12 +425,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "5ft7dnhk";
 		// End section oemName
 
-//		strcpy(oemName,"m");
-				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-				{
-					lastUnlock = AP_HAL::millis();
-					isUnlocked = true;
-				}
+		strcpy(oemName,"m");
+		//				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+		//				{
+		//					lastUnlock = AP_HAL::millis();
+		//					isUnlocked = true;
+		//				}
 	}
 	break;
 
@@ -537,12 +549,31 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_GET_SIG_VALIDATION_RESULT:
 		break;
 
+	case COMMAND_GET_SDCARD_STATUS:
+		sendSdcardStatus();
+		break;
+	case COMMAND_GET_FW_PROGRESS:
+	{
+		start = packet.command_buff[0]?1:0;
+		break;
+	}
+	case COMMAND_GET_FRAM_WRITE:
+	{
+		if(hal.storage->load_backup_from_sdcard())
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"FRAM write finished");
+		}
+		else
+		{
+			gcs().send_text(MAV_SEVERITY_INFO,"FRAM write failed");
+		}
+	}
+		break;
+
 	case COMMAND_PDRL_ENUM_END:
 		break;
 
-	case COMMAND_GET_SDCARD_STATUS:
-	    sendSdcardStatus();
-	    break;
+
 	}
 }
 

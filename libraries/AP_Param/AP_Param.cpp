@@ -1415,42 +1415,41 @@ bool AP_Param::is_read_only(void) const
 
 bool AP_Param::verifySha256Checksum()
 {
-    // Start section lockParamCount
-    int lockParamCount = 2;
-    const char pname[lockParamCount][17] = {
-    		"FRAME_CLASS\0",
-			"FRAME_TYPE\0"
-    };
-    // End section lockParamCount
+     // Start section lockParamCount
+    int lockParamCount = 5;
+    const char pname[lockParamCount][17] = {};
+     // End section lockParamCount
 
    enum ap_var_type ptype;
-
-//    frame_type = (AP_Int8 *)AP_Param::find(pname[0], &ptype);
-//    frame_class = (AP_Int8 *)AP_Param::find(pname[1], &ptype);
-//    uint16_t combined_value = (*frame_type << 8) | (*frame_class);  // Combine frame_type and frame_class
-//    PdrlBootPlugin::calculateCodeCksm();
-//    PdrlBootPlugin::startSha2();
-//    PdrlBootPlugin::updateToSha2((uint8_t*)&combined_value, sizeof(int16_t));
-//    PdrlBootPlugin::finishSha2(DATA_CHKSM);
-//    return PdrlBootPlugin::isDataChecksumMatch();
-
 //	   AP_Param * combined_value = 0;
    	EXPECT_DELAY_MS(1000);
 	PdrlBootPlugin::calculateCodeCksm();
 	PdrlBootPlugin::startSha2();
 		for(int i=0;i<lockParamCount;i++)
 		{
+			union FloatHexUnion {
+			    float fl;
+			    unsigned int in;
+			};
 			AP_Param *vp = AP_Param::find(pname[i], &ptype);
 			if(vp != NULL)
 			{
 				float uVal = vp->cast_to_float(ptype);
-				double roundedNum = round(uVal * 10000) / 10000;
-				PdrlBootPlugin::updateToSha2((uint8_t*)&roundedNum, sizeof(roundedNum));
+//				float roundedNum = round(uVal * 10000) / 10000;
+				union FloatHexUnion FHex;
+				FHex.fl = uVal;
+
+				for(int j=3; j>=0; j--)
+				{
+					unsigned char chVal = (FHex.in >> j*8) & 0xFF;
+					PdrlBootPlugin::updateToSha2((uint8_t*)&chVal, sizeof(chVal));
+				}
 			}
 		}
 	PdrlBootPlugin::finishSha2(DATA_CHKSM);
 	return PdrlBootPlugin::isDataChecksumMatch();
 }
+
 
 // set a AP_Param variable to a specified value
 void AP_Param::set_value(enum ap_var_type type, void *ptr, float value)

@@ -3,43 +3,76 @@
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
 {
-    // put your initialisation code here
-    // this will be called once at start-up
+	// put your initialisation code here
+	// this will be called once at start-up
 }
 #endif
 
 #ifdef USERHOOK_FASTLOOP
 void Copter::userhook_FastLoop()
 {
-    // put your 100Hz code here
+	// put your 100Hz code here
 }
 #endif
 
 #ifdef USERHOOK_50HZLOOP
 void Copter::userhook_50Hz()
 {
-    // put your 50Hz code here
+	// put your 50Hz code here
 }
 #endif
 
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
-    // put your 10Hz code here
+	// put your 10Hz code here
 }
 #endif
 
 #ifdef USERHOOK_SLOWLOOP
 void Copter::userhook_SlowLoop()
 {
-    // put your 3.3Hz code here
+	// put your 3.3Hz code here
+	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
+	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
+
+	size_t total_size = flashEndAddr - flashStartAddr;
+
+	static int once = 0;
+	if(once) return;
+	once++;
+	int logFileFd = AP::FS().open("firmware_i.bin", O_CREAT | O_WRONLY | O_TRUNC);
+	int percent[100] = {0};
+	if (logFileFd >= 0) {
+		const size_t chunk_size = 256;
+		size_t written = 0;
+
+		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
+			size_t remaining = flashEndAddr - p;
+			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
+
+			AP::FS().write(logFileFd, p, write_size);
+			written += write_size;
+
+			// Print progress every 4KB (optional to reduce spamming)
+			if (written % 4096 == 0 || written == total_size) {
+				percent[0] = (written * 100) / total_size;
+				printf("Progress: %d%%\n", percent[0]);
+				//          	sendCommand(0,COMMAND_GET_FW_PROGRESS,COMMAND_TYPE_ACK,0,1,0,percent[0]);
+
+			}
+		}
+
+		AP::FS().close(logFileFd);
+		printf("Firmware save complete.\n");
+	}
 }
 #endif
 
 #ifdef USERHOOK_SUPERSLOWLOOP
 void Copter::userhook_SuperSlowLoop()
 {
-    // put your 1Hz code here
+	// put your 1Hz code here
 	// @Values: 0:Undefined, 1:Quad, 2:Hexa, 3:Octa, 4:OctaQuad, 5:Y6, 6:Heli, 7:Tri, 8:SingleCopter, 9:CoaxCopter, 10:BiCopter, 11:Heli_Dual, 12:DodecaHexa, 13:HeliQuad, 14:Deca, 15:Scripting Matrix, 16:6DoF Scripting, 17:Dynamic Scripting Matrix
 	// @Values: 0:Plus, 1:X, 2:V, 3:H, 4:V-Tail, 5:A-Tail, 10:Y6B, 11:Y6F, 12:BetaFlightX, 13:DJIX, 14:ClockwiseX, 15: I, 18: BetaFlightXReversed, 19:Y4
 	//Quad - + (1,0)	//Quad - X (1,1)
@@ -181,16 +214,16 @@ void Copter::userhook_SuperSlowLoop()
 #ifdef USERHOOK_AUXSWITCH
 void Copter::userhook_auxSwitch1(const RC_Channel::AuxSwitchPos ch_flag)
 {
-    // put your aux switch #1 handler here (CHx_OPT = 47)
+	// put your aux switch #1 handler here (CHx_OPT = 47)
 }
 
 void Copter::userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag)
 {
-    // put your aux switch #2 handler here (CHx_OPT = 48)
+	// put your aux switch #2 handler here (CHx_OPT = 48)
 }
 
 void Copter::userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag)
 {
-    // put your aux switch #3 handler here (CHx_OPT = 49)
+	// put your aux switch #3 handler here (CHx_OPT = 49)
 }
 #endif
