@@ -147,10 +147,14 @@ void AC_Sprayer::update()
 		// velocity will already be zero but this avoids a coverity warning
 		velocity.zero();
 	}
-
+    float ground_speed = velocity.xy().length() * 100.0;
 
 	bool should_be_spraying = 1;
 
+    if(ground_speed < 30.0f)
+    {
+    	should_be_spraying = false;
+    }
 	// if testing pump output speed as if traveling at 1m/s
 	if (_flags.testing) {
 		should_be_spraying = true;
