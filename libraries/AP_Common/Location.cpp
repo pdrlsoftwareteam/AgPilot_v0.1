@@ -6,6 +6,7 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Terrain/AP_Terrain.h>
+#include <AP_Math/AP_Math.h>
 
 /// constructors
 Location::Location()
@@ -480,3 +481,169 @@ void Location::linearly_interpolate_alt(const Location &point1, const Location &
     // new target's distance along the original track and then linear interpolate between the original origin and destination altitudes
     set_alt_cm(point1.alt + (point2.alt - point1.alt) * constrain_float(line_path_proportion(point1, point2), 0.0f, 1.0f), point2.get_alt_frame());
 }
+
+void Location::calculate_next_waypoint(double current_lat_deg,
+                                       double current_lon_deg,
+                                       float heading_deg,
+                                       float distance_m,
+                                       double &next_lat_deg,
+                                       double &next_lon_deg)
+{
+    // Create origin Location
+    Location result;
+    result.lat = current_lat_deg * 1e7;
+    result.lng = current_lon_deg * 1e7;
+    result.alt = 0;
+
+    // Convert heading to radians
+    float heading_rad = radians(heading_deg);
+
+    // Convert heading+distance to north/east offsets
+    float offset_north = distance_m * cosf(heading_rad);
+    float offset_east  = distance_m * sinf(heading_rad);
+
+    // Apply offset (in meters)
+    result.offset(offset_north, offset_east);
+
+    // Convert back to degrees
+    next_lat_deg = result.lat / 1.0e7;
+    next_lon_deg = result.lng / 1.0e7;
+}
+
+
+// heading_deg: direction of survey lines (e.g., 0° = north-south, 90° = east-west)
+// side_m: width of the square (length of one side)
+// spacing_m: distance between each pass (line separation)
+//void Location::generate_square_survey(double center_lat_deg,
+//                            double center_lon_deg,
+//                            float heading_deg,
+//                            float side_m,
+//                            float spacing_m,
+//                            Location waypoints[6])
+//{
+//    Location center;
+//    center.lat = center_lat_deg * 1e7;
+//    center.lng = center_lon_deg * 1e7;
+//    center.alt = 0;
+//    center.options = 0;
+//
+//    // Calculate heading vector (direction of flight lines)
+//    float hdg_rad = radians(heading_deg);
+//    float dx = cosf(hdg_rad);
+//    float dy = sinf(hdg_rad);
+//
+//    // Perpendicular vector (to space lines)
+//    float px = -dy;
+//    float py = dx;
+//
+//    // Start from bottom-left corner of square
+//    float half_side = side_m / 2.0f;
+//
+//    for (int i = 0; i < 3; ++i) {
+//        float line_offset = (i - 1) * spacing_m;
+//
+//        // Start point of this line
+//        float start_n = -half_side * dx + line_offset * px;
+//        float start_e = -half_side * dy + line_offset * py;
+//
+//        // End point of this line
+//        float end_n = half_side * dx + line_offset * px;
+//        float end_e = half_side * dy + line_offset * py;
+//
+//        // Even lines go forward, odd go backward (zig-zag)
+//        if (i % 2 == 0) {
+//            waypoints[i * 2 + 0].offset(center, start_n, start_e);
+//            waypoints[i * 2 + 1].offset(center, end_n, end_e);
+//        } else {
+//            waypoints[i * 2 + 0].offset(center, end_n, end_e);
+//            waypoints[i * 2 + 1].offset(center, start_n, start_e);
+//        }
+//    }
+//}
+#include "GCS_MAVLink/GCS.h"
+#include "AP_Math/vector2.h" // for Vector2f
+#include <cmath>
+
+void Location::plan_ab_survey(Location &loc,
+                    double start_lat_deg,
+                    double start_lon_deg,
+                    float heading_deg,
+                    float line_distance_m,
+                    float spacing_m,
+                    uint8_t num_lines,
+					std::vector<Location> &waypoints)
+{
+    double current_lat = start_lat_deg;
+    double current_lon = start_lon_deg;
+
+    // Calculate unit heading vector
+    Vector2f heading_vector(cosf(radians(heading_deg)), sinf(radians(heading_deg)));
+    Vector2f perpendicular_vector(-heading_vector.y, heading_vector.x); // 90 deg rotation
+
+    for (uint8_t i = 0; i < num_lines; ++i) {
+        double next_lat, next_lon;
+
+        // Use forward or reverse direction
+        float leg_heading = (i % 2 == 0) ? heading_deg : fmodf(heading_deg + 180.0f, 360.0f);
+
+        loc.calculate_next_waypoint(current_lat, current_lon, leg_heading, line_distance_m, next_lat, next_lon);
+
+        Location wp;
+        wp.lat = next_lat * 1e7;
+        wp.lng = next_lon * 1e7;
+        wp.alt = 0;
+        wp.options = 0;
+        waypoints.push_back(wp);
+
+        // Move perpendicular (to start next leg)
+        if (i < num_lines - 1) {
+            Vector2f offset_vec = perpendicular_vector * spacing_m;
+
+            // Convert N/E offset to lat/lon
+            double new_lat, new_lon;
+            float offset_heading = atan2f(offset_vec.y, offset_vec.x) * (180.0f / M_PI);
+            float offset_dist = offset_vec.length();
+
+            loc.calculate_next_waypoint(current_lat, current_lon, offset_heading, offset_dist, new_lat, new_lon);
+
+            current_lat = new_lat;
+            current_lon = new_lon;
+        }
+    }
+}
+
+//
+//#include "AP_Common/Location.h"
+//#include "AP_HAL/AP_HAL.h"
+//
+//extern const AP_HAL::HAL& hal;
+//
+//void Location::test_calculate_next_waypoint()
+//{
+//    Location loc; // just to call the member function
+//
+//    double current_lat_deg = 19.000000;
+//    double current_lon_deg = 72.000000;
+//    float heading_deg = 100.0;       // East
+//    float distance_m = 100.0;       // 100 meters
+//
+//    double next_lat_deg = 0;
+//    double next_lon_deg = 0;
+//
+//    loc.calculate_next_waypoint(current_lat_deg,
+//                                current_lon_deg,
+//                                heading_deg,
+//                                distance_m,
+//                                next_lat_deg,
+//                                next_lon_deg);
+//
+//    GCS_SEND_TEXT(MAV_SEVERITY_INFO,
+//                  "calculated WP: lat=%.7f lon=%.7f",
+//				  next_lat_deg, next_lon_deg);
+//
+////    hal.console->printf("Next waypoint:\n");
+////    hal.console->printf("Latitude:  %.7f\n", next_lat_deg);
+////    hal.console->printf("Longitude: %.7f\n", next_lon_deg);
+//}
+
+

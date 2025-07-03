@@ -571,8 +571,6 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_PDRL_ENUM_END:
 		break;
-
-
 	}
 }
 

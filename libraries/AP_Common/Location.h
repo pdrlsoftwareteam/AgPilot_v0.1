@@ -32,6 +32,27 @@ public:
     Location(int32_t latitude, int32_t longitude, int32_t alt_in_cm, AltFrame frame);
     Location(const Vector3f &ekf_offset_neu, AltFrame frame);
     Location(const Vector3d &ekf_offset_neu, AltFrame frame);
+    void calculate_next_waypoint(double current_lat_deg,
+            double current_lon_deg,
+            float heading_deg,
+            float distance_m,
+            double &next_lat_deg,
+            double &next_lon_deg);
+//    void generate_square_survey(double center_lat_deg,
+//            double center_lon_deg,
+//            float heading_deg,
+//            float side_m,
+//            float spacing_m,
+//            Location waypoints[6]);
+//    void plan_ab_survey(Location &loc,
+//                        double start_lat_deg,
+//                        double start_lon_deg,
+//                        float heading_deg,
+//                        float line_distance_m,
+//                        float spacing_m,
+//                        uint8_t num_lines,
+//                      vector<Location> &waypoints);
+    void test_calculate_next_waypoint();
 
     // set altitude
     void set_alt_cm(int32_t alt_cm, AltFrame frame);

@@ -341,12 +341,14 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
 {
     static uint64_t status_time = AP_HAL::millis();
 
-	if((AP_HAL::millis() - status_time) > 100)
+	if((AP_HAL::millis() - status_time) > 1500)
 	{
     	status_time = AP_HAL::millis();
-    	send_global_position_int();
-    	AP_PDRL_COMMANDER::getInstance()->sendSprayStatus();
-    	send_global_position_int();
+//    	send_global_position_int();
+//    	AP_PDRL_COMMANDER::getInstance()->sendSprayStatus();
+//    	send_global_position_int();
+    	Location loc;
+    	loc.test_calculate_next_waypoint();
 	}
 
     switch(id) {
