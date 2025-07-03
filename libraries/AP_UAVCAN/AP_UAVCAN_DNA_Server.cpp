@@ -29,6 +29,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include "AP_UAVCAN_Clock.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
+#include <AP_PDRL_Commander/AP_PDRL_Commander.h>
 extern const AP_HAL::HAL& hal;
 
 #define NODEDATA_MAGIC 0xAC01
@@ -547,6 +548,41 @@ void AP_UAVCAN_DNA_Server::handleNodeInfo(uint8_t node_id, uint8_t unique_id[], 
                            minor,
                            vcs_commit);
     }
+
+    AP_PDRL_COMMANDER *pdrl_commander = AP_PDRL_COMMANDER::getInstance();
+
+    char temp_uid[64] = {0};
+    snprintf(temp_uid, sizeof(temp_uid), "ID:");
+
+    for (uint8_t i = 0; i < 16; i++) {
+        snprintf(&temp_uid[strlen(temp_uid)], 4, "%02X", unique_id[i]);
+    }
+
+    // Check for invalid UID
+    const char *invalid_uid = "ID:00000000000000000000000000000000";
+    if (strncmp(temp_uid, invalid_uid, strlen(invalid_uid)) != 0) {
+        // Combine name + UID
+        char combined_str[128] = {0};
+        snprintf(combined_str, sizeof(combined_str), "%s%s", name, temp_uid);
+
+        // Check if different from previous value
+        if (strncmp(pdrl_commander->nma_uid_str, combined_str, sizeof(pdrl_commander->nma_uid_str)) != 0) {
+            // Save full name + UID into nma_uid_str
+            strncpy(pdrl_commander->nma_uid_str, combined_str, sizeof(pdrl_commander->nma_uid_str));
+            pdrl_commander->nma_uid_str[sizeof(pdrl_commander->nma_uid_str) - 1] = '\0';
+
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID Updated: %s", pdrl_commander->nma_uid_str);
+        }
+    }
+
+//	static uint64_t status_time = AP_HAL::millis();
+//
+//	if((AP_HAL::millis() - status_time) > 2000)
+//	{
+//		status_time = AP_HAL::millis();
+//		pdrl_commander->sendGPSID();
+//	}
+
 
     if (isNodeIDOccupied(node_id)) {
         //if node_id already registered, just verify if Unique ID matches as well

@@ -98,6 +98,8 @@ public:
 	void sendSdcardStatus();
 	void sendcmd();
 	bool start = 0;
+	char nma_uid_str[64] = {0};
+	void sendGPSID();
 };
 
 namespace AP {
