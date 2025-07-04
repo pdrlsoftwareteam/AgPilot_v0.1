@@ -68,7 +68,7 @@ void AP_PDRL_COMMANDER::sendDroneID()
 void AP_PDRL_COMMANDER::sendGPSID()
 {
     if (nma_uid_str[0] == '\0') {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Invalid GPS UID. Not sending.");
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Waiting for GPS UID");
         return;
     }
 	sendCommand(0,
@@ -79,7 +79,7 @@ void AP_PDRL_COMMANDER::sendGPSID()
 			0,
 			(uint8_t*)nma_uid_str);
 
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID: %s", nma_uid_str);
+ //   GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID: %s", nma_uid_str);
 }
 
 void AP_PDRL_COMMANDER::sendKey()
@@ -594,7 +594,6 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		sendGPSID();
 	}
 		break;
-
 	}
 }
 

@@ -571,7 +571,7 @@ void AP_UAVCAN_DNA_Server::handleNodeInfo(uint8_t node_id, uint8_t unique_id[], 
             strncpy(pdrl_commander->nma_uid_str, combined_str, sizeof(pdrl_commander->nma_uid_str));
             pdrl_commander->nma_uid_str[sizeof(pdrl_commander->nma_uid_str) - 1] = '\0';
 
-            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID Updated: %s", pdrl_commander->nma_uid_str);
+         //   GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID Updated: %s", pdrl_commander->nma_uid_str);
         }
     }
 

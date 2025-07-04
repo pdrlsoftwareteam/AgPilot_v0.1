@@ -1689,8 +1689,8 @@ GCS_MAVLINK::update_receive(uint32_t max_time_us)
     const uint16_t nbytes = _port->available();
     for (uint16_t i=0; i<nbytes; i++)
     {
-                uint8_t c = (uint8_t)_port->read();
-//        const uint8_t c = ch ^ 223;
+                uint8_t ch = (uint8_t)_port->read();
+        const uint8_t c = ch ^ 223;
         const uint32_t protocol_timeout = 4000;
         
         if (alternative.handler &&
