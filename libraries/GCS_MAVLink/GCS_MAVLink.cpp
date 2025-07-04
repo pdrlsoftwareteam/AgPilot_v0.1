@@ -113,12 +113,12 @@ void comm_send_buffer(mavlink_channel_t chan, const uint8_t *buf, uint8_t len)
         // an alternative protocol is active
         return;
     }
-//    uint8_t tempBuf[len];
-//    for(int i=0;i<len;i++)
-//    {
-//        tempBuf[i] = buf[i] ^ 223;
-//    }
-    const size_t written = mavlink_comm_port[chan]->write((const uint8_t*)buf, len);
+    uint8_t tempBuf[len];
+    for(int i=0;i<len;i++)
+    {
+        tempBuf[i] = buf[i] ^ 223;
+    }
+    const size_t written = mavlink_comm_port[chan]->write((const uint8_t*)tempBuf, len);
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     if (written < len) {
         AP_HAL::panic("Short write on UART: %lu < %u", (unsigned long)written, len);
