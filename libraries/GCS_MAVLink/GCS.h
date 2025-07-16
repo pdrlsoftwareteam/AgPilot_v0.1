@@ -336,6 +336,7 @@ public:
 #endif
     void send_battery_status(const uint8_t instance) const;
     bool send_battery_status();
+    bool send_gps_info();
     void send_distance_sensor();
     // send_rangefinder sends only if a downward-facing instance is
     // found.  Rover overrides this!

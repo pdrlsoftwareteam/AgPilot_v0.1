@@ -30,6 +30,7 @@
 #include "AP_UAVCAN_Clock.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_PDRL_Commander/AP_PDRL_Commander.h>
+
 extern const AP_HAL::HAL& hal;
 
 #define NODEDATA_MAGIC 0xAC01
@@ -549,41 +550,6 @@ void AP_UAVCAN_DNA_Server::handleNodeInfo(uint8_t node_id, uint8_t unique_id[], 
                            vcs_commit);
     }
 
-    AP_PDRL_COMMANDER *pdrl_commander = AP_PDRL_COMMANDER::getInstance();
-
-    char temp_uid[64] = {0};
-    snprintf(temp_uid, sizeof(temp_uid), "ID:");
-
-    for (uint8_t i = 0; i < 16; i++) {
-        snprintf(&temp_uid[strlen(temp_uid)], 4, "%02X", unique_id[i]);
-    }
-
-    // Check for invalid UID
-    const char *invalid_uid = "ID:00000000000000000000000000000000";
-    if (strncmp(temp_uid, invalid_uid, strlen(invalid_uid)) != 0) {
-        // Combine name + UID
-        char combined_str[128] = {0};
-        snprintf(combined_str, sizeof(combined_str), "%s%s", name, temp_uid);
-
-        // Check if different from previous value
-        if (strncmp(pdrl_commander->nma_uid_str, combined_str, sizeof(pdrl_commander->nma_uid_str)) != 0) {
-            // Save full name + UID into nma_uid_str
-            strncpy(pdrl_commander->nma_uid_str, combined_str, sizeof(pdrl_commander->nma_uid_str));
-            pdrl_commander->nma_uid_str[sizeof(pdrl_commander->nma_uid_str) - 1] = '\0';
-
-         //   GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID Updated: %s", pdrl_commander->nma_uid_str);
-        }
-    }
-
-//	static uint64_t status_time = AP_HAL::millis();
-//
-//	if((AP_HAL::millis() - status_time) > 2000)
-//	{
-//		status_time = AP_HAL::millis();
-//		pdrl_commander->sendGPSID();
-//	}
-
-
     if (isNodeIDOccupied(node_id)) {
         //if node_id already registered, just verify if Unique ID matches as well
         if (node_id == getNodeIDForUniqueID(unique_id, 16)) {
@@ -620,7 +586,7 @@ void AP_UAVCAN_DNA_Server::handleNodeInfo(uint8_t node_id, uint8_t unique_id[], 
 void AP_UAVCAN_DNA_Server::trampoline_handleNodeInfo(AP_UAVCAN* ap_uavcan, uint8_t node_id, const GetNodeInfoCb& resp)
 {
     uint8_t unique_id[16] = {0};
-    char name[50] = {0};
+    char name[80] = {0};
 
     //copy the unique id from message to uint8_t array
     auto &r = resp.rsp->getResponse();
@@ -628,6 +594,27 @@ void AP_UAVCAN_DNA_Server::trampoline_handleNodeInfo(AP_UAVCAN* ap_uavcan, uint8
                  r.hardware_version.unique_id.end(),
                  unique_id);
     strncpy_noterm(name, r.name.c_str(), sizeof(name)-1);
+
+    uint64_t time_usec = AP_HAL::micros64(); // Use current time
+
+
+    		AP_PDRL_COMMANDER *pdrl_commander = AP_PDRL_COMMANDER::getInstance();
+
+    		strncpy_noterm(pdrl_commander->name, r.name.c_str(), sizeof(name) - 1);
+
+    	    char temp_uid[64] = {0};
+
+    	    for (uint8_t i = 0; i < 16; i++) {
+    	        snprintf(&temp_uid[strlen(temp_uid)], 4, "%02X", unique_id[i]);
+    	    }
+
+    		pdrl_commander->time_usec  = time_usec;
+    		pdrl_commander->hw_version_major = r.hardware_version.major;
+    		pdrl_commander->hw_version_minor = r.hardware_version.minor;
+    		memcpy(pdrl_commander->hw_unique_id, temp_uid, sizeof(pdrl_commander->hw_unique_id));
+    		pdrl_commander->sw_version_major = r.software_version.major;
+    		pdrl_commander->sw_version_minor = r.software_version.minor;
+    		pdrl_commander->sw_vcs_commit = r.software_version.vcs_commit;
 
     ap_uavcan->_dna_server->handleNodeInfo(node_id, unique_id, name,
                               r.software_version.major,
