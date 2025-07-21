@@ -5,7 +5,6 @@
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_Parachute/AP_Parachute.h>
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_Scripting/AP_Scripting.h>
 #include <RC_Channel/RC_Channel.h>
 #include <AP_Mount/AP_Mount.h>
@@ -188,46 +187,6 @@ bool AP_Mission::command_do_set_repeat_dist(const AP_Mission::Mission_Command& c
     _repeat_dist = cmd.p1;
     gcs().send_text(MAV_SEVERITY_INFO, "Resume repeat dist set to %u m",_repeat_dist);
     return true;
-}
-
-bool AP_Mission::start_command_do_sprayer(const AP_Mission::Mission_Command& cmd)
-{
-#if HAL_SPRAYER_ENABLED
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return false;
-    }
-
-    if (cmd.p1 == 1) {
-        sprayer->run(true);
-    } else {
-        sprayer->run(false);
-    }
-	Spray_wp = cmd.p1;
-    return true;
-#else
-    return false;
-#endif // HAL_SPRAYER_ENABLED
-}
-
-bool AP_Mission::start_command_do_sprayer_in_auto(uint16_t doOn)
-{
-#if HAL_SPRAYER_ENABLED
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return false;
-    }
-
-    if (doOn == 1) {
-        sprayer->run(true);
-    } else {
-        sprayer->run(false);
-    }
-	Spray_wp = doOn;
-    return true;
-#else
-    return false;
-#endif // HAL_SPRAYER_ENABLED
 }
 
 bool AP_Mission::start_command_do_scripting(const AP_Mission::Mission_Command& cmd)

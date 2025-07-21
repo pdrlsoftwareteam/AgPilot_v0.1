@@ -8,9 +8,7 @@
 #include "AP_LIBNPNT/PdrlBootPlugin.h"
 #include "AC_Avoidance/AP_OAPathPlanner.h"
 #include "AC_Avoidance/AC_Avoid.h"
-#include "AC_Sprayer/AC_Sprayer.h"
 #include "AP_AHRS/AP_AHRS.h"
-#include "AP_BattMonitor/AP_BattMonitor_FuelFlow.h"
 #include "AP_Arming/AP_Arming.h"
 #include "AP_Logger/AP_Logger.h"
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
@@ -227,28 +225,95 @@ void AP_PDRL_COMMANDER::sendPostLogFileSignature(mavlink_command_transfer_t *rcv
 	return;
 }
 
-void AP_PDRL_COMMANDER::sendSprayStatus()
+void AP_PDRL_COMMANDER::setCircleCoordinateNFZ(uint8_t index, uint8_t area_type, uint8_t zone_type, double lat_arr[], double lng_arr[], uint32_t radius, uint16_t altitude_max)
 {
+  if (area_type == 0)
+  {
+      NFZ_Circle temp_NFZ_Circle = {0, 0, 0, 0, 0, 0};
+      temp_NFZ_Circle = {index, zone_type, lat_arr[0], lng_arr[0], radius, altitude_max};
+      addNFZ(temp_NFZ_Circle);
+      printf("Circle NFZ saved\n");
+      printf("index: %d zone_type: %d\t lat_arr[0]: %lf\t lng_arr[0]: %lf\t radius: %d\t altitude_max: %d\n",
+	     temp_NFZ_Circle.id, temp_NFZ_Circle.zone_type, temp_NFZ_Circle.lat, temp_NFZ_Circle.lng, temp_NFZ_Circle.radius_m, temp_NFZ_Circle.alt_max);
+  }
+}
 
-//	if(AP::arming().is_armed())
-//	{
-		uint8_t dataBuff[100] = {0};
-		// send spray status only if the sprayer is enabled
-		dataBuff[0] = AP::sprayer()->spraying();
-
-		if(dataBuff[0] == 1 && AP::sprayer()->getPulseCount())
-		{
-			sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
-			//		printf("Sent Spray Status: %d\n",dataBuff[0]);
+void AP_PDRL_COMMANDER::setPolygonCoordinateNFZ(uint8_t index, uint16_t total_point, uint16_t curr_index, double lat, double lng, uint16_t altitude_max, uint8_t zone_type)
+{
+	// Check if index is already stored (optional — to avoid duplicates)
+	bool already_present = false;
+	static uint8_t* temp = NULL;
+	for (size_t i = 0; i < entry_count; ++i) {
+		if (entry_arr[i] == index) {
+			already_present = true;
+			break;
+		}
+	}
+	if (!already_present) {
+		temp = (uint8_t*)realloc(entry_arr, (entry_count + 1) * sizeof(uint8_t));
+		if (!temp) {
+			printf("Memory allocation failed for entry_arr\n");
 			return;
 		}
-		dataBuff[0] = 0;
-		sendCommand(0,COMMAND_SET_SPRAY_STATUS,COMMAND_TYPE_GET,0,1,1,dataBuff);
-//		if(!AP::sprayer()->getTankstatus())
-//			AP::sprayer()->setPulseCount(1);
+		// Add new index
+		entry_arr = temp;
+		entry_arr[entry_count++] = index;
+		printf("Stored new index: %d\n", index);
+	}
 
-//	}
+	if(!already_present)
+	{
+		// Only reallocate the array itself (not the struct)
+		NFZ_Polygon* temp_ptr = (NFZ_Polygon*)realloc(nfz_poly_array, (count_poly + 1) * sizeof(NFZ_Polygon));
+		if (!temp_ptr) {
+			printf("Memory allocation failed for nfz_poly_array\n");
+			return;
+		}
+		nfz_poly_array = temp_ptr;
+		// Allocate memory for lat/lng inside the newly added polygon struct
+		nfz_poly_array[count_poly].lat_arr = (double*)calloc(total_point, sizeof(double));
+		nfz_poly_array[count_poly].lng_arr = (double*)calloc(total_point, sizeof(double));
 
+		if (!nfz_poly_array[count_poly].lat_arr || !nfz_poly_array[count_poly].lng_arr) {
+			printf("Memory allocation failed for lat/lng arrays\n");
+			return;
+		}
+		// Now safely assign
+		nfz_poly_array[count_poly].id = index;
+		nfz_poly_array[count_poly].lat_arr[curr_index] = lat;
+		nfz_poly_array[count_poly].lng_arr[curr_index] = lng;
+		nfz_poly_array[count_poly].alt_max = altitude_max;
+		nfz_poly_array[count_poly].zone_type = zone_type;
+		nfz_poly_array[count_poly].total_point = total_point;
+
+		count_poly++;  // Done adding one polygon
+	}
+	else
+	{
+		int index_check = -1;
+		for (size_t i = 0; i < entry_count; ++i) {
+			if (entry_arr[i] == index) {
+				index_check = i;
+				break;
+			}
+		}
+		nfz_poly_array[index_check].lat_arr[curr_index] = lat;
+		nfz_poly_array[index_check].lng_arr[curr_index] = lng;
+	}
+
+	for(size_t i=0;i<count_poly;i++)
+	{
+		if(nfz_poly_array[i].total_point == curr_index+1)
+		{
+			printf("id: %d zone_type: %d alt_max: %d\n",nfz_poly_array[i].id,nfz_poly_array[i].zone_type,nfz_poly_array[i].alt_max);
+			for(int j=0; j<nfz_poly_array[i].total_point;j++)
+			{
+				printf("[ %lf %lf ]\n",nfz_poly_array[i].lat_arr[j],nfz_poly_array[i].lng_arr[j]);
+			}
+			printf("Polygon NFZ saved\n");
+
+		}
+	}
 }
 
 void AP_PDRL_COMMANDER::sendCommand(
@@ -332,13 +397,9 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	COMMAND_PDRL command = (COMMAND_PDRL)packet.command;
 	switch(command)
 	{
-	case COMMAND_SET_SPRAY_STATUS:
-		break;
+
 
 	case COMMAND_SEND_PARAM_ACK:
-		break;
-
-	case COMMAND_GET_SPRAYED_AREA:
 		break;
 
 	case COMMAND_GET_DRONE_ID:
@@ -412,12 +473,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		char oemName[] = "5ft7dnhk";
 		// End section oemName
 
-		// strcpy(oemName,"m");
-				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-				{
-					lastUnlock = AP_HAL::millis();
-					isUnlocked = true;
-				}
+		 strcpy(oemName,"m");
+//				if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+//				{
+//					lastUnlock = AP_HAL::millis();
+//					isUnlocked = true;
+//				}
 	}
 	break;
 
@@ -498,26 +559,6 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	break;
 
 	case COMMAND_GET_PERMISSION_ARTIFACTS:
-	{
-		AC_Sprayer *sprayer = AP::sprayer();
-		if (sprayer == nullptr) {
-			uint8_t spray_ack[100] = {0};
-			gcs().send_text(MAV_SEVERITY_INFO,"Sprayer Not Init");
-			sendCommand(0,COMMAND_GET_PERMISSION_ARTIFACTS,COMMAND_TYPE_GET,0,1,1,spray_ack);
-			break;
-		}
-
-		if(packet.command_buff[0])
-		{
-			printf("Got Sprayer ON command\n");
-			sprayer->run(true);
-		}
-		else
-		{
-			printf("Got Sprayer OFF command\n");
-			sprayer->run(false);
-		}
-	}
 	break;
 
 	case COMMAND_GET_SIGN_FROM_HASH:
@@ -542,8 +583,6 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 
 	case COMMAND_PDRL_ENUM_END:
 		break;
-
-
 	}
 }
 

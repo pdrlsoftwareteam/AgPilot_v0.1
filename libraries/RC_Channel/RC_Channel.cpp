@@ -29,7 +29,6 @@ extern const AP_HAL::HAL& hal;
 #include <GCS_MAVLink/GCS.h>
 
 #include <AC_Avoidance/AC_Avoid.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_Camera/AP_Camera.h>
 #include <AP_Camera/AP_RunCam.h>
 #include <AP_Compass/AP_Compass.h>
@@ -546,7 +545,6 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const AuxSwitchPo
     case AUX_FUNC::RC_OVERRIDE_ENABLE:
     case AUX_FUNC::RUNCAM_CONTROL:
     case AUX_FUNC::RUNCAM_OSD_CONTROL:
-    case AUX_FUNC::SPRAYER:
     case AUX_FUNC::DISABLE_AIRSPEED_USE:
     case AUX_FUNC::FFT_NOTCH_TUNE:
 #if HAL_MOUNT_ENABLED
@@ -579,7 +577,6 @@ const RC_Channel::LookupTable RC_Channel::lookuptable[] = {
     { AUX_FUNC::CAMERA_TRIGGER,"CameraTrigger"},
     { AUX_FUNC::RANGEFINDER,"Rangefinder"},
     { AUX_FUNC::FENCE,"Fence"},
-    { AUX_FUNC::SPRAYER,"Sprayer"},
     { AUX_FUNC::PARACHUTE_ENABLE,"ParachuteEnable"},
     { AUX_FUNC::PARACHUTE_RELEASE,"ParachuteRelease"},
     { AUX_FUNC::PARACHUTE_3POS,"Parachute3Position"},
@@ -941,20 +938,6 @@ void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
 }
 #endif
 
-#if HAL_SPRAYER_ENABLED
-void RC_Channel::do_aux_function_sprayer(const AuxSwitchPos ch_flag)
-{
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return;
-    }
-
-    sprayer->run(ch_flag == AuxSwitchPos::HIGH);
-    // if we are disarmed the pilot must want to test the pump
-    sprayer->test_pump((ch_flag == AuxSwitchPos::HIGH) && !hal.util->get_soft_armed());
-}
-#endif // HAL_SPRAYER_ENABLED
-
 #if AP_GRIPPER_ENABLED
 void RC_Channel::do_aux_function_gripper(const AuxSwitchPos ch_flag)
 {
@@ -1150,12 +1133,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
             AP::battery().MPPT_set_powered_state_to_all(ch_flag == AuxSwitchPos::HIGH);
         }
         break;
-
-#if HAL_SPRAYER_ENABLED
-    case AUX_FUNC::SPRAYER:
-        do_aux_function_sprayer(ch_flag);
-        break;
-#endif
 
     case AUX_FUNC::LOST_VEHICLE_SOUND:
         do_aux_function_lost_vehicle_sound(ch_flag);

@@ -109,7 +109,6 @@ public:
         k_param_rangefinder_gain,       // deprecated - remove
         k_param_ch8_option_old,         // deprecated
         k_param_arming_check_old,       // deprecated - remove
-        k_param_sprayer,
         k_param_angle_max,
         k_param_gps_hdop_good,
         k_param_battery,

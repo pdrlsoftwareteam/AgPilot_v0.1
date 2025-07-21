@@ -31,7 +31,6 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Camera/AP_Camera.h>
 #include <AP_Gripper/AP_Gripper.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_RSSI/AP_RSSI.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
@@ -918,7 +917,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_SCALED_IMU,            MSG_SCALED_IMU},
         { MAVLINK_MSG_ID_SCALED_IMU2,           MSG_SCALED_IMU2},
         { MAVLINK_MSG_ID_SCALED_IMU3,           MSG_SCALED_IMU3},
-		{ MAVLINK_MSG_ID_SPRAY_FLIGHT_DETAIL, 	MSG_SPRAY_FLIGHT_DETAIL},
 
         { MAVLINK_MSG_ID_SCALED_PRESSURE,       MSG_SCALED_PRESSURE},
         { MAVLINK_MSG_ID_SCALED_PRESSURE2,      MSG_SCALED_PRESSURE2},
@@ -1666,7 +1664,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+//    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -1986,29 +1984,6 @@ void GCS_MAVLINK::send_raw_imu()
 #endif
 }
 
-void GCS_MAVLINK::send_spray_flight_detail()
-{
-	mavlink_msg_spray_flight_detail_send(
-			chan,
-			AP_HAL::millis(),
-			AP::battery().flight_time/1000,
-			AP::battery().spray_time/1000,
-			AP::battery().spray_dist,
-			AP::battery().flight_dist,
-			AP::battery().spray_area_sqm,
-			AP::battery().spray_area_acre,
-			global_position_int_relative_alt()*0.001,
-			AP::battery().consumed_liquid
-	);
-	printf("flight_time: %d\tspray_time: %d\tspray_dist: %.2f\tflight_dist: %.2f\tspray_area_sqm: %.2f\tspray_area_acre: %.2f\talt: %.2f\n",
-			AP::battery().flight_time/1000,
-			AP::battery().spray_time/1000,
-			AP::battery().spray_dist,
-			AP::battery().flight_dist,
-			AP::battery().spray_area_sqm,
-			AP::battery().spray_area_acre,
-			global_position_int_relative_alt()*0.001);
-}
 void GCS_MAVLINK::send_scaled_imu(uint8_t instance, void (*send_fn)(mavlink_channel_t chan, uint32_t time_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag, int16_t temperature))
 {
 #if AP_INERTIALSENSOR_ENABLED
@@ -3866,6 +3841,22 @@ void GCS_MAVLINK::handle_osd_param_config(const mavlink_message_t &msg) const
 #endif
 }
 
+void GCS_MAVLINK::handle_msg_no_fly_zone(const mavlink_message_t &msg) const
+{
+  mavlink_no_fly_zone_t packet;
+  mavlink_msg_no_fly_zone_decode(&msg, &packet);
+  AP_PDRL_COMMANDER::getInstance()->setCircleCoordinateNFZ(packet.id,packet.area_type,packet.zone_type,packet.lat,
+							   packet.lng,packet.radius_cm,packet.alt_max);
+}
+
+void GCS_MAVLINK::handle_msg_no_fly_zone_poly(const mavlink_message_t &msg) const
+{
+  mavlink_no_fly_zone_polygon_t packet;
+  mavlink_msg_no_fly_zone_polygon_decode(&msg, &packet);
+  AP_PDRL_COMMANDER::getInstance()->setPolygonCoordinateNFZ(packet.id,packet.total_point,packet.curr_index,packet.lat,
+							   packet.lng,packet.alt_max,packet.zone_type);
+}
+
 void GCS_MAVLINK::handle_heartbeat(const mavlink_message_t &msg) const
 {
     // if the heartbeat is from our GCS then we don't failsafe for
@@ -3905,7 +3896,17 @@ void GCS_MAVLINK::handle_common_message(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN:
         handle_set_gps_global_origin(msg);
         break;
+    case MAVLINK_MSG_ID_NO_FLY_ZONE:
+      gcs().send_text(MAV_SEVERITY_INFO,"NFZ parameter received");
+      handle_msg_no_fly_zone(msg);
 
+      break;
+
+    case MAVLINK_MSG_ID_NO_FLY_ZONE_POLYGON:
+      gcs().send_text(MAV_SEVERITY_INFO,"NFZ parameter received poly");
+      handle_msg_no_fly_zone_poly(msg);
+
+      break;
     case MAVLINK_MSG_ID_DEVICE_OP_READ:
         handle_device_op_read(msg);
         break;
@@ -4683,24 +4684,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_do_gripper(const mavlink_command_long_t &
 }
 #endif  // AP_GRIPPER_ENABLED
 
-#if HAL_SPRAYER_ENABLED
-MAV_RESULT GCS_MAVLINK::handle_command_do_sprayer(const mavlink_command_long_t &packet)
-{
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return MAV_RESULT_FAILED;
-    }
-
-    if (is_equal(packet.param1, 1.0f)) {
-        sprayer->run(true);
-    } else if (is_zero(packet.param1)) {
-        sprayer->run(false);
-    }
-
-    return MAV_RESULT_ACCEPTED;
-}
-#endif
-
 #if HAL_INS_ACCELCAL_ENABLED
 MAV_RESULT GCS_MAVLINK::handle_command_accelcal_vehicle_pos(const mavlink_command_long_t &packet)
 {
@@ -4832,11 +4815,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_long_packet(const mavlink_command_long_t 
     case MAV_CMD_SET_CAMERA_FOCUS:
     case MAV_CMD_IMAGE_START_CAPTURE:
         result = handle_command_camera(packet);
-        break;
-#endif
-#if HAL_SPRAYER_ENABLED
-    case MAV_CMD_DO_SPRAYER:
-        result = handle_command_do_sprayer(packet);
         break;
 #endif
 
@@ -5692,14 +5670,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        {
+//        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+//        {
 		 	last_heartbeat_time = AP_HAL::millis();
-			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+//			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-			else
-				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        }
+//			else
+//				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+//        }
         break;
 
     case MSG_HWSTATUS:
@@ -5878,11 +5856,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_RC_CHANNELS_RAW:
         CHECK_PAYLOAD_SIZE(RC_CHANNELS_RAW);
         send_rc_channels_raw();
-        break;
-
-    case MSG_SPRAY_FLIGHT_DETAIL:
-        CHECK_PAYLOAD_SIZE(SPRAY_FLIGHT_DETAIL);
-        send_spray_flight_detail();
         break;
 
     case MSG_RAW_IMU:

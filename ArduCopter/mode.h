@@ -316,7 +316,6 @@ public:
         float x;
         float y;
     } Point;
-    bool should_spray;;
 };
 
 
@@ -545,7 +544,6 @@ private:
     uint16_t loiter_time_max;                // How long we should stay in Loiter Mode for mission scripting (time in seconds)
     uint32_t loiter_time;                    // How long have we been loitering - The start time in millis
 
-    bool was_spraying = false;
 
     struct {
         bool reached_destination_xy : 1;
@@ -1386,7 +1384,6 @@ private:
     void manual_control();
     bool reached_destination();
     bool calculate_next_dest(Destination ab_dest, bool use_wpnav_alt, Vector3f& next_dest, bool& terrain_alt) const;
-    void spray(bool b);
     bool calculate_side_dest(Vector3f& next_dest, bool& terrain_alt) const;
     void move_to_side();
 
@@ -1397,9 +1394,6 @@ private:
 
     // parameters
     AP_Int8  _auto_enabled;    // top level enable/disable control
-#if HAL_SPRAYER_ENABLED
-    AP_Int8  _spray_enabled;   // auto spray enable/disable
-#endif
     AP_Int8  _wp_delay;        // delay for zigzag waypoint
     AP_Float _side_dist;       // sideways distance
     AP_Int8  _direction;       // sideways direction

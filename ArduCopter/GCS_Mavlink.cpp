@@ -339,16 +339,6 @@ bool GCS_Copter::vehicle_initialised() const {
 // try to send a message, return false if it wasn't sent
 bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
 {
-    static uint64_t status_time = AP_HAL::millis();
-
-	if((AP_HAL::millis() - status_time) > 100)
-	{
-    	status_time = AP_HAL::millis();
-    	send_global_position_int();
-    	AP_PDRL_COMMANDER::getInstance()->sendSprayStatus();
-    	send_global_position_int();
-	}
-
     switch(id) {
 
     case MSG_TERRAIN:
@@ -504,7 +494,6 @@ static const ap_message STREAM_RAW_SENSORS_msgs[] = {
     MSG_SCALED_PRESSURE,
     MSG_SCALED_PRESSURE2,
     MSG_SCALED_PRESSURE3,
-	MSG_SPRAY_FLIGHT_DETAIL,
 };
 static const ap_message STREAM_EXTENDED_STATUS_msgs[] = {
     MSG_SYS_STATUS,

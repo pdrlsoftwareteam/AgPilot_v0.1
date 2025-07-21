@@ -59,6 +59,76 @@ private:
 	~AP_PDRL_COMMANDER();
 
 public:
+
+	    uint8_t* entry_arr = nullptr;     // dynamic array to store indices
+	    size_t entry_count = 0;           // how many entries are stored
+	    size_t entry_capacity = 0;        // how much space is allocated
+
+	struct NFZ_Circle {
+	    uint8_t  id;
+	    uint8_t	zone_type;
+	    double    lat;      // degrees
+	    double    lng;      // degrees
+	    uint32_t    radius_m; // centimeters
+	    uint16_t    alt_max;  // cms
+	};
+
+	NFZ_Circle* nfz_array = nullptr;
+	size_t count = 0;
+	size_t capacity = 0;
+
+	bool addNFZ(const NFZ_Circle& nfz) {
+	    if (count >= capacity) {
+		size_t new_capacity = capacity + 1;  // minimal growth
+		NFZ_Circle* temp = (NFZ_Circle*)realloc(nfz_array, new_capacity * sizeof(NFZ_Circle));
+		if (!temp) {
+		    return false; // out of memory
+		}
+		nfz_array = temp;
+		capacity = new_capacity;
+	    }
+
+	    nfz_array[count++] = nfz;
+	    return true;
+	}
+
+	NFZ_Circle* getNFZ(size_t index) {
+	       return (index < count) ? &nfz_array[index] : nullptr;
+	}
+	size_t send_NFZ_count(){ return count;}
+
+	struct NFZ_Polygon {
+	    uint8_t  	id;
+	    uint8_t	zone_type;
+	    double	*lat_arr;      // degrees
+	    double    	*lng_arr;      // degrees
+	    uint16_t	alt_max;  // cms
+	    uint8_t 	total_point;
+	};
+
+	NFZ_Polygon* nfz_poly_array = nullptr;
+	size_t count_poly = 0;
+	size_t capacity_poly = 0;
+
+	bool addNFZ_poly(const NFZ_Polygon& nfz) {
+		    if (count_poly >= capacity_poly) {
+			size_t new_capacity = capacity_poly + 1;  // minimal growth
+			NFZ_Polygon* temp = (NFZ_Polygon*)realloc(nfz_poly_array, new_capacity * sizeof(NFZ_Polygon));
+			if (!temp) {
+			    return false; // out of memory
+			}
+			nfz_poly_array = temp;
+			capacity_poly = new_capacity;
+		    }
+
+		    nfz_poly_array[count_poly++] = nfz;
+		    return true;
+		}
+
+	NFZ_Polygon* getNFZ_poly(size_t index) {
+	       return (index < count_poly) ? &nfz_poly_array[index] : nullptr;
+	}
+	size_t send_NFZ_count_poly(){ return count_poly;}
 	AP_NPNT_data_helper* m_AP_NPNT_data_helper;
 	mavlink_command_transfer_t cmdReceived;
 	mavlink_command_transfer_t cmdSend;
@@ -84,7 +154,10 @@ public:
 	void sendLogFile(mavlink_command_transfer_t *rcvedPacket);
 	void sendLogFileSignature(mavlink_command_transfer_t *rcvedPacket);
 	void sendPostLogFileSignature(mavlink_command_transfer_t *rcvedPacket);
-	void sendSprayStatus();
+	void setCircleCoordinateNFZ(uint8_t index, uint8_t area_type, uint8_t zone_type,
+				    double latitude[], double longitude[], uint32_t radius, uint16_t altitude_max);
+	void setPolygonCoordinateNFZ(uint8_t index, uint16_t total_point, uint16_t curr_index, double lat, double lng, uint16_t altitude_max,uint8_t zone_type);
+
 	void sendCommand(
 			uint16_t item_offset,
 			uint8_t command,

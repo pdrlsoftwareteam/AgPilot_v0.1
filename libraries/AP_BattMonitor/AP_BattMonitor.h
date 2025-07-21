@@ -46,7 +46,6 @@ class AP_BattMonitor_LTC2946;
 class AP_BattMonitor_Torqeedo;
 class AP_BattMonitor_FuelLevel_Analog;
 class AP_BattMonitor_EFI;
-class AP_BattMonitor_XKC_Y25_NPN;
 
 class AP_BattMonitor
 {
@@ -70,7 +69,6 @@ class AP_BattMonitor
     friend class AP_BattMonitor_Torqeedo;
     friend class AP_BattMonitor_FuelLevel_Analog;
     friend class AP_BattMonitor_Synthetic_Current;
-    friend class AP_BattMonitor_XKC_Y25_NPN;
 
 public:
 
@@ -92,7 +90,6 @@ public:
         UAVCAN_BatteryInfo             = 8,
         BLHeliESC                      = 9,
         Sum                            = 10,
-        FuelFlow                       = 11,
         FuelLevel_PWM                  = 12,
         SUI3                           = 13,
         SUI6                           = 14,
@@ -109,7 +106,6 @@ public:
         Analog_Volt_Synthetic_Current  = 26,
         INA239_SPI                     = 27,
         EFI                            = 28,
-		XKC_Y25_NPN				   	   = 25,
     };
 
     FUNCTOR_TYPEDEF(battery_failsafe_handler_fn_t, void, const char *, const int8_t);
@@ -122,16 +118,6 @@ public:
     Vector2f Current_Loc;
     void set_val(Vector2f Loc);
     Vector2f get_val();
-//	float calculated_area = 0;
-//	float Cal
-
-    float spray_dist;
-    float spray_area_acre;
-    float spray_area_sqm;
-    uint32_t spray_time;
-    uint32_t flight_time;
-    float flight_dist;
-    float consumed_liquid;
 
 
     static AP_BattMonitor *get_singleton() {

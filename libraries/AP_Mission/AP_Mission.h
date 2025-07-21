@@ -520,11 +520,6 @@ public:
     	reason = val;
     }
 
-    int16_t  Spray_wp;
-    bool Send_spray_wp(){
-    	return Spray_wp;
-    };
-
     ///
     /// public command methods
     ///
@@ -736,11 +731,6 @@ public:
     // Returns 0 if no appropriate JUMP_TAG match can be found.
     uint16_t get_index_of_jump_tag(const uint16_t tag) const;
 
-    bool do_sprayer_in_auto(uint16_t doOn)
-    {
-    	return start_command_do_sprayer_in_auto(doOn);
-    }
-
 #if AP_SDCARD_STORAGE_ENABLED
     bool failed_sdcard_storage(void) const {
         return _failed_sdcard_storage;
@@ -903,11 +893,9 @@ private:
     bool start_command_parachute(const AP_Mission::Mission_Command& cmd);
     bool command_do_set_repeat_dist(const AP_Mission::Mission_Command& cmd);
 
-    bool start_command_do_sprayer(const AP_Mission::Mission_Command& cmd);
     bool start_command_do_scripting(const AP_Mission::Mission_Command& cmd);
     bool start_command_do_gimbal_manager_pitchyaw(const AP_Mission::Mission_Command& cmd);
 
-    bool start_command_do_sprayer_in_auto(uint16_t doOn);
 
     /*
       handle format conversion of storage format to allow us to update

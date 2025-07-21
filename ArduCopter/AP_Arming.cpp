@@ -697,11 +697,6 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
 
     hal.util->set_soft_armed(true);
 
-#if HAL_SPRAYER_ENABLED
-    // turn off sprayer's test if on
-    copter.sprayer.test_pump(false);
-#endif
-
     // enable output to motors
     copter.enable_motor_output();
 

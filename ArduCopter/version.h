@@ -6,7 +6,7 @@
 
 #include "ap_version.h"
 
-#define THISFIRMWARE "AgPilot v0.1"
+#define THISFIRMWARE "AgPilot v0.1_Defence"
 // the following line is parsed by the autotest scripts
 #define FIRMWARE_VERSION 0,0,1,FIRMWARE_VERSION_TYPE_OFFICIAL
 

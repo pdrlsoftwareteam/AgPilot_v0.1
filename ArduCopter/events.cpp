@@ -294,7 +294,7 @@ void Copter::failsafe_terrain_on_event()
 
 void Copter::failsafe_obstacle_on_event()
 {
-    gcs().send_text(MAV_SEVERITY_WARNING,"Warning: Obstacle ahead");
+  gcs().send_text(MAV_SEVERITY_WARNING,"Warning: Obstacle Ahead");
     AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILSAFE_OCCURRED);
 
 #if MODE_RTL_ENABLED == ENABLED
@@ -304,6 +304,63 @@ void Copter::failsafe_obstacle_on_event()
     } else {
     	set_mode_loiter_or_RTL(ModeReason::FAILSAFE);
     }
+}
+
+void Copter::failsafe_NFZ_on_event(Red_Zone::zone_breach type)
+{
+  if(flightmode->mode_number() != Mode::Number::RTL)
+    {
+      switch(type)
+      {
+	case Red_Zone::zone_breach::NO_BREACH:{
+	  return;
+	  }
+	  break;
+
+	case Red_Zone::zone_breach::ALT_BREACH:{
+	      gcs().send_text(MAV_SEVERITY_CRITICAL,"Warning: ALT_BREACH");
+	  }
+	  break;
+
+	case Red_Zone::zone_breach::CIRCULAR_BREACH_YELLOW:{
+	      gcs().send_text(MAV_SEVERITY_CRITICAL,"Warning: CIRCULAR_BREACH_YELLOW");
+	  }
+	  break;
+
+	case Red_Zone::zone_breach::CIRCULAR_BREACH_RED:{
+	      gcs().send_text(MAV_SEVERITY_CRITICAL,"Warning: CIRCULAR_BREACH_RED");
+	  }
+	  break;
+
+	case Red_Zone::zone_breach::POLY_BREACH_YELLOW:{
+	      gcs().send_text(MAV_SEVERITY_CRITICAL,"Warning: POLY_BREACH_YELLOW");
+	  }
+	  break;
+
+	case Red_Zone::zone_breach::POLY_BREACH_RED:{
+	      gcs().send_text(MAV_SEVERITY_CRITICAL,"Warning: POLY_BREACH_RED");
+	  }
+	  break;
+
+	default:
+	  break;
+      }
+    }
+  else
+    {
+      return;
+    }
+
+  AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILSAFE_OCCURRED);
+
+#if MODE_RTL_ENABLED == ENABLED
+  if (flightmode->mode_number() == Mode::Number::RTL) {
+      mode_rtl.restart_without_terrain();
+#endif
+  } else {
+      gcs().send_text(MAV_SEVERITY_ALERT,"Switching to RTL mode");
+      set_mode_RTL_or_land_with_pause(ModeReason::FAILSAFE);
+  }
 }
 
 // check for gps glitch failsafe

@@ -67,7 +67,6 @@
 #include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
 #include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
 #include <AP_Parachute/AP_Parachute.h>      // ArduPilot parachute release library
-#include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
@@ -168,6 +167,7 @@
 #endif
 
 #include "mode.h"
+#include "redzone.h"
 
 class Copter : public AP_Vehicle {
 public:
@@ -182,6 +182,7 @@ public:
     friend class AP_AdvancedFailsafe_Copter;
 #endif
     friend class AP_Arming_Copter;
+    friend class Red_Zone;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
@@ -487,11 +488,6 @@ private:
     AP_Rally_Copter rally;
 #endif
 
-    // Crop Sprayer
-#if HAL_SPRAYER_ENABLED
-    AC_Sprayer sprayer;
-#endif
-
     // Parachute release
 #if PARACHUTE == ENABLED
     AP_Parachute parachute;
@@ -727,6 +723,7 @@ private:
     void failsafe_terrain_set_status(bool data_ok);
     void failsafe_terrain_on_event();
     void failsafe_obstacle_on_event();
+    void failsafe_NFZ_on_event(Red_Zone::zone_breach typ);
     void gpsglitch_check();
     void failsafe_deadreckon_check();
     void set_mode_RTL_or_land_with_pause(ModeReason reason);
@@ -930,6 +927,8 @@ private:
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ModeZigZag mode_zigzag;
 #endif
+    Red_Zone red_zone;
+
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);

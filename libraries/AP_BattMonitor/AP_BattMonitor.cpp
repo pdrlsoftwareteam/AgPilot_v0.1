@@ -10,7 +10,6 @@
 #include "AP_BattMonitor_SMBus_SUI.h"
 #include "AP_BattMonitor_SMBus_NeoDesign.h"
 #include "AP_BattMonitor_Sum.h"
-#include "AP_BattMonitor_FuelFlow.h"
 #include "AP_BattMonitor_FuelLevel_PWM.h"
 #include "AP_BattMonitor_Generator.h"
 #include "AP_BattMonitor_EFI.h"
@@ -20,7 +19,6 @@
 #include "AP_BattMonitor_Torqeedo.h"
 #include "AP_BattMonitor_FuelLevel_Analog.h"
 #include "AP_BattMonitor_Synthetic_Current.h"
-#include "AP_BattMonitor_XKC_Y25_NPN.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -324,11 +322,6 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_Sum(*this, state[instance], _params[instance], instance);
                 break;
 #endif
-#if AP_BATTERY_FUELFLOW_ENABLED
-            case Type::FuelFlow:
-                drivers[instance] = new AP_BattMonitor_FuelFlow(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_FUELFLOW_ENABLED
 #if AP_BATTERY_FUELLEVEL_PWM_ENABLED
             case Type::FuelLevel_PWM:
                 drivers[instance] = new AP_BattMonitor_FuelLevel_PWM(*this, state[instance], _params[instance]);
@@ -378,9 +371,6 @@ AP_BattMonitor::init()
                 break;
 #endif // AP_BATTERY_EFI_ENABLED
 
-            case Type::XKC_Y25_NPN:
-            	drivers[instance] = new AP_BattMonitor_XKC_Y25_NPN(*this, state[instance], _params[instance]);
-            	break;
             case Type::NONE:
             default:
                 break;

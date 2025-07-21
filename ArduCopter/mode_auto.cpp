@@ -1075,14 +1075,6 @@ void ModeAuto::wp_run()
 		make_safe_ground_handling();
 		return;
 	}
-	if(should_spray && Check_Range())
-	{
-		AP::sprayer()->run(true);
-	}
-	else
-	{
-		AP::sprayer()->run(false);
-	}
 
 	if (g2.auto_man_alt != 1) {
 		motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
@@ -1176,7 +1168,6 @@ void ModeAuto::land_run()
 		make_safe_ground_handling();
 		return;
 	}
-	AP::sprayer()->run(false);
 	// set motors to full range
 	motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
@@ -1188,7 +1179,6 @@ void ModeAuto::land_run()
 //      called by auto_run at 100hz or more
 void ModeAuto::rtl_run()
 {
-	AP::sprayer()->run(false);
 	wp_nav->resetAutomode();
 	wp_nav->resetWaypointZ(copter.current_loc.alt);
 	// call regular rtl flight mode run function
@@ -1674,8 +1664,8 @@ void ModeAuto::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 	// this will be used to remember the time in millis after we reach or pass the WP.
 	loiter_time = 0;
 	// this is the delay, stored in seconds
-	loiter_time_max = cmd.p1 & 0x7FFF;
-	should_spray = !(cmd.p1>>15&1);
+	loiter_time_max = cmd.p1;
+
 	// set next destination if necessary
 	if (!set_next_wp(cmd, target_loc)) {
 		// failure to set next destination can only be because of missing terrain data
@@ -1692,7 +1682,7 @@ void ModeAuto::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 bool ModeAuto::set_next_wp(const AP_Mission::Mission_Command& current_cmd, const Location &default_loc)
 {
 	// do not add next wp if current command has a delay meaning the vehicle will stop at the destination
-	if ((current_cmd.p1&0x7fff) > 0) {
+	if (current_cmd.p1 > 0) {
 		return true;
 	}
 
@@ -1770,7 +1760,6 @@ void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
 // note: caller should set yaw_mode
 void ModeAuto::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
 {
-	AP::sprayer()->run(false);
 	loiter_run();
 	return;
 }
@@ -2228,7 +2217,7 @@ bool ModeAuto::verify_loiter_time(const AP_Mission::Mission_Command& cmd)
 
 	printf("delay1 in millis: %d\n",loiter_time_max);
 	// check if loiter timer has run out
-	if (((millis() - loiter_time)) >= loiter_time_max) {
+	if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
 		gcs().send_text(MAV_SEVERITY_INFO, "Reached command #%i",cmd.index);
 		return true;
 	}
@@ -2308,7 +2297,7 @@ bool ModeAuto::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
 
 	printf("delay2 in millis: %d\n",loiter_time_max);
 	// check if timer has run out
-	if (((millis() - loiter_time)) >= loiter_time_max) {
+	if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
 		if (loiter_time_max == 0) {
 			// play a tone
 			AP_Notify::events.waypoint_complete = 1;
@@ -2350,7 +2339,7 @@ bool ModeAuto::verify_spline_wp(const AP_Mission::Mission_Command& cmd)
 
 	printf("delay3 in millis: %d\n",loiter_time_max);
 	// check if timer has run out
-	if (((millis() - loiter_time)) >= loiter_time_max) {
+	if (((millis() - loiter_time) / 1000) >= loiter_time_max) {
 		gcs().send_text(MAV_SEVERITY_INFO, "Reached command #%i",cmd.index);
 		return true;
 	}

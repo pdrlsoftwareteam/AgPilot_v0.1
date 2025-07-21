@@ -7,7 +7,7 @@ class AP_Arming_Copter : public AP_Arming
 public:
     friend class Copter;
     friend class ToyMode;
-
+    friend class Red_Zone;
     AP_Arming_Copter() : AP_Arming()
     {
         // default REQUIRE parameter to 1 (Copter does not have an

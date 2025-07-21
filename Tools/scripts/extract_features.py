@@ -137,7 +137,6 @@ class ExtractFeatures(object):
             ('HAL_LANDING_DEEPSTALL_ENABLED', r'AP_Landing_Deepstall::terminate\b',),
 
             ('AP_GRIPPER_ENABLED', r'AP_Gripper::init\b',),
-            ('HAL_SPRAYER_ENABLED', 'AC_Sprayer::AC_Sprayer',),
             ('AP_LANDINGGEAR_ENABLED', r'AP_LandingGear::init\b',),
             ('WINCH_ENABLED', 'AP_Winch::AP_Winch',),
 
