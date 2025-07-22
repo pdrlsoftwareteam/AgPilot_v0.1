@@ -227,93 +227,81 @@ void AP_PDRL_COMMANDER::sendPostLogFileSignature(mavlink_command_transfer_t *rcv
 
 void AP_PDRL_COMMANDER::setCircleCoordinateNFZ(uint8_t index, uint8_t area_type, uint8_t zone_type, double lat_arr[], double lng_arr[], uint32_t radius, uint16_t altitude_max)
 {
+    static int NFZcount = 0;
+
   if (area_type == 0)
   {
-      NFZ_Circle temp_NFZ_Circle = {0, 0, 0, 0, 0, 0};
-      temp_NFZ_Circle = {index, zone_type, lat_arr[0], lng_arr[0], radius, altitude_max};
-      addNFZ(temp_NFZ_Circle);
-      printf("Circle NFZ saved\n");
-      printf("index: %d zone_type: %d\t lat_arr[0]: %lf\t lng_arr[0]: %lf\t radius: %d\t altitude_max: %d\n",
-	     temp_NFZ_Circle.id, temp_NFZ_Circle.zone_type, temp_NFZ_Circle.lat, temp_NFZ_Circle.lng, temp_NFZ_Circle.radius_m, temp_NFZ_Circle.alt_max);
+        NFZ_Circle temp_NFZ_Circle = {
+            index,
+            zone_type,
+            lat_arr[0],
+            lng_arr[0],
+            radius,
+            altitude_max
+        };
+
+        nfz_array.push_back(temp_NFZ_Circle);  // Direct insertion
+        NFZcount++;
+        printf("Circle NFZ saved: %d\n",index);
+        printf("index: %d zone_type: %d\t lat: %lf\t lng: %lf\t radius: %u\t altitude_max: %u\n",
+               temp_NFZ_Circle.id,
+               temp_NFZ_Circle.zone_type,
+               temp_NFZ_Circle.lat,
+               temp_NFZ_Circle.lng,
+               temp_NFZ_Circle.radius_m,
+               temp_NFZ_Circle.alt_max);
   }
 }
 
+
 void AP_PDRL_COMMANDER::setPolygonCoordinateNFZ(uint8_t index, uint16_t total_point, uint16_t curr_index, double lat, double lng, uint16_t altitude_max, uint8_t zone_type)
 {
-	// Check if index is already stored (optional — to avoid duplicates)
-	bool already_present = false;
-	static uint8_t* temp = NULL;
-	for (size_t i = 0; i < entry_count; ++i) {
-		if (entry_arr[i] == index) {
-			already_present = true;
-			break;
-		}
-	}
+    auto it = std::find(entry_arr.begin(), entry_arr.end(), index);
+    bool already_present = (it != entry_arr.end());
+//	}
 	if (!already_present) {
-		temp = (uint8_t*)realloc(entry_arr, (entry_count + 1) * sizeof(uint8_t));
-		if (!temp) {
-			printf("Memory allocation failed for entry_arr\n");
-			return;
-		}
-		// Add new index
-		entry_arr = temp;
-		entry_arr[entry_count++] = index;
-		printf("Stored new index: %d\n", index);
-	}
+	    // Allocate new memory
+        entry_arr.push_back(index);
+	    printf("Stored new index: %d\n", index);
 
-	if(!already_present)
-	{
-		// Only reallocate the array itself (not the struct)
-		NFZ_Polygon* temp_ptr = (NFZ_Polygon*)realloc(nfz_poly_array, (count_poly + 1) * sizeof(NFZ_Polygon));
-		if (!temp_ptr) {
-			printf("Memory allocation failed for nfz_poly_array\n");
-			return;
-		}
-		nfz_poly_array = temp_ptr;
-		// Allocate memory for lat/lng inside the newly added polygon struct
-		nfz_poly_array[count_poly].lat_arr = (double*)calloc(total_point, sizeof(double));
-		nfz_poly_array[count_poly].lng_arr = (double*)calloc(total_point, sizeof(double));
 
-		if (!nfz_poly_array[count_poly].lat_arr || !nfz_poly_array[count_poly].lng_arr) {
-			printf("Memory allocation failed for lat/lng arrays\n");
-			return;
-		}
-		// Now safely assign
-		nfz_poly_array[count_poly].id = index;
-		nfz_poly_array[count_poly].lat_arr[curr_index] = lat;
-		nfz_poly_array[count_poly].lng_arr[curr_index] = lng;
-		nfz_poly_array[count_poly].alt_max = altitude_max;
-		nfz_poly_array[count_poly].zone_type = zone_type;
-		nfz_poly_array[count_poly].total_point = total_point;
+        NFZ_Polygon new_poly;
+        new_poly.id = index;
+        new_poly.lat_arr.resize(total_point);
+        new_poly.lng_arr.resize(total_point);
+        new_poly.lat_arr[curr_index] = lat;
+        new_poly.lng_arr[curr_index] = lng;
+        new_poly.alt_max = altitude_max;
+        new_poly.zone_type = zone_type;
+        new_poly.total_point = total_point;
+	    // Add new entry
+        nfz_poly_array.push_back(new_poly);
 
-		count_poly++;  // Done adding one polygon
-	}
-	else
-	{
-		int index_check = -1;
-		for (size_t i = 0; i < entry_count; ++i) {
-			if (entry_arr[i] == index) {
-				index_check = i;
-				break;
-			}
-		}
+	    }
+    else {
+
+        size_t index_check = std::distance(entry_arr.begin(), it);
+        if (index_check < nfz_poly_array.size()) {
 		nfz_poly_array[index_check].lat_arr[curr_index] = lat;
 		nfz_poly_array[index_check].lng_arr[curr_index] = lng;
+        }
 	}
 
-	for(size_t i=0;i<count_poly;i++)
-	{
-		if(nfz_poly_array[i].total_point == curr_index+1)
-		{
+    static int NFZcount = 0;
+    for (size_t i = 0; i < nfz_poly_array.size(); i++) {
+        if (nfz_poly_array[i].total_point == curr_index + 1) {
+            NFZcount++;
 			printf("id: %d zone_type: %d alt_max: %d\n",nfz_poly_array[i].id,nfz_poly_array[i].zone_type,nfz_poly_array[i].alt_max);
-			for(int j=0; j<nfz_poly_array[i].total_point;j++)
-			{
+            for (int j = 0; j < nfz_poly_array[i].total_point; j++) {
 				printf("[ %lf %lf ]\n",nfz_poly_array[i].lat_arr[j],nfz_poly_array[i].lng_arr[j]);
 			}
 			printf("Polygon NFZ saved\n");
-
 		}
 	}
+}
+
+int AP_PDRL_COMMANDER::getTotalNFZcount() const {
+    return nfz_array.size() + nfz_poly_array.size();
 }
 
 void AP_PDRL_COMMANDER::sendCommand(

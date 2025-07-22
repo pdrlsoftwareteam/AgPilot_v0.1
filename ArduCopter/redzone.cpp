@@ -70,7 +70,8 @@ bool Red_Zone::isPointOnSegment(double lat1, double lon1, double lat2, double lo
 
 
 // Main inside-polygon check
-bool Red_Zone::isInsidePolygon(const double lat[], const double lon[], int n, const Point& p) {
+bool Red_Zone::isInsidePolygon(const std::vector<double>& lat,const std::vector<double>& lon,int n,const Point& p)
+ {
   // Check if point matches any vertex
   for (int i = 0; i < n; ++i) {
       if (isSame(p.lat_test, lat[i]) && isSame(p.lon_test, lon[i])) {
@@ -101,124 +102,85 @@ bool Red_Zone::isInsidePolygon(const double lat[], const double lon[], int n, co
 }
 Red_Zone::zone_breach Red_Zone::check_redzone()
 {
-  size_t NFZ_size = AP_PDRL_COMMANDER::getInstance()->send_NFZ_count();
-  size_t NFZ_size_poly = AP_PDRL_COMMANDER::getInstance()->send_NFZ_count_poly();
+    const auto& circles = AP_PDRL_COMMANDER::getInstance()->getAllCircles();
+    const auto& polygons = AP_PDRL_COMMANDER::getInstance()->getAllPolygons();
 
-  location curr_loc;
-  curr_loc.lat = copter.current_loc.lat * 1.0e-7;
-  curr_loc.lng = copter.current_loc.lng * 1.0e-7;
-  curr_loc.alt = copter.current_loc.alt/* * 1.0e-2*/;
-  printf("lat: %lf\tlng: %lf\talt: %d\n",curr_loc.lat,curr_loc.lng,curr_loc.alt);
+    location curr_loc;
+    curr_loc.lat = copter.current_loc.lat * 1.0e-7;
+    curr_loc.lng = copter.current_loc.lng * 1.0e-7;
+    curr_loc.alt = copter.current_loc.alt;
 
+    printf("lat: %lf\tlng: %lf\talt: %d\n", curr_loc.lat, curr_loc.lng, curr_loc.alt);
 
-//  double min_distance = DBL_MAX;
-  bool horizontal_breach = false;
-  size_t horizontal_index = -1;
-  size_t closest_index = -1;
-  double horizontal_dist = 0;
-  double index_distance = 0;
-  bool altitude_breach = false;
-  size_t altitude_index = -1;
-  uint16_t altitude_alt = 0;
+    for (size_t i = 0; i < circles.size(); ++i) {
+        const auto& nfz = circles[i];
 
-  for (size_t i = 0; i < NFZ_size; i++) {
-      const AP_PDRL_COMMANDER::NFZ_Circle* got_these = AP_PDRL_COMMANDER::getInstance()->getNFZ(i);
+        double distance = haversine_distance(curr_loc.lat, curr_loc.lng, nfz.lat, nfz.lng);
+        bool inside_radius = distance <= nfz.radius_m;
+        bool altitude_ok = static_cast<int>(curr_loc.alt) < static_cast<int>(nfz.alt_max);
 
-      if (got_these != nullptr) {
-	  double distance = haversine_distance(curr_loc.lat, curr_loc.lng,
-					       got_these->lat, got_these->lng);
-	  double radius_m = got_these->radius_m;
-	  bool inside_radius = distance <= radius_m;
-	  bool altitude_ok = (signed)curr_loc.alt < (signed)got_these->alt_max;
-//	  if((signed)curr_loc.alt < 0)
-	  // CASE 1: Entered safely, now climbed
-	  if (inside_radius &&
-	      nfz_states[i].was_inside_radius &&
-	      nfz_states[i].was_altitude_ok &&
-	      !altitude_ok) {
+        if (inside_radius &&
+            nfz_states[i].was_inside_radius &&
+            nfz_states[i].was_altitude_ok &&
+            !altitude_ok) {
 
-	      printf("Zone %zu: Safe horizontal entry, now altitude breach!\n", i);
-	      return zone_breach::ALT_BREACH;
-	  }
+            printf("Zone %zu: Safe horizontal entry, now altitude breach!\n", i);
+            return zone_breach::ALT_BREACH;
+        }
 
-	  // CASE 2: Entered dangerously (high altitude)
-	  if (inside_radius &&
-	      !nfz_states[i].was_inside_radius &&
-	      !altitude_ok) {
+        if (inside_radius &&
+            !nfz_states[i].was_inside_radius &&
+            !altitude_ok) {
 
-	      printf("Zone %zu: Entered NFZ with high altitude — critical!\n", i);
-	      return zone_breach::CIRCULAR_BREACH_RED;
-	  }
+            printf("Zone %zu: Entered NFZ with high altitude — critical!\n", i);
+            return zone_breach::CIRCULAR_BREACH_RED;
+        }
 
-	  // Save current state for next iteration
-	  nfz_states[i].was_inside_radius = inside_radius;
-	  nfz_states[i].was_altitude_ok = altitude_ok;
-      }
-  }
-
-  if(horizontal_breach || altitude_breach)
-    {
-      printf("closest index: %zu\n",closest_index);
-      if(horizontal_breach)
-	{
-	  printf("Horizontal breach in NFZ index %zu (distance: %.2f m <= radius: %.2f m)\n",
-		 horizontal_index, horizontal_dist, index_distance);
-	  //	  return zone_breach::CIRCULAR_BREACH_RED;
-	}
-      if(altitude_breach && horizontal_breach)
-	{
-	  printf("Altitude breach in NFZ index %zu (alt: %u >= alt_max: %u)\n",
-		 altitude_index, curr_loc.alt, altitude_alt);
-	  return zone_breach::ALT_BREACH;
-	}
+        // Save state
+        nfz_states[i].was_inside_radius = inside_radius;
+        nfz_states[i].was_altitude_ok = altitude_ok;
     }
 
+    for (size_t j = 0; j < polygons.size(); ++j) {
+        const auto& nfz = polygons[j];
 
-  for(size_t j=0;j<NFZ_size_poly;j++)
-    {
-      const AP_PDRL_COMMANDER::NFZ_Polygon* got_these = AP_PDRL_COMMANDER::getInstance()->getNFZ_poly(j);
-      if (got_these != nullptr)
-	{
-	  Point testPoint = {curr_loc.lat,curr_loc.lng};
+        Point testPoint = {curr_loc.lat, curr_loc.lng};
 
-	  // Current checks
-	  int num_point = 0;
+        // Count valid points
+        int num_points = 0;
+        for (int i = 0; i < nfz.total_point; ++i) {
+            if (std::fabs(nfz.lat_arr[i]) > EPSILON && std::fabs(nfz.lng_arr[i]) > EPSILON) {
+                num_points = i + 1;
+            }
+        }
 
-	  for (int i = 0; i < got_these->total_point; i++) {
-	      if (std::fabs(got_these->lat_arr[i]) > EPSILON && std::fabs(got_these->lng_arr[i]) > EPSILON) {
-		  num_point = i + 1;
-	      }
-	  }
+        bool is_inside_now = isInsidePolygon(nfz.lat_arr, nfz.lng_arr, num_points, testPoint);
+        bool altitude_ok = static_cast<int>(curr_loc.alt) < static_cast<int>(nfz.alt_max);
 
-	  bool is_inside_now = isInsidePolygon(got_these->lat_arr,got_these->lng_arr, num_point, testPoint);
-	  bool altitude_ok = (signed)curr_loc.alt < (signed)got_these->alt_max;
-	  // CASE 1: Entered safely, now climbed
-	  if (is_inside_now &&
-	      nfz_states_poly[j].was_inside_polygon &&
-	      nfz_states_poly[j].was_altitude_ok &&
-	      !altitude_ok) {
+        if (is_inside_now &&
+            nfz_states_poly[j].was_inside_polygon &&
+            nfz_states_poly[j].was_altitude_ok &&
+            !altitude_ok) {
 
-	      printf("Zone %zu: Safe horizontal entry, now altitude breach!\n", j);
-	      return zone_breach::ALT_BREACH;
-	  }
+            printf("Zone %zu: Safe polygon entry, now altitude breach!\n", j);
+            return zone_breach::ALT_BREACH;
+        }
 
-	  // CASE 2: Entered dangerously (high altitude)
-	  if (is_inside_now &&
-	      !nfz_states_poly[j].was_inside_polygon &&
-	      !altitude_ok) {
+        if (is_inside_now &&
+            !nfz_states_poly[j].was_inside_polygon &&
+            !altitude_ok) {
 
-	      printf("Zone %zu: Entered NFZ with high altitude — critical!\n", j);
-	      return zone_breach::POLY_BREACH_RED;
-	  }
+            printf("Zone %zu: Entered polygon NFZ with high altitude — critical!\n", j);
+            return zone_breach::POLY_BREACH_RED;
+        }
 
-	  // Save current state for next iteration
-	  nfz_states_poly[j].was_inside_polygon = is_inside_now;
-	  nfz_states_poly[j].was_altitude_ok = altitude_ok;
-	}
-
+        nfz_states_poly[j].was_inside_polygon = is_inside_now;
+        nfz_states_poly[j].was_altitude_ok = altitude_ok;
     }
-  return zone_breach::NO_BREACH;
+
+    return zone_breach::NO_BREACH;
 }
+
 void Red_Zone::update()
 {
 

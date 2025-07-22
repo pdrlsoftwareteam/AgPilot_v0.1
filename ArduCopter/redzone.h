@@ -57,7 +57,8 @@ public:
   bool isSame(double a, double b);
 
   bool isPointOnSegment(double lat1, double lon1, double lat2, double lon2, double plat, double plon);
-  bool isInsidePolygon(const double lat[], const double lon[], int n, const Point& p);
+  bool isInsidePolygon(const std::vector<double>& lat,const std::vector<double>& lon,int n,const Point& p);
+
 
   zone_breach check_redzone();
   double deg2rad(double);

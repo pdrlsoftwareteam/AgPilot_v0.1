@@ -3871,6 +3871,14 @@ void GCS_MAVLINK::handle_heartbeat(const mavlink_message_t &msg) const
  */
 void GCS_MAVLINK::handle_common_message(const mavlink_message_t &msg)
 {
+  static uint64_t set_time = AP_HAL::millis();
+  static bool rec = 0;
+  if((AP_HAL::millis() - set_time > 5000) && rec)
+    {
+      rec = false;
+      gcs().send_text(MAV_SEVERITY_NOTICE,"%d NFZ Received",AP_PDRL_COMMANDER::getInstance()->getTotalNFZcount());
+    }
+  /*changes should be done for sending spraying specific data*/
     switch (msg.msgid) {
 
     case MAVLINK_MSG_ID_HEARTBEAT: {
@@ -3897,14 +3905,20 @@ void GCS_MAVLINK::handle_common_message(const mavlink_message_t &msg)
         handle_set_gps_global_origin(msg);
         break;
     case MAVLINK_MSG_ID_NO_FLY_ZONE:
-      gcs().send_text(MAV_SEVERITY_INFO,"NFZ parameter received");
+      {
       handle_msg_no_fly_zone(msg);
+      rec = true;
+      set_time = AP_HAL::millis();
+      }
 
       break;
 
     case MAVLINK_MSG_ID_NO_FLY_ZONE_POLYGON:
-      gcs().send_text(MAV_SEVERITY_INFO,"NFZ parameter received poly");
-      handle_msg_no_fly_zone_poly(msg);
+      {
+      	handle_msg_no_fly_zone_poly(msg);
+		rec = true;
+		set_time = AP_HAL::millis();
+      }
 
       break;
     case MAVLINK_MSG_ID_DEVICE_OP_READ:
