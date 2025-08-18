@@ -32,6 +32,8 @@ public:
         BATTMONITOR_SMBUS_SERIAL = 0x1C,               // Serial Number
         BATTMONITOR_SMBUS_MANUFACTURE_NAME = 0x20,     // Manufacture Name
         BATTMONITOR_SMBUS_MANUFACTURE_DATA = 0x23,     // Manufacture Data
+
+        BATTMONITOR_SMBUS_STATE_OF_HEALTH = 0x4F,     // STATE_OF_HEALTH
     };
 
     /// Constructor
@@ -55,6 +57,37 @@ public:
 
     // return true if cycle count can be provided and fills in cycles argument
     bool get_cycle_count(uint16_t &cycles) const override;
+
+    // return true if state_of_health can be provided
+    bool get_state_of_health(uint16_t &state_of_health) const override;
+    uint16_t get_temp_kelvin(uint16_t &temp_kelvin) const override;
+    bool get_unique_id(const uint8_t* &unique_id) const override{ return false; }
+    bool get_firmware_info(uint16_t &firm_info) const override { return false; }
+    bool get_state_of_charge(uint16_t &state_of_charge) const override { return false; }
+    bool get_capacity(uint32_t &cap) const override { return false; }
+    bool get_temperature2(int16_t &temp) const override { return false; }
+
+    bool get_battery_info(uint16_t &firm_info, const uint8_t* &unique_id) const override { return false; }
+
+    bool get_VI_readings(uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
+                         float &batt_volt, float &batt_curr, float &batt_chr_volt) const override { return false; }
+
+    bool get_min_max_cellVolt(float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
+                              float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const override { return false; }
+
+    bool get_min_max_temperature(int8_t &max_temp, uint8_t &max_temp_ntc_loc_cell, uint8_t &max_temp_ntc_loc_ctr,
+                                 int8_t &min_temp, uint8_t &min_temp_ntc_loc_cell, uint8_t &min_temp_ntc_loc_ctr) const override { return false; }
+
+    bool get_bms_relay_state(uint8_t &bms_state, bool &relay_charge, bool &relay_precharge,
+                             bool &relay_negative, bool &relay_positive) const override { return false; }
+
+    bool get_cell_balancing_status(uint16_t &balancing_status_cc1, uint16_t &balancing_status_cc2,
+                                   uint16_t &balancing_status_cc3, uint16_t &balancing_status_cc4) const override { return false; }
+
+    bool get_faults_and_warnings(uint32_t &fault_flags, uint32_t &warning_flags) const override { return false; }
+
+    bool get_temp_ntc_cell_count_and_voltages(const int8_t* &temperatures_ntc, uint8_t &cell_count_series,
+					      const uint16_t* &cell_voltages) const override { return false; }
 
     virtual void init(void) override;
 
@@ -95,6 +128,9 @@ protected:
     // buff is the data that was read or will be written
     uint8_t get_PEC(const uint8_t i2c_addr, uint8_t cmd, bool reading, const uint8_t buff[], uint8_t len) const;
 
+    // reads the battery's state_of_health
+    void read_state_of_health();
+
     AP_HAL::OwnPtr<AP_HAL::I2CDevice> _dev;
     bool _pec_supported; // true if PEC is supported
 
@@ -104,6 +140,9 @@ protected:
     uint16_t _cycle_count = 0;      // number of cycles the battery has experienced. An amount of discharge approximately equal to the value of DesignCapacity.
     bool _has_cycle_count;          // true if cycle count has been retrieved from the battery
     bool _has_temperature;
+    bool _has_state_of_health;
+    uint16_t _state_of_health = 0;
+    uint16_t kelvin_temp;
 
     virtual void timer(void) = 0;   // timer function to read from the battery
 

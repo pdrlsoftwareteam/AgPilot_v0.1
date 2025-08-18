@@ -56,6 +56,39 @@ public:
     virtual bool get_cycle_count(uint16_t &cycles) const { return false; }
 
     /// get voltage with sag removed (based on battery current draw and resistance)
+    virtual bool get_state_of_health(uint16_t &state_of_health) const { return false; }
+    virtual uint8_t get_cell_count(uint8_t &cell_count) const { return 0; }
+    virtual uint16_t get_temp_kelvin(uint16_t &temp_kelvin) const {return 0;}
+    virtual bool get_unique_id(const uint8_t* &unique_id) const { return false; }
+    virtual bool get_firmware_info(uint16_t &firm_info) const { return false; }
+    virtual bool get_state_of_charge(uint16_t &state_of_charge) const { return false; }
+    virtual bool get_capacity(uint32_t &cap) const { return false; }
+    virtual bool get_temperature2(int16_t &temp) const { return false; }
+
+    virtual bool get_battery_info(uint16_t &firm_info, const uint8_t* &unique_id) const { return false; }
+
+    virtual bool get_VI_readings(uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
+                                  float &batt_volt, float &batt_curr, float &batt_chr_volt) const { return false; }
+
+    virtual bool get_min_max_cellVolt(float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
+                                      float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const { return false; }
+
+    virtual bool get_min_max_temperature(int8_t &max_temp, uint8_t &max_temp_ntc_loc_cell, uint8_t &max_temp_ntc_loc_ctr,
+                                         int8_t &min_temp, uint8_t &min_temp_ntc_loc_cell, uint8_t &min_temp_ntc_loc_ctr) const { return false; }
+
+    virtual bool get_bms_relay_state(uint8_t &bms_state, bool &relay_charge, bool &relay_precharge,
+                                     bool &relay_negative, bool &relay_positive) const { return false; }
+
+    virtual bool get_cell_balancing_status(uint16_t &balancing_status_cc1, uint16_t &balancing_status_cc2,
+                                           uint16_t &balancing_status_cc3, uint16_t &balancing_status_cc4) const { return false; }
+
+    virtual bool get_faults_and_warnings(uint32_t &fault_flags, uint32_t &warning_flags) const { return false; }
+
+    virtual bool get_temp_ntc_cell_count_and_voltages(const int8_t* &temperatures_ntc, uint8_t &cell_count_series,
+						      const uint16_t* &cell_voltages) const { return false; }
+
+
+    /// get voltage with sag removed (based on battery current draw and resistance)
     /// this will always be greater than or equal to the raw voltage
     float voltage_resting_estimate() const;
 

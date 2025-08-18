@@ -88,5 +88,7 @@ enum ap_message : uint8_t {
     MSG_HYGROMETER,
     MSG_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE,
 	MSG_SPRAY_FLIGHT_DETAIL,
+    MSG_SMART_BATTERY_INFO,
+    MSG_CAN_BMS_STATUS,
     MSG_LAST // MSG_LAST must be the last entry in this enum
 };
