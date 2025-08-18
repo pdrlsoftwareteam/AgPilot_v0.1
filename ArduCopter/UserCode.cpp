@@ -33,39 +33,6 @@ void Copter::userhook_MediumLoop()
 void Copter::userhook_SlowLoop()
 {
 	// put your 3.3Hz code here
-	uint8_t* flashStartAddr = (uint8_t*)0x08020000;
-	uint8_t* flashEndAddr = (uint8_t*)0x08200000;
-
-	size_t total_size = flashEndAddr - flashStartAddr;
-
-	static int once = 0;
-	if(once) return;
-	once++;
-	int logFileFd = AP::FS().open("firmware_i.bin", O_CREAT | O_WRONLY | O_TRUNC);
-	int percent[100] = {0};
-	if (logFileFd >= 0) {
-		const size_t chunk_size = 256;
-		size_t written = 0;
-
-		for (uint8_t* p = flashStartAddr; p < flashEndAddr; p += chunk_size) {
-			size_t remaining = flashEndAddr - p;
-			size_t write_size = (remaining < chunk_size) ? remaining : chunk_size;
-
-			AP::FS().write(logFileFd, p, write_size);
-			written += write_size;
-
-			// Print progress every 4KB (optional to reduce spamming)
-			if (written % 4096 == 0 || written == total_size) {
-				percent[0] = (written * 100) / total_size;
-				printf("Progress: %d%%\n", percent[0]);
-				//          	sendCommand(0,COMMAND_GET_FW_PROGRESS,COMMAND_TYPE_ACK,0,1,0,percent[0]);
-
-			}
-		}
-
-		AP::FS().close(logFileFd);
-		printf("Firmware save complete.\n");
-	}
 }
 #endif
 
