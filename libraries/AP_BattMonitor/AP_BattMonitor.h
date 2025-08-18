@@ -47,6 +47,7 @@ class AP_BattMonitor_Torqeedo;
 class AP_BattMonitor_FuelLevel_Analog;
 class AP_BattMonitor_EFI;
 class AP_BattMonitor_XKC_Y25_NPN;
+class AP_BattMonitor_CAN_BMS;
 
 class AP_BattMonitor
 {
@@ -71,6 +72,7 @@ class AP_BattMonitor
     friend class AP_BattMonitor_FuelLevel_Analog;
     friend class AP_BattMonitor_Synthetic_Current;
     friend class AP_BattMonitor_XKC_Y25_NPN;
+friend class AP_BattMonitor_CAN_BMS;
 
 public:
 
@@ -110,6 +112,7 @@ public:
         INA239_SPI                     = 27,
         EFI                            = 28,
 		XKC_Y25_NPN				   	   = 25,
+	CAN_BMS		       = 40,
     };
 
     FUNCTOR_TYPEDEF(battery_failsafe_handler_fn_t, void, const char *, const int8_t);
@@ -263,6 +266,34 @@ public:
 
     // cycle count
     bool get_cycle_count(uint8_t instance, uint16_t &cycles) const;
+
+    bool get_state_of_health(uint8_t instance,uint16_t &state_of_health) const;
+    uint8_t get_cell_count(uint8_t instance,uint8_t &cell_count) const;
+    uint16_t get_temp_kelvin(uint8_t instance, uint16_t &temp_kelvin) const;
+    bool get_unique_id(uint8_t instance, const uint8_t* &unique_id) const;
+    bool get_firmware_info(uint8_t instance, uint16_t &firm_info) const;
+    bool get_state_of_charge(uint8_t instance, uint16_t &state_of_charge) const;
+    bool get_capacity(uint8_t instance, uint32_t &cap) const;
+    bool get_temperature2(uint8_t instance, int16_t &temp) const;
+
+    bool get_battery_info(uint8_t instance, uint16_t &firm_info, const uint8_t* &unique_id) const;
+    bool get_VI_readings(uint8_t instance, uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
+			 float &batt_volt, float& batt_curr, float &batt_chr_volt) const;
+
+    bool get_min_max_cellVolt(uint8_t instance, float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
+    						    float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const;
+
+    bool get_min_max_temperature(uint8_t instance, int8_t &max_temp, uint8_t &max_temp_ntc_loc_cell, uint8_t &max_temp_ntc_loc_ctr,
+				 int8_t &min_temp, uint8_t &min_temp_ntc_loc_cell, uint8_t &min_temp_ntc_loc_ctr) const;
+
+    bool get_bms_relay_state(uint8_t instance,uint8_t &bms_state,bool &relay_charge, bool &relay_precharge,
+			     bool &relay_negative, bool &relay_positive) const;
+
+    bool get_cell_balancing_status(uint8_t instance, uint16_t &balancing_status_cc1, uint16_t &balancing_status_cc2,
+				   uint16_t &balancing_status_cc3, uint16_t &balancing_status_cc4) const;
+
+    bool get_faults_and_warnings(uint8_t instance, uint32_t &fault_flags, uint32_t &warning_flags) const;
+    bool get_temp_ntc_cell_count_and_voltages(uint8_t instance, const int8_t* &temperatures_ntc,uint8_t &cell_count_series, const uint16_t* &cell_voltages) const;
 
     // get battery resistance estimate in ohms
     float get_resistance() const { return get_resistance(AP_BATT_PRIMARY_INSTANCE); }
