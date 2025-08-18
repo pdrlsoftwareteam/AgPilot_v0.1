@@ -21,6 +21,7 @@
 #include "AP_BattMonitor_FuelLevel_Analog.h"
 #include "AP_BattMonitor_Synthetic_Current.h"
 #include "AP_BattMonitor_XKC_Y25_NPN.h"
+#include "AP_BattMonitor_CAN_BMS.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -381,6 +382,11 @@ AP_BattMonitor::init()
             case Type::XKC_Y25_NPN:
             	drivers[instance] = new AP_BattMonitor_XKC_Y25_NPN(*this, state[instance], _params[instance]);
             	break;
+
+		case Type::CAN_BMS:
+			drivers[instance] = new AP_BattMonitor_CAN_BMS(*this, state[instance], _params[instance]);
+			break;
+
             case Type::NONE:
             default:
                 break;
@@ -755,6 +761,141 @@ bool AP_BattMonitor::get_cycle_count(uint8_t instance, uint16_t &cycles) const
     }
     return drivers[instance]->get_cycle_count(cycles);
 }
+
+// return true if state_of_health can be provided and fills in state_of_health argument
+bool AP_BattMonitor::get_state_of_health(uint8_t instance, uint16_t &state_of_health) const
+{
+    if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+        return false;
+    }
+    return drivers[instance]->get_state_of_health(state_of_health);
+}
+
+uint8_t AP_BattMonitor::get_cell_count(uint8_t instance, uint8_t &cell_count) const
+{
+    if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+        return false;
+    }
+    return drivers[instance]->get_cell_count(cell_count);
+}
+
+uint16_t AP_BattMonitor::get_temp_kelvin(uint8_t instance, uint16_t &temp_kelvin) const
+{
+    if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+        return false;
+    }
+    return drivers[instance]->get_temp_kelvin(temp_kelvin);
+}
+
+bool AP_BattMonitor::get_unique_id(uint8_t instance, const uint8_t* &unique_id) const
+{
+  if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+          return false;
+      }
+      return drivers[instance]->get_unique_id(unique_id);
+}
+bool AP_BattMonitor::get_firmware_info(uint8_t instance, uint16_t &firm_info) const
+{
+  if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+          return false;
+      }
+      return drivers[instance]->get_firmware_info(firm_info);
+}
+bool AP_BattMonitor::get_state_of_charge(uint8_t instance, uint16_t &state_of_charge) const
+{
+  if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+          return false;
+      }
+      return drivers[instance]->get_state_of_charge(state_of_charge);
+}
+
+bool AP_BattMonitor::get_capacity(uint8_t instance, uint32_t &cap) const
+{
+  if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+          return false;
+      }
+      return drivers[instance]->get_capacity(cap);
+}
+bool AP_BattMonitor::get_temperature2(uint8_t instance, int16_t &temp) const
+{
+  if (instance >= _num_instances || (drivers[instance] == nullptr)) {
+          return false;
+      }
+      return drivers[instance]->get_temperature2(temp);
+}
+
+bool AP_BattMonitor::get_battery_info(uint8_t instance, uint16_t &firm_info, const uint8_t* &unique_id) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_battery_info(firm_info, unique_id);
+}
+
+bool AP_BattMonitor::get_VI_readings(uint8_t instance, uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
+                                     float &batt_volt, float &batt_curr, float &batt_chr_volt) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_VI_readings(SOC, SOH, capacity, batt_volt, batt_curr, batt_chr_volt);
+}
+
+bool AP_BattMonitor::get_min_max_cellVolt(uint8_t instance, float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
+                                          float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_min_max_cellVolt(max_cell_volt, max_cell_volt_cell_loc, max_cell_volt_cell_ctr,
+                                                   min_cell_volt, min_cell_volt_cell_loc, min_cell_volt_cell_ctr);
+}
+
+bool AP_BattMonitor::get_min_max_temperature(uint8_t instance, int8_t &max_temp, uint8_t &max_temp_ntc_loc_cell, uint8_t &max_temp_ntc_loc_ctr,
+                                             int8_t &min_temp, uint8_t &min_temp_ntc_loc_cell, uint8_t &min_temp_ntc_loc_ctr) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_min_max_temperature(max_temp, max_temp_ntc_loc_cell, max_temp_ntc_loc_ctr,
+                                                      min_temp, min_temp_ntc_loc_cell, min_temp_ntc_loc_ctr);
+}
+
+bool AP_BattMonitor::get_bms_relay_state(uint8_t instance, uint8_t &bms_state, bool &relay_charge,
+                                         bool &relay_precharge, bool &relay_negative, bool &relay_positive) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_bms_relay_state(bms_state, relay_charge, relay_precharge, relay_negative, relay_positive);
+}
+
+bool AP_BattMonitor::get_cell_balancing_status(uint8_t instance, uint16_t &balancing_status_cc1, uint16_t &balancing_status_cc2,
+                                               uint16_t &balancing_status_cc3, uint16_t &balancing_status_cc4) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_cell_balancing_status(balancing_status_cc1, balancing_status_cc2, balancing_status_cc3, balancing_status_cc4);
+}
+
+bool AP_BattMonitor::get_faults_and_warnings(uint8_t instance, uint32_t &fault_flags, uint32_t &warning_flags) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_faults_and_warnings(fault_flags, warning_flags);
+}
+
+bool AP_BattMonitor::get_temp_ntc_cell_count_and_voltages(uint8_t instance, const int8_t* &temperatures_ntc,
+                                                          uint8_t &cell_count_series, const uint16_t* &cell_voltages) const
+{
+    if (instance >= _num_instances || drivers[instance] == nullptr) {
+        return false;
+    }
+    return drivers[instance]->get_temp_ntc_cell_count_and_voltages(temperatures_ntc, cell_count_series, cell_voltages);
+}
+
 
 bool AP_BattMonitor::arming_checks(size_t buflen, char *buffer) const
 {

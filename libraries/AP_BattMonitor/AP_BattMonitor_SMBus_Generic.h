@@ -26,6 +26,7 @@ private:
     // check if PEC supported with the version value in SpecificationInfo() function
     // returns true once PEC is confirmed as working or not working
     bool check_pec_support();
+    uint8_t get_cell_count (uint8_t &count_cell) const override;
 
     uint8_t _pec_confirmed; // count of the number of times PEC has been confirmed as working
     uint32_t _last_cell_update_us[BATTMONITOR_SMBUS_NUM_CELLS_MAX]; // system time of last successful read of cell voltage
