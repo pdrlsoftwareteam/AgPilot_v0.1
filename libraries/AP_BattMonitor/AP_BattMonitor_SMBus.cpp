@@ -67,6 +67,22 @@ bool AP_BattMonitor_SMBus::get_cycle_count(uint16_t &cycles) const
 }
 
 /// read the battery_voltage and current, should be called at 10hz
+bool AP_BattMonitor_SMBus::get_state_of_health(uint16_t &state_of_health) const
+{
+    if (!_has_state_of_health) {
+        return false;
+    }
+    state_of_health = _state_of_health;
+    return true;
+}
+
+uint16_t AP_BattMonitor_SMBus::get_temp_kelvin(uint16_t &temp_kelvin) const
+{
+  temp_kelvin = kelvin_temp;
+  return temp_kelvin;
+}
+
+/// read the battery_voltage and current, should be called at 10hz
 void AP_BattMonitor_SMBus::read(void)
 {
     // nothing to be done here for actually interacting with the battery
@@ -119,6 +135,7 @@ void AP_BattMonitor_SMBus::read_temp(void)
         return;
     }
     _has_temperature = true;
+    kelvin_temp = data;
 
     _state.temperature_time = AP_HAL::millis();
     _state.temperature = KELVIN_TO_C(0.1f * data);
@@ -253,6 +270,16 @@ uint8_t AP_BattMonitor_SMBus::get_PEC(const uint8_t i2c_addr, uint8_t cmd, bool 
 
     // return result
     return crc;
+}
+
+// reads the battery's state of health
+void AP_BattMonitor_SMBus::read_state_of_health()
+{
+    // only read state of health once
+    if (_has_state_of_health) {
+        return;
+    }
+    _has_state_of_health = read_word(BATTMONITOR_SMBUS_STATE_OF_HEALTH, _state_of_health);
 }
 
 #endif  // AP_BATTERY_SMBUS_ENABLED

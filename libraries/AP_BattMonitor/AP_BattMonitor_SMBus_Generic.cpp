@@ -130,8 +130,15 @@ void AP_BattMonitor_SMBus_Generic::timer()
     read_serial_number();
 
     read_cycle_count();
+
+    read_state_of_health();
 }
 
+uint8_t AP_BattMonitor_SMBus_Generic::get_cell_count(uint8_t &count_cell) const
+{
+  count_cell = _cell_count;
+  return count_cell;
+}
 // check if PEC supported with the version value in SpecificationInfo() function
 // returns true once PEC is confirmed as working or not working
 bool AP_BattMonitor_SMBus_Generic::check_pec_support()
