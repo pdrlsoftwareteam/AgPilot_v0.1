@@ -23,6 +23,9 @@ public:
     // get distance upwards in meters. returns true on success
     bool get_upward_distance(float &distance) const override;
 
+    bool _orientation_connected_last[8] = {false};
+    bool _upward_connected_last = false;
+
 private:
 
     // horizontal distance support
