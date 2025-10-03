@@ -48,6 +48,7 @@ class AP_BattMonitor_FuelLevel_Analog;
 class AP_BattMonitor_EFI;
 class AP_BattMonitor_XKC_Y25_NPN;
 class AP_BattMonitor_CAN_BMS;
+class AP_BattMonitor_CAN_BMS_NEXUS;
 
 class AP_BattMonitor
 {
@@ -72,7 +73,8 @@ class AP_BattMonitor
     friend class AP_BattMonitor_FuelLevel_Analog;
     friend class AP_BattMonitor_Synthetic_Current;
     friend class AP_BattMonitor_XKC_Y25_NPN;
-friend class AP_BattMonitor_CAN_BMS;
+	friend class AP_BattMonitor_CAN_BMS;
+    friend class AP_BattMonitor_CAN_BMS_NEXUS;
 
 public:
 
@@ -113,6 +115,7 @@ public:
         EFI                            = 28,
 		XKC_Y25_NPN				   	   = 25,
 	CAN_BMS		       = 40,
+	CAN_BMS_NEXUS			= 41,
     };
 
     FUNCTOR_TYPEDEF(battery_failsafe_handler_fn_t, void, const char *, const int8_t);

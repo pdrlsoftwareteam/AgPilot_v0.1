@@ -39,7 +39,7 @@
 #include "AP_RangeFinder_USD1_CAN.h"
 #include "AP_RangeFinder_Benewake_CAN.h"
 #include "AP_RangeFinder_Lua.h"
-
+#include "AP_RangeFinder_USD1_CAN_IOTECH.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
@@ -222,6 +222,46 @@ void RangeFinder::update(void)
 #if HAL_LOGGING_ENABLED
     Log_RFND();
 #endif
+}
+bool RangeFinder::check_sensor_status()const
+{
+	for (uint8_t i=0; i<num_instances; i++) {
+		if (drivers[i] != nullptr) {
+			if ((Type)params[i].type.get() == Type::NONE || (Type)params[i].type.get() != Type::IOTECH) {
+				// allow user to disable a rangefinder at runtime
+				continue;
+			}
+			return drivers[i]->check_sensor_status();
+		}
+	}
+	return false;
+}
+
+
+void RangeFinder::get_iotech_rear_value(uint32_t &rx, uint32_t &ry) const
+{
+	for (uint8_t i=0; i<num_instances; i++) {
+		if (drivers[i] != nullptr) {
+			if ((Type)params[i].type.get() == Type::NONE || (Type)params[i].type.get() != Type::IOTECH) {
+				// allow user to disable a rangefinder at runtime
+				continue;
+			}
+			drivers[i]->get_iotech_rear_value(rx,ry);
+		}
+	}
+}
+
+void RangeFinder::get_iotech_front_value(uint32_t &fx, uint32_t &fy) const
+{
+	for (uint8_t i=0; i<num_instances; i++) {
+		if (drivers[i] != nullptr) {
+			if ((Type)params[i].type.get() == Type::NONE || (Type)params[i].type.get() != Type::IOTECH) {
+				// allow user to disable a rangefinder at runtime
+				continue;
+			}
+			drivers[i]->get_iotech_front_value(fx,fy);
+		}
+	}
 }
 
 float RangeFinder::getDist(){
@@ -422,6 +462,10 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
 #if AP_SCRIPTING_ENABLED
         _add_backend(new AP_RangeFinder_Lua(state[instance], params[instance]), instance);
 #endif
+		break;
+
+	case Type::IOTECH:
+		_add_backend(new AP_RangeFinder_USD1_CAN_IOTECH(state[instance], params[instance]), instance);
         break;
 
     case Type::NONE:

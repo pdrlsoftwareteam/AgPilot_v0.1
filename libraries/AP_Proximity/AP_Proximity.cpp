@@ -27,7 +27,7 @@
 #include "AP_Proximity_AirSimSITL.h"
 #include "AP_Proximity_Cygbot_D1.h"
 #include "AP_Proximity_DroneCAN.h"
-
+#include "AP_Proximity_IOTECH.h"
 #include <AP_Logger/AP_Logger.h>
 #include "GCS_MAVLink/GCS.h"
 
@@ -199,6 +199,11 @@ void AP_Proximity::init()
             drivers[instance] = new AP_Proximity_AirSimSITL(*this, state[instance], params[instance]);
             break;
 #endif
+
+		case Type::IOTECH:
+			state[instance].instance = instance;
+			drivers[instance] = new AP_Proximity_IOTECH(*this, state[instance], params[instance]);
+
         }
 
         if (drivers[instance] != nullptr) {

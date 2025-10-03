@@ -22,6 +22,7 @@
 #include "AP_BattMonitor_Synthetic_Current.h"
 #include "AP_BattMonitor_XKC_Y25_NPN.h"
 #include "AP_BattMonitor_CAN_BMS.h"
+#include "AP_BattMonitor_CAN_BMS_NEXUS.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -386,7 +387,9 @@ AP_BattMonitor::init()
 		case Type::CAN_BMS:
 			drivers[instance] = new AP_BattMonitor_CAN_BMS(*this, state[instance], _params[instance]);
 			break;
-
+		case Type::CAN_BMS_NEXUS:
+			drivers[instance] = new AP_BattMonitor_CAN_BMS_NEXUS(*this, state[instance], _params[instance]);
+			break;
             case Type::NONE:
             default:
                 break;

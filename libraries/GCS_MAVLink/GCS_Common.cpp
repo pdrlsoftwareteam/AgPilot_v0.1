@@ -356,6 +356,58 @@ void GCS_MAVLINK::send_smart_battery_status() const
                 manufacture_date
             );
         }
+        else if (battery.get_type(instance) == AP_BattMonitor::Type::CAN_BMS_NEXUS)
+        {
+            uint32_t temp_capacity_full = 0;
+            uint16_t temp_SOC = 0;
+            int16_t temp_temperature = 0;
+            if(battery.get_cell_count(instance, cells_in_series)){}
+            if(battery.get_state_of_health(instance, SOH)){}
+            if(battery.get_state_of_charge(instance, temp_SOC)){}
+            if(battery.get_capacity(instance,temp_capacity_full)){}
+            if(battery.get_temperature2(instance,temp_temperature)){}
+            if(battery.get_cycle_count(instance, cycle_count)){}
+            capacity_full = temp_capacity_full;
+            SOC = temp_SOC;
+            temp = temp_temperature;
+            // Device name for CAN battery
+            uint16_t firmware_info = 0;
+            if (!battery.get_firmware_info(instance, firmware_info)) {
+                firmware_info = 0; // default if not available
+            }
+            // Build device name as "mpower_<firmware_info>"
+            snprintf(device_name, sizeof(device_name), "Nexus_BMS_%u", firmware_info);
+            // Get 16-byte unique ID and convert to HEX string
+            const uint8_t* uid_ptr = nullptr;
+            if (battery.get_unique_id(instance, uid_ptr) && uid_ptr != nullptr) {
+        	memcpy(serial_number,uid_ptr,50);
+            } else {
+                strncpy(serial_number, "UNKNOWN", sizeof(serial_number) - 1);
+            }
+
+            uint16_t word = ((uint8_t)SOH << 8) | ((uint8_t)SOC & 0xff);
+
+            mavlink_msg_smart_battery_info_send(
+        	chan,
+                instance,                       //id
+                battery_function,
+                type,
+                capacity_full_spec,
+                capacity_full,
+                cycle_count,
+                serial_number,
+                device_name,
+		word,
+                0,                              //discharge_minimum_voltage
+                temp,                           //charging_minimum_voltage
+                0,                              //resting_minimum_voltage
+                0,                            //charging_maximum_voltage
+		cells_in_series,
+                0,                              //discharge_maximum_current
+                0,                             //discharge_maximum_burst_current
+                manufacture_date
+            );
+        }
         else
         {
             // Other battery types
@@ -382,145 +434,256 @@ void GCS_MAVLINK::send_smart_battery_status() const
                 0,                             //discharge_maximum_burst_current
                 manufacture_date
             );
+
         }
         last_batt_info_idx = instance;
     }
 }
 
+//void GCS_MAVLINK::send_can_bms_battery_status() const
+//{
+//  static uint8_t last_batt_info_idx = 0;
+//
+//  AP_BattMonitor &battery = AP::battery();
+//  const uint8_t num_instances = battery.num_instances();
+//
+//  for (uint8_t i = 0; i < num_instances; i++) {
+//      const uint8_t instance = (last_batt_info_idx + 1) % num_instances;
+//
+//      if (battery.get_type(instance) == AP_BattMonitor::Type::NONE) {
+//          last_batt_info_idx = instance;
+//          continue;
+//      }
+//
+//      if(battery.get_type(i) == AP_BattMonitor::Type::CAN_BMS || battery.get_type(i) == AP_BattMonitor::Type::CAN_BMS_NEXUS)
+//	{
+//           uint16_t firmware_info;       // divide by 100
+//           const uint8_t* uid_str;
+//
+//           uint16_t SOC;                 // divide by 10
+//           uint16_t SOH;                 // divide by 10
+//           uint32_t capacity;            // divide by 1000 (mAh)
+//           float batt_volt;              // divide by 1000 (mV)
+//           float batt_curr;              // divide by 1000 then subtract 1500 (mA)
+//           float batt_chr_volt;          // divide by 100 (mV)
+//
+//           float max_cell_volt;          // divide by 1000 (mV)
+//           uint8_t max_cell_volt_cell_loc;
+//           uint8_t max_cell_volt_cell_ctr;
+//           float min_cell_volt;          // divide by 1000 (mV)
+//           uint8_t min_cell_volt_cell_loc;
+//           uint8_t min_cell_volt_cell_ctr;
+//
+//           int8_t max_temp;              // offset -128
+//           uint8_t max_temp_ntc_loc_cell;
+//           uint8_t max_temp_ntc_loc_ctr;
+//           int8_t min_temp;              // offset -128
+//           uint8_t min_temp_ntc_loc_cell;
+//           uint8_t min_temp_ntc_loc_ctr;
+//
+//           uint8_t bms_state;
+//           bool relay_precharge;
+//           bool relay_charge;
+//           bool relay_negative;
+//           bool relay_positive;
+//
+//           uint16_t balancing_status_cc1;
+//           uint16_t balancing_status_cc2;
+//           uint16_t balancing_status_cc3;
+//           uint16_t balancing_status_cc4;
+//
+//           uint32_t fault_flags;
+//           uint32_t warning_flags;
+//
+//           const int8_t* temperatures_ntc;   // NTC1 - NTC7
+//           const uint16_t* cell_voltages;   // 14 per controller, max 2 controllers (use 12 if 12S only)
+//           uint8_t cell_count_series;
+//
+//	  if(!battery.get_battery_info(instance,firmware_info,uid_str))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS firmware info");
+//	    }
+//	  if(!battery.get_VI_readings(instance,SOC,SOH,capacity,batt_volt,batt_curr,batt_chr_volt))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS VI readings");
+//	    }
+//	  if(!battery.get_min_max_cellVolt(instance,max_cell_volt,max_cell_volt_cell_loc,max_cell_volt_cell_ctr,
+//						    min_cell_volt,min_cell_volt_cell_loc,min_cell_volt_cell_ctr))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS min max cell volt readings");
+//	    }
+//	  if(!battery.get_min_max_temperature(instance,max_temp,max_temp_ntc_loc_cell,max_temp_ntc_loc_ctr,
+//						       min_temp,min_temp_ntc_loc_cell,min_temp_ntc_loc_ctr))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS min max cell temperature readings");
+//	    }
+//	  if(!battery.get_bms_relay_state(instance,bms_state,relay_charge,relay_precharge,relay_negative,relay_positive))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS bms relay readings");
+//	    }
+//	  if(!battery.get_cell_balancing_status(instance,balancing_status_cc1,balancing_status_cc2,balancing_status_cc3,balancing_status_cc4))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS cell balancing readings");
+//
+//	    }
+//	  if(!battery.get_faults_and_warnings(instance,fault_flags,warning_flags))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS fault and warning readings");
+//	    }
+//	  if(!battery.get_temp_ntc_cell_count_and_voltages(instance,temperatures_ntc,cell_count_series,cell_voltages))
+//	    {
+////	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS ntc and cell voltage readings");
+//	    }
+//	  mavlink_msg_can_bms_status_send( chan,
+//					   instance,
+//					   firmware_info,
+//					   reinterpret_cast<const char*>(uid_str),
+//					   SOC,
+//					   SOH,
+//					   capacity,
+//					   batt_volt,
+//					   batt_curr,
+//					   batt_chr_volt,
+//					   max_cell_volt,
+//					   max_cell_volt_cell_loc,
+//					   max_cell_volt_cell_ctr,
+//					   min_cell_volt,
+//					   min_cell_volt_cell_loc,
+//					   min_cell_volt_cell_ctr,
+//					   max_temp,
+//					   max_temp_ntc_loc_cell,
+//					   max_temp_ntc_loc_ctr,
+//					   min_temp,
+//					   min_temp_ntc_loc_cell,
+//					   min_temp_ntc_loc_ctr,
+//					   bms_state,
+//					   relay_precharge,
+//					   relay_charge,
+//					   relay_negative,
+//					   relay_positive,
+//					   balancing_status_cc1,
+//					   balancing_status_cc2,
+//					   balancing_status_cc3,
+//					   balancing_status_cc4,
+//					   fault_flags,
+//					   warning_flags,
+//					   temperatures_ntc,
+//					   cell_voltages,
+//					   cell_count_series);
+//	}
+//      last_batt_info_idx = instance;
+//    }
+//}
+
 void GCS_MAVLINK::send_can_bms_battery_status() const
 {
-  static uint8_t last_batt_info_idx = 0;
+    AP_BattMonitor &battery = AP::battery();
+    const uint8_t num_instances = battery.num_instances();
 
-  AP_BattMonitor &battery = AP::battery();
-  const uint8_t num_instances = battery.num_instances();
+    for (uint8_t instance = 0; instance < num_instances; instance++) {
 
-  for (uint8_t i = 0; i < num_instances; i++) {
-      const uint8_t instance = (last_batt_info_idx + 1) % num_instances;
+        if (battery.get_type(instance) != AP_BattMonitor::Type::CAN_BMS &&
+            battery.get_type(instance) != AP_BattMonitor::Type::CAN_BMS_NEXUS) {
+            continue;   // skip non-CAN BMS
+        }
 
-      if (battery.get_type(instance) == AP_BattMonitor::Type::NONE) {
-          last_batt_info_idx = instance;
-          continue;
-      }
+        // ----------- Variables with safe defaults -------------
+        uint16_t firmware_info = 0;
+        const uint8_t* uid_str = nullptr;
 
-      if(battery.get_type(i) == AP_BattMonitor::Type::CAN_BMS)
-	{
-           uint16_t firmware_info;       // divide by 100
-           const uint8_t* uid_str;
+        uint16_t SOC = 0, SOH = 0;
+        uint32_t capacity = 0;
+        float batt_volt = 0, batt_curr = 0, batt_chr_volt = 0;
 
-           uint16_t SOC;                 // divide by 10
-           uint16_t SOH;                 // divide by 10
-           uint32_t capacity;            // divide by 1000 (mAh)
-           float batt_volt;              // divide by 1000 (mV)
-           float batt_curr;              // divide by 1000 then subtract 1500 (mA)
-           float batt_chr_volt;          // divide by 100 (mV)
+        float max_cell_volt = 0, min_cell_volt = 0;
+        uint8_t max_cell_volt_cell_loc = 0, max_cell_volt_cell_ctr = 0;
+        uint8_t min_cell_volt_cell_loc = 0, min_cell_volt_cell_ctr = 0;
 
-           float max_cell_volt;          // divide by 1000 (mV)
-           uint8_t max_cell_volt_cell_loc;
-           uint8_t max_cell_volt_cell_ctr;
-           float min_cell_volt;          // divide by 1000 (mV)
-           uint8_t min_cell_volt_cell_loc;
-           uint8_t min_cell_volt_cell_ctr;
+        int8_t max_temp = 0, min_temp = 0;
+        uint8_t max_temp_ntc_loc_cell = 0, max_temp_ntc_loc_ctr = 0;
+        uint8_t min_temp_ntc_loc_cell = 0, min_temp_ntc_loc_ctr = 0;
 
-           int8_t max_temp;              // offset -128
-           uint8_t max_temp_ntc_loc_cell;
-           uint8_t max_temp_ntc_loc_ctr;
-           int8_t min_temp;              // offset -128
-           uint8_t min_temp_ntc_loc_cell;
-           uint8_t min_temp_ntc_loc_ctr;
+        uint8_t bms_state = 0;
+        bool relay_precharge = false, relay_charge = false;
+        bool relay_negative = false, relay_positive = false;
 
-           uint8_t bms_state;
-           bool relay_precharge;
-           bool relay_charge;
-           bool relay_negative;
-           bool relay_positive;
+        uint16_t balancing_status_cc1 = 0, balancing_status_cc2 = 0;
+        uint16_t balancing_status_cc3 = 0, balancing_status_cc4 = 0;
 
-           uint16_t balancing_status_cc1;
-           uint16_t balancing_status_cc2;
-           uint16_t balancing_status_cc3;
-           uint16_t balancing_status_cc4;
+        uint32_t fault_flags = 0, warning_flags = 0;
 
-           uint32_t fault_flags;
-           uint32_t warning_flags;
+        const int8_t* temperatures_ntc = nullptr;
+        const uint16_t* cell_voltages = nullptr;
+        uint8_t cell_count_series = 0;
 
-           const int8_t* temperatures_ntc;   // NTC1 - NTC7
-           const uint16_t* cell_voltages;   // 14 per controller, max 2 controllers (use 12 if 12S only)
-           uint8_t cell_count_series;
+        // ----------- Fetch values (ignore failure) -------------
+        if(battery.get_battery_info(instance, firmware_info, uid_str)){}
+        if(battery.get_VI_readings(instance, SOC, SOH, capacity, batt_volt, batt_curr, batt_chr_volt)){}
+        if(battery.get_min_max_cellVolt(instance, max_cell_volt, max_cell_volt_cell_loc, max_cell_volt_cell_ctr,
+                                     min_cell_volt, min_cell_volt_cell_loc, min_cell_volt_cell_ctr)){}
+        if(battery.get_min_max_temperature(instance, max_temp, max_temp_ntc_loc_cell, max_temp_ntc_loc_ctr,
+                                        min_temp, min_temp_ntc_loc_cell, min_temp_ntc_loc_ctr)){}
+        if(battery.get_bms_relay_state(instance, bms_state, relay_charge, relay_precharge,
+                                    relay_negative, relay_positive)){}
+        if(battery.get_cell_balancing_status(instance, balancing_status_cc1, balancing_status_cc2,
+                                          balancing_status_cc3, balancing_status_cc4)){}
+        if(battery.get_faults_and_warnings(instance, fault_flags, warning_flags)){}
+        if(battery.get_temp_ntc_cell_count_and_voltages(instance, temperatures_ntc, cell_count_series, cell_voltages)){}
 
-	  if(!battery.get_battery_info(instance,firmware_info,uid_str))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS firmware info");
-	    }
-	  if(!battery.get_VI_readings(instance,SOC,SOH,capacity,batt_volt,batt_curr,batt_chr_volt))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS VI readings");
-	    }
-	  if(!battery.get_min_max_cellVolt(instance,max_cell_volt,max_cell_volt_cell_loc,max_cell_volt_cell_ctr,
-						    min_cell_volt,min_cell_volt_cell_loc,min_cell_volt_cell_ctr))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS min max cell volt readings");
-	    }
-	  if(!battery.get_min_max_temperature(instance,max_temp,max_temp_ntc_loc_cell,max_temp_ntc_loc_ctr,
-						       min_temp,min_temp_ntc_loc_cell,min_temp_ntc_loc_ctr))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS min max cell temperature readings");
-	    }
-	  if(!battery.get_bms_relay_state(instance,bms_state,relay_charge,relay_precharge,relay_negative,relay_positive))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS bms relay readings");
-	    }
-	  if(!battery.get_cell_balancing_status(instance,balancing_status_cc1,balancing_status_cc2,balancing_status_cc3,balancing_status_cc4))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS cell balancing readings");
+        // ----------- Safety defaults for pointers -------------
+        if (uid_str == nullptr) {
+            static const char empty_uid[] = "";
+            uid_str = reinterpret_cast<const uint8_t*>(empty_uid);
+        }
+        if (temperatures_ntc == nullptr) {
+            static int8_t dummy_temps[7] = {0};
+            temperatures_ntc = dummy_temps;
+        }
+        if (cell_voltages == nullptr) {
+            static uint16_t dummy_voltages[28] = {0};
+            cell_voltages = dummy_voltages;
+        }
 
-	    }
-	  if(!battery.get_faults_and_warnings(instance,fault_flags,warning_flags))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS fault and warning readings");
-	    }
-	  if(!battery.get_temp_ntc_cell_count_and_voltages(instance,temperatures_ntc,cell_count_series,cell_voltages))
-	    {
-	      gcs().send_text(MAV_SEVERITY_INFO, "Failed to get CAN-BMS ntc and cell voltage readings");
-	    }
-	  mavlink_msg_can_bms_status_send( chan,
-					   instance,
-					   firmware_info,
-					   reinterpret_cast<const char*>(uid_str),
-					   SOC,
-					   SOH,
-					   capacity,
-					   batt_volt,
-					   batt_curr,
-					   batt_chr_volt,
-					   max_cell_volt,
-					   max_cell_volt_cell_loc,
-					   max_cell_volt_cell_ctr,
-					   min_cell_volt,
-					   min_cell_volt_cell_loc,
-					   min_cell_volt_cell_ctr,
-					   max_temp,
-					   max_temp_ntc_loc_cell,
-					   max_temp_ntc_loc_ctr,
-					   min_temp,
-					   min_temp_ntc_loc_cell,
-					   min_temp_ntc_loc_ctr,
-					   bms_state,
-					   relay_precharge,
-					   relay_charge,
-					   relay_negative,
-					   relay_positive,
-					   balancing_status_cc1,
-					   balancing_status_cc2,
-					   balancing_status_cc3,
-					   balancing_status_cc4,
-					   fault_flags,
-					   warning_flags,
-					   temperatures_ntc,
-					   cell_voltages,
-					   cell_count_series);
-	}
-      last_batt_info_idx = instance;
+        // ----------- Send MAVLink message -------------
+        mavlink_msg_can_bms_status_send(chan,
+                                        instance,
+                                        firmware_info,
+                                        reinterpret_cast<const char*>(uid_str),
+                                        SOC,
+                                        SOH,
+                                        capacity,
+                                        batt_volt,
+                                        batt_curr,
+                                        batt_chr_volt,
+                                        max_cell_volt,
+                                        max_cell_volt_cell_loc,
+                                        max_cell_volt_cell_ctr,
+                                        min_cell_volt,
+                                        min_cell_volt_cell_loc,
+                                        min_cell_volt_cell_ctr,
+                                        max_temp,
+                                        max_temp_ntc_loc_cell,
+                                        max_temp_ntc_loc_ctr,
+                                        min_temp,
+                                        min_temp_ntc_loc_cell,
+                                        min_temp_ntc_loc_ctr,
+                                        bms_state,
+                                        relay_precharge,
+                                        relay_charge,
+                                        relay_negative,
+                                        relay_positive,
+                                        balancing_status_cc1,
+                                        balancing_status_cc2,
+                                        balancing_status_cc3,
+                                        balancing_status_cc4,
+                                        fault_flags,
+                                        warning_flags,
+                                        temperatures_ntc,
+                                        cell_voltages,
+                                        cell_count_series);
     }
 }
+
 
 void GCS_MAVLINK::send_battery_status(const uint8_t instance) const
 {
@@ -1952,7 +2115,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-//    if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+   if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -5978,14 +6141,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-//        if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-//        {
+       if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+       {
 		 	last_heartbeat_time = AP_HAL::millis();
-//			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-//			else
-//				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-//        }
+			else
+				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+       }
         break;
 
     case MSG_HWSTATUS:

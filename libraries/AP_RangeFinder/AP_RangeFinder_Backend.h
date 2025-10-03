@@ -31,6 +31,9 @@ public:
 
     // update the state structure
     virtual void update() = 0;
+    virtual void get_iotech_rear_value(uint32_t &rx, uint32_t &ry);
+    virtual void get_iotech_front_value(uint32_t &fx, uint32_t &fy);
+    virtual bool check_sensor_status();
     virtual void init_serial(uint8_t serial_instance) {};
 
     virtual void handle_msg(const mavlink_message_t &msg) { return; }

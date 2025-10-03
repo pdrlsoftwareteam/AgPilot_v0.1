@@ -14,6 +14,9 @@ public:
     AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint8_t mlowerByte = 0, uint8_t muppertByte = 0, uint8_t msensId = 0);
 
     void update() override;
+    void get_iotech_rear_value(uint32_t &rx, uint32_t &ry)override {};
+    void get_iotech_front_value(uint32_t &fx, uint32_t &fy) override{};
+    bool check_sensor_status()override { return false;}
     
 protected:
     virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {

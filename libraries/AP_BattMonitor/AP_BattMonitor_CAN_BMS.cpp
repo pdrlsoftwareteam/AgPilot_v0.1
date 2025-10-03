@@ -28,13 +28,17 @@ AP_BattMonitor_CAN_BMS::AP_BattMonitor_CAN_BMS(AP_BattMonitor &mon,
 {
   //  AP_Param::setup_object_defaults(this, var_info);
   //  _state.var_info = var_info;
-  gcs().send_text(MAV_SEVERITY_NOTICE,"inside AP_BattMonitor_CAN_BMS");
   TEST_CAN::getInstance();
   TEST_CAN::getInstance()->set_monitor(this);
 }
 
 void AP_BattMonitor_CAN_BMS::read(){
+  const uint32_t tnow_us = AP_HAL::micros();
 
+  // timeout after 5 seconds
+  if ((tnow_us - _state.last_time_micros) > 10000000) {
+      _state.healthy = false;
+  }
 }
 
 void AP_BattMonitor_CAN_BMS::read_frame(){
@@ -102,6 +106,7 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	_state.voltage = Battery_info.batt_volt;
 	_state.current_amps = Battery_info.batt_curr;
 	_has_current = true;
+	_state.healthy = true;
 //	gcs().send_text(MAV_SEVERITY_INFO, "batt Volt: %fV  batt curr: %fAmp  Charger Volt: %fV",batt_volt, batt_curr, batt_chr_volt);
 
       }
@@ -216,8 +221,12 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
     default:
       break;
   }
-
-  _state.healthy = true;
+  const uint32_t tnow_us = AP_HAL::micros();
+  const uint32_t dt_us = tnow_us - _state.last_time_micros;
+  if (_state.healthy && has_current()) {
+      update_consumed(_state, dt_us);
+      _state.last_time_micros = tnow_us;
+  }
   //  send_gcs_bms_status();
 }
 
