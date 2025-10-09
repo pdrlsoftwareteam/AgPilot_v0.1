@@ -593,6 +593,7 @@ void GCS_MAVLINK::send_can_bms_battery_status() const
 
         uint16_t SOC = 0, SOH = 0;
         uint32_t capacity = 0;
+        uint32_t remaining_capacity = 0;
         float batt_volt = 0, batt_curr = 0, batt_chr_volt = 0;
 
         float max_cell_volt = 0, min_cell_volt = 0;
@@ -629,6 +630,7 @@ void GCS_MAVLINK::send_can_bms_battery_status() const
                                           balancing_status_cc3, balancing_status_cc4)){}
         if(battery.get_faults_and_warnings(instance, fault_flags, warning_flags)){}
         if(battery.get_temp_ntc_cell_count_and_voltages(instance, temperatures_ntc, cell_count_series, cell_voltages)){}
+        if(battery.get_remaining_capacity(instance,remaining_capacity)){}
 
         // ----------- Safety defaults for pointers -------------
         if (uid_str == nullptr) {
@@ -652,6 +654,7 @@ void GCS_MAVLINK::send_can_bms_battery_status() const
                                         SOC,
                                         SOH,
                                         capacity,
+					remaining_capacity,
                                         batt_volt,
                                         batt_curr,
                                         batt_chr_volt,
@@ -2115,7 +2118,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-   if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+   // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -6141,13 +6144,13 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-       if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+       // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
        {
 		 	last_heartbeat_time = AP_HAL::millis();
-			if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			// if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-			else
-				AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+			// else
+				// AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
        }
         break;
 

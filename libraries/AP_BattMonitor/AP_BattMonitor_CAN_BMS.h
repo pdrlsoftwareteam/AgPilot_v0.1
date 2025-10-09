@@ -69,6 +69,7 @@ public:
     bool has_current() const override { return _has_current; }
     bool has_consumed_energy() const override { return has_current(); }
     bool has_cell_voltages() const override { return _has_cell_voltages; }
+    bool get_remaining_capacity(uint32_t &rem_cap) const override;
 
     // Optional init if needed
     void init() override {}
@@ -84,7 +85,7 @@ public:
             uint16_t SOC;                 // divide by 10
             uint16_t SOH;                 // divide by 10
             uint32_t capacity;            // divide by 1000 (mAh)
-
+            uint32_t remaining_capacity;  // divide by 1000 (mAh)
             // ID 0x131 - Battery Voltage, Current, Charger Voltage
             float batt_volt;              // divide by 1000 (mV)
             float batt_curr;              // divide by 1000 then subtract 1500 (mA)

@@ -116,6 +116,24 @@ void AP_BattMonitor_CAN_BMS_NEXUS::parse_frame(uint32_t id, uint8_t* byte) {
 
 //	gcs().send_text(MAV_SEVERITY_INFO,"Remaining_Capacity: %u %u %u",(byte[0]<<8 | byte[1]), byte[0] , byte[1]);
 //	gcs().send_text(MAV_SEVERITY_INFO,"Usable_Capacity: %u Ah",byte[7]);
+	Battery_info.remaining_capacity = byte[7] * 1000;
+
+	// Check if total and remaining values are valid
+	if (_params._pack_capacity > 0) {
+
+	    // If remaining is greater than total, treat as invalid and skip update
+	    if (Battery_info.remaining_capacity > _params._pack_capacity) {
+		// Optionally log or clamp values
+		Battery_info.remaining_capacity = _params._pack_capacity;
+	    }
+
+	    // Calculate consumed mAh directly
+	    _state.consumed_mah = _params._pack_capacity - Battery_info.remaining_capacity;
+	}
+	else
+	  {
+	    _state.consumed_mah = 0;
+	  }
       }
       break;
     case 0x18FF8284:
@@ -245,9 +263,9 @@ void AP_BattMonitor_CAN_BMS_NEXUS::parse_frame(uint32_t id, uint8_t* byte) {
       break;
   }
   const uint32_t tnow_us = AP_HAL::micros();
-  const uint32_t dt_us = tnow_us - _state.last_time_micros;
+//  const uint32_t dt_us = tnow_us - _state.last_time_micros;
   if (_state.healthy && has_current()) {
-      update_consumed(_state, dt_us);
+      update_consumed_from_remaining(_state);
       _state.last_time_micros = tnow_us;
   }
   //  send_gcs_bms_status();
@@ -284,6 +302,12 @@ bool AP_BattMonitor_CAN_BMS_NEXUS::get_state_of_charge(uint16_t &state_of_charge
 bool AP_BattMonitor_CAN_BMS_NEXUS::get_capacity(uint32_t &cap) const
 {
   cap = Battery_info.capacity;
+  return true;
+}
+
+bool AP_BattMonitor_CAN_BMS_NEXUS::get_remaining_capacity(uint32_t &rem_cap) const
+{
+  rem_cap = Battery_info.remaining_capacity;
   return true;
 }
 

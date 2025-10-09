@@ -33,6 +33,8 @@ public:
     bool get_VI_readings(uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
                          float &batt_volt, float &batt_curr, float &batt_chr_volt) const override { return false; }
 
+    bool get_remaining_capacity(uint32_t &rem_cap) const override {return false;}
+
     bool get_min_max_cellVolt(float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
                               float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const override { return false; }
 

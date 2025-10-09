@@ -38,7 +38,7 @@ public:
     bool get_capacity(uint32_t &cap) const override;
     uint8_t get_cell_count(uint8_t &count_cell) const override;
     bool get_temperature2(int16_t &temp) const override;
-
+    bool get_remaining_capacity(uint32_t &rem_cap) const override;
     bool get_battery_info(uint16_t &firm_info,const uint8_t* &uniq_id) const override;
 
     bool get_VI_readings(uint16_t &SOC, uint16_t &SOH, uint32_t &capacity,
@@ -86,6 +86,7 @@ public:
             uint16_t SOC;                 // divide by 10
             uint16_t SOH;                 // divide by 10
             uint32_t capacity;            // divide by 1000 (mAh)
+            uint32_t remaining_capacity;  // divide by 1000 (mAh)
 
             // ID 0x131 - Battery Voltage, Current, Charger Voltage
             float batt_volt;              // divide by 1000 (mV)

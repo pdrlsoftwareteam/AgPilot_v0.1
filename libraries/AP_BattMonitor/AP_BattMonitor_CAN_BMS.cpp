@@ -95,6 +95,20 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	Battery_info.SOH = ((byte[3] << 8) | byte[2]) / 10;
 	Battery_info.capacity = ((byte[6] << 16) | (byte[5] << 8) | byte[4]);
 	//	gcs().send_text(MAV_SEVERITY_INFO, "SOC: %u  SOH: %u  Capacity: %lu mAh", SOC, SOH, capacity);
+
+	Battery_info.remaining_capacity = _params._pack_capacity - _state.consumed_mah;
+	if (_params._pack_capacity > 0) {
+
+	    // If remaining is greater than total, treat as invalid and skip update
+	    if (Battery_info.remaining_capacity > _params._pack_capacity) {
+		// Optionally log or clamp values
+		Battery_info.remaining_capacity = _params._pack_capacity;
+	    }
+	}
+	else
+	  {
+	    Battery_info.remaining_capacity = 0;
+	  }
       }
       break;
 
@@ -261,6 +275,12 @@ bool AP_BattMonitor_CAN_BMS::get_state_of_charge(uint16_t &state_of_charge) cons
 bool AP_BattMonitor_CAN_BMS::get_capacity(uint32_t &cap) const
 {
   cap = Battery_info.capacity;
+  return true;
+}
+
+bool AP_BattMonitor_CAN_BMS::get_remaining_capacity(uint32_t &rem_cap) const
+{
+  rem_cap = Battery_info.remaining_capacity;
   return true;
 }
 

@@ -844,6 +844,15 @@ bool AP_BattMonitor::get_VI_readings(uint8_t instance, uint16_t &SOC, uint16_t &
     return drivers[instance]->get_VI_readings(SOC, SOH, capacity, batt_volt, batt_curr, batt_chr_volt);
 }
 
+bool AP_BattMonitor::get_remaining_capacity(uint8_t instance, uint32_t &rem_cap) const
+{
+  if (instance >= _num_instances || drivers[instance] == nullptr) {
+      return false;
+  }
+  return drivers[instance]->get_remaining_capacity(rem_cap);
+}
+
+
 bool AP_BattMonitor::get_min_max_cellVolt(uint8_t instance, float &max_cell_volt, uint8_t &max_cell_volt_cell_loc, uint8_t &max_cell_volt_cell_ctr,
                                           float &min_cell_volt, uint8_t &min_cell_volt_cell_loc, uint8_t &min_cell_volt_cell_ctr) const
 {
