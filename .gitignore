@@ -36,7 +36,7 @@
 *.vbrain
 *.vrx
 *.zip
-!Bhumi_modules_03_10_2025.zip
+!bhumi_mavlink_09_10_2025.zip
 !Tools/autotest/tilecache/**/*.zip
 *~
 .*.swo
