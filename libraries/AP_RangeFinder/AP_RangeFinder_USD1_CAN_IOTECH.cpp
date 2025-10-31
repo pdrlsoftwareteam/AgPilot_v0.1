@@ -72,7 +72,7 @@ void AP_RangeFinder_USD1_CAN_IOTECH::update(void)
 
     // --- Staggered CAN send ---
     static uint32_t last_send_ms = 0;
-    static bool send_first_frame = true;
+//    static bool send_first_frame = true;
 
     if (now - last_send_ms >= 10) {
         last_send_ms = now;
@@ -91,7 +91,7 @@ void AP_RangeFinder_USD1_CAN_IOTECH::update(void)
         int32_t lat = latitude * 1000000;
         int32_t lon = longitude * 1000000;
 
-        if (send_first_frame) {
+//        if (send_first_frame) {
             // Frame 1: latitude + longitude
             AP_HAL::CANFrame frame1;
             frame1.id = 0xAFF | AP_HAL::CANFrame::FlagEFF;
@@ -111,8 +111,8 @@ void AP_RangeFinder_USD1_CAN_IOTECH::update(void)
 //                gcs().send_text(MAV_SEVERITY_INFO, "Frame1 failed");
             }
 
-            send_first_frame = false;  // next time send frame2
-        } else {
+//            send_first_frame = false;  // next time send frame2
+//        } else {
             // Frame 2: heading + params
 
             AP_HAL::CANFrame frame2;
@@ -129,8 +129,8 @@ void AP_RangeFinder_USD1_CAN_IOTECH::update(void)
 //                gcs().send_text(MAV_SEVERITY_INFO, "Frame2 failed");
             }
 
-            send_first_frame = true;   // next time send frame1
-        }
+//            send_first_frame = true;   // next time send frame1
+//        }
     }
     update_sensor_status();
 }
@@ -201,33 +201,28 @@ void AP_CANDataDistribuer_IOTECH::handle_frame(AP_HAL::CANFrame &frame)
             return;
         }
 
-        if (raw_id == 0xCF)
-        {
-            static uint32_t last_alt = 0;   // stores last valid altitude
+	for(int i = 0; i < totalDeviceHandled;i++)
+	{
+		if (raw_id == 0xCF)
+		{
+//			static uint32_t last_alt = 0;   // stores last valid altitude
 
-            uint32_t alt = 0;
-            alt |= (frame.data[0]);
-            alt |= (frame.data[1] << 8);
-            alt |= (frame.data[2] << 16);
-            alt |= (frame.data[3] << 24);
+			uint32_t alt = 0;
+			alt |= (frame.data[0]);
+			alt |= (frame.data[1] << 8);
+			alt |= (frame.data[2] << 16);
+			alt |= (frame.data[3] << 24);
 
-            // Convert to meters (scaled down)
-            uint32_t altitude_val = (uint16_t)(alt / 10000);
-
-            // If altitude is zero, fall back to last known non-zero altitude
-            if (altitude_val == 0 && last_alt != 0) {
-                altitude_val = last_alt;
-            } else if (altitude_val != 0) {
-                last_alt = altitude_val;  // update last_alt if new valid value
-            }
-
-            rngfndInst[0]->_distance_sum += altitude_val * 0.01f;   // convert cm → m if needed
-            rngfndInst[0]->_distance_count++;
-
-            return;
-        }
-
-
+			// Convert to meters (scaled down)
+			uint32_t altitude_val = (uint16_t)(alt / 10000);
+		    // --- Protection: if value ≥ 16 meters, set to zero ---
+		    if (altitude_val >= rngfndInst[i]->max_distance_cm()) {   // 1600 cm = 16 m
+		        altitude_val = 0;
+		    }
+			rngfndInst[i]->_distance_sum += altitude_val * 0.01f;   // convert cm → m if needed
+			rngfndInst[i]->_distance_count++;
+		}
+	}
         return; // unknown frame
 }
 bool AP_CANDataDistribuer_IOTECH::write_frame(AP_HAL::CANFrame &out_frame, const uint64_t timeout_us)

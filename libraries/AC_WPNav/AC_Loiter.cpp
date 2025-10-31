@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AC_Loiter.h"
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-
+#include <stdio.h>
 extern const AP_HAL::HAL& hal;
 
 #define LOITER_SPEED_DEFAULT                800.0f // default loiter speed in cm/s
@@ -33,7 +33,9 @@ const AP_Param::GroupInfo AC_Loiter::var_info[] = {
     // @Range: 20 3500
     // @Increment: 50
     // @User: Standard
-    AP_GROUPINFO("SPEED", 2, AC_Loiter, _speed_cms, LOITER_SPEED_DEFAULT),
+    AP_GROUPINFO("SPEED", 2, AC_Loiter, _max_speed_cms, LOITER_SPEED_DEFAULT),
+    AP_GROUPINFO("LIM_SPEED", 7, AC_Loiter, _speed_cms, LOITER_SPEED_DEFAULT),
+
 
     // @Param: ACC_MAX
     // @DisplayName: Loiter maximum correction acceleration
@@ -188,6 +190,18 @@ float AC_Loiter::get_angle_max_cd() const
 /// run the loiter controller
 void AC_Loiter::update(bool avoidance_on)
 {
+  float speed = _speed_cms;  // dynamic read — AP_Float supports implicit float conversion
+  float test_speed = _max_speed_cms;
+
+  printf("Inside loiter update _test_speed_cms: %f\t_speed_cms: %f\n", test_speed, speed);
+
+  if (speed > test_speed) {
+      _speed_cms.set(test_speed);  // updates AP_Float storage
+  }
+  if(speed < 20.0f)
+    {
+      _speed_cms.set(20.0);  // updates AP_Float storage
+    }
     calc_desired_velocity(avoidance_on);
     _pos_control.update_xy_controller();
 }

@@ -203,6 +203,7 @@ void AP_Proximity::init()
 		case Type::IOTECH:
 			state[instance].instance = instance;
 			drivers[instance] = new AP_Proximity_IOTECH(*this, state[instance], params[instance]);
+			break;
 
         }
 

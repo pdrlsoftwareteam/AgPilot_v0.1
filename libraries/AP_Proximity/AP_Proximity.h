@@ -38,7 +38,7 @@ class AP_Proximity
 public:
     friend class AP_Proximity_Backend;
     friend class AP_Proximity_DroneCAN;
-
+    friend class AP_Proximity_IOTECH;
     AP_Proximity();
 
     /* Do not allow copies */

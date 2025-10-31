@@ -293,7 +293,7 @@ float RangeFinder::getDist(){
 		return back_dist;
 	}
 
-	return 0;
+	return -1;
 }
 
 bool RangeFinder::_add_backend(AP_RangeFinder_Backend *backend, uint8_t instance, uint8_t serial_instance)
