@@ -96,6 +96,26 @@ public:
 	void handleHashToSign(mavlink_command_transfer_t* packet);
 	void parseCommand(const mavlink_message_t &msg);
 	void sendSdcardStatus();
+	void sendcmd();
+	bool start = 0;
+	char nma_uid_str[64] = {0};
+	void sendGPSID(mavlink_channel_t);
+
+	uint64_t time_usec;
+	uint8_t hw_version_major;
+	uint8_t hw_version_minor;
+	uint8_t hw_unique_id[64] = {};
+	uint8_t sw_version_major;
+	uint8_t sw_version_minor;
+	uint32_t sw_vcs_commit;
+	char name[80] = {0};
+	bool isRequested = false;
 };
+
+namespace AP {
+AP_PDRL_COMMANDER *pdrl_commander();
+};
+
+
 
 #endif /* KEYSTORE_HPP_ */

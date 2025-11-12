@@ -88,6 +88,7 @@ public:
 		UAV_R21_FRONT = 38,
 		UAV_R21_BACK = 39,
         Lua_Scripting = 40,
+		IOTECH = 50,
         SIM = 100,
     };
 
@@ -173,6 +174,9 @@ public:
     // methods to return a distance on a particular orientation from
     // any sensor which can current supply it
     float distance_orient(enum Rotation orientation) const;
+    bool check_sensor_status() const;
+    void get_iotech_rear_value(uint32_t &rx, uint32_t &ry) const;
+    void get_iotech_front_value(uint32_t &fx, uint32_t &fy) const;
     uint16_t distance_cm_orient(enum Rotation orientation) const;
     int16_t max_distance_cm_orient(enum Rotation orientation) const;
     int16_t min_distance_cm_orient(enum Rotation orientation) const;

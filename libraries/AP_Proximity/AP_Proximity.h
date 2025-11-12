@@ -38,7 +38,7 @@ class AP_Proximity
 public:
     friend class AP_Proximity_Backend;
     friend class AP_Proximity_DroneCAN;
-
+    friend class AP_Proximity_IOTECH;
     AP_Proximity();
 
     /* Do not allow copies */
@@ -61,6 +61,7 @@ public:
 #endif
         CYGBOT_D1 = 13,
         DroneCAN = 14,
+	IOTECH = 15,
     };
 
     enum class Status {

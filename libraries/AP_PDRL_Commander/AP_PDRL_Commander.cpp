@@ -63,6 +63,35 @@ void AP_PDRL_COMMANDER::sendDroneID()
 	sendCommand(0,COMMAND_GET_DRONE_ID,COMMAND_TYPE_RESPONSE,0,sizeof(droneIDBuffer),0,droneIDBuffer); //COMMAND_GET_DRONE_ID,droneIDBuffer,30,COMMAND_TYPE_RESPONSE,0);
 }
 
+void AP_PDRL_COMMANDER::sendGPSID(mavlink_channel_t chan_m)
+{
+ //   GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS UID: %s", nma_uid_str);
+
+	uint32_t uptime_sec = 123456;              // Uptime
+
+	bool is_valid_uid = false ;
+	for (size_t i = 0; i < 64; ++i) {
+		if (hw_unique_id[i] != 0) {
+			is_valid_uid = true;
+			break;
+		}
+	}
+	if(is_valid_uid){
+		mavlink_msg_uavcan_node_info_send(
+				chan_m,
+				time_usec,
+				uptime_sec,
+				name,
+				hw_version_major,
+				hw_version_minor,
+				hw_unique_id,
+				sw_version_major,
+				sw_version_minor,
+				sw_vcs_commit
+		);
+	}
+}
+
 void AP_PDRL_COMMANDER::sendKey()
 {
 	//	uint16_t keyLen = 0;
@@ -413,11 +442,11 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		// End section oemName
 
 		strcpy(oemName,"m");
-				//if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
-				//{
-				//	lastUnlock = AP_HAL::millis();
-				//	isUnlocked = true;
-				//}
+	// 					if(memcmp((void*)packet.command_buff,(void*)oemName,strlen(oemName)) == 0)
+	// 					{
+	// 						lastUnlock = AP_HAL::millis();
+	// 						isUnlocked = true;
+	// 					}
 	}
 	break;
 
@@ -543,7 +572,8 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_PDRL_ENUM_END:
 		break;
 
-
+	case COMMAND_GET_DRONE_GPS_ID:
+		break;
 	}
 }
 

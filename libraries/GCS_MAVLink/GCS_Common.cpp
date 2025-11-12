@@ -363,6 +363,27 @@ void GCS_MAVLINK::send_battery_status(const uint8_t instance) const
 #endif
 }
 
+bool GCS_MAVLINK::send_gps_info()
+{
+    uint32_t uptime_sec = 123456;              // Uptime
+
+    AP_PDRL_COMMANDER *pdrl_commander = AP_PDRL_COMMANDER::getInstance();
+    mavlink_msg_uavcan_node_info_send(
+        chan,
+		pdrl_commander->time_usec,
+        uptime_sec,
+		pdrl_commander->name,
+		pdrl_commander->hw_version_major,
+		pdrl_commander->hw_version_minor,
+		pdrl_commander->hw_unique_id,
+		pdrl_commander->sw_version_major,
+		pdrl_commander->sw_version_minor,
+		pdrl_commander->sw_vcs_commit
+    );
+    return true;
+}
+
+
 // returns true if all battery instances were reported
 bool GCS_MAVLINK::send_battery_status()
 {
@@ -975,6 +996,7 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_DEEPSTALL,             MSG_LANDING},
         { MAVLINK_MSG_ID_EXTENDED_SYS_STATE,    MSG_EXTENDED_SYS_STATE},
         { MAVLINK_MSG_ID_AUTOPILOT_VERSION,     MSG_AUTOPILOT_VERSION},
+		{ MAVLINK_MSG_ID_UAVCAN_NODE_INFO,     MSG_UAVCAN_NODE_INFO},
 #if HAL_EFI_ENABLED
         { MAVLINK_MSG_ID_EFI_STATUS,            MSG_EFI_STATUS},
 #endif
@@ -1666,7 +1688,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
     }
-    // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
+   // if ((msg.sysid != sysid_my_gcs()) || AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked() || (msg.msgid == MAVLINK_MSG_ID_COMMAND_TRANSFER))
     handleMessage(msg);
 }
 
@@ -5673,6 +5695,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 {
     bool ret = true;
 
+    static uint32_t gps_send_t = AP_HAL::millis();
     switch(id) {
 
     case MSG_ATTITUDE:
@@ -5692,14 +5715,14 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_HEARTBEAT:
         CHECK_PAYLOAD_SIZE(HEARTBEAT);
-        // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
-        // {
+       // if(AP_PDRL_COMMANDER::getInstance()->isGcsUnlocked())
+        {
 		 	last_heartbeat_time = AP_HAL::millis();
-		// 	if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
+			// if(last_heartbeat_time - AP_PDRL_COMMANDER::getInstance()->getLastUnlock() < 10000)
         		send_heartbeat();
-		// 	else
-		// 		AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
-        // }
+			// else
+				// AP_PDRL_COMMANDER::getInstance()->setIsUnock(false);
+        }
         break;
 
     case MSG_HWSTATUS:
@@ -5749,6 +5772,16 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_BATTERY_STATUS:
         send_battery_status();
         break;
+
+    case MSG_UAVCAN_NODE_INFO:
+    {
+        if(AP_HAL::millis() - gps_send_t > 10000)
+        {
+            AP_PDRL_COMMANDER::getInstance()->sendGPSID(chan);
+            gps_send_t = AP_HAL::millis();
+        }
+    }
+    	break;
 
 #if AP_MAVLINK_BATTERY2_ENABLED
     case MSG_BATTERY2:

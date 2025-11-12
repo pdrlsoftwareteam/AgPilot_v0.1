@@ -18,7 +18,9 @@ public:
     using AP_RangeFinder_Backend::AP_RangeFinder_Backend;
 
     void update() override;
-
+    void get_iotech_rear_value(uint32_t &rx, uint32_t &ry) override{};
+    void get_iotech_front_value(uint32_t &fx, uint32_t &fy) override{};
+    bool check_sensor_status()override { return false;}
     static void subscribe_msgs(AP_UAVCAN* ap_uavcan);
     static AP_RangeFinder_UAVCAN* get_uavcan_backend(AP_UAVCAN* ap_uavcan, uint8_t node_id, uint8_t address, bool create_new);
     static AP_RangeFinder_Backend* detect(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params);

@@ -65,6 +65,27 @@ void AP_RangeFinder_Backend::update_status()
     }
 }
 
+void AP_RangeFinder_Backend::get_iotech_rear_value(uint32_t& rx, uint32_t& ry)
+{
+    // Default implementation: backends that don’t support IOTECH
+    // just return false
+    rx = 0.0f;
+    ry = 0.0f;
+}
+
+bool AP_RangeFinder_Backend::check_sensor_status()
+{
+  return false;
+}
+
+void AP_RangeFinder_Backend::get_iotech_front_value(uint32_t & fx, uint32_t& fy)
+{
+    // Default implementation: backends that don’t support IOTECH
+    // just return false
+    fx = 0.0f;
+    fy = 0.0f;
+}
+
 // set status and update valid count
 void AP_RangeFinder_Backend::set_status(RangeFinder::Status _status)
 {

@@ -19,7 +19,9 @@ public:
     AP_RangeFinder_Benewake_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params);
 
     void update() override;
-
+    void get_iotech_rear_value(uint32_t &rx, uint32_t &ry) override{};
+    void get_iotech_front_value(uint32_t &fx, uint32_t &fy) override{};
+    bool check_sensor_status() override{ return false;}
     // handler for incoming frames. Return true if consumed
     bool handle_frame(AP_HAL::CANFrame &frame);
     bool handle_frame_H30(AP_HAL::CANFrame &frame);
