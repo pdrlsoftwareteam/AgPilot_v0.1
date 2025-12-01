@@ -261,7 +261,7 @@ void AP_Proximity_IOTECH::send_frame()
 	static uint32_t last_send_ms = 0;
 	static bool send_first_frame = true;
 
-	if (now - last_send_ms >= 50) {
+	if (now - last_send_ms >= 10) {
 		last_send_ms = now;
 		float latitude  = 12.345678f;    // degrees
 		float longitude = 98.765432f;

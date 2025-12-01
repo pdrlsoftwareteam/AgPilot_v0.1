@@ -255,21 +255,6 @@ bool AP_BattMonitor_Backend::reset_remaining(float percentage)
     return true;
 }
 
-
-void AP_BattMonitor_Backend::update_consumed_from_remaining(AP_BattMonitor::BattMonitor_State &state)
-{
-
-        // Calculate consumed Wh (approximation)
-        state.consumed_wh = (state.consumed_mah * state.voltage) * 0.001f;  // mAh * V → Wh
-
-        // Ensure bounds
-        if (state.consumed_mah < 0.0f) {
-            state.consumed_mah = 0.0f;
-        } else if (state.consumed_mah > _params._pack_capacity) {
-            state.consumed_mah = _params._pack_capacity;
-        }
-}
-
 /*
   update consumed mAh and Wh
  */

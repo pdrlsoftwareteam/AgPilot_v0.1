@@ -24,10 +24,7 @@ void Copter::fence_check()
     if (new_breaches) {
 
         if (!copter.ap.land_complete) {
-            if(!(flightmode->mode_number() == Mode::Number::LAND || flightmode->mode_number() == Mode::Number::RTL))
-            {
-                GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Fence Breached");
-            }
+            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Fence Breached");
         }
 
         // if the user wants some kind of response and motors are armed

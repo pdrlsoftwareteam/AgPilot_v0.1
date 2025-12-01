@@ -20,4 +20,3 @@
 bool sdcard_init();
 void sdcard_stop();
 bool sdcard_retry();
-bool sdcard_is_inserted();

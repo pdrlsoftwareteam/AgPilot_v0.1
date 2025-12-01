@@ -3,43 +3,43 @@
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
 {
-	// put your initialisation code here
-	// this will be called once at start-up
+    // put your initialisation code here
+    // this will be called once at start-up
 }
 #endif
 
 #ifdef USERHOOK_FASTLOOP
 void Copter::userhook_FastLoop()
 {
-	// put your 100Hz code here
+    // put your 100Hz code here
 }
 #endif
 
 #ifdef USERHOOK_50HZLOOP
 void Copter::userhook_50Hz()
 {
-	// put your 50Hz code here
+    // put your 50Hz code here
 }
 #endif
 
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
-	// put your 10Hz code here
+    // put your 10Hz code here
 }
 #endif
 
 #ifdef USERHOOK_SLOWLOOP
 void Copter::userhook_SlowLoop()
 {
-	// put your 3.3Hz code here
+    // put your 3.3Hz code here
 }
 #endif
 
 #ifdef USERHOOK_SUPERSLOWLOOP
 void Copter::userhook_SuperSlowLoop()
 {
-	// put your 1Hz code here
+    // put your 1Hz code here
 	// @Values: 0:Undefined, 1:Quad, 2:Hexa, 3:Octa, 4:OctaQuad, 5:Y6, 6:Heli, 7:Tri, 8:SingleCopter, 9:CoaxCopter, 10:BiCopter, 11:Heli_Dual, 12:DodecaHexa, 13:HeliQuad, 14:Deca, 15:Scripting Matrix, 16:6DoF Scripting, 17:Dynamic Scripting Matrix
 	// @Values: 0:Plus, 1:X, 2:V, 3:H, 4:V-Tail, 5:A-Tail, 10:Y6B, 11:Y6F, 12:BetaFlightX, 13:DJIX, 14:ClockwiseX, 15: I, 18: BetaFlightXReversed, 19:Y4
 	//Quad - + (1,0)	//Quad - X (1,1)
@@ -181,16 +181,16 @@ void Copter::userhook_SuperSlowLoop()
 #ifdef USERHOOK_AUXSWITCH
 void Copter::userhook_auxSwitch1(const RC_Channel::AuxSwitchPos ch_flag)
 {
-	// put your aux switch #1 handler here (CHx_OPT = 47)
+    // put your aux switch #1 handler here (CHx_OPT = 47)
 }
 
 void Copter::userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag)
 {
-	// put your aux switch #2 handler here (CHx_OPT = 48)
+    // put your aux switch #2 handler here (CHx_OPT = 48)
 }
 
 void Copter::userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag)
 {
-	// put your aux switch #3 handler here (CHx_OPT = 49)
+    // put your aux switch #3 handler here (CHx_OPT = 49)
 }
 #endif

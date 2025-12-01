@@ -88,7 +88,7 @@ public:
 
     // HAL::Callbacks implementation.
     void loop() override final;
-    void check_task(void);
+
     // set_mode *must* set control_mode_reason
     virtual bool set_mode(const uint8_t new_mode, const ModeReason reason) = 0;
     virtual uint8_t get_mode() const = 0;

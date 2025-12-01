@@ -239,7 +239,15 @@ float AP_Proximity::getDist(){
 
 	    Proximity_Distance_Array dist_array{};
 	    get_horizontal_distances(dist_array);
+	if(dist_array.distance[0] >= dist_array.distance[4])
+	    return dist_array.distance[4];
+	else if(dist_array.distance[0] <= dist_array.distance[4])
 	    return dist_array.distance[0];
+	else
+	    return 0;
+	//	    return dist_array.distance[0];
+	//	    printf("prx dist: %f\n",dist_array.distance[0]);
+//	gcs().send_text(MAV_SEVERITY_INFO, "[0]: %f\t [1]: %f\t[2]: %f",dist_array.distance[0],dist_array.distance[1],dist_array.distance[2]);
 //	    printf("prx dist: %f\n",dist_array.distance[0]);
 //		gcs().send_text(MAV_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
 

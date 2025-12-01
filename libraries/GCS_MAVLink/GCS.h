@@ -335,8 +335,6 @@ public:
     void send_mcu_status(void);
 #endif
     void send_battery_status(const uint8_t instance) const;
-    void send_smart_battery_status() const;
-    void send_can_bms_battery_status() const;
     bool send_battery_status();
     void send_distance_sensor();
     // send_rangefinder sends only if a downward-facing instance is

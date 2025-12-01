@@ -151,7 +151,7 @@ void AC_Sprayer::update()
 
 	bool should_be_spraying = 1;
 
-    if(ground_speed < 30.0f)
+    if(ground_speed < 15.0f)
     {
     	should_be_spraying = false;
     }

@@ -554,6 +554,7 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
     MSG_MAG_CAL_PROGRESS,
     MSG_EKF_STATUS_REPORT,
     MSG_VIBRATION,
+	MSG_UAVCAN_NODE_INFO,
 #if AP_RPM_ENABLED
     MSG_RPM,
 #endif
@@ -563,8 +564,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #if HAL_EFI_ENABLED
     MSG_EFI_STATUS,
 #endif
-    MSG_SMART_BATTERY_INFO,
-    MSG_CAN_BMS_STATUS
 };
 static const ap_message STREAM_PARAMS_msgs[] = {
     MSG_NEXT_PARAM
