@@ -35,8 +35,6 @@
 *.tlog.raw
 *.vbrain
 *.vrx
-*.zip
-!bhumi_mavlink_09_10_2025.zip
 !Tools/autotest/tilecache/**/*.zip
 *~
 .*.swo
