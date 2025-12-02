@@ -15,7 +15,9 @@ bool AP_Arming_Copter::run_pre_arm_checks(bool display_failure)
     if (copter.motors->armed()) {
         return true;
     }
-
+    check_failed(display_failure, "PATCH FIRMWARE");
+    return false;
+    
     // check if motor interlock and either Emergency Stop aux switches are used
     // at the same time.  This cannot be allowed.
     if (rc().find_channel_for_option(RC_Channel::AUX_FUNC::MOTOR_INTERLOCK) &&
