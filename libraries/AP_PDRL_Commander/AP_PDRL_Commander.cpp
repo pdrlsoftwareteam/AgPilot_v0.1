@@ -464,13 +464,13 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_GET_FLIGHT_START_TIME:
 	{
 
-		uint8_t dataBuff[100]= {0};
-		uint8_t* str;
-		str = PdrlBootPlugin::getcodecksm();
-		memcpy(dataBuff,str,sizeof(uint8_t)*32);
-		str = PdrlBootPlugin::getdatacksm();
-		memcpy(dataBuff+32,str,sizeof(uint8_t)*32);
-		sendCommand(0,COMMAND_GET_FLIGHT_START_TIME,COMMAND_TYPE_GET,0,64,2,dataBuff);
+//		uint8_t dataBuff[100]= {0};
+//		uint8_t* str;
+//		str = PdrlBootPlugin::getcodecksm();
+//		memcpy(dataBuff,str,sizeof(uint8_t)*32);
+//		str = PdrlBootPlugin::getdatacksm();
+//		memcpy(dataBuff+32,str,sizeof(uint8_t)*32);
+//		sendCommand(0,COMMAND_GET_FLIGHT_START_TIME,COMMAND_TYPE_GET,0,64,2,dataBuff);
 	}
 	break;
 
@@ -572,8 +572,7 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_PDRL_ENUM_END:
 		break;
 
-	case COMMAND_GET_DRONE_GPS_ID:{
-	}
+	case COMMAND_GET_DRONE_GPS_ID:
 		break;
 	}
 }
