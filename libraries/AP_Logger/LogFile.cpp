@@ -27,18 +27,24 @@ void AP_Logger_Backend::Fill_Format(const struct LogStructure *s, struct log_For
     pkt.head1 = HEAD_BYTE1;
     pkt.head2 = HEAD_BYTE2;
     pkt.msgid = LOG_FORMAT_MSG;
-    pkt.type = s->msg_type ^ 0x6E;
-    pkt.length = s->msg_len ^ 0x8B;
+    pkt.type = s->msg_type;
+    pkt.length = s->msg_len;
+    strncpy_noterm(pkt.name, s->name, sizeof(pkt.name));
+    strncpy_noterm(pkt.format, s->format, sizeof(pkt.format));
+    strncpy_noterm(pkt.labels, s->labels, sizeof(pkt.labels));
 
-    for (size_t i = 0; i < sizeof(pkt.name); i++) {
-        pkt.name[i] = s->name[i] ^ 0x6B;
-    }
-    for (size_t i = 0; i < sizeof(pkt.format); i++) {
-        pkt.format[i] = s->format[i] ^ 0xA9;
-    }
-    for (size_t i = 0; i < sizeof(pkt.labels); i++) {
-        pkt.labels[i] = s->labels[i] ^ 0x3E;
-    }
+    // pkt.type = s->msg_type ^ 0x6E;
+    // pkt.length = s->msg_len ^ 0x8B;
+
+    // for (size_t i = 0; i < sizeof(pkt.name); i++) {
+    //     pkt.name[i] = s->name[i] ^ 0x6B;
+    // }
+    // for (size_t i = 0; i < sizeof(pkt.format); i++) {
+    //     pkt.format[i] = s->format[i] ^ 0xA9;
+    // }
+    // for (size_t i = 0; i < sizeof(pkt.labels); i++) {
+    //     pkt.labels[i] = s->labels[i] ^ 0x3E;
+    // }
 }
 
 /*

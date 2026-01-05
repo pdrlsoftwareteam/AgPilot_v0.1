@@ -432,24 +432,16 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
 
     case Type::USD1_CAN:
 #if AP_RANGEFINDER_USD1_CAN_ENABLED
-        _add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance]), instance);
+		_add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],0x00), instance);
 #endif
         break;
 
-    case Type::Radar_H30:
-    	_add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],4,5,0xc8), instance);
+	case Type::RADAR_OBSTACLE:
+		_add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],0x7FE), instance);
     	break;
 
-    case Type::NEW_ALTIMETER:
-        _add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],4,5,0xd6), instance);
-        break;
-
-    case Type::UAV_R21_FRONT:
-    	_add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],4,5,0xdc), instance);
-		break;
-
-    case Type::UAV_R21_BACK:
-        _add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],4,5,0xdd), instance);
+	case Type::DEBUG:
+		_add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance],0x7FF), instance);
     	break;
 
     case Type::Benewake_CAN:

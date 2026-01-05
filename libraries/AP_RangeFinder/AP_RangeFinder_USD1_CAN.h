@@ -7,17 +7,17 @@
 #define AP_RANGEFINDER_USD1_CAN_ENABLED (HAL_MAX_CAN_PROTOCOL_DRIVERS && AP_RANGEFINDER_BACKEND_DEFAULT_ENABLED)
 #endif
 
-#if AP_RANGEFINDER_USD1_CAN_ENABLED
+//#if AP_RANGEFINDER_USD1_CAN_ENABLED
 
 class AP_RangeFinder_USD1_CAN :  public AP_RangeFinder_Backend {
 public:
-    AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint8_t mlowerByte = 0, uint8_t muppertByte = 0, uint8_t msensId = 0);
+	AP_RangeFinder_USD1_CAN(RangeFinder::RangeFinder_State &_state, AP_RangeFinder_Params &_params, uint32_t msensId = 0);
 
     void update() override;
     void get_iotech_rear_value(uint32_t &rx, uint32_t &ry)override {};
     void get_iotech_front_value(uint32_t &fx, uint32_t &fy) override{};
     bool check_sensor_status()override { return false;}
-    
+
 protected:
     virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
         return MAV_DISTANCE_SENSOR_RADAR;
@@ -25,9 +25,14 @@ protected:
 public:
     float _distance_sum;
     uint32_t _distance_count;
-    uint8_t _sensId = 0;
+    uint32_t _sensId;
     uint8_t _lowerByte=0, _upperByte=0;
+    uint8_t _arr[4];
+    uint32_t _msg_byte;
+    bool sen_status = false;
     HAL_Semaphore *_msem;
+    uint16_t _min_dist;
+    uint32_t prev_valid_cm;
 };
 
 
@@ -37,6 +42,7 @@ class AP_CANDataDistribuer : public CANSensor
 	AP_RangeFinder_USD1_CAN *rngfndInst[3];
 	uint8_t totalDeviceHandled = 0;
 public:
+	uint32_t now_us = AP_HAL::millis();
 	static AP_CANDataDistribuer* getInstance(){
 		if(instance == nullptr)
 			instance = new AP_CANDataDistribuer();
@@ -59,4 +65,4 @@ public:
 };
 
 
-#endif  // AP_RANGEFINDER_USD1_CAN_ENABLED
+//#endif  // AP_RANGEFINDER_USD1_CAN_ENABLED

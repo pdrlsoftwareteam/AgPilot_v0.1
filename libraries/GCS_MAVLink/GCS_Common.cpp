@@ -1426,6 +1426,7 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_DEEPSTALL,             MSG_LANDING},
         { MAVLINK_MSG_ID_EXTENDED_SYS_STATE,    MSG_EXTENDED_SYS_STATE},
         { MAVLINK_MSG_ID_AUTOPILOT_VERSION,     MSG_AUTOPILOT_VERSION},
+		{ MAVLINK_MSG_ID_UAVCAN_NODE_INFO,     MSG_UAVCAN_NODE_INFO},
 #if HAL_EFI_ENABLED
         { MAVLINK_MSG_ID_EFI_STATUS,            MSG_EFI_STATUS},
 #endif
@@ -6125,6 +6126,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 {
     bool ret = true;
 
+    static uint32_t gps_send_t = AP_HAL::millis();
     switch(id) {
 
     case MSG_ATTITUDE:
@@ -6200,6 +6202,17 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 
     case MSG_BATTERY_STATUS:
         send_battery_status();
+        break;
+
+    case MSG_UAVCAN_NODE_INFO:
+    {
+        if(AP_PDRL_COMMANDER::getInstance()->node_received || (AP_HAL::millis() - gps_send_t > 10000))
+        {
+            AP_PDRL_COMMANDER::getInstance()->sendGPSID(chan);
+            gps_send_t = AP_HAL::millis();
+            AP_PDRL_COMMANDER::getInstance()->node_received = false;
+        }
+    }
         break;
 
     case MSG_SMART_BATTERY_INFO:
