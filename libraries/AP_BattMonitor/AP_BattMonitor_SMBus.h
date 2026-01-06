@@ -106,7 +106,7 @@ protected:
     void read_remaining_capacity(void);
 
     // return a scaler that should be multiplied by the battery's reported capacity numbers to arrive at the actual capacity in mAh
-    virtual uint16_t get_capacity_scaler() const { return 1; }
+    virtual uint16_t get_capacity_scaler() const { return 10; }
 
     // reads the temperature word from the battery
     virtual void read_temp(void);

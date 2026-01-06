@@ -316,7 +316,7 @@ void GCS_MAVLINK::handle_param_set(const mavlink_message_t &msg)
 			return;
         }
     }
-	printf("Param Write successful: %s\n",(char *)packet.param_id);
+
 //	gcs().send_text(MAV_SEVERITY_WARNING,"Param Write successful: %s\n",key);
 	AP_PDRL_COMMANDER::getInstance()->sendCommand(0,COMMAND_SEND_PARAM_ACK,COMMAND_TYPE_GET,1,strlen(key),2,(uint8_t*)key);
 
@@ -479,7 +479,6 @@ uint8_t GCS_MAVLINK::send_parameter_async_replies()
             return async_replies_sent_count;
         }
         reserve_param_space_start_ms = saved_reserve_param_space_start_ms;
-
         mavlink_msg_param_value_send(
             reply.chan,
             reply.param_name,

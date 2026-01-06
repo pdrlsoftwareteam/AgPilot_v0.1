@@ -1,5 +1,7 @@
-- Improved H30/R21f/b driver changes.
-- Log file encoding removed.
-- Auto Mode obstacle avoidance rear sensor added.
-- DroneCAN GPS-ID fetching and sennding algorithm.
-- Smart Battery parameters sending mavlink message implementation.
+- Changed sd card directories name APM to PDRL.
+- Changed compass field direction in mmc5xx3 compass driver.
+- Added tank empty functionality using fuelflow sensor.
+- Changed vehicle type in firmware "ArduCopter" to "BhuMI v0.1".
+- Added new parameters to defaults.parm file.
+- Added/adjusted servo1-6 parameter to simplify motor pin connection.
+- Created new build board type as AeroFC.

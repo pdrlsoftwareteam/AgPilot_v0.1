@@ -27,6 +27,8 @@ public:
     float _distance_sum;
     uint32_t _distance_count;
     HAL_Semaphore *_msem;
+	uint16_t _min_dist;
+	bool sen_status = false;
 };
 
 

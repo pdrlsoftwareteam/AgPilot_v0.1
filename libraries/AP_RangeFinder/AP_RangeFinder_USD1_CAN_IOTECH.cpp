@@ -14,6 +14,7 @@ AP_RangeFinder_Backend(_state, _params)
 {
   _distance_count = 0;
   _distance_sum = 0;
+  _min_dist = _params.min_distance_cm;
 
   AP_CANDataDistribuer_IOTECH::getInstance()->addCANDataListener(this);
 }
@@ -52,23 +53,26 @@ void AP_RangeFinder_USD1_CAN_IOTECH::update(void)
 {
     WITH_SEMAPHORE(_sem);
     const uint32_t now = AP_HAL::millis();
-//    gcs().send_text(MAV_SEVERITY_INFO,"Fr x:%ld y:%ld Rr x: %ld y: %ld Altitude: %ld\n",
-//				AP_CANDataDistribuer_IOTECH::getInstance()->front.x,
-//				AP_CANDataDistribuer_IOTECH::getInstance()->front.y,
-//				AP_CANDataDistribuer_IOTECH::getInstance()->rear.x,
-//				AP_CANDataDistribuer_IOTECH::getInstance()->rear.y,
-//				AP_CANDataDistribuer_IOTECH::getInstance()->altitude);
-
-    if (_distance_count == 0 && now - state.last_reading_ms > 500) {
-        // no new data.
-        set_status(RangeFinder::Status::NoData);
-    } else if (_distance_count != 0) {
-        state.distance_m = _distance_sum / _distance_count;
-        state.last_reading_ms = now;
-        _distance_sum = 0;
-        _distance_count = 0;
-        update_status();
+    if (_distance_count == 0 && now - state.last_reading_ms > 500 && !sen_status) {
+      // no new data.
+      state.distance_m = 0;
+      set_status(RangeFinder::Status::NoData);
     }
+    else if(_distance_count == 0 && now - state.last_reading_ms > 500 && sen_status) {
+      state.distance_m = _min_dist*0.01;
+      state.last_reading_ms = now;
+      sen_status = false;
+      set_status(RangeFinder::Status::Good);
+    }
+    else if (_distance_count != 0) {
+      state.distance_m = _distance_sum / _distance_count;
+      state.last_reading_ms = now;
+      _distance_sum = 0;
+      _distance_count = 0;
+      sen_status = false;
+      update_status();
+    }
+
 
     // --- Staggered CAN send ---
     static uint32_t last_send_ms = 0;
@@ -213,10 +217,19 @@ void AP_CANDataDistribuer_IOTECH::handle_frame(AP_HAL::CANFrame &frame)
 			alt |= (frame.data[2] << 16);
 			alt |= (frame.data[3] << 24);
 
+
 			// Convert to meters (scaled down)
 			uint32_t altitude_val = (uint16_t)(alt / 10000);
+            
+            rngfndInst[i]->sen_status = true;
+
+            if(altitude_val == 0)
+            {
+                continue;
+            }
+            
 		    // --- Protection: if value ≥ 16 meters, set to zero ---
-		    if (altitude_val >= rngfndInst[i]->max_distance_cm()) {   // 1600 cm = 16 m
+		    if (altitude_val >= (uint32_t)rngfndInst[i]->max_distance_cm()) {   // 1600 cm = 16 m
 		        altitude_val = 0;
 		    }
 			rngfndInst[i]->_distance_sum += altitude_val * 0.01f;   // convert cm → m if needed

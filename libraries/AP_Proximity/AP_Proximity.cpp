@@ -248,8 +248,8 @@ float AP_Proximity::getDist(){
 	//	    return dist_array.distance[0];
 	//	    printf("prx dist: %f\n",dist_array.distance[0]);
 //	gcs().send_text(MAV_SEVERITY_INFO, "[0]: %f\t [1]: %f\t[2]: %f",dist_array.distance[0],dist_array.distance[1],dist_array.distance[2]);
-//	    printf("prx dist: %f\n",dist_array.distance[0]);
-//		gcs().send_text(MAV_SEVERITY_INFO, "prx_dist[0]: %f",dist_array.distance[0]);
+//	gcs().send_text(MAV_SEVERITY_INFO, "[3]: %f\t [4]: %f\t[5]: %f",dist_array.distance[3],dist_array.distance[4],dist_array.distance[5]);
+//	gcs().send_text(MAV_SEVERITY_INFO, "[6]: %f\t [7]: %f\t[8]: %f",dist_array.distance[6],dist_array.distance[7],dist_array.distance[8]);
 
 }
 AP_Proximity::Type AP_Proximity::get_type(uint8_t instance) const

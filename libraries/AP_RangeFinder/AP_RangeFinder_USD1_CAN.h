@@ -17,7 +17,7 @@ public:
     void get_iotech_rear_value(uint32_t &rx, uint32_t &ry)override {};
     void get_iotech_front_value(uint32_t &fx, uint32_t &fy) override{};
     bool check_sensor_status()override { return false;}
-
+    
 protected:
     virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
         return MAV_DISTANCE_SENSOR_RADAR;

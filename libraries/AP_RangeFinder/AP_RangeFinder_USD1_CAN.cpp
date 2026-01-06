@@ -115,7 +115,7 @@ void AP_CANDataDistribuer::handle_frame(AP_HAL::CANFrame &frame)
       uint32_t raw = dist_cm;
 
       // 1) Too far (>= max) → process as zero
-      if (raw >= rngfndInst[i]->max_distance_cm()) {
+      if (raw >= (uint32_t)rngfndInst[i]->max_distance_cm()) {
           dist_cm = 0;
           rngfndInst[i]->_distance_sum += 0.01f * dist_cm;
           rngfndInst[i]->_distance_count++;
