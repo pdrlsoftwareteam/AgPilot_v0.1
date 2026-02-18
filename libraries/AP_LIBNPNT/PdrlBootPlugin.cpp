@@ -110,7 +110,7 @@ void PdrlBootPlugin::checksum_config_error(const char *reason)
 
 void PdrlBootPlugin::handleChecksumStatus()
 {
-//	return;
+	// return;
 #if DISABLE_CHECKSUM_VERIFICATION
     return;
 #endif

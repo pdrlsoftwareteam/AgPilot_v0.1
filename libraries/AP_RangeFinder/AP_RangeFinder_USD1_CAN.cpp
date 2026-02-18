@@ -112,36 +112,47 @@ void AP_CANDataDistribuer::handle_frame(AP_HAL::CANFrame &frame)
       }
       rngfndInst[i]->sen_status = true;
 
-      uint32_t raw = dist_cm;
+      if(rngfndInst[i]->orientation() == 25)
+      {
+          uint32_t raw = dist_cm;
 
-      // 1) Too far (>= max) → process as zero
-      if (raw >= (uint32_t)rngfndInst[i]->max_distance_cm()) {
-          dist_cm = 0;
-          rngfndInst[i]->_distance_sum += 0.01f * dist_cm;
-          rngfndInst[i]->_distance_count++;
-          return;
-      }
-
-      // 2) Sensor returned zero — decide by context
-      if (raw == 0) {
-
-          // If previous value was high (e.g., > 80% of max) → likely out of range
-          if (rngfndInst[i]->prev_valid_cm > (rngfndInst[i]->max_distance_cm() * 0.8f)) {
-              dist_cm = 0;     // process as zero
+          // 1) Too far (>= max) → process as zero
+          if (raw >= (uint32_t)rngfndInst[i]->max_distance_cm()) {
+              dist_cm = 0;
               rngfndInst[i]->_distance_sum += 0.01f * dist_cm;
               rngfndInst[i]->_distance_count++;
               return;
           }
 
-          // otherwise: likely too close or noise → ignore
-          continue;
+          // 2) Sensor returned zero — decide by context
+          if (raw == 0) {
+
+              // If previous value was high (e.g., > 80% of max) → likely out of range
+              if (rngfndInst[i]->prev_valid_cm > (rngfndInst[i]->max_distance_cm() * 0.8f)) {
+                  dist_cm = 0;     // process as zero
+                  rngfndInst[i]->_distance_sum += 0.01f * dist_cm;
+                  rngfndInst[i]->_distance_count++;
+                  return;
+              }
+
+              // otherwise: likely too close or noise → ignore
+              continue;
+          }
+
+          // 3) Normal valid reading → process and update previous
+          rngfndInst[i]->_distance_sum += 0.01f * raw;
+          rngfndInst[i]->_distance_count++;
+          rngfndInst[i]->prev_valid_cm = raw;
+          return;
+      }
+      else
+      {
+          // 3) Normal valid reading → process and update previous
+          rngfndInst[i]->_distance_sum += 0.01f * dist_cm;
+          rngfndInst[i]->_distance_count++;
+          rngfndInst[i]->prev_valid_cm = dist_cm;
       }
 
-      // 3) Normal valid reading → process and update previous
-      rngfndInst[i]->_distance_sum += 0.01f * raw;
-      rngfndInst[i]->_distance_count++;
-      rngfndInst[i]->prev_valid_cm = raw;
-      return;
     }
 
     }

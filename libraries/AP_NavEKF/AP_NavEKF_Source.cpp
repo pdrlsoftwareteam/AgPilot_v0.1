@@ -42,7 +42,7 @@ const AP_Param::GroupInfo AP_NavEKF_Source::var_info[] = {
     // @Description: Position Vertical Source
     // @Values: 0:None, 1:Baro, 2:RangeFinder, 3:GPS, 4:Beacon, 6:ExternalNav
     // @User: Advanced
-    AP_GROUPINFO("1_POSZ", 3, AP_NavEKF_Source, _source_set[0].posz, (int8_t)AP_NavEKF_Source::SourceZ::BARO),
+    AP_GROUPINFO("1_POSZ", 3, AP_NavEKF_Source, _source_set[0].posz, (int8_t)AP_NavEKF_Source::SourceZ::GPS),
 
     // @Param: 1_VELZ
     // @DisplayName: Velocity Vertical Source

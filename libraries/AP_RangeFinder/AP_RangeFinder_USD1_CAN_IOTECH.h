@@ -28,7 +28,9 @@ public:
     uint32_t _distance_count;
     HAL_Semaphore *_msem;
 	uint16_t _min_dist;
-	bool sen_status = false;
+	uint32_t _last_frame_ms = 0;
+    float _last_distance;
+    bool  _have_reading;
 };
 
 
