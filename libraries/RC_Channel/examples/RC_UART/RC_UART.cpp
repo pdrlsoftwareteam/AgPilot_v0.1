@@ -85,7 +85,7 @@ void RC_UART::loop()
         }
         if (!(enable_mask & 1U<<i)) {
             if (enable_mask == 0) {
-                hal.rcout->force_safety_off();
+                hal.rcout->force_safety_off();  //off
             }
             hal.rcout->enable_ch(i);
             enable_mask |= 1U<<i;

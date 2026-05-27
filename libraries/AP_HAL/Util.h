@@ -92,7 +92,7 @@ public:
     /*
       return state of safety switch, if applicable
      */
-    virtual enum safety_state safety_switch_state(void) { return SAFETY_NONE; }
+    virtual enum safety_state safety_switch_state(void) { return SAFETY_DISARMED; }  //Rohit
 
     /*
       set HW RTC in UTC microseconds

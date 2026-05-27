@@ -188,7 +188,7 @@ void AP_IOMCU_FW::init()
     reg_status.freemem = hal.util->available_memory();
 
     if (hal.util->was_watchdog_safety_off()) {
-        hal.rcout->force_safety_off();
+        hal.rcout->force_safety_off();      //
         reg_status.flag_safety_off = true;
     }
 }

@@ -1,9 +1,9 @@
 /*
- * AP_BattMonitor_CAN_BMS.cpp
- *
- *  Created on: Aug 4, 2025
- *      Author: pdrl
- */
+* AP_BattMonitor_CAN_BMS.cpp
+*
+*  Created on: Aug 4, 2025
+*      Author: pdrl
+*/
 
 #include "AP_BattMonitor_config.h"
 #include <AP_HAL/AP_HAL.h>
@@ -56,6 +56,7 @@ TEST_CAN::TEST_CAN():CANSensor("CAN_BMS")
 void TEST_CAN::handle_frame(AP_HAL::CANFrame &frame)
 {
   int32_t raw_id = frame.id_signed();
+//  gcs().send_text(MAV_SEVERITY_INFO, "Prajwal Tayade");
   monitor->parse_frame(raw_id,frame.data);
 }
 
@@ -95,12 +96,12 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	Battery_info.SOH = ((byte[3] << 8) | byte[2]) / 10;
 	Battery_info.capacity = ((byte[6] << 16) | (byte[5] << 8) | byte[4]);
 	//	gcs().send_text(MAV_SEVERITY_INFO, "SOC: %u  SOH: %u  Capacity: %lu mAh", SOC, SOH, capacity);
-
+	gcs().send_text(MAV_SEVERITY_INFO, "SOC: %u  SOH: %u  Capacity: %lu mAh", Battery_info.SOC, Battery_info.SOH, Battery_info.capacity);
 	Battery_info.remaining_capacity = _params._pack_capacity - _state.consumed_mah;
 	if (_params._pack_capacity > 0) {
 
 	    // If remaining is greater than total, treat as invalid and skip update
-	    if (Battery_info.remaining_capacity > _params._pack_capacity) {
+	    if (Battery_info.remaining_capacity > (uint32_t)_params._pack_capacity) {
 		// Optionally log or clamp values
 		Battery_info.remaining_capacity = _params._pack_capacity;
 	    }
@@ -121,8 +122,8 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	_state.current_amps = Battery_info.batt_curr;
 	_has_current = true;
 	_state.healthy = true;
-//	gcs().send_text(MAV_SEVERITY_INFO, "batt Volt: %fV  batt curr: %fAmp  Charger Volt: %fV",batt_volt, batt_curr, batt_chr_volt);
-
+	//	gcs().send_text(MAV_SEVERITY_INFO, "batt Volt: %fV  batt curr: %fAmp  Charger Volt: %fV",batt_volt, batt_curr, batt_chr_volt);
+	gcs().send_text(MAV_SEVERITY_INFO, "batt Volt: %fV  batt curr: %fAmp  Charger Volt: %fV",Battery_info.batt_volt, Battery_info.batt_curr, Battery_info.batt_chr_volt);
       }
       break;
 
@@ -136,7 +137,7 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	Battery_info.min_cell_volt_cell_ctr = byte[5] & 0x0F;
 	//	gcs().send_text(MAV_SEVERITY_INFO, "MaxCell: %f V [Loc:%u Ctr:%u]", max_cell_volt, max_cell_volt_cell_loc, max_cell_volt_cell_ctr);
 	//	gcs().send_text(MAV_SEVERITY_INFO, "MinCell: %f V [Loc:%u Ctr:%u]", min_cell_volt, min_cell_volt_cell_loc, min_cell_volt_cell_ctr);
-//		gcs().send_text(MAV_SEVERITY_INFO, "minmaxcellvolt: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
+	//	gcs().send_text(MAV_SEVERITY_INFO, "minmaxcellvolt: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
 
       }
       break;
@@ -151,7 +152,7 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	Battery_info.min_temp_ntc_loc_ctr = byte[3] & 0x0F;
 	//	gcs().send_text(MAV_SEVERITY_INFO, "MaxT: %d°C [Cell:%u Ctr:%u]", max_temp, max_temp_ntc_loc_cell, max_temp_ntc_loc_ctr);
 	//	gcs().send_text(MAV_SEVERITY_INFO, "MinT: %d°C [Cell:%u Ctr:%u]", min_temp, min_temp_ntc_loc_cell, min_temp_ntc_loc_ctr);
-//	gcs().send_text(MAV_SEVERITY_INFO, "minmaxtemp: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
+	//	gcs().send_text(MAV_SEVERITY_INFO, "minmaxtemp: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
 
       }
       break;
@@ -177,7 +178,7 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	//	gcs().send_text(MAV_SEVERITY_INFO, "Balancing: CC1=0x%04X CC2=0x%04X CC3=0x%04X CC4=0x%04X",
 	//			balancing_status_cc1, balancing_status_cc2,
 	//			balancing_status_cc3, balancing_status_cc4);
-//	gcs().send_text(MAV_SEVERITY_INFO, "cellblnc: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
+	//	gcs().send_text(MAV_SEVERITY_INFO, "cellblnc: %X %X %X %X %X %X %X %X ",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
 
       }
       break;
@@ -203,34 +204,35 @@ void AP_BattMonitor_CAN_BMS::parse_frame(uint32_t id, uint8_t* byte) {
 	//	}
       }
       break;
-    case 0x150: // Cell voltages Frame 1 (cells 0–7)
-    case 0x151: // Cell voltages Frame 2 (cells 8–13)
-      {
-//	if(id == 0x150)
-//	  gcs().send_text(MAV_SEVERITY_INFO, "0x150: %d %d %d %d %d %d %d %d",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
-//	if(id == 0x151)
-//	  gcs().send_text(MAV_SEVERITY_INFO, "0x151: %d %d %d %d %d %d %d %d",byte[0],byte[1],byte[2],byte[3],byte[4],byte[5],byte[6],byte[7]);
+    case 0x150:
+	{
+	  _cell_index = 0;
 
-	static uint8_t cell_index = 0;
-	if (id == 0x150) {
-	    cell_index = 0; // Start new cycle for the first frame
+	  for (uint8_t i = 0; i < 8; i++) {
+		  if (byte[i] == 0) continue;  // skip zero bytes anywhere in frame
+		  if (_cell_index >= 14) break; // safety guard
+		  _state.cell_voltages.cells[_cell_index] = (uint16_t)byte[i] * 10;
+		  Battery_info.cell_voltages[_cell_index] = (uint16_t)byte[i] * 10;
+		  _cell_index++;
+	  }
 	}
-	for (uint8_t i = 0; i < 8; i++) {
-	    if (byte[i] > 0) { // Valid voltage byte
-		_state.cell_voltages.cells[cell_index] = (unsigned)byte[i] * 100;
-		Battery_info.cell_voltages[cell_index] = (unsigned)byte[i] * 100;
-		cell_index++;
-	    }
-	}
-	if (id == 0x151) {
-	    Battery_info.cell_count_series = cell_index;
-	    _has_cell_voltages = true;
-	}
-//	for (uint8_t i = 0; i < cell_count_series; i++) {
-//	    gcs().send_text(MAV_SEVERITY_INFO, "Cell[%u]: %u V", i, _state.cell_voltages.cells[i]);
-//	}
 	break;
-      }
+
+	case 0x151:
+	{
+	  for (uint8_t i = 0; i < 8; i++) {
+		  if (byte[i] == 0) continue;  // skip zero bytes
+		  if (_cell_index >= 14) break; // safety guard
+		  _state.cell_voltages.cells[_cell_index] = (uint16_t)byte[i] * 10;
+		  Battery_info.cell_voltages[_cell_index] = (uint16_t)byte[i] * 10;
+		  _cell_index++;
+	  }
+
+	  Battery_info.cell_count_series = _cell_index;
+	  _has_cell_voltages = true;
+
+	}
+	break;
 
     default:
       break;
@@ -441,4 +443,3 @@ void AP_BattMonitor_CAN_BMS::send_gcs_bms_status()
 //      }
 //    }
 }
-

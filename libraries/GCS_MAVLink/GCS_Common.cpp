@@ -3006,7 +3006,7 @@ MAV_RESULT GCS_MAVLINK::_set_mode_common(const MAV_MODE _base_mode, const uint32
         // set the safety switch position. Must be in a command by itself
         if (_custom_mode == 0) {
             // turn safety off (pwm outputs flow to the motors)
-            hal.rcout->force_safety_off();
+            hal.rcout->force_safety_off();   //
             return MAV_RESULT_ACCEPTED;
         }
         if (_custom_mode == 1) {

@@ -664,14 +664,14 @@ bool AP_Arming::battery_checks(bool report)
 
 bool AP_Arming::hardware_safety_check(bool report) 
 {
-    if (check_enabled(ARMING_CHECK_SWITCH)) {
+ //   if (check_enabled(ARMING_CHECK_SWITCH)) {        //Rohit
 
       // check if safety switch has been pushed
       if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
           check_failed(ARMING_CHECK_SWITCH, report, "Hardware safety switch");
           return false;
       }
-    }
+ //   }
 
     return true;
 }
@@ -1544,6 +1544,7 @@ bool AP_Arming::mandatory_checks(bool report)
 #endif
     ret &= rc_in_calibration_check(report);
     ret &= serial_protocol_checks(report);
+    ret &= hardware_safety_check(report);      //Safety Switch
     return ret;
 }
 
@@ -1612,11 +1613,14 @@ bool AP_Arming::arm(AP_Arming::Method method, const bool do_arming_checks)
 //returns true if disarming occurred successfully
 bool AP_Arming::disarm(const AP_Arming::Method method, bool do_disarm_checks)
 {
+
     if (!armed) { // already disarmed
         return false;
     }
     armed = false;
+
     _last_disarm_method = method;
+
 
     Log_Write_Disarm(!do_disarm_checks, method);  // Log_Write_Disarm takes "force"
 
@@ -1645,6 +1649,8 @@ bool AP_Arming::disarm(const AP_Arming::Method method, bool do_disarm_checks)
         }
     }
 #endif
+
+    hal.rcout->force_safety_on();    //Safety Switch
 
     return true;
 }
