@@ -113,6 +113,7 @@ void AP_Proximity_IOTECH::update(void)
 			const float distance_front = findDistance(lat, lon, ffx, ffy);
 			const float angle_front    = 0.0f;   // 0° = front
 			_last_update_ms = now;
+			_last_upward_update_ms = now;
 			_distance_min = prx->params[c].min_m;
 			_distance_max = prx->params[c].max_m;
 
@@ -132,6 +133,7 @@ void AP_Proximity_IOTECH::update(void)
 			const float angle_rear    = 180.0f;   // 180° = rear
 
 			_last_update_ms = now;
+			_last_upward_update_ms = now;
 			_distance_min = prx->params[c].min_m;
 			_distance_max = prx->params[c].max_m;
 
@@ -203,7 +205,7 @@ void AP_Proximity_IOTECH::new_driver()
 		const float distance_front = AP_CANDataDistribuer_IOT::get_instance()->front_dist;
 		const float angle_front    = 0.0f;   // 0° = front
 		_last_update_ms = now;
-
+		_last_upward_update_ms = now;
 		_distance_min = prx->params[c].min_m ;
 		_distance_max = prx->params[c].max_m ;
 
@@ -228,7 +230,7 @@ void AP_Proximity_IOTECH::new_driver()
 		const float distance_rear = AP_CANDataDistribuer_IOT::get_instance()->rear_dist;
 		const float angle_rear    = 180.0f;   // 0° = front
 		_last_update_ms = now;
-
+		_last_upward_update_ms = now;
 		_distance_min = prx->params[c].min_m ;
 		_distance_max = prx->params[c].max_m ;
 
