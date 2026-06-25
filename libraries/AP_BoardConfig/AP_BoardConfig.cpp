@@ -64,7 +64,7 @@
 #endif
 
 #ifndef BOARD_SAFETY_OPTION_DEFAULT
-#  define BOARD_SAFETY_OPTION_DEFAULT (BOARD_SAFETY_OPTION_BUTTON_ACTIVE_SAFETY_OFF|BOARD_SAFETY_OPTION_BUTTON_ACTIVE_SAFETY_ON)
+#  define BOARD_SAFETY_OPTION_DEFAULT (BOARD_SAFETY_OPTION_BUTTON_ACTIVE_SAFETY_OFF|BOARD_SAFETY_OPTION_BUTTON_ACTIVE_SAFETY_ON | BOARD_SAFETY_OPTION_SAFETY_ON_DISARM)    //Safety Switch Rohit
 #endif
 #ifndef BOARD_SAFETY_ENABLE
 #  define BOARD_SAFETY_ENABLE 1
@@ -360,6 +360,8 @@ void AP_BoardConfig::init()
 
     board_setup();
 
+    state.safety_enable.set(1);    //Rohit
+
     AP::rtc().set_utc_usec(hal.util->get_hw_rtc(), AP_RTC::SOURCE_HW);
 
     if (_boot_delay_ms > 0) {
@@ -372,6 +374,8 @@ void AP_BoardConfig::init()
         hal.scheduler->delay(delay_ms);
     }
     
+    hal.rcout->force_safety_on();   //Rohit
+
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS && defined(USE_POSIX)
     uint8_t slowdown = constrain_int16(_sdcard_slowdown.get(), 0, 32);
     const uint8_t max_slowdown = 8;
