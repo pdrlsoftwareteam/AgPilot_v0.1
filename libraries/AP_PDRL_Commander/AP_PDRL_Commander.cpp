@@ -526,7 +526,12 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 		strcpy((char*)flag_Status,"OBSTACLE_FLAG");
 
 		flag_Status[13] = 0x41;
+#if !APM_BUILD_TYPE(APM_BUILD_ArduPlane)
 		flag_Status[14] = AP::ac_avoid()->get_manFlag();
+#else
+		// AC_Avoid is not built for ArduPlane
+		flag_Status[14] = 0;
+#endif
 		flag_Status[15] = 0x4F;
 		flag_Status[16] = AP::ap_oapathplanner()->get_autoFlag();
 		sendCommand(0,COMMAND_SET_FLIGHT_PAYLOAD_DETAILS,COMMAND_TYPE_GET,0,17,2,flag_Status);
@@ -568,6 +573,15 @@ void AP_PDRL_COMMANDER::parseCommand(const mavlink_message_t &msg)
 	case COMMAND_GET_SDCARD_STATUS:
 	    sendSdcardStatus();
 	    break;
+
+	case COMMAND_SET_SPRAY_STATUS:
+	case COMMAND_GET_SPRAYED_AREA:
+		// spray functionality removed from this build; command acknowledged as a no-op
+		break;
+
+	case COMMAND_GET_DRONE_GPS_ID:
+		// not yet implemented; command acknowledged as a no-op
+		break;
 
 	case COMMAND_PDRL_ENUM_END:
 		break;
