@@ -45,6 +45,24 @@ void AP_BoardConfig::board_init_safety()
         while (hal.util->safety_switch_state() != AP_HAL::Util::SAFETY_ARMED && count--) {
             hal.scheduler->delay(20);
         }
+    }  
+    else {
+		hal.rcout->force_safety_on();
+		uint8_t count = 100;         // up to 2s, since IOMCU round-trip + 10Hz periodic sync needs time
+		uint8_t stable = 0;
+		while (stable < 5 && count--) {           // require 5 consecutive confirmations (~100ms apart)
+          hal.scheduler->delay(20);
+          if (hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED) {
+              stable++;
+          } else {
+              stable = 0;
+              hal.rcout->force_safety_on();     // re-issue in case the first request was queued too early
+          }
+		}
+		if (hal.util->safety_switch_state() != AP_HAL::Util::SAFETY_DISARMED) {
+			GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Safety force-ON did not confirm at boot");
+        
+        }
     }
 }
 
