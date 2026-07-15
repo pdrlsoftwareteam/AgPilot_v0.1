@@ -360,7 +360,7 @@ void AP_BoardConfig::init()
 
     board_setup();
 
-    state.safety_enable.set(1);    //Rohit
+    // state.safety_enable.set(1);    //Rohit
 
     AP::rtc().set_utc_usec(hal.util->get_hw_rtc(), AP_RTC::SOURCE_HW);
 
@@ -374,7 +374,7 @@ void AP_BoardConfig::init()
         hal.scheduler->delay(delay_ms);
     }
     
-    hal.rcout->force_safety_on();   //Rohit
+    // hal.rcout->force_safety_on();   //Rohit
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS && defined(USE_POSIX)
     uint8_t slowdown = constrain_int16(_sdcard_slowdown.get(), 0, 32);
