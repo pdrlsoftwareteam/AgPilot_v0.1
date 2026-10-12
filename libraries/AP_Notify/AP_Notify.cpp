@@ -49,8 +49,8 @@ AP_Notify *AP_Notify::_singleton;
 #define CONFIG_NOTIFY_DEVICES_MAX 6
 
 #if AP_NOTIFY_TOSHIBALED_ENABLED
-#define TOSHIBA_LED_I2C_BUS_INTERNAL    0
-#define TOSHIBA_LED_I2C_BUS_EXTERNAL    1
+// #define TOSHIBA_LED_I2C_BUS_INTERNAL    0
+// #define TOSHIBA_LED_I2C_BUS_EXTERNAL    1
 #define ALL_TOSHIBALED_I2C (Notify_LED_ToshibaLED_I2C_Internal | Notify_LED_ToshibaLED_I2C_External)
 #else
 #define ALL_TOSHIBALED_I2C 0
@@ -316,10 +316,16 @@ void AP_Notify::add_backends(void)
                 break;
 #if AP_NOTIFY_TOSHIBALED_ENABLED
             case Notify_LED_ToshibaLED_I2C_Internal:
-                ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_INTERNAL));
+                // ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_INTERNAL));
+                FOREACH_I2C_INTERNAL(b) {
+                    ADD_BACKEND(new ToshibaLED_I2C(b));
+                }
                 break;
             case Notify_LED_ToshibaLED_I2C_External:
-                ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_EXTERNAL));
+                // ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_EXTERNAL));
+                FOREACH_I2C_EXTERNAL(b) {
+                    ADD_BACKEND(new ToshibaLED_I2C(b));
+                }
                 break;
 #endif
 #if AP_NOTIFY_NCP5623_ENABLED
